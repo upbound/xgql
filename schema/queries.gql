@@ -1,0 +1,26 @@
+type Query {
+    providers(limit: Int): ProviderList!
+    configurations(limit: Int): ConfigurationList!
+    compositeResourceDefinitions(limit: Int, dangling: Boolean = false): CompositeResourceDefinitionList!
+    compositions(limit: Int, dangling: Boolean = false): CompositionList!
+}
+
+type ProviderList {
+    items: [Provider!]
+    count: Int!
+}
+
+type ConfigurationList {
+    items: [Configuration!]
+    count: Int!
+}
+
+type CompositeResourceDefinitionList {
+    items: [CompositeResourceDefinition!]
+    count: Int!
+}
+
+type CompositionList {
+    items: [Composition!]
+    count: Int!
+}

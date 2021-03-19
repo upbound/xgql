@@ -1,0 +1,67 @@
+type Provider implements KubernetesResource {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  spec: ProviderSpec!
+  status: ProviderStatus
+
+  raw: JSONObject!
+
+  events(limit: Int): EventConnection! @goField(forceResolver: true)
+  revisions(limit: Int, active: Boolean): ProviderRevisionConnection! @goField(forceResolver: true)
+}
+
+type ProviderRevisionConnection {
+  items: [ProviderRevision!]
+  count: Int!
+}
+
+type ProviderSpec {
+  package: String!
+  revisionActivationPolicy: RevisionActivationPolicy
+  revisionHistoryLimit: Int
+  packagePullPolicy: PackagePullPolicy
+  ignoreCrossplaneConstraints: Boolean
+  skipDependencyResolution: Boolean
+
+  packagePullSecrets(limit: Int): SecretConnection! @goField(forceResolver: true)
+}
+
+type ProviderStatus implements ConditionedStatus {
+  conditions: [Condition!]
+  currentRevision: String
+  currentIdentifier: String
+}
+
+type ProviderRevision implements KubernetesResource {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  spec: ProviderRevisionSpec!
+  status: ProviderRevisionStatus
+
+  raw: JSONObject!
+
+  events(limit: Int): EventConnection! @goField(forceResolver: true)
+}
+
+type ProviderRevisionSpec {
+  desiredState: PackageRevisionDesiredState!
+  package: String!
+  packagePullPolicy: PackagePullPolicy
+  revision: Int!
+  ignoreCrossplaneConstraints: Boolean
+  skipDependencyResolution: Boolean
+
+  packagePullSecrets(limit: Int): SecretConnection! @goField(forceResolver: true)
+}
+
+type ProviderRevisionStatus implements ConditionedStatus {
+  conditions: [Condition!]
+  foundDependencies: Int
+  installedDependencies: Int
+  invalidDependencies: Int
+  permissionRequests: [PolicyRule!]
+
+  objects(limit: Int): KubernetesResourceConnection! @goField(forceResolver: true)
+}

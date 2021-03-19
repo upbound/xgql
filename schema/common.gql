@@ -1,0 +1,173 @@
+scalar Time
+scalar Map
+scalar JSONObject
+
+interface KubernetesResource {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  raw: JSONObject!
+
+  events(limit: Int): EventConnection! 
+}
+
+type EventConnection {
+  items: [Event!]
+  count: Int!
+}
+
+type KubernetesResourceConnection {
+  items: [KubernetesResource!]
+  count: Int!
+}
+
+type GenericResource implements KubernetesResource {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  raw: JSONObject!
+
+  events(limit: Int): EventConnection! 
+}
+
+# Corresponds to v1 object metadata
+# https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#objectmeta-v1-meta
+type ObjectMeta {
+  name: String!
+  generateName: String
+  namespace: String
+  uid: ID!
+  resourceVersion: String!
+  generation: Int!
+  creationTime: Time!
+  deletionTime: Time
+  labels: Map
+  annotations: Map
+
+  owners(limit: Int, controller: Boolean): OwnerConnection! @goField(forceResolver: true)
+}
+
+type OwnerConnection {
+  items: [Owner!]
+  count: Int!
+}
+
+type Owner {
+  resource: KubernetesResource!
+  controller: Boolean,
+}
+
+interface ConditionedStatus {
+  conditions: [Condition!]
+}
+
+# Note that type and reason are intentionally not enums; Crossplane does not
+# limit the allowed values at the API level.
+type Condition {
+  type: String!
+  status: ConditionStatus!
+  lastTransitionTime: Time!
+  reason: String!
+  message: String
+}
+
+enum ConditionStatus {
+  Unknown
+  False
+  True
+}
+
+type PolicyRule {
+  verbs: [String!]!
+  apiGroups: [String!]
+  resources: [String!]
+  resourceNames: [String!]
+  nonResourceURLs: [String!]
+}
+
+type LabelSelector {
+  matchLabels: Map
+}
+
+type Event {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  involvedObject: KubernetesResource!
+  type: EventType
+  reason: String
+  message: String
+  source: EventSource
+  count: Int
+  firstTime: Time
+  lastTime: Time
+
+  raw: JSONObject!
+}
+
+type EventSource {
+  component: String
+}
+
+enum EventType {
+  Normal
+  Warning
+}
+
+type Secret implements KubernetesResource {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  data: JSONObject
+
+  raw: JSONObject!
+
+  events(limit: Int): EventConnection! @goField(forceResolver: true)
+}
+
+type SecretConnection {
+  items: [Secret!]
+  count: Int!
+}
+
+type CustomResourceDefinition implements KubernetesResource {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  spec: CustomResourceDefinitionSpec!
+  status: CustomResourceDefinitionStatus
+
+  raw: JSONObject!
+
+  events(limit: Int): EventConnection!
+  definedResources(limit: Int, version: String): KubernetesResourceConnection! @goField(forceResolver: true)
+}
+
+type CustomResourceDefinitionSpec {
+  group: String!
+  names: CustomResourceDefinitionNames!
+  versions: [CustomResourceDefinitionVersion!]
+}
+
+type CustomResourceDefinitionNames {
+  plural: String!
+  singular: String
+  shortNames: [String!]
+  kind: String!
+  listKind: String
+  categories: [String!]
+}
+
+type CustomResourceDefinitionVersion {
+  name: String
+  served: Boolean
+  schema: CustomResourceValidation
+}
+
+type CustomResourceValidation {
+  openAPIV3Schema: JSONObject
+}
+
+type CustomResourceDefinitionStatus implements ConditionedStatus {
+  conditions: [Condition!]
+}

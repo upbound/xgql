@@ -1,0 +1,64 @@
+type CompositeResource implements KubernetesResource {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  spec: CompositeResourceSpec!
+  status: CompositeResourceStatus!
+
+  raw: JSONObject!
+
+  events(limit: Int): EventConnection! @goField(forceResolver: true)
+}
+
+type CompositeResourceSpec {
+  composition: Composition
+  compositionSelector: LabelSelector
+  claim: CompositeResourceClaim
+  writesConnectionSecretTo: Secret
+
+  resources: ComposedResourceList
+}
+
+type ComposedResourceList {
+  items: [ComposedResource!]
+  count: Int!
+}
+
+union ComposedResource = ManagedResource | CompositeResource
+
+type CompositeResourceStatus implements ConditionedStatus {
+  conditions: [Condition!]
+  connectionDetails: CompositeResourceConnectionDetails
+}
+
+type CompositeResourceConnectionDetails {
+  lastPublishedTime: Time
+}
+
+type CompositeResourceClaim implements KubernetesResource {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  spec: CompositeResourceClaimSpec!
+  status: CompositeResourceClaimStatus!
+
+  raw: JSONObject!
+
+  events(limit: Int): EventConnection! @goField(forceResolver: true)
+}
+
+type CompositeResourceClaimSpec {
+  composition: Composition
+  compositionSelector: LabelSelector
+  resource: CompositeResource!
+  writesConnectionSecretTo: Secret
+}
+
+type CompositeResourceClaimStatus implements ConditionedStatus {
+  conditions: [Condition!]
+  connectionDetails: CompositeResourceClaimConnectionDetails
+}
+
+type CompositeResourceClaimConnectionDetails {
+  lastPublishedTime: Time
+}

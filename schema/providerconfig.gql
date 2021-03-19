@@ -1,0 +1,15 @@
+type ProviderConfig implements KubernetesResource {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  status: ProviderConfigStatus
+
+  events(limit: Int): EventConnection! @goField(forceResolver: true)
+
+  raw: JSONObject!
+}
+
+type ProviderConfigStatus implements ConditionedStatus {
+  conditions: [Condition!]
+  users: Int
+}

@@ -1,0 +1,26 @@
+type ManagedResource implements KubernetesResource {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  spec: ManagedResourceSpec!
+  status: ManagedResourceStatus!
+
+  raw: JSONObject!
+
+  events(limit: Int): EventConnection! @goField(forceResolver: true)
+}
+
+type ManagedResourceSpec {
+  writesConnectionSecretTo: Secret
+  providerConfig: ProviderConfig
+  deletionPolicy: DeletionPolicy
+}
+
+enum DeletionPolicy {
+  Delete
+  Orphan
+}
+
+type ManagedResourceStatus implements ConditionedStatus {
+  conditions: [Condition!]
+}

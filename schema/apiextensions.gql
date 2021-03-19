@@ -1,0 +1,92 @@
+type CompositeResourceDefinition implements KubernetesResource {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  spec: CompositeResourceDefinitionSpec!
+  status: CompositeResourceDefinitionStatus
+
+  raw: JSONObject!
+
+  events(limit: Int): EventConnection!
+  definedCompositeResources(limit: Int, version: String): CompositeResourceConnection! @goField(forceResolver: true)
+  definedCompositeResourceClaims(limit: Int, version: String): CompositeResourceClaimConnection! @goField(forceResolver: true)
+}
+
+type CompositeResourceConnection {
+  items: [CompositeResource!]
+  count: Int!
+}
+
+type CompositeResourceClaimConnection {
+  items: [CompositeResourceClaim!]
+  count: Int!
+}
+
+type CompositeResourceDefinitionSpec {
+  group: String!
+  names: CompositeResourceDefinitionNames!
+  claimNames: CompositeResourceDefinitionNames
+  connectionSecretKeys: [String!]
+  defaultComposition: Composition
+  enforcedComposition: Composition
+  versions: [CompositeResourceDefinitionVersion!]
+}
+
+type CompositeResourceDefinitionNames {
+  plural: String!
+  singular: String
+  shortNames: [String!]
+  kind: String!
+  listKind: String
+  categories: [String!]
+}
+
+type CompositeResourceDefinitionVersion {
+  name: String
+  referenceable: Boolean
+  served: Boolean
+  schema: CompositeResourceValidation
+}
+
+type CompositeResourceValidation {
+  openAPIV3Schema: JSONObject
+}
+
+type CompositeResourceDefinitionStatus implements ConditionedStatus {
+  conditions: [Condition!]
+  controllers: CompositeResourceDefinitionControllerStatus
+}
+
+type CompositeResourceDefinitionControllerStatus {
+  compositeResourceType: TypeReference
+  compositeResourceClaimType: TypeReference
+}
+
+type TypeReference {
+  apiVersion: String!
+  kind: String!
+}
+
+type Composition implements KubernetesResource {
+  apiVersion: String!
+  kind: String!
+  metadata: ObjectMeta!
+  spec: CompositionSpec!
+  status: CompositionStatus
+
+  raw: JSONObject!
+
+  events(limit: Int): EventConnection! @goField(forceResolver: true)
+}
+
+type CompositionSpec {
+  compositeTypeRef: TypeReference!
+  writeConnectionSecretsToNamespace: String
+
+  # TODO(negz): Model patch sets and resource templates.
+}
+
+type CompositionStatus implements ConditionedStatus {
+  conditions: [Condition!]
+}
+
