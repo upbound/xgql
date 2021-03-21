@@ -16,6 +16,13 @@ type ProviderRevisionConnection {
   count: Int!
 }
 
+# TODO(negz): Include packagePullSecrets? It seems idiomatic to resolve an array
+# of actual secrets, but we're missing the information required to do so and
+# it's not obvious whether returning them is useful. At the Kubernetes level we
+# have an array of local object references, which do not include a namespace.
+# The Secrets are presumed to be read from the namespace in which Crossplane is
+# running, which we do not know.
+
 type ProviderSpec {
   package: String!
   revisionActivationPolicy: RevisionActivationPolicy
@@ -23,8 +30,6 @@ type ProviderSpec {
   packagePullPolicy: PackagePullPolicy
   ignoreCrossplaneConstraints: Boolean
   skipDependencyResolution: Boolean
-
-  packagePullSecrets(limit: Int): SecretConnection! @goField(forceResolver: true)
 }
 
 type ProviderStatus implements ConditionedStatus {
@@ -53,7 +58,6 @@ type ProviderRevisionSpec {
   ignoreCrossplaneConstraints: Boolean
   skipDependencyResolution: Boolean
 
-  packagePullSecrets(limit: Int): SecretConnection! @goField(forceResolver: true)
 }
 
 type ProviderRevisionStatus implements ConditionedStatus {

@@ -46,9 +46,7 @@ type ResolverRoot interface {
 	Composition() CompositionResolver
 	Configuration() ConfigurationResolver
 	ConfigurationRevision() ConfigurationRevisionResolver
-	ConfigurationRevisionSpec() ConfigurationRevisionSpecResolver
 	ConfigurationRevisionStatus() ConfigurationRevisionStatusResolver
-	ConfigurationSpec() ConfigurationSpecResolver
 	CustomResourceDefinition() CustomResourceDefinitionResolver
 	Event() EventResolver
 	GenericResource() GenericResourceResolver
@@ -58,9 +56,7 @@ type ResolverRoot interface {
 	Provider() ProviderResolver
 	ProviderConfig() ProviderConfigResolver
 	ProviderRevision() ProviderRevisionResolver
-	ProviderRevisionSpec() ProviderRevisionSpecResolver
 	ProviderRevisionStatus() ProviderRevisionStatusResolver
-	ProviderSpec() ProviderSpecResolver
 	Query() QueryResolver
 	Secret() SecretResolver
 }
@@ -262,7 +258,6 @@ type ComplexityRoot struct {
 		IgnoreCrossplaneConstraints func(childComplexity int) int
 		Package                     func(childComplexity int) int
 		PackagePullPolicy           func(childComplexity int) int
-		PackagePullSecrets          func(childComplexity int, limit *int) int
 		Revision                    func(childComplexity int) int
 		SkipDependencyResolution    func(childComplexity int) int
 	}
@@ -280,7 +275,6 @@ type ComplexityRoot struct {
 		IgnoreCrossplaneConstraints func(childComplexity int) int
 		Package                     func(childComplexity int) int
 		PackagePullPolicy           func(childComplexity int) int
-		PackagePullSecrets          func(childComplexity int, limit *int) int
 		RevisionActivationPolicy    func(childComplexity int) int
 		RevisionHistoryLimit        func(childComplexity int) int
 		SkipDependencyResolution    func(childComplexity int) int
@@ -475,7 +469,6 @@ type ComplexityRoot struct {
 		IgnoreCrossplaneConstraints func(childComplexity int) int
 		Package                     func(childComplexity int) int
 		PackagePullPolicy           func(childComplexity int) int
-		PackagePullSecrets          func(childComplexity int, limit *int) int
 		Revision                    func(childComplexity int) int
 		SkipDependencyResolution    func(childComplexity int) int
 	}
@@ -493,7 +486,6 @@ type ComplexityRoot struct {
 		IgnoreCrossplaneConstraints func(childComplexity int) int
 		Package                     func(childComplexity int) int
 		PackagePullPolicy           func(childComplexity int) int
-		PackagePullSecrets          func(childComplexity int, limit *int) int
 		RevisionActivationPolicy    func(childComplexity int) int
 		RevisionHistoryLimit        func(childComplexity int) int
 		SkipDependencyResolution    func(childComplexity int) int
@@ -570,14 +562,8 @@ type ConfigurationResolver interface {
 type ConfigurationRevisionResolver interface {
 	Events(ctx context.Context, obj *model.ConfigurationRevision, limit *int) (*model.EventConnection, error)
 }
-type ConfigurationRevisionSpecResolver interface {
-	PackagePullSecrets(ctx context.Context, obj *model.ConfigurationRevisionSpec, limit *int) (*model.SecretConnection, error)
-}
 type ConfigurationRevisionStatusResolver interface {
 	Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus, limit *int) (*model.KubernetesResourceConnection, error)
-}
-type ConfigurationSpecResolver interface {
-	PackagePullSecrets(ctx context.Context, obj *model.ConfigurationSpec, limit *int) (*model.SecretConnection, error)
 }
 type CustomResourceDefinitionResolver interface {
 	DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, limit *int, version *string) (*model.KubernetesResourceConnection, error)
@@ -608,14 +594,8 @@ type ProviderConfigResolver interface {
 type ProviderRevisionResolver interface {
 	Events(ctx context.Context, obj *model.ProviderRevision, limit *int) (*model.EventConnection, error)
 }
-type ProviderRevisionSpecResolver interface {
-	PackagePullSecrets(ctx context.Context, obj *model.ProviderRevisionSpec, limit *int) (*model.SecretConnection, error)
-}
 type ProviderRevisionStatusResolver interface {
 	Objects(ctx context.Context, obj *model.ProviderRevisionStatus, limit *int) (*model.KubernetesResourceConnection, error)
-}
-type ProviderSpecResolver interface {
-	PackagePullSecrets(ctx context.Context, obj *model.ProviderSpec, limit *int) (*model.SecretConnection, error)
 }
 type QueryResolver interface {
 	Providers(ctx context.Context, limit *int) (*model.ProviderList, error)
@@ -1448,18 +1428,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ConfigurationRevisionSpec.PackagePullPolicy(childComplexity), true
 
-	case "ConfigurationRevisionSpec.packagePullSecrets":
-		if e.complexity.ConfigurationRevisionSpec.PackagePullSecrets == nil {
-			break
-		}
-
-		args, err := ec.field_ConfigurationRevisionSpec_packagePullSecrets_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.ConfigurationRevisionSpec.PackagePullSecrets(childComplexity, args["limit"].(*int)), true
-
 	case "ConfigurationRevisionSpec.revision":
 		if e.complexity.ConfigurationRevisionSpec.Revision == nil {
 			break
@@ -1541,18 +1509,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ConfigurationSpec.PackagePullPolicy(childComplexity), true
-
-	case "ConfigurationSpec.packagePullSecrets":
-		if e.complexity.ConfigurationSpec.PackagePullSecrets == nil {
-			break
-		}
-
-		args, err := ec.field_ConfigurationSpec_packagePullSecrets_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.ConfigurationSpec.PackagePullSecrets(childComplexity, args["limit"].(*int)), true
 
 	case "ConfigurationSpec.revisionActivationPolicy":
 		if e.complexity.ConfigurationSpec.RevisionActivationPolicy == nil {
@@ -2390,18 +2346,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProviderRevisionSpec.PackagePullPolicy(childComplexity), true
 
-	case "ProviderRevisionSpec.packagePullSecrets":
-		if e.complexity.ProviderRevisionSpec.PackagePullSecrets == nil {
-			break
-		}
-
-		args, err := ec.field_ProviderRevisionSpec_packagePullSecrets_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.ProviderRevisionSpec.PackagePullSecrets(childComplexity, args["limit"].(*int)), true
-
 	case "ProviderRevisionSpec.revision":
 		if e.complexity.ProviderRevisionSpec.Revision == nil {
 			break
@@ -2483,18 +2427,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProviderSpec.PackagePullPolicy(childComplexity), true
-
-	case "ProviderSpec.packagePullSecrets":
-		if e.complexity.ProviderSpec.PackagePullSecrets == nil {
-			break
-		}
-
-		args, err := ec.field_ProviderSpec_packagePullSecrets_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.ProviderSpec.PackagePullSecrets(childComplexity, args["limit"].(*int)), true
 
 	case "ProviderSpec.revisionActivationPolicy":
 		if e.complexity.ProviderSpec.RevisionActivationPolicy == nil {
@@ -3063,6 +2995,13 @@ type ConfigurationRevisionConnection {
   count: Int!
 }
 
+# TODO(negz): Include packagePullSecrets? It seems idiomatic to resolve an array
+# of actual secrets, but we're missing the information required to do so and
+# it's not obvious whether returning them is useful. At the Kubernetes level we
+# have an array of local object references, which do not include a namespace.
+# The Secrets are presumed to be read from the namespace in which Crossplane is
+# running, which we do not know.
+
 type ConfigurationSpec {
   package: String!
   revisionActivationPolicy: RevisionActivationPolicy
@@ -3070,8 +3009,6 @@ type ConfigurationSpec {
   packagePullPolicy: PackagePullPolicy
   ignoreCrossplaneConstraints: Boolean
   skipDependencyResolution: Boolean
-
-  packagePullSecrets(limit: Int): SecretConnection! @goField(forceResolver: true)
 }
 
 type ConfigurationStatus implements ConditionedStatus {
@@ -3099,8 +3036,6 @@ type ConfigurationRevisionSpec {
   revision: Int!
   ignoreCrossplaneConstraints: Boolean
   skipDependencyResolution: Boolean
-
-  packagePullSecrets(limit: Int): SecretConnection! @goField(forceResolver: true)
 }
 
 type ConfigurationRevisionStatus implements ConditionedStatus {
@@ -3184,6 +3119,13 @@ type ProviderRevisionConnection {
   count: Int!
 }
 
+# TODO(negz): Include packagePullSecrets? It seems idiomatic to resolve an array
+# of actual secrets, but we're missing the information required to do so and
+# it's not obvious whether returning them is useful. At the Kubernetes level we
+# have an array of local object references, which do not include a namespace.
+# The Secrets are presumed to be read from the namespace in which Crossplane is
+# running, which we do not know.
+
 type ProviderSpec {
   package: String!
   revisionActivationPolicy: RevisionActivationPolicy
@@ -3191,8 +3133,6 @@ type ProviderSpec {
   packagePullPolicy: PackagePullPolicy
   ignoreCrossplaneConstraints: Boolean
   skipDependencyResolution: Boolean
-
-  packagePullSecrets(limit: Int): SecretConnection! @goField(forceResolver: true)
 }
 
 type ProviderStatus implements ConditionedStatus {
@@ -3221,7 +3161,6 @@ type ProviderRevisionSpec {
   ignoreCrossplaneConstraints: Boolean
   skipDependencyResolution: Boolean
 
-  packagePullSecrets(limit: Int): SecretConnection! @goField(forceResolver: true)
 }
 
 type ProviderRevisionStatus implements ConditionedStatus {
@@ -3405,21 +3344,6 @@ func (ec *executionContext) field_Composition_events_args(ctx context.Context, r
 	return args, nil
 }
 
-func (ec *executionContext) field_ConfigurationRevisionSpec_packagePullSecrets_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_ConfigurationRevisionStatus_objects_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3436,21 +3360,6 @@ func (ec *executionContext) field_ConfigurationRevisionStatus_objects_args(ctx c
 }
 
 func (ec *executionContext) field_ConfigurationRevision_events_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_ConfigurationSpec_packagePullSecrets_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int
@@ -3612,21 +3521,6 @@ func (ec *executionContext) field_ProviderConfig_events_args(ctx context.Context
 	return args, nil
 }
 
-func (ec *executionContext) field_ProviderRevisionSpec_packagePullSecrets_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_ProviderRevisionStatus_objects_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3643,21 +3537,6 @@ func (ec *executionContext) field_ProviderRevisionStatus_objects_args(ctx contex
 }
 
 func (ec *executionContext) field_ProviderRevision_events_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_ProviderSpec_packagePullSecrets_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int
@@ -7630,48 +7509,6 @@ func (ec *executionContext) _ConfigurationRevisionSpec_skipDependencyResolution(
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ConfigurationRevisionSpec_packagePullSecrets(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevisionSpec) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "ConfigurationRevisionSpec",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_ConfigurationRevisionSpec_packagePullSecrets_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ConfigurationRevisionSpec().PackagePullSecrets(rctx, obj, args["limit"].(*int))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.SecretConnection)
-	fc.Result = res
-	return ec.marshalNSecretConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretConnection(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _ConfigurationRevisionStatus_conditions(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevisionStatus) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8067,48 +7904,6 @@ func (ec *executionContext) _ConfigurationSpec_skipDependencyResolution(ctx cont
 	res := resTmp.(*bool)
 	fc.Result = res
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _ConfigurationSpec_packagePullSecrets(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationSpec) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "ConfigurationSpec",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_ConfigurationSpec_packagePullSecrets_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ConfigurationSpec().PackagePullSecrets(rctx, obj, args["limit"].(*int))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.SecretConnection)
-	fc.Result = res
-	return ec.marshalNSecretConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationStatus_conditions(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationStatus) (ret graphql.Marshaler) {
@@ -11944,48 +11739,6 @@ func (ec *executionContext) _ProviderRevisionSpec_skipDependencyResolution(ctx c
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProviderRevisionSpec_packagePullSecrets(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevisionSpec) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "ProviderRevisionSpec",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_ProviderRevisionSpec_packagePullSecrets_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ProviderRevisionSpec().PackagePullSecrets(rctx, obj, args["limit"].(*int))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.SecretConnection)
-	fc.Result = res
-	return ec.marshalNSecretConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretConnection(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _ProviderRevisionStatus_conditions(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevisionStatus) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12381,48 +12134,6 @@ func (ec *executionContext) _ProviderSpec_skipDependencyResolution(ctx context.C
 	res := resTmp.(*bool)
 	fc.Result = res
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _ProviderSpec_packagePullSecrets(ctx context.Context, field graphql.CollectedField, obj *model.ProviderSpec) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "ProviderSpec",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_ProviderSpec_packagePullSecrets_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ProviderSpec().PackagePullSecrets(rctx, obj, args["limit"].(*int))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.SecretConnection)
-	fc.Result = res
-	return ec.marshalNSecretConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderStatus_conditions(ctx context.Context, field graphql.CollectedField, obj *model.ProviderStatus) (ret graphql.Marshaler) {
@@ -15589,38 +15300,24 @@ func (ec *executionContext) _ConfigurationRevisionSpec(ctx context.Context, sel 
 		case "desiredState":
 			out.Values[i] = ec._ConfigurationRevisionSpec_desiredState(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "package":
 			out.Values[i] = ec._ConfigurationRevisionSpec_package(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "packagePullPolicy":
 			out.Values[i] = ec._ConfigurationRevisionSpec_packagePullPolicy(ctx, field, obj)
 		case "revision":
 			out.Values[i] = ec._ConfigurationRevisionSpec_revision(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "ignoreCrossplaneConstraints":
 			out.Values[i] = ec._ConfigurationRevisionSpec_ignoreCrossplaneConstraints(ctx, field, obj)
 		case "skipDependencyResolution":
 			out.Values[i] = ec._ConfigurationRevisionSpec_skipDependencyResolution(ctx, field, obj)
-		case "packagePullSecrets":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ConfigurationRevisionSpec_packagePullSecrets(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15692,7 +15389,7 @@ func (ec *executionContext) _ConfigurationSpec(ctx context.Context, sel ast.Sele
 		case "package":
 			out.Values[i] = ec._ConfigurationSpec_package(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "revisionActivationPolicy":
 			out.Values[i] = ec._ConfigurationSpec_revisionActivationPolicy(ctx, field, obj)
@@ -15704,20 +15401,6 @@ func (ec *executionContext) _ConfigurationSpec(ctx context.Context, sel ast.Sele
 			out.Values[i] = ec._ConfigurationSpec_ignoreCrossplaneConstraints(ctx, field, obj)
 		case "skipDependencyResolution":
 			out.Values[i] = ec._ConfigurationSpec_skipDependencyResolution(ctx, field, obj)
-		case "packagePullSecrets":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ConfigurationSpec_packagePullSecrets(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16803,38 +16486,24 @@ func (ec *executionContext) _ProviderRevisionSpec(ctx context.Context, sel ast.S
 		case "desiredState":
 			out.Values[i] = ec._ProviderRevisionSpec_desiredState(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "package":
 			out.Values[i] = ec._ProviderRevisionSpec_package(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "packagePullPolicy":
 			out.Values[i] = ec._ProviderRevisionSpec_packagePullPolicy(ctx, field, obj)
 		case "revision":
 			out.Values[i] = ec._ProviderRevisionSpec_revision(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "ignoreCrossplaneConstraints":
 			out.Values[i] = ec._ProviderRevisionSpec_ignoreCrossplaneConstraints(ctx, field, obj)
 		case "skipDependencyResolution":
 			out.Values[i] = ec._ProviderRevisionSpec_skipDependencyResolution(ctx, field, obj)
-		case "packagePullSecrets":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ProviderRevisionSpec_packagePullSecrets(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16906,7 +16575,7 @@ func (ec *executionContext) _ProviderSpec(ctx context.Context, sel ast.Selection
 		case "package":
 			out.Values[i] = ec._ProviderSpec_package(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "revisionActivationPolicy":
 			out.Values[i] = ec._ProviderSpec_revisionActivationPolicy(ctx, field, obj)
@@ -16918,20 +16587,6 @@ func (ec *executionContext) _ProviderSpec(ctx context.Context, sel ast.Selection
 			out.Values[i] = ec._ProviderSpec_ignoreCrossplaneConstraints(ctx, field, obj)
 		case "skipDependencyResolution":
 			out.Values[i] = ec._ProviderSpec_skipDependencyResolution(ctx, field, obj)
-		case "packagePullSecrets":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ProviderSpec_packagePullSecrets(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -17903,20 +17558,6 @@ func (ec *executionContext) marshalNProviderSpec2ᚖgithubᚗcomᚋnegzᚋxgql�
 
 func (ec *executionContext) marshalNSecret2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx context.Context, sel ast.SelectionSet, v model.Secret) graphql.Marshaler {
 	return ec._Secret(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNSecretConnection2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretConnection(ctx context.Context, sel ast.SelectionSet, v model.SecretConnection) graphql.Marshaler {
-	return ec._SecretConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNSecretConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretConnection(ctx context.Context, sel ast.SelectionSet, v *model.SecretConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._SecretConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

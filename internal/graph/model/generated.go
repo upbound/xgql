@@ -237,7 +237,6 @@ type ConfigurationRevisionSpec struct {
 	Revision                    int                         `json:"revision"`
 	IgnoreCrossplaneConstraints *bool                       `json:"ignoreCrossplaneConstraints"`
 	SkipDependencyResolution    *bool                       `json:"skipDependencyResolution"`
-	PackagePullSecrets          *SecretConnection           `json:"packagePullSecrets"`
 }
 
 type ConfigurationRevisionStatus struct {
@@ -258,7 +257,6 @@ type ConfigurationSpec struct {
 	PackagePullPolicy           *PackagePullPolicy        `json:"packagePullPolicy"`
 	IgnoreCrossplaneConstraints *bool                     `json:"ignoreCrossplaneConstraints"`
 	SkipDependencyResolution    *bool                     `json:"skipDependencyResolution"`
-	PackagePullSecrets          *SecretConnection         `json:"packagePullSecrets"`
 }
 
 type ConfigurationStatus struct {

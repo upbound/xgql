@@ -81,20 +81,9 @@ func (r *Root) Configuration() generated.ConfigurationResolver {
 	return nil
 }
 
-// ConfigurationSpec resolves properties of the ConfigurationSpec GraphQL type.
-func (r *Root) ConfigurationSpec() generated.ConfigurationSpecResolver {
-	return nil
-}
-
 // ConfigurationRevision resolves properties of the ConfigurationRevision
 // GraphQL type.
 func (r *Root) ConfigurationRevision() generated.ConfigurationRevisionResolver {
-	return nil
-}
-
-// ConfigurationRevisionSpec resolves properties of the
-// ConfigurationRevisionSpec GraphQL type.
-func (r *Root) ConfigurationRevisionSpec() generated.ConfigurationRevisionSpecResolver {
 	return nil
 }
 
@@ -137,20 +126,9 @@ func (r *Root) Provider() generated.ProviderResolver {
 	return &provider{clients: r.clients}
 }
 
-// ProviderSpec resolves properties of the ProviderSpec GraphQL type.
-func (r *Root) ProviderSpec() generated.ProviderSpecResolver {
-	return &providerSpec{clients: r.clients}
-}
-
 // ProviderRevision resolves properties of the ProviderRevision GraphQL type.
 func (r *Root) ProviderRevision() generated.ProviderRevisionResolver {
 	return &providerRevision{clients: r.clients}
-}
-
-// ProviderRevisionSpec resolves properties of the ProviderRevisionSpec GraphQL
-// type.
-func (r *Root) ProviderRevisionSpec() generated.ProviderRevisionSpecResolver {
-	return &providerRevisionSpec{clients: r.clients}
 }
 
 // ProviderRevisionStatus resolves properties of the ProviderRevisionStatus

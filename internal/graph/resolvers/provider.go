@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/pointer"
 
@@ -45,7 +45,7 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, limit *in
 		// We're not the controller reference of this ProviderRevision; it's not
 		// one of ours.
 		// https://github.com/kubernetes/community/blob/0331e/contributors/design-proposals/api-machinery/controller-ref.md
-		if c := v1.GetControllerOf(&pr); c == nil || c.UID != types.UID(obj.Metadata.UID) {
+		if c := metav1.GetControllerOf(&pr); c == nil || c.UID != types.UID(obj.Metadata.UID) {
 			continue
 		}
 
@@ -88,14 +88,6 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, limit *in
 	return out, nil
 }
 
-type providerSpec struct {
-	clients ClientCache
-}
-
-func (r *providerSpec) PackagePullSecrets(ctx context.Context, obj *model.ProviderSpec, limit *int) (*model.SecretConnection, error) {
-	return nil, nil
-}
-
 type providerRevision struct {
 	clients ClientCache
 }
@@ -105,14 +97,6 @@ func (r *providerRevision) Events(ctx context.Context, obj *model.ProviderRevisi
 }
 
 func (r *providerRevision) Objects(ctx context.Context, obj *model.ProviderRevision, limit *int) (*model.KubernetesResourceConnection, error) {
-	return nil, nil
-}
-
-type providerRevisionSpec struct {
-	clients ClientCache
-}
-
-func (r *providerRevisionSpec) PackagePullSecrets(ctx context.Context, obj *model.ProviderRevisionSpec, limit *int) (*model.SecretConnection, error) {
 	return nil, nil
 }
 
