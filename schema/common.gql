@@ -27,7 +27,7 @@ type GenericResource implements KubernetesResource {
   metadata: ObjectMeta!
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! 
+  events(limit: Int): EventConnection! @goField(forceResolver: true)
 }
 
 # Corresponds to v1 object metadata
@@ -93,7 +93,7 @@ type Event {
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!
-  involvedObject: KubernetesResource!
+  involvedObject: KubernetesResource! @goField(forceResolver: true)
   type: EventType
   reason: String
   message: String

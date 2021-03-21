@@ -7,7 +7,7 @@ type CompositeResourceDefinition implements KubernetesResource {
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection!
+  events(limit: Int): EventConnection! @goField(forceResolver: true)
   definedCompositeResources(limit: Int, version: String): CompositeResourceConnection! @goField(forceResolver: true)
   definedCompositeResourceClaims(limit: Int, version: String): CompositeResourceClaimConnection! @goField(forceResolver: true)
 }
@@ -27,8 +27,8 @@ type CompositeResourceDefinitionSpec {
   names: CompositeResourceDefinitionNames!
   claimNames: CompositeResourceDefinitionNames
   connectionSecretKeys: [String!]
-  defaultComposition: Composition
-  enforcedComposition: Composition
+  defaultComposition: Composition @goField(forceResolver: true)
+  enforcedComposition: Composition @goField(forceResolver: true)
   versions: [CompositeResourceDefinitionVersion!]
 }
 

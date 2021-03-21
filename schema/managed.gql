@@ -11,8 +11,8 @@ type ManagedResource implements KubernetesResource {
 }
 
 type ManagedResourceSpec {
-  writesConnectionSecretTo: Secret
-  providerConfig: ProviderConfig
+  writesConnectionSecretTo: Secret @goField(forceResolver: true)
+  providerConfig: ProviderConfig @goField(forceResolver: true)
   deletionPolicy: DeletionPolicy
 }
 

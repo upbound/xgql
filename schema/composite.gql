@@ -11,12 +11,12 @@ type CompositeResource implements KubernetesResource {
 }
 
 type CompositeResourceSpec {
-  composition: Composition
+  composition: Composition @goField(forceResolver: true)
   compositionSelector: LabelSelector
-  claim: CompositeResourceClaim
-  writesConnectionSecretTo: Secret
+  claim: CompositeResourceClaim @goField(forceResolver: true)
+  writesConnectionSecretTo: Secret @goField(forceResolver: true)
 
-  resources: ComposedResourceList
+  resources(limit: Int): ComposedResourceList @goField(forceResolver: true)
 }
 
 type ComposedResourceList {
@@ -24,6 +24,9 @@ type ComposedResourceList {
   count: Int!
 }
 
+# TODO(negz): Do we need to support GenericResource here, just in case? We only
+# support managed an composite resources officially, but in practice some folks
+# use arbitrary resources.
 union ComposedResource = ManagedResource | CompositeResource
 
 type CompositeResourceStatus implements ConditionedStatus {
@@ -48,10 +51,10 @@ type CompositeResourceClaim implements KubernetesResource {
 }
 
 type CompositeResourceClaimSpec {
-  composition: Composition
+  composition: Composition @goField(forceResolver: true)
   compositionSelector: LabelSelector
-  resource: CompositeResource!
-  writesConnectionSecretTo: Secret
+  resource: CompositeResource! @goField(forceResolver: true)
+  writesConnectionSecretTo: Secret @goField(forceResolver: true)
 }
 
 type CompositeResourceClaimStatus implements ConditionedStatus {

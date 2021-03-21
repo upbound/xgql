@@ -47,9 +47,27 @@ func (r *Root) CompositeResourceClaim() generated.CompositeResourceClaimResolver
 	return nil
 }
 
+// CompositeResourceClaimSpec resolves properties of the CompositeResourceClaimSpec
+// GraphQL type.
+func (r *Root) CompositeResourceClaimSpec() generated.CompositeResourceClaimSpecResolver {
+	return nil
+}
+
 // CompositeResourceDefinition resolves properties of the
 // CompositeResourceDefinition GraphQL type.
 func (r *Root) CompositeResourceDefinition() generated.CompositeResourceDefinitionResolver {
+	return nil
+}
+
+// CompositeResourceDefinitionSpec resolves properties of the
+// CompositeResourceDefinitionSpec GraphQL type.
+func (r *Root) CompositeResourceDefinitionSpec() generated.CompositeResourceDefinitionSpecResolver {
+	return nil
+}
+
+// CompositeResourceSpec resolves properties of the CompositeResourceSpec
+// GraphQL type.
+func (r *Root) CompositeResourceSpec() generated.CompositeResourceSpecResolver {
 	return nil
 }
 
@@ -92,9 +110,25 @@ func (r *Root) CustomResourceDefinition() generated.CustomResourceDefinitionReso
 	return nil
 }
 
+// Event resolves properties of the Event GraphQL type.
+func (r *Root) Event() generated.EventResolver {
+	return nil
+}
+
+// GenericResource resolves properties of the GenericResource GraphQL type.
+func (r *Root) GenericResource() generated.GenericResourceResolver {
+	return nil
+}
+
 // ManagedResource resolves properties of the CustomResourceDefinition GraphQL
 // type.
 func (r *Root) ManagedResource() generated.ManagedResourceResolver {
+	return nil
+}
+
+// ManagedResourceSpec resolves properties of the CustomResourceDefinition GraphQL
+// type.
+func (r *Root) ManagedResourceSpec() generated.ManagedResourceSpecResolver {
 	return nil
 }
 

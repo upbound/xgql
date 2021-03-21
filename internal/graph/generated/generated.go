@@ -39,7 +39,10 @@ type Config struct {
 type ResolverRoot interface {
 	CompositeResource() CompositeResourceResolver
 	CompositeResourceClaim() CompositeResourceClaimResolver
+	CompositeResourceClaimSpec() CompositeResourceClaimSpecResolver
 	CompositeResourceDefinition() CompositeResourceDefinitionResolver
+	CompositeResourceDefinitionSpec() CompositeResourceDefinitionSpecResolver
+	CompositeResourceSpec() CompositeResourceSpecResolver
 	Composition() CompositionResolver
 	Configuration() ConfigurationResolver
 	ConfigurationRevision() ConfigurationRevisionResolver
@@ -47,7 +50,10 @@ type ResolverRoot interface {
 	ConfigurationRevisionStatus() ConfigurationRevisionStatusResolver
 	ConfigurationSpec() ConfigurationSpecResolver
 	CustomResourceDefinition() CustomResourceDefinitionResolver
+	Event() EventResolver
+	GenericResource() GenericResourceResolver
 	ManagedResource() ManagedResourceResolver
+	ManagedResourceSpec() ManagedResourceSpecResolver
 	ObjectMeta() ObjectMetaResolver
 	Provider() ProviderResolver
 	ProviderConfig() ProviderConfigResolver
@@ -175,7 +181,7 @@ type ComplexityRoot struct {
 		Claim                    func(childComplexity int) int
 		Composition              func(childComplexity int) int
 		CompositionSelector      func(childComplexity int) int
-		Resources                func(childComplexity int) int
+		Resources                func(childComplexity int, limit *int) int
 		WritesConnectionSecretTo func(childComplexity int) int
 	}
 
@@ -532,9 +538,27 @@ type CompositeResourceResolver interface {
 type CompositeResourceClaimResolver interface {
 	Events(ctx context.Context, obj *model.CompositeResourceClaim, limit *int) (*model.EventConnection, error)
 }
+type CompositeResourceClaimSpecResolver interface {
+	Composition(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.Composition, error)
+
+	Resource(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.CompositeResource, error)
+	WritesConnectionSecretTo(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.Secret, error)
+}
 type CompositeResourceDefinitionResolver interface {
+	Events(ctx context.Context, obj *model.CompositeResourceDefinition, limit *int) (*model.EventConnection, error)
 	DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, limit *int, version *string) (*model.CompositeResourceConnection, error)
 	DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, limit *int, version *string) (*model.CompositeResourceClaimConnection, error)
+}
+type CompositeResourceDefinitionSpecResolver interface {
+	DefaultComposition(ctx context.Context, obj *model.CompositeResourceDefinitionSpec) (*model.Composition, error)
+	EnforcedComposition(ctx context.Context, obj *model.CompositeResourceDefinitionSpec) (*model.Composition, error)
+}
+type CompositeResourceSpecResolver interface {
+	Composition(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Composition, error)
+
+	Claim(ctx context.Context, obj *model.CompositeResourceSpec) (*model.CompositeResourceClaim, error)
+	WritesConnectionSecretTo(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error)
+	Resources(ctx context.Context, obj *model.CompositeResourceSpec, limit *int) (*model.ComposedResourceList, error)
 }
 type CompositionResolver interface {
 	Events(ctx context.Context, obj *model.Composition, limit *int) (*model.EventConnection, error)
@@ -558,8 +582,18 @@ type ConfigurationSpecResolver interface {
 type CustomResourceDefinitionResolver interface {
 	DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, limit *int, version *string) (*model.KubernetesResourceConnection, error)
 }
+type EventResolver interface {
+	InvolvedObject(ctx context.Context, obj *model.Event) (model.KubernetesResource, error)
+}
+type GenericResourceResolver interface {
+	Events(ctx context.Context, obj *model.GenericResource, limit *int) (*model.EventConnection, error)
+}
 type ManagedResourceResolver interface {
 	Events(ctx context.Context, obj *model.ManagedResource, limit *int) (*model.EventConnection, error)
+}
+type ManagedResourceSpecResolver interface {
+	WritesConnectionSecretTo(ctx context.Context, obj *model.ManagedResourceSpec) (*model.Secret, error)
+	ProviderConfig(ctx context.Context, obj *model.ManagedResourceSpec) (*model.ProviderConfig, error)
 }
 type ObjectMetaResolver interface {
 	Owners(ctx context.Context, obj *model.ObjectMeta, limit *int, controller *bool) (*model.OwnerConnection, error)
@@ -1079,7 +1113,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.CompositeResourceSpec.Resources(childComplexity), true
+		args, err := ec.field_CompositeResourceSpec_resources_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.CompositeResourceSpec.Resources(childComplexity, args["limit"].(*int)), true
 
 	case "CompositeResourceSpec.writesConnectionSecretTo":
 		if e.complexity.CompositeResourceSpec.WritesConnectionSecretTo == nil {
@@ -2681,7 +2720,7 @@ var sources = []*ast.Source{
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection!
+  events(limit: Int): EventConnection! @goField(forceResolver: true)
   definedCompositeResources(limit: Int, version: String): CompositeResourceConnection! @goField(forceResolver: true)
   definedCompositeResourceClaims(limit: Int, version: String): CompositeResourceClaimConnection! @goField(forceResolver: true)
 }
@@ -2701,8 +2740,8 @@ type CompositeResourceDefinitionSpec {
   names: CompositeResourceDefinitionNames!
   claimNames: CompositeResourceDefinitionNames
   connectionSecretKeys: [String!]
-  defaultComposition: Composition
-  enforcedComposition: Composition
+  defaultComposition: Composition @goField(forceResolver: true)
+  enforcedComposition: Composition @goField(forceResolver: true)
   versions: [CompositeResourceDefinitionVersion!]
 }
 
@@ -2794,7 +2833,7 @@ type GenericResource implements KubernetesResource {
   metadata: ObjectMeta!
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! 
+  events(limit: Int): EventConnection! @goField(forceResolver: true)
 }
 
 # Corresponds to v1 object metadata
@@ -2860,7 +2899,7 @@ type Event {
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!
-  involvedObject: KubernetesResource!
+  involvedObject: KubernetesResource! @goField(forceResolver: true)
   type: EventType
   reason: String
   message: String
@@ -2951,12 +2990,12 @@ type CustomResourceDefinitionStatus implements ConditionedStatus {
 }
 
 type CompositeResourceSpec {
-  composition: Composition
+  composition: Composition @goField(forceResolver: true)
   compositionSelector: LabelSelector
-  claim: CompositeResourceClaim
-  writesConnectionSecretTo: Secret
+  claim: CompositeResourceClaim @goField(forceResolver: true)
+  writesConnectionSecretTo: Secret @goField(forceResolver: true)
 
-  resources: ComposedResourceList
+  resources(limit: Int): ComposedResourceList @goField(forceResolver: true)
 }
 
 type ComposedResourceList {
@@ -2964,6 +3003,9 @@ type ComposedResourceList {
   count: Int!
 }
 
+# TODO(negz): Do we need to support GenericResource here, just in case? We only
+# support managed an composite resources officially, but in practice some folks
+# use arbitrary resources.
 union ComposedResource = ManagedResource | CompositeResource
 
 type CompositeResourceStatus implements ConditionedStatus {
@@ -2988,10 +3030,10 @@ type CompositeResourceClaim implements KubernetesResource {
 }
 
 type CompositeResourceClaimSpec {
-  composition: Composition
+  composition: Composition @goField(forceResolver: true)
   compositionSelector: LabelSelector
-  resource: CompositeResource!
-  writesConnectionSecretTo: Secret
+  resource: CompositeResource! @goField(forceResolver: true)
+  writesConnectionSecretTo: Secret @goField(forceResolver: true)
 }
 
 type CompositeResourceClaimStatus implements ConditionedStatus {
@@ -3093,8 +3135,8 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
 }
 
 type ManagedResourceSpec {
-  writesConnectionSecretTo: Secret
-  providerConfig: ProviderConfig
+  writesConnectionSecretTo: Secret @goField(forceResolver: true)
+  providerConfig: ProviderConfig @goField(forceResolver: true)
   deletionPolicy: DeletionPolicy
 }
 
@@ -3304,6 +3346,21 @@ func (ec *executionContext) field_CompositeResourceDefinition_definedCompositeRe
 }
 
 func (ec *executionContext) field_CompositeResourceDefinition_events_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_CompositeResourceSpec_resources_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int
@@ -4481,14 +4538,14 @@ func (ec *executionContext) _CompositeResourceClaimSpec_composition(ctx context.
 		Object:     "CompositeResourceClaimSpec",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Composition, nil
+		return ec.resolvers.CompositeResourceClaimSpec().Composition(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4545,14 +4602,14 @@ func (ec *executionContext) _CompositeResourceClaimSpec_resource(ctx context.Con
 		Object:     "CompositeResourceClaimSpec",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Resource, nil
+		return ec.resolvers.CompositeResourceClaimSpec().Resource(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4580,14 +4637,14 @@ func (ec *executionContext) _CompositeResourceClaimSpec_writesConnectionSecretTo
 		Object:     "CompositeResourceClaimSpec",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.WritesConnectionSecretTo, nil
+		return ec.resolvers.CompositeResourceClaimSpec().WritesConnectionSecretTo(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4982,8 +5039,8 @@ func (ec *executionContext) _CompositeResourceDefinition_events(ctx context.Cont
 		Object:     "CompositeResourceDefinition",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
@@ -4996,7 +5053,7 @@ func (ec *executionContext) _CompositeResourceDefinition_events(ctx context.Cont
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Events, nil
+		return ec.resolvers.CompositeResourceDefinition().Events(rctx, obj, args["limit"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5571,14 +5628,14 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec_defaultComposition(
 		Object:     "CompositeResourceDefinitionSpec",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.DefaultComposition, nil
+		return ec.resolvers.CompositeResourceDefinitionSpec().DefaultComposition(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5603,14 +5660,14 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec_enforcedComposition
 		Object:     "CompositeResourceDefinitionSpec",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.EnforcedComposition, nil
+		return ec.resolvers.CompositeResourceDefinitionSpec().EnforcedComposition(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5859,14 +5916,14 @@ func (ec *executionContext) _CompositeResourceSpec_composition(ctx context.Conte
 		Object:     "CompositeResourceSpec",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Composition, nil
+		return ec.resolvers.CompositeResourceSpec().Composition(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5923,14 +5980,14 @@ func (ec *executionContext) _CompositeResourceSpec_claim(ctx context.Context, fi
 		Object:     "CompositeResourceSpec",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Claim, nil
+		return ec.resolvers.CompositeResourceSpec().Claim(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5955,14 +6012,14 @@ func (ec *executionContext) _CompositeResourceSpec_writesConnectionSecretTo(ctx 
 		Object:     "CompositeResourceSpec",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.WritesConnectionSecretTo, nil
+		return ec.resolvers.CompositeResourceSpec().WritesConnectionSecretTo(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5987,14 +6044,21 @@ func (ec *executionContext) _CompositeResourceSpec_resources(ctx context.Context
 		Object:     "CompositeResourceSpec",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_CompositeResourceSpec_resources_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Resources, nil
+		return ec.resolvers.CompositeResourceSpec().Resources(rctx, obj, args["limit"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9010,14 +9074,14 @@ func (ec *executionContext) _Event_involvedObject(ctx context.Context, field gra
 		Object:     "Event",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.InvolvedObject, nil
+		return ec.resolvers.Event().InvolvedObject(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9543,8 +9607,8 @@ func (ec *executionContext) _GenericResource_events(ctx context.Context, field g
 		Object:     "GenericResource",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
@@ -9557,7 +9621,7 @@ func (ec *executionContext) _GenericResource_events(ctx context.Context, field g
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Events, nil
+		return ec.resolvers.GenericResource().Events(rctx, obj, args["limit"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9936,14 +10000,14 @@ func (ec *executionContext) _ManagedResourceSpec_writesConnectionSecretTo(ctx co
 		Object:     "ManagedResourceSpec",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.WritesConnectionSecretTo, nil
+		return ec.resolvers.ManagedResourceSpec().WritesConnectionSecretTo(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9968,14 +10032,14 @@ func (ec *executionContext) _ManagedResourceSpec_providerConfig(ctx context.Cont
 		Object:     "ManagedResourceSpec",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ProviderConfig, nil
+		return ec.resolvers.ManagedResourceSpec().ProviderConfig(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14577,16 +14641,43 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceClaimSpec")
 		case "composition":
-			out.Values[i] = ec._CompositeResourceClaimSpec_composition(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceClaimSpec_composition(ctx, field, obj)
+				return res
+			})
 		case "compositionSelector":
 			out.Values[i] = ec._CompositeResourceClaimSpec_compositionSelector(ctx, field, obj)
 		case "resource":
-			out.Values[i] = ec._CompositeResourceClaimSpec_resource(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceClaimSpec_resource(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "writesConnectionSecretTo":
-			out.Values[i] = ec._CompositeResourceClaimSpec_writesConnectionSecretTo(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceClaimSpec_writesConnectionSecretTo(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -14716,10 +14807,19 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
-			out.Values[i] = ec._CompositeResourceDefinition_events(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceDefinition_events(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "definedCompositeResources":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -14868,21 +14968,39 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec(ctx context.Context
 		case "group":
 			out.Values[i] = ec._CompositeResourceDefinitionSpec_group(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "names":
 			out.Values[i] = ec._CompositeResourceDefinitionSpec_names(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "claimNames":
 			out.Values[i] = ec._CompositeResourceDefinitionSpec_claimNames(ctx, field, obj)
 		case "connectionSecretKeys":
 			out.Values[i] = ec._CompositeResourceDefinitionSpec_connectionSecretKeys(ctx, field, obj)
 		case "defaultComposition":
-			out.Values[i] = ec._CompositeResourceDefinitionSpec_defaultComposition(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceDefinitionSpec_defaultComposition(ctx, field, obj)
+				return res
+			})
 		case "enforcedComposition":
-			out.Values[i] = ec._CompositeResourceDefinitionSpec_enforcedComposition(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceDefinitionSpec_enforcedComposition(ctx, field, obj)
+				return res
+			})
 		case "versions":
 			out.Values[i] = ec._CompositeResourceDefinitionSpec_versions(ctx, field, obj)
 		default:
@@ -14964,15 +15082,51 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceSpec")
 		case "composition":
-			out.Values[i] = ec._CompositeResourceSpec_composition(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceSpec_composition(ctx, field, obj)
+				return res
+			})
 		case "compositionSelector":
 			out.Values[i] = ec._CompositeResourceSpec_compositionSelector(ctx, field, obj)
 		case "claim":
-			out.Values[i] = ec._CompositeResourceSpec_claim(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceSpec_claim(ctx, field, obj)
+				return res
+			})
 		case "writesConnectionSecretTo":
-			out.Values[i] = ec._CompositeResourceSpec_writesConnectionSecretTo(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceSpec_writesConnectionSecretTo(ctx, field, obj)
+				return res
+			})
 		case "resources":
-			out.Values[i] = ec._CompositeResourceSpec_resources(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceSpec_resources(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15835,23 +15989,32 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 		case "apiVersion":
 			out.Values[i] = ec._Event_apiVersion(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
 			out.Values[i] = ec._Event_kind(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
 			out.Values[i] = ec._Event_metadata(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "involvedObject":
-			out.Values[i] = ec._Event_involvedObject(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Event_involvedObject(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "type":
 			out.Values[i] = ec._Event_type(ctx, field, obj)
 		case "reason":
@@ -15869,7 +16032,7 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 		case "raw":
 			out.Values[i] = ec._Event_raw(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -15949,28 +16112,37 @@ func (ec *executionContext) _GenericResource(ctx context.Context, sel ast.Select
 		case "apiVersion":
 			out.Values[i] = ec._GenericResource_apiVersion(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
 			out.Values[i] = ec._GenericResource_kind(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
 			out.Values[i] = ec._GenericResource_metadata(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "raw":
 			out.Values[i] = ec._GenericResource_raw(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
-			out.Values[i] = ec._GenericResource_events(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._GenericResource_events(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16113,9 +16285,27 @@ func (ec *executionContext) _ManagedResourceSpec(ctx context.Context, sel ast.Se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ManagedResourceSpec")
 		case "writesConnectionSecretTo":
-			out.Values[i] = ec._ManagedResourceSpec_writesConnectionSecretTo(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ManagedResourceSpec_writesConnectionSecretTo(ctx, field, obj)
+				return res
+			})
 		case "providerConfig":
-			out.Values[i] = ec._ManagedResourceSpec_providerConfig(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ManagedResourceSpec_providerConfig(ctx, field, obj)
+				return res
+			})
 		case "deletionPolicy":
 			out.Values[i] = ec._ManagedResourceSpec_deletionPolicy(ctx, field, obj)
 		default:
