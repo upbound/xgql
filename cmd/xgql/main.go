@@ -32,7 +32,7 @@ import (
 
 func main() {
 	var (
-		app    = kingpin.New(filepath.Base(os.Args[0]), "AWS support for Crossplane.").DefaultEnvars()
+		app    = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
 		debug  = app.Flag("debug", "Enable debug logging").Short('d').Bool()
 		listen = app.Flag("listen", "Address to listen at").Default(":8080").String()
 	)
