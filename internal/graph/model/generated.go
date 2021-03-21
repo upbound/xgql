@@ -302,8 +302,8 @@ type CustomResourceDefinitionStatus struct {
 func (CustomResourceDefinitionStatus) IsConditionedStatus() {}
 
 type CustomResourceDefinitionVersion struct {
-	Name   *string                   `json:"name"`
-	Served *bool                     `json:"served"`
+	Name   string                    `json:"name"`
+	Served bool                      `json:"served"`
 	Schema *CustomResourceValidation `json:"schema"`
 }
 

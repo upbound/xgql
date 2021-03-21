@@ -67,5 +67,11 @@ type ProviderRevisionStatus implements ConditionedStatus {
   invalidDependencies: Int
   permissionRequests: [PolicyRule!]
 
+  # In practice these objects are currently always a CustomResourceDefinition.
+  # Crossplane lints the content of provider packages to enforce this, but it's
+  # not enforced at the API level. We return an array of KubernetesResource here
+  # because doing so allows us to package different types in future without a
+  # breaking GraphQL schema change.
+
   objects(limit: Int): KubernetesResourceConnection! @goField(forceResolver: true)
 }

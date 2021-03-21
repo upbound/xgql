@@ -2897,8 +2897,8 @@ type CustomResourceDefinitionNames {
 }
 
 type CustomResourceDefinitionVersion {
-  name: String
-  served: Boolean
+  name: String!
+  served: Boolean!
   schema: CustomResourceValidation
 }
 
@@ -3045,6 +3045,12 @@ type ConfigurationRevisionStatus implements ConditionedStatus {
   invalidDependencies: Int
   permissionRequests: [PolicyRule!]
 
+  # In practice these objects are currently always a CompositeResourceDefinition
+  # or a Composition. Crossplane lints the content of configuration packages to
+  # enforce this, but it's not enforced at the API level. We return an array of
+  # KubernetesResource here because doing so allows us to package different
+  # types in future without a breaking GraphQL schema change.
+
   objects(limit: Int): KubernetesResourceConnection! @goField(forceResolver: true)
 }
 `, BuiltIn: false},
@@ -3169,6 +3175,12 @@ type ProviderRevisionStatus implements ConditionedStatus {
   installedDependencies: Int
   invalidDependencies: Int
   permissionRequests: [PolicyRule!]
+
+  # In practice these objects are currently always a CustomResourceDefinition.
+  # Crossplane lints the content of provider packages to enforce this, but it's
+  # not enforced at the API level. We return an array of KubernetesResource here
+  # because doing so allows us to package different types in future without a
+  # breaking GraphQL schema change.
 
   objects(limit: Int): KubernetesResourceConnection! @goField(forceResolver: true)
 }
@@ -8650,11 +8662,14 @@ func (ec *executionContext) _CustomResourceDefinitionVersion_name(ctx context.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinitionVersion_served(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinitionVersion) (ret graphql.Marshaler) {
@@ -8682,11 +8697,14 @@ func (ec *executionContext) _CustomResourceDefinitionVersion_served(ctx context.
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinitionVersion_schema(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinitionVersion) (ret graphql.Marshaler) {
@@ -15619,8 +15637,14 @@ func (ec *executionContext) _CustomResourceDefinitionVersion(ctx context.Context
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinitionVersion")
 		case "name":
 			out.Values[i] = ec._CustomResourceDefinitionVersion_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "served":
 			out.Values[i] = ec._CustomResourceDefinitionVersion_served(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "schema":
 			out.Values[i] = ec._CustomResourceDefinitionVersion_schema(ctx, field, obj)
 		default:

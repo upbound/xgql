@@ -159,8 +159,8 @@ type CustomResourceDefinitionNames {
 }
 
 type CustomResourceDefinitionVersion {
-  name: String
-  served: Boolean
+  name: String!
+  served: Boolean!
   schema: CustomResourceValidation
 }
 
