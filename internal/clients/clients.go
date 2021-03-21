@@ -6,19 +6,41 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/crossplane/crossplane-runtime/pkg/logging"
 )
 
 const expiry = 5 * time.Minute
 
-// AnonymousConfig returns a REST config with no bearer token (or bearer token
-// file) set. The config follows the controller-runtime precedence.
-func AnonymousConfig() (*rest.Config, error) {
+// A set of resources that we never want to cache. The client takes a watch on
+// any kind of resource it's asked to read unless it's in this list. We allow
+// caching of arbitrary resources (i.e. *unstructured.Unstructured, which may
+// have any GVK) in order to allow us to cache managed and composite resources.
+// We're particularly at risk of caching resources like these unexpectedly when
+// iterating through arrays of arbitrary object references (e.g. owner refs).
+var doNotCache = []client.Object{
+	&corev1.Pod{},
+	&corev1.Secret{},
+	&corev1.ConfigMap{},
+	&corev1.Service{},
+	&corev1.ServiceAccount{},
+	&appsv1.Deployment{},
+	&appsv1.DaemonSet{},
+	&rbacv1.RoleBinding{},
+	&rbacv1.ClusterRoleBinding{},
+}
+
+// Config returns a REST config.
+func Config() (*rest.Config, error) {
 	cfg, err := ctrl.GetConfig()
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot create in-cluster configuration")
@@ -34,6 +56,16 @@ func AnonymousConfig() (*rest.Config, error) {
 	cfg.Burst = 10
 
 	return cfg, nil
+}
+
+// WithoutBearerToken returns a copy of the supplied REST config wihout its own
+// bearer token. This allows a bearer token to be injected into the config at
+// client creation time.
+func WithoutBearerToken(cfg *rest.Config) *rest.Config {
+	out := rest.CopyConfig(cfg)
+	out.BearerToken = ""
+	out.BearerTokenFile = ""
+	return out
 }
 
 // TODO(negz): There are a few gotchas with watch based caches. The chief issue
@@ -59,47 +91,91 @@ type Cache struct {
 
 	cfg    *rest.Config
 	scheme *runtime.Scheme
+	mapper meta.RESTMapper
+
+	log logging.Logger
+}
+
+// A CacheOption configures the client cache.
+type CacheOption func(c *Cache)
+
+// WithLogger configures the logger used by the client cache. A no-op logger is
+// used by default.
+func WithLogger(l logging.Logger) CacheOption {
+	return func(c *Cache) {
+		c.log = l
+	}
+}
+
+// WithRESTMapper configures the REST mapper used by cached clients. A mapper
+// is created for each new client by default, which can take ~10 seconds.
+func WithRESTMapper(m meta.RESTMapper) CacheOption {
+	return func(c *Cache) {
+		c.mapper = m
+	}
 }
 
 // NewCache creates a cache of Kubernetes clients. Clients use the supplied
 // scheme, and connect to the API server using a copy of the supplied REST
 // config with a specific bearer token injected.
-func NewCache(s *runtime.Scheme, c *rest.Config) *Cache {
-	return &Cache{
+func NewCache(s *runtime.Scheme, c *rest.Config, o ...CacheOption) *Cache {
+	ch := &Cache{
 		active: make(map[string]*session),
 		cfg:    c,
 		scheme: s,
+		log:    logging.NewNopLogger(),
 	}
+
+	for _, fn := range o {
+		fn(ch)
+	}
+
+	return ch
 }
 
 // Get a client that uses the specified bearer token.
 func (c *Cache) Get(token string) (client.Client, error) {
+	// TODO(negz): Don't log this bearer token; perhaps a hash would be okay?
+	log := c.log.WithValues("token", token)
+
 	c.mx.RLock()
 	sn, ok := c.active[token]
 	c.mx.RUnlock()
 
 	if ok {
+		log.Debug("Used existing client")
 		return sn, nil
 	}
+
+	started := time.Now()
 
 	cfg := rest.CopyConfig(c.cfg)
 	cfg.BearerToken = token
 	cfg.BearerTokenFile = ""
 
-	wc, err := client.New(cfg, client.Options{Scheme: c.scheme})
+	wc, err := client.New(cfg, client.Options{Scheme: c.scheme, Mapper: c.mapper})
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot create write client")
 	}
 
-	ca, err := cache.New(cfg, cache.Options{Scheme: c.scheme})
+	ca, err := cache.New(cfg, cache.Options{Scheme: c.scheme, Mapper: c.mapper})
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot create cache")
 	}
 
-	// TODO(negz): Is there any issue caching unstructured objects? The docstring
-	// for client.delegatingReader implies it could result in 'unexpectedly
-	// caching the entire cluster' if arbitrary references are loaded.
-	dc, err := client.NewDelegatingClient(client.NewDelegatingClientInput{CacheReader: ca, Client: wc, CacheUnstructured: true})
+	dci := client.NewDelegatingClientInput{
+		CacheReader:     ca,
+		Client:          wc,
+		UncachedObjects: doNotCache,
+
+		// TODO(negz): Don't cache unstructured objects? Doing so allows us to
+		// cache object types that aren't known at build time, like managed
+		// resources and composite resources. On the other hand it could lead to
+		// the cache starting a watch on any kind of resource it encounters,
+		// e.g. arbitrary owner references.
+		CacheUnstructured: true,
+	}
+	dc, err := client.NewDelegatingClient(dci)
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot create delegating client")
 	}
@@ -108,8 +184,9 @@ func (c *Cache) Get(token string) (client.Client, error) {
 	// because it's not possible to extend a context's deadline or timeout, but it
 	// is possible to 'reset' (i.e. extend) a ticker.
 	expired := time.NewTicker(expiry)
+	newExpiry := time.Now().Add(expiry)
 	ctx, cancel := context.WithCancel(context.Background())
-	sn = &session{client: dc, cancel: cancel, expired: expired}
+	sn = &session{client: dc, cancel: cancel, expired: expired, log: c.log}
 
 	c.mx.Lock()
 	c.active[token] = sn
@@ -142,6 +219,11 @@ func (c *Cache) Get(token string) (client.Client, error) {
 		return nil, errors.New("cannot sync cache")
 	}
 
+	log.Debug("Created new client",
+		"duration", time.Since(started),
+		"new-expiry", newExpiry,
+	)
+
 	return sn, nil
 }
 
@@ -153,6 +235,7 @@ func (c *Cache) remove(token string) {
 		sn.cancel()
 		sn.expired.Stop()
 		delete(c.active, token)
+		c.log.Debug("Removed client from cache", "token", token)
 	}
 }
 
@@ -160,54 +243,126 @@ type session struct {
 	client  client.Client
 	cancel  context.CancelFunc
 	expired *time.Ticker
+
+	log logging.Logger
 }
 
 func (s *session) Get(ctx context.Context, key client.ObjectKey, obj client.Object) error {
+	t := time.Now()
 	s.expired.Reset(expiry)
-	return s.client.Get(ctx, key, obj)
+	err := s.client.Get(ctx, key, obj)
+	s.log.Debug("Client called",
+		"operation", "Get",
+		"duration", time.Since(t),
+		"new-expiry", t.Add(expiry),
+	)
+	return err
 }
 
 func (s *session) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
+	t := time.Now()
 	s.expired.Reset(expiry)
-	return s.client.List(ctx, list, opts...)
+	err := s.client.List(ctx, list, opts...)
+	s.log.Debug("Client called",
+		"operation", "List",
+		"duration", time.Since(t),
+		"new-expiry", t.Add(expiry),
+	)
+	return err
 }
 
 func (s *session) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
+	t := time.Now()
 	s.expired.Reset(expiry)
-	return s.client.Create(ctx, obj, opts...)
+	err := s.client.Create(ctx, obj, opts...)
+	s.log.Debug("Client called",
+		"operation", "Create",
+		"duration", time.Since(t),
+		"new-expiry", t.Add(expiry),
+	)
+	return err
 }
 
 func (s *session) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
+	t := time.Now()
 	s.expired.Reset(expiry)
-	return s.client.Delete(ctx, obj, opts...)
+	err := s.client.Delete(ctx, obj, opts...)
+	s.log.Debug("Client called",
+		"operation", "Delete",
+		"duration", time.Since(t),
+		"new-expiry", t.Add(expiry),
+	)
+	return err
 }
 
 func (s *session) Update(ctx context.Context, obj client.Object, opts ...client.UpdateOption) error {
+	t := time.Now()
 	s.expired.Reset(expiry)
-	return s.client.Update(ctx, obj, opts...)
+	err := s.client.Update(ctx, obj, opts...)
+	s.log.Debug("Client called",
+		"operation", "Update",
+		"duration", time.Since(t),
+		"new-expiry", t.Add(expiry),
+	)
+	return err
 }
 
 func (s *session) Patch(ctx context.Context, obj client.Object, patch client.Patch, opts ...client.PatchOption) error {
+	t := time.Now()
 	s.expired.Reset(expiry)
-	return s.client.Patch(ctx, obj, patch, opts...)
+	err := s.client.Patch(ctx, obj, patch, opts...)
+	s.log.Debug("Client called",
+		"operation", "Patch",
+		"duration", time.Since(t),
+		"new-expiry", t.Add(expiry),
+	)
+	return err
 }
 
 func (s *session) DeleteAllOf(ctx context.Context, obj client.Object, opts ...client.DeleteAllOfOption) error {
+	t := time.Now()
 	s.expired.Reset(expiry)
-	return s.client.DeleteAllOf(ctx, obj, opts...)
+	err := s.client.DeleteAllOf(ctx, obj, opts...)
+	s.log.Debug("Client called",
+		"operation", "DeleteallOf",
+		"duration", time.Since(t),
+		"new-expiry", t.Add(expiry),
+	)
+	return err
 }
 
 func (s *session) Status() client.StatusWriter {
+	t := time.Now()
 	s.expired.Reset(expiry)
-	return s.client.Status()
+	err := s.client.Status()
+	s.log.Debug("Client called",
+		"operation", "Status",
+		"duration", time.Since(t),
+		"new-expiry", t.Add(expiry),
+	)
+	return err
 }
 
 func (s *session) Scheme() *runtime.Scheme {
+	t := time.Now()
 	s.expired.Reset(expiry)
-	return s.client.Scheme()
+	err := s.client.Scheme()
+	s.log.Debug("Client called",
+		"operation", "Scheme",
+		"duration", time.Since(t),
+		"new-expiry", t.Add(expiry),
+	)
+	return err
 }
 
 func (s *session) RESTMapper() meta.RESTMapper {
+	t := time.Now()
 	s.expired.Reset(expiry)
-	return s.client.RESTMapper()
+	err := s.client.RESTMapper()
+	s.log.Debug("Client called",
+		"operation", "Scheme",
+		"duration", time.Since(t),
+		"new-expiry", t.Add(expiry),
+	)
+	return err
 }
