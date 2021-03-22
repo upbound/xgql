@@ -1,4 +1,3 @@
-# ====================================================================================
 # Setup Project
 PROJECT_NAME := xgql
 PROJECT_REPO := github.com/upbound/$(PROJECT_NAME)
@@ -17,6 +16,21 @@ GO_LDFLAGS += -X $(GO_PROJECT)/internal/version.Version=$(VERSION)
 GO_SUBDIRS += cmd internal
 GO111MODULE = on
 -include build/makelib/golang.mk
+
+# Setup Helm
+HELM_VERSION=v2.17.0
+HELM_BASE_URL = https://charts.upbound.io 
+HELM_S3_BUCKET = upbound.charts
+HELM_CHARTS = xgql
+HELM_CHART_LINT_ARGS_xgql = --set nameOverride='',imagePullSecrets=''
+-include build/makelib/k8s_tools.mk
+-include build/makelib/helm.mk                                                           
+                                                                                         
+# Setup Images
+DOCKER_REGISTRY = upbound
+IMAGES = xgql
+OSBASEIMAGE = gcr.io/distroless/static:nonroot         
+-include build/makelib/image.mk  
 
 fallthrough: submodules
 	@echo Initial setup complete. Running make again . . .
@@ -42,20 +56,19 @@ submodules:
 # ====================================================================================
 # Special Targets
 
-define CROSSPLANE_MAKE_HELP
-Crossplane Targets:
+define XGQL_MAKE_HELP
+xgql Targets:
     reviewable            Ensure a PR is ready for review.
     submodules            Update the submodules, such as the common build scripts.
-    run                   Run crossplane locally, out-of-cluster. Useful for development.
 
 endef
-# The reason CROSSPLANE_MAKE_HELP is used instead of CROSSPLANE_HELP is because the crossplane
-# binary will try to use CROSSPLANE_HELP if it is set, and this is for something different.
-export CROSSPLANE_MAKE_HELP
+# The reason XGQL_MAKE_HELP is used instead of XGQL_HELP is because the xgql
+# binary will try to use XGQL_HELP if it is set, and this is for something different.
+export XGQL_MAKE_HELP
 
-crossplane.help:
-	@echo "$$CROSSPLANE_MAKE_HELP"
+xgql.help:
+	@echo "$$XGQL_MAKE_HELP"
 
-help-special: crossplane.help
+help-special: xgql.help
 
-.PHONY: crossplane.help help-special
+.PHONY: xgql.help help-special

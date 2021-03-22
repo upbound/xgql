@@ -1,0 +1,6 @@
+FROM BASEIMAGE
+
+ADD xgql /usr/local/bin/
+EXPOSE 8080
+USER 1001
+ENTRYPOINT ["xgql"]
