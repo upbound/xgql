@@ -56,7 +56,7 @@ func (r *Root) CompositeResourceClaimSpec() generated.CompositeResourceClaimSpec
 // CompositeResourceDefinition resolves properties of the
 // CompositeResourceDefinition GraphQL type.
 func (r *Root) CompositeResourceDefinition() generated.CompositeResourceDefinitionResolver {
-	return nil
+	return &xrd{clients: r.clients}
 }
 
 // CompositeResourceDefinitionSpec resolves properties of the
@@ -78,19 +78,19 @@ func (r *Root) Composition() generated.CompositionResolver {
 
 // Configuration resolves properties of the Configuration GraphQL type.
 func (r *Root) Configuration() generated.ConfigurationResolver {
-	return nil
+	return &configuration{clients: r.clients}
 }
 
 // ConfigurationRevision resolves properties of the ConfigurationRevision
 // GraphQL type.
 func (r *Root) ConfigurationRevision() generated.ConfigurationRevisionResolver {
-	return nil
+	return &configurationRevision{clients: r.clients}
 }
 
 // ConfigurationRevisionStatus resolves properties of the
 // ConfigurationRevisionStatus GraphQL type.
 func (r *Root) ConfigurationRevisionStatus() generated.ConfigurationRevisionStatusResolver {
-	return nil
+	return &configurationRevisionStatus{clients: r.clients}
 }
 
 // CustomResourceDefinition resolves properties of the CustomResourceDefinition

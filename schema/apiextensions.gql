@@ -9,7 +9,7 @@ type CompositeResourceDefinition implements KubernetesResource {
 
   events(limit: Int): EventConnection! @goField(forceResolver: true)
   definedCompositeResources(limit: Int, version: String): CompositeResourceConnection! @goField(forceResolver: true)
-  definedCompositeResourceClaims(limit: Int, version: String): CompositeResourceClaimConnection! @goField(forceResolver: true)
+  definedCompositeResourceClaims(limit: Int, version: String, namespace: String): CompositeResourceClaimConnection! @goField(forceResolver: true)
 }
 
 type CompositeResourceConnection {
@@ -42,9 +42,9 @@ type CompositeResourceDefinitionNames {
 }
 
 type CompositeResourceDefinitionVersion {
-  name: String
-  referenceable: Boolean
-  served: Boolean
+  name: String!
+  referenceable: Boolean!
+  served: Boolean!
   schema: CompositeResourceValidation
 }
 

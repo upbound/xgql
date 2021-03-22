@@ -2,6 +2,7 @@ package model
 
 import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/json"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -26,6 +27,20 @@ func GetConditions(in []xpv1.Condition) []Condition {
 		}
 	}
 	return out
+}
+
+// GetLabelSelector from the supplied Kubernetes label selector
+func GetLabelSelector(s *metav1.LabelSelector) *LabelSelector {
+	if s == nil {
+		return nil
+	}
+
+	ml := map[string]interface{}{}
+	for k, v := range s.MatchLabels {
+		ml[k] = v
+	}
+
+	return &LabelSelector{MatchLabels: ml}
 }
 
 // GetCustomResourceDefinitionVersions from the supplied Kubernetes versions.

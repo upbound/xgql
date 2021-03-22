@@ -83,7 +83,6 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, limit *in
 				Revision:                    int(pr.Spec.Revision),
 				IgnoreCrossplaneConstraints: pr.Spec.IgnoreCrossplaneConstraints,
 				SkipDependencyResolution:    pr.Spec.SkipDependencyResolution,
-				PackagePullSecrets:          pr.Spec.PackagePullSecrets,
 			},
 			Status: &model.ProviderRevisionStatus{
 				Conditions:            model.GetConditions(pr.Status.Conditions),
@@ -105,10 +104,6 @@ type providerRevision struct {
 }
 
 func (r *providerRevision) Events(ctx context.Context, obj *model.ProviderRevision, limit *int) (*model.EventConnection, error) {
-	return nil, nil
-}
-
-func (r *providerRevision) Objects(ctx context.Context, obj *model.ProviderRevision, limit *int) (*model.KubernetesResourceConnection, error) {
 	return nil, nil
 }
 

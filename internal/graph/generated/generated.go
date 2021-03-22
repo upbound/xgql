@@ -65,7 +65,7 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	ComposedResourceList struct {
+	ComposedResourceConnection struct {
 		Count func(childComplexity int) int
 		Items func(childComplexity int) int
 	}
@@ -122,7 +122,7 @@ type ComplexityRoot struct {
 
 	CompositeResourceDefinition struct {
 		APIVersion                     func(childComplexity int) int
-		DefinedCompositeResourceClaims func(childComplexity int, limit *int, version *string) int
+		DefinedCompositeResourceClaims func(childComplexity int, limit *int, version *string, namespace *string) int
 		DefinedCompositeResources      func(childComplexity int, limit *int, version *string) int
 		Events                         func(childComplexity int, limit *int) int
 		Kind                           func(childComplexity int) int
@@ -539,7 +539,7 @@ type CompositeResourceClaimSpecResolver interface {
 type CompositeResourceDefinitionResolver interface {
 	Events(ctx context.Context, obj *model.CompositeResourceDefinition, limit *int) (*model.EventConnection, error)
 	DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, limit *int, version *string) (*model.CompositeResourceConnection, error)
-	DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, limit *int, version *string) (*model.CompositeResourceClaimConnection, error)
+	DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, limit *int, version *string, namespace *string) (*model.CompositeResourceClaimConnection, error)
 }
 type CompositeResourceDefinitionSpecResolver interface {
 	DefaultComposition(ctx context.Context, obj *model.CompositeResourceDefinitionSpec) (*model.Composition, error)
@@ -550,7 +550,7 @@ type CompositeResourceSpecResolver interface {
 
 	Claim(ctx context.Context, obj *model.CompositeResourceSpec) (*model.CompositeResourceClaim, error)
 	WritesConnectionSecretTo(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error)
-	Resources(ctx context.Context, obj *model.CompositeResourceSpec, limit *int) (*model.ComposedResourceList, error)
+	Resources(ctx context.Context, obj *model.CompositeResourceSpec, limit *int) (*model.ComposedResourceConnection, error)
 }
 type CompositionResolver interface {
 	Events(ctx context.Context, obj *model.Composition, limit *int) (*model.EventConnection, error)
@@ -622,19 +622,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "ComposedResourceList.count":
-		if e.complexity.ComposedResourceList.Count == nil {
+	case "ComposedResourceConnection.count":
+		if e.complexity.ComposedResourceConnection.Count == nil {
 			break
 		}
 
-		return e.complexity.ComposedResourceList.Count(childComplexity), true
+		return e.complexity.ComposedResourceConnection.Count(childComplexity), true
 
-	case "ComposedResourceList.items":
-		if e.complexity.ComposedResourceList.Items == nil {
+	case "ComposedResourceConnection.items":
+		if e.complexity.ComposedResourceConnection.Items == nil {
 			break
 		}
 
-		return e.complexity.ComposedResourceList.Items(childComplexity), true
+		return e.complexity.ComposedResourceConnection.Items(childComplexity), true
 
 	case "CompositeResource.apiVersion":
 		if e.complexity.CompositeResource.APIVersion == nil {
@@ -845,7 +845,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.CompositeResourceDefinition.DefinedCompositeResourceClaims(childComplexity, args["limit"].(*int), args["version"].(*string)), true
+		return e.complexity.CompositeResourceDefinition.DefinedCompositeResourceClaims(childComplexity, args["limit"].(*int), args["version"].(*string), args["namespace"].(*string)), true
 
 	case "CompositeResourceDefinition.definedCompositeResources":
 		if e.complexity.CompositeResourceDefinition.DefinedCompositeResources == nil {
@@ -2654,7 +2654,7 @@ var sources = []*ast.Source{
 
   events(limit: Int): EventConnection! @goField(forceResolver: true)
   definedCompositeResources(limit: Int, version: String): CompositeResourceConnection! @goField(forceResolver: true)
-  definedCompositeResourceClaims(limit: Int, version: String): CompositeResourceClaimConnection! @goField(forceResolver: true)
+  definedCompositeResourceClaims(limit: Int, version: String, namespace: String): CompositeResourceClaimConnection! @goField(forceResolver: true)
 }
 
 type CompositeResourceConnection {
@@ -2687,9 +2687,9 @@ type CompositeResourceDefinitionNames {
 }
 
 type CompositeResourceDefinitionVersion {
-  name: String
-  referenceable: Boolean
-  served: Boolean
+  name: String!
+  referenceable: Boolean!
+  served: Boolean!
   schema: CompositeResourceValidation
 }
 
@@ -2927,10 +2927,10 @@ type CompositeResourceSpec {
   claim: CompositeResourceClaim @goField(forceResolver: true)
   writesConnectionSecretTo: Secret @goField(forceResolver: true)
 
-  resources(limit: Int): ComposedResourceList @goField(forceResolver: true)
+  resources(limit: Int): ComposedResourceConnection @goField(forceResolver: true)
 }
 
-type ComposedResourceList {
+type ComposedResourceConnection {
   items: [ComposedResource!]
   count: Int!
 }
@@ -3269,6 +3269,15 @@ func (ec *executionContext) field_CompositeResourceDefinition_definedCompositeRe
 		}
 	}
 	args["version"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg2
 	return args, nil
 }
 
@@ -3748,7 +3757,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _ComposedResourceList_items(ctx context.Context, field graphql.CollectedField, obj *model.ComposedResourceList) (ret graphql.Marshaler) {
+func (ec *executionContext) _ComposedResourceConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.ComposedResourceConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3756,7 +3765,7 @@ func (ec *executionContext) _ComposedResourceList_items(ctx context.Context, fie
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "ComposedResourceList",
+		Object:     "ComposedResourceConnection",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -3780,7 +3789,7 @@ func (ec *executionContext) _ComposedResourceList_items(ctx context.Context, fie
 	return ec.marshalOComposedResource2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ComposedResourceList_count(ctx context.Context, field graphql.CollectedField, obj *model.ComposedResourceList) (ret graphql.Marshaler) {
+func (ec *executionContext) _ComposedResourceConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.ComposedResourceConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3788,7 +3797,7 @@ func (ec *executionContext) _ComposedResourceList_count(ctx context.Context, fie
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "ComposedResourceList",
+		Object:     "ComposedResourceConnection",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -5028,7 +5037,7 @@ func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResourc
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.CompositeResourceDefinition().DefinedCompositeResourceClaims(rctx, obj, args["limit"].(*int), args["version"].(*string))
+		return ec.resolvers.CompositeResourceDefinition().DefinedCompositeResourceClaims(rctx, obj, args["limit"].(*int), args["version"].(*string), args["namespace"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5693,11 +5702,14 @@ func (ec *executionContext) _CompositeResourceDefinitionVersion_name(ctx context
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionVersion_referenceable(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionVersion) (ret graphql.Marshaler) {
@@ -5725,11 +5737,14 @@ func (ec *executionContext) _CompositeResourceDefinitionVersion_referenceable(ct
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionVersion_served(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionVersion) (ret graphql.Marshaler) {
@@ -5757,11 +5772,14 @@ func (ec *executionContext) _CompositeResourceDefinitionVersion_served(ctx conte
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionVersion_schema(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionVersion) (ret graphql.Marshaler) {
@@ -5958,9 +5976,9 @@ func (ec *executionContext) _CompositeResourceSpec_resources(ctx context.Context
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.ComposedResourceList)
+	res := resTmp.(*model.ComposedResourceConnection)
 	fc.Result = res
-	return ec.marshalOComposedResourceList2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceList(ctx, field.Selections, res)
+	return ec.marshalOComposedResourceConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceStatus_conditions(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceStatus) (ret graphql.Marshaler) {
@@ -14144,21 +14162,21 @@ func (ec *executionContext) _KubernetesResource(ctx context.Context, sel ast.Sel
 
 // region    **************************** object.gotpl ****************************
 
-var composedResourceListImplementors = []string{"ComposedResourceList"}
+var composedResourceConnectionImplementors = []string{"ComposedResourceConnection"}
 
-func (ec *executionContext) _ComposedResourceList(ctx context.Context, sel ast.SelectionSet, obj *model.ComposedResourceList) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, composedResourceListImplementors)
+func (ec *executionContext) _ComposedResourceConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ComposedResourceConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, composedResourceConnectionImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ComposedResourceList")
+			out.Values[i] = graphql.MarshalString("ComposedResourceConnection")
 		case "items":
-			out.Values[i] = ec._ComposedResourceList_items(ctx, field, obj)
+			out.Values[i] = ec._ComposedResourceConnection_items(ctx, field, obj)
 		case "count":
-			out.Values[i] = ec._ComposedResourceList_count(ctx, field, obj)
+			out.Values[i] = ec._ComposedResourceConnection_count(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -14782,10 +14800,19 @@ func (ec *executionContext) _CompositeResourceDefinitionVersion(ctx context.Cont
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionVersion")
 		case "name":
 			out.Values[i] = ec._CompositeResourceDefinitionVersion_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "referenceable":
 			out.Values[i] = ec._CompositeResourceDefinitionVersion_referenceable(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "served":
 			out.Values[i] = ec._CompositeResourceDefinitionVersion_served(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "schema":
 			out.Values[i] = ec._CompositeResourceDefinitionVersion_schema(ctx, field, obj)
 		default:
@@ -17947,11 +17974,11 @@ func (ec *executionContext) marshalOComposedResource2ᚕgithubᚗcomᚋnegzᚋxg
 	return ret
 }
 
-func (ec *executionContext) marshalOComposedResourceList2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceList(ctx context.Context, sel ast.SelectionSet, v *model.ComposedResourceList) graphql.Marshaler {
+func (ec *executionContext) marshalOComposedResourceConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.ComposedResourceConnection) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._ComposedResourceList(ctx, sel, v)
+	return ec._ComposedResourceConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOCompositeResource2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CompositeResource) graphql.Marshaler {

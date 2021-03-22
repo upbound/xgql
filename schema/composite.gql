@@ -16,10 +16,10 @@ type CompositeResourceSpec {
   claim: CompositeResourceClaim @goField(forceResolver: true)
   writesConnectionSecretTo: Secret @goField(forceResolver: true)
 
-  resources(limit: Int): ComposedResourceList @goField(forceResolver: true)
+  resources(limit: Int): ComposedResourceConnection @goField(forceResolver: true)
 }
 
-type ComposedResourceList {
+type ComposedResourceConnection {
   items: [ComposedResource!]
   count: Int!
 }

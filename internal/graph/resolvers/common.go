@@ -33,13 +33,13 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 	case version != nil:
 		gv.Version = *version
 	default:
-		gv.Version = pickVersion(obj.Spec.Versions)
+		gv.Version = pickCRDVersion(obj.Spec.Versions)
 	}
 
 	in := &kunstructured.UnstructuredList{}
 	in.SetAPIVersion(gv.String())
 	in.SetKind(obj.Spec.Names.Kind + "List")
-	if lk := obj.Spec.Names.ListKind; lk != nil {
+	if lk := obj.Spec.Names.ListKind; lk != nil && *lk != "" {
 		in.SetKind(*lk)
 	}
 
@@ -118,7 +118,7 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 // TODO(negz): Try to pick the 'highest' version (e.g. v2 > v1 > v1beta1),
 // rather than returning the first served one. There's no guarantee versions
 // will actually follow this convention, but it's ubiquitous.
-func pickVersion(vs []model.CustomResourceDefinitionVersion) string {
+func pickCRDVersion(vs []model.CustomResourceDefinitionVersion) string {
 	candidates := make([]string, 0, len(vs))
 
 	for _, v := range vs {

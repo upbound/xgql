@@ -21,7 +21,7 @@ type KubernetesResource interface {
 	IsKubernetesResource()
 }
 
-type ComposedResourceList struct {
+type ComposedResourceConnection struct {
 	Items []ComposedResource `json:"items"`
 	Count int                `json:"count"`
 }
@@ -116,16 +116,6 @@ type CompositeResourceDefinitionNames struct {
 	Categories []string `json:"categories"`
 }
 
-type CompositeResourceDefinitionSpec struct {
-	Group                string                               `json:"group"`
-	Names                *CompositeResourceDefinitionNames    `json:"names"`
-	ClaimNames           *CompositeResourceDefinitionNames    `json:"claimNames"`
-	ConnectionSecretKeys []string                             `json:"connectionSecretKeys"`
-	DefaultComposition   *Composition                         `json:"defaultComposition"`
-	EnforcedComposition  *Composition                         `json:"enforcedComposition"`
-	Versions             []CompositeResourceDefinitionVersion `json:"versions"`
-}
-
 type CompositeResourceDefinitionStatus struct {
 	Conditions  []Condition                                  `json:"conditions"`
 	Controllers *CompositeResourceDefinitionControllerStatus `json:"controllers"`
@@ -134,18 +124,10 @@ type CompositeResourceDefinitionStatus struct {
 func (CompositeResourceDefinitionStatus) IsConditionedStatus() {}
 
 type CompositeResourceDefinitionVersion struct {
-	Name          *string                      `json:"name"`
-	Referenceable *bool                        `json:"referenceable"`
-	Served        *bool                        `json:"served"`
+	Name          string                       `json:"name"`
+	Referenceable bool                         `json:"referenceable"`
+	Served        bool                         `json:"served"`
 	Schema        *CompositeResourceValidation `json:"schema"`
-}
-
-type CompositeResourceSpec struct {
-	Composition              *Composition            `json:"composition"`
-	CompositionSelector      *LabelSelector          `json:"compositionSelector"`
-	Claim                    *CompositeResourceClaim `json:"claim"`
-	WritesConnectionSecretTo *Secret                 `json:"writesConnectionSecretTo"`
-	Resources                *ComposedResourceList   `json:"resources"`
 }
 
 type CompositeResourceStatus struct {
@@ -238,17 +220,6 @@ type ConfigurationRevisionSpec struct {
 	IgnoreCrossplaneConstraints *bool                       `json:"ignoreCrossplaneConstraints"`
 	SkipDependencyResolution    *bool                       `json:"skipDependencyResolution"`
 }
-
-type ConfigurationRevisionStatus struct {
-	Conditions            []Condition                   `json:"conditions"`
-	FoundDependencies     *int                          `json:"foundDependencies"`
-	InstalledDependencies *int                          `json:"installedDependencies"`
-	InvalidDependencies   *int                          `json:"invalidDependencies"`
-	PermissionRequests    []PolicyRule                  `json:"permissionRequests"`
-	Objects               *KubernetesResourceConnection `json:"objects"`
-}
-
-func (ConfigurationRevisionStatus) IsConditionedStatus() {}
 
 type ConfigurationSpec struct {
 	Package                     string                    `json:"package"`
@@ -391,6 +362,19 @@ type PolicyRule struct {
 	NonResourceURLs []string `json:"nonResourceURLs"`
 }
 
+type Provider struct {
+	APIVersion string                      `json:"apiVersion"`
+	Kind       string                      `json:"kind"`
+	Metadata   *ObjectMeta                 `json:"metadata"`
+	Spec       *ProviderSpec               `json:"spec"`
+	Status     *ProviderStatus             `json:"status"`
+	Raw        string                      `json:"raw"`
+	Events     *EventConnection            `json:"events"`
+	Revisions  *ProviderRevisionConnection `json:"revisions"`
+}
+
+func (Provider) IsKubernetesResource() {}
+
 type ProviderConfig struct {
 	APIVersion string                `json:"apiVersion"`
 	Kind       string                `json:"kind"`
@@ -414,10 +398,48 @@ type ProviderList struct {
 	Count int        `json:"count"`
 }
 
+type ProviderRevision struct {
+	APIVersion string                  `json:"apiVersion"`
+	Kind       string                  `json:"kind"`
+	Metadata   *ObjectMeta             `json:"metadata"`
+	Spec       *ProviderRevisionSpec   `json:"spec"`
+	Status     *ProviderRevisionStatus `json:"status"`
+	Raw        string                  `json:"raw"`
+	Events     *EventConnection        `json:"events"`
+}
+
+func (ProviderRevision) IsKubernetesResource() {}
+
 type ProviderRevisionConnection struct {
 	Items []ProviderRevision `json:"items"`
 	Count int                `json:"count"`
 }
+
+type ProviderRevisionSpec struct {
+	DesiredState                PackageRevisionDesiredState `json:"desiredState"`
+	Package                     string                      `json:"package"`
+	PackagePullPolicy           *PackagePullPolicy          `json:"packagePullPolicy"`
+	Revision                    int                         `json:"revision"`
+	IgnoreCrossplaneConstraints *bool                       `json:"ignoreCrossplaneConstraints"`
+	SkipDependencyResolution    *bool                       `json:"skipDependencyResolution"`
+}
+
+type ProviderSpec struct {
+	Package                     string                    `json:"package"`
+	RevisionActivationPolicy    *RevisionActivationPolicy `json:"revisionActivationPolicy"`
+	RevisionHistoryLimit        *int                      `json:"revisionHistoryLimit"`
+	PackagePullPolicy           *PackagePullPolicy        `json:"packagePullPolicy"`
+	IgnoreCrossplaneConstraints *bool                     `json:"ignoreCrossplaneConstraints"`
+	SkipDependencyResolution    *bool                     `json:"skipDependencyResolution"`
+}
+
+type ProviderStatus struct {
+	Conditions        []Condition `json:"conditions"`
+	CurrentRevision   *string     `json:"currentRevision"`
+	CurrentIdentifier *string     `json:"currentIdentifier"`
+}
+
+func (ProviderStatus) IsConditionedStatus() {}
 
 type Secret struct {
 	APIVersion string           `json:"apiVersion"`
