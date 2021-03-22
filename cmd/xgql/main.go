@@ -35,6 +35,7 @@ func main() {
 		app    = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
 		debug  = app.Flag("debug", "Enable debug logging").Short('d').Bool()
 		listen = app.Flag("listen", "Address to listen at").Default(":8080").String()
+		play   = app.Flag("enable-playground", "Serve a GraphQL Playground").Bool()
 	)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
@@ -73,7 +74,10 @@ func main() {
 		clients.WithLogger(log),
 	)
 	rt.Handle("/query", handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)})))
-	rt.Handle("/", playground.Handler("GraphQL playground", "/query"))
+
+	if *play {
+		rt.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	}
 
 	kingpin.FatalIfError(http.ListenAndServe(*listen, rt), "cannot listen for HTTP")
 }

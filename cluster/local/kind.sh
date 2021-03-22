@@ -16,7 +16,7 @@ make ${KIND} ${KUBECTL} ${HELM3}
 BUILD_IMAGE="${BUILD_REGISTRY}/${PROJECT_NAME}-amd64"
 DEFAULT_NAMESPACE="crossplane-system"
 
-HELM3_FLAGS=${FLAGS:-"--set args={--debug}"}
+HELM3_FLAGS=${FLAGS:-"--set args={--debug,--enable-playground}"}
 
 function copy_image_to_cluster() {
   local build_image=$1
