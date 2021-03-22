@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -29,6 +30,31 @@ import (
 	"github.com/upbound/xgql/internal/graph/resolvers"
 	"github.com/upbound/xgql/internal/token"
 )
+
+// A set of resources that we never want to cache. Clients take a watch on any
+// kind of resource they're asked to read unless it's in this list. We allow
+// caching of arbitrary resources (i.e. *unstructured.Unstructured, which may
+// have any GVK) in order to allow us to cache managed and composite resources.
+// We're particularly at risk of caching resources like these unexpectedly when
+// iterating through arrays of arbitrary object references (e.g. owner refs).
+var noCache = []client.Object{
+	// We don't cache these resources because there's a (very slim) possibility
+	// they could end up as the owner reference of a resource we're concerned
+	// with, and we don't want to try to watch (e.g.) all pods in the cluster
+	// just because a pod somehow became the owner reference of an XR.
+	&corev1.Pod{},
+	&corev1.ConfigMap{},
+	&corev1.Service{},
+	&corev1.ServiceAccount{},
+	&appsv1.Deployment{},
+	&appsv1.DaemonSet{},
+	&rbacv1.RoleBinding{},
+	&rbacv1.ClusterRoleBinding{},
+
+	// We don't cache secrets because there's a high risk that the caller won't
+	// have access to list and watch secrets across all namespaces.
+	&corev1.Secret{},
+}
 
 func main() {
 	var (
@@ -50,9 +76,6 @@ func main() {
 	kingpin.FatalIfError(kextv1.AddToScheme(s), "cannot add Kubernetes apiextensions/v1 to scheme")
 	kingpin.FatalIfError(pkgv1.AddToScheme(s), "cannot add Crossplane pkg/v1 to scheme")
 	kingpin.FatalIfError(extv1.AddToScheme(s), "cannot add Crossplane apiextensions/v1 to scheme")
-
-	// We don't actually use these except to make sure we never cache them - see
-	// client.doNotCache.
 	kingpin.FatalIfError(appsv1.AddToScheme(s), "cannot add Kubernetes apps/v1 to scheme")
 	kingpin.FatalIfError(rbacv1.AddToScheme(s), "cannot add Kubernetes rbac/v1 to scheme")
 
@@ -71,6 +94,7 @@ func main() {
 	ca := clients.NewCache(s,
 		clients.WithoutBearerToken(cfg),
 		clients.WithRESTMapper(rm),
+		clients.DoNotCache(noCache),
 		clients.WithLogger(log),
 	)
 	rt.Handle("/query", handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)})))

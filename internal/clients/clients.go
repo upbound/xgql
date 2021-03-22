@@ -2,13 +2,14 @@ package clients
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/sha256"
+	"fmt"
+	"io"
 	"sync"
 	"time"
 
 	"github.com/pkg/errors"
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
@@ -20,24 +21,6 @@ import (
 )
 
 const expiry = 5 * time.Minute
-
-// A set of resources that we never want to cache. The client takes a watch on
-// any kind of resource it's asked to read unless it's in this list. We allow
-// caching of arbitrary resources (i.e. *unstructured.Unstructured, which may
-// have any GVK) in order to allow us to cache managed and composite resources.
-// We're particularly at risk of caching resources like these unexpectedly when
-// iterating through arrays of arbitrary object references (e.g. owner refs).
-var doNotCache = []client.Object{
-	&corev1.Pod{},
-	&corev1.Secret{},
-	&corev1.ConfigMap{},
-	&corev1.Service{},
-	&corev1.ServiceAccount{},
-	&appsv1.Deployment{},
-	&appsv1.DaemonSet{},
-	&rbacv1.RoleBinding{},
-	&rbacv1.ClusterRoleBinding{},
-}
 
 // Config returns a REST config.
 func Config() (*rest.Config, error) {
@@ -89,11 +72,13 @@ type Cache struct {
 	active map[string]*session
 	mx     sync.RWMutex
 
-	cfg    *rest.Config
-	scheme *runtime.Scheme
-	mapper meta.RESTMapper
+	cfg     *rest.Config
+	scheme  *runtime.Scheme
+	mapper  meta.RESTMapper
+	nocache []client.Object
 
-	log logging.Logger
+	salt []byte
+	log  logging.Logger
 }
 
 // A CacheOption configures the client cache.
@@ -115,14 +100,28 @@ func WithRESTMapper(m meta.RESTMapper) CacheOption {
 	}
 }
 
+// DoNotCache configures clients not to cache objects of the supplied types.
+// Note that the cache machinery extracts a GVK from these objects, so they can
+// either be types known to the scheme or *unstructured.Unstructured with their
+// APIVersion and Kind set.
+func DoNotCache(o []client.Object) CacheOption {
+	return func(c *Cache) {
+		c.nocache = o
+	}
+}
+
 // NewCache creates a cache of Kubernetes clients. Clients use the supplied
 // scheme, and connect to the API server using a copy of the supplied REST
 // config with a specific bearer token injected.
 func NewCache(s *runtime.Scheme, c *rest.Config, o ...CacheOption) *Cache {
+	salt := make([]byte, 32)
+	_, _ = io.ReadFull(rand.Reader, salt)
+
 	ch := &Cache{
 		active: make(map[string]*session),
 		cfg:    c,
 		scheme: s,
+		salt:   salt,
 		log:    logging.NewNopLogger(),
 	}
 
@@ -133,13 +132,42 @@ func NewCache(s *runtime.Scheme, c *rest.Config, o ...CacheOption) *Cache {
 	return ch
 }
 
+type getOptions struct {
+	Namespace string
+}
+
+// A GetOption modifies the kind of client returned.
+type GetOption func(o *getOptions)
+
+// ForNamespace returns a client backed by a cache scoped to the supplied
+// namespace.
+func ForNamespace(n string) GetOption {
+	return func(o *getOptions) {
+		o.Namespace = n
+	}
+}
+
 // Get a client that uses the specified bearer token.
-func (c *Cache) Get(token string) (client.Client, error) {
-	// TODO(negz): Don't log this bearer token; perhaps a hash would be okay?
-	log := c.log.WithValues("token", token)
+func (c *Cache) Get(token string, o ...GetOption) (client.Client, error) {
+	opts := &getOptions{}
+	for _, fn := range o {
+		fn(opts)
+	}
+
+	// TODO(negz): Is this sufficient to anonymize our bearer token?
+	h := sha256.New()
+	_, _ = h.Write(c.salt)
+	_, _ = h.Write([]byte(token))
+	_, _ = h.Write([]byte(opts.Namespace))
+	id := fmt.Sprintf("%x", h.Sum(nil))
+
+	log := c.log.WithValues("client-id", id)
+	if opts.Namespace != "" {
+		log = log.WithValues("namespace", opts.Namespace)
+	}
 
 	c.mx.RLock()
-	sn, ok := c.active[token]
+	sn, ok := c.active[id]
 	c.mx.RUnlock()
 
 	if ok {
@@ -166,7 +194,7 @@ func (c *Cache) Get(token string) (client.Client, error) {
 	dci := client.NewDelegatingClientInput{
 		CacheReader:     ca,
 		Client:          wc,
-		UncachedObjects: doNotCache,
+		UncachedObjects: c.nocache,
 
 		// TODO(negz): Don't cache unstructured objects? Doing so allows us to
 		// cache object types that aren't known at build time, like managed
@@ -186,10 +214,10 @@ func (c *Cache) Get(token string) (client.Client, error) {
 	expired := time.NewTicker(expiry)
 	newExpiry := time.Now().Add(expiry)
 	ctx, cancel := context.WithCancel(context.Background())
-	sn = &session{client: dc, cancel: cancel, expired: expired, log: c.log}
+	sn = &session{client: dc, cancel: cancel, expired: expired, log: log}
 
 	c.mx.Lock()
-	c.active[token] = sn
+	c.active[id] = sn
 	c.mx.Unlock()
 
 	go func() {
@@ -198,7 +226,7 @@ func (c *Cache) Get(token string) (client.Client, error) {
 		// Start blocks until ctx is closed, or it encounters an error. If we make
 		// it here either the cache crashed, or the context was cancelled (e.g.
 		// because our session expired).
-		c.remove(token)
+		c.remove(id)
 	}()
 
 	// Stop our cache when we expire.
@@ -206,7 +234,7 @@ func (c *Cache) Get(token string) (client.Client, error) {
 		select {
 		case <-expired.C:
 			// We expired, and should remove ourself from the session cache.
-			c.remove(token)
+			c.remove(id)
 		case <-ctx.Done():
 			// We're done for some other reason (e.g. the cache crashed). We assume
 			// whatever cancelled our context did so by calling done() - we just need
@@ -215,7 +243,7 @@ func (c *Cache) Get(token string) (client.Client, error) {
 	}()
 
 	if !ca.WaitForCacheSync(ctx) {
-		c.remove(token)
+		c.remove(id)
 		return nil, errors.New("cannot sync cache")
 	}
 
@@ -227,15 +255,15 @@ func (c *Cache) Get(token string) (client.Client, error) {
 	return sn, nil
 }
 
-func (c *Cache) remove(token string) {
+func (c *Cache) remove(id string) {
 	c.mx.Lock()
 	defer c.mx.Unlock()
 
-	if sn, ok := c.active[token]; ok {
+	if sn, ok := c.active[id]; ok {
 		sn.cancel()
 		sn.expired.Stop()
-		delete(c.active, token)
-		c.log.Debug("Removed client from cache", "token", token)
+		delete(c.active, id)
+		c.log.Debug("Removed client from cache", "client-id", id)
 	}
 }
 

@@ -3,12 +3,13 @@ package resolvers
 import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 )
 
 // A ClientCache can produce a client for a given token.
 type ClientCache interface {
-	Get(token string) (client.Client, error)
+	Get(token string, o ...clients.GetOption) (client.Client, error)
 }
 
 // The Root resolver.
