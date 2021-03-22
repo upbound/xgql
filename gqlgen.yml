@@ -18,7 +18,7 @@ omit_slice_element_pointers: true
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
 autobind:
-  - "github.com/negz/xgql/internal/graph/model"
+  - "github.com/upbound/xgql/internal/graph/model"
 
 # This section declares type mapping between the GraphQL and go type systems
 #

@@ -3786,7 +3786,7 @@ func (ec *executionContext) _ComposedResourceConnection_items(ctx context.Contex
 	}
 	res := resTmp.([]model.ComposedResource)
 	fc.Result = res
-	return ec.marshalOComposedResource2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceᚄ(ctx, field.Selections, res)
+	return ec.marshalOComposedResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ComposedResourceConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.ComposedResourceConnection) (ret graphql.Marshaler) {
@@ -3926,7 +3926,7 @@ func (ec *executionContext) _CompositeResource_metadata(ctx context.Context, fie
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResource_spec(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
@@ -3961,7 +3961,7 @@ func (ec *executionContext) _CompositeResource_spec(ctx context.Context, field g
 	}
 	res := resTmp.(*model.CompositeResourceSpec)
 	fc.Result = res
-	return ec.marshalNCompositeResourceSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceSpec(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResource_status(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
@@ -3996,7 +3996,7 @@ func (ec *executionContext) _CompositeResource_status(ctx context.Context, field
 	}
 	res := resTmp.(*model.CompositeResourceStatus)
 	fc.Result = res
-	return ec.marshalNCompositeResourceStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceStatus(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResource_raw(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
@@ -4073,7 +4073,7 @@ func (ec *executionContext) _CompositeResource_events(ctx context.Context, field
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaim_apiVersion(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
@@ -4178,7 +4178,7 @@ func (ec *executionContext) _CompositeResourceClaim_metadata(ctx context.Context
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaim_spec(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
@@ -4213,7 +4213,7 @@ func (ec *executionContext) _CompositeResourceClaim_spec(ctx context.Context, fi
 	}
 	res := resTmp.(*model.CompositeResourceClaimSpec)
 	fc.Result = res
-	return ec.marshalNCompositeResourceClaimSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimSpec(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceClaimSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaim_status(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
@@ -4248,7 +4248,7 @@ func (ec *executionContext) _CompositeResourceClaim_status(ctx context.Context, 
 	}
 	res := resTmp.(*model.CompositeResourceClaimStatus)
 	fc.Result = res
-	return ec.marshalNCompositeResourceClaimStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimStatus(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceClaimStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaim_raw(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
@@ -4325,7 +4325,7 @@ func (ec *executionContext) _CompositeResourceClaim_events(ctx context.Context, 
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaimConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimConnection) (ret graphql.Marshaler) {
@@ -4357,7 +4357,7 @@ func (ec *executionContext) _CompositeResourceClaimConnection_items(ctx context.
 	}
 	res := resTmp.([]model.CompositeResourceClaim)
 	fc.Result = res
-	return ec.marshalOCompositeResourceClaim2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimᚄ(ctx, field.Selections, res)
+	return ec.marshalOCompositeResourceClaim2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaimConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimConnection) (ret graphql.Marshaler) {
@@ -4456,7 +4456,7 @@ func (ec *executionContext) _CompositeResourceClaimSpec_composition(ctx context.
 	}
 	res := resTmp.(*model.Composition)
 	fc.Result = res
-	return ec.marshalOComposition2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx, field.Selections, res)
+	return ec.marshalOComposition2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaimSpec_compositionSelector(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimSpec) (ret graphql.Marshaler) {
@@ -4488,7 +4488,7 @@ func (ec *executionContext) _CompositeResourceClaimSpec_compositionSelector(ctx 
 	}
 	res := resTmp.(*model.LabelSelector)
 	fc.Result = res
-	return ec.marshalOLabelSelector2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐLabelSelector(ctx, field.Selections, res)
+	return ec.marshalOLabelSelector2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐLabelSelector(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaimSpec_resource(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimSpec) (ret graphql.Marshaler) {
@@ -4523,7 +4523,7 @@ func (ec *executionContext) _CompositeResourceClaimSpec_resource(ctx context.Con
 	}
 	res := resTmp.(*model.CompositeResource)
 	fc.Result = res
-	return ec.marshalNCompositeResource2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx, field.Selections, res)
+	return ec.marshalNCompositeResource2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaimSpec_writesConnectionSecretTo(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimSpec) (ret graphql.Marshaler) {
@@ -4555,7 +4555,7 @@ func (ec *executionContext) _CompositeResourceClaimSpec_writesConnectionSecretTo
 	}
 	res := resTmp.(*model.Secret)
 	fc.Result = res
-	return ec.marshalOSecret2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx, field.Selections, res)
+	return ec.marshalOSecret2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaimStatus_conditions(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimStatus) (ret graphql.Marshaler) {
@@ -4587,7 +4587,7 @@ func (ec *executionContext) _CompositeResourceClaimStatus_conditions(ctx context
 	}
 	res := resTmp.([]model.Condition)
 	fc.Result = res
-	return ec.marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaimStatus_connectionDetails(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimStatus) (ret graphql.Marshaler) {
@@ -4619,7 +4619,7 @@ func (ec *executionContext) _CompositeResourceClaimStatus_connectionDetails(ctx 
 	}
 	res := resTmp.(*model.CompositeResourceClaimConnectionDetails)
 	fc.Result = res
-	return ec.marshalOCompositeResourceClaimConnectionDetails2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnectionDetails(ctx, field.Selections, res)
+	return ec.marshalOCompositeResourceClaimConnectionDetails2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnectionDetails(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceConnection) (ret graphql.Marshaler) {
@@ -4651,7 +4651,7 @@ func (ec *executionContext) _CompositeResourceConnection_items(ctx context.Conte
 	}
 	res := resTmp.([]model.CompositeResource)
 	fc.Result = res
-	return ec.marshalOCompositeResource2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceᚄ(ctx, field.Selections, res)
+	return ec.marshalOCompositeResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceConnection) (ret graphql.Marshaler) {
@@ -4823,7 +4823,7 @@ func (ec *executionContext) _CompositeResourceDefinition_metadata(ctx context.Co
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinition_spec(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
@@ -4858,7 +4858,7 @@ func (ec *executionContext) _CompositeResourceDefinition_spec(ctx context.Contex
 	}
 	res := resTmp.(*model.CompositeResourceDefinitionSpec)
 	fc.Result = res
-	return ec.marshalNCompositeResourceDefinitionSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionSpec(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceDefinitionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinition_status(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
@@ -4890,7 +4890,7 @@ func (ec *executionContext) _CompositeResourceDefinition_status(ctx context.Cont
 	}
 	res := resTmp.(*model.CompositeResourceDefinitionStatus)
 	fc.Result = res
-	return ec.marshalOCompositeResourceDefinitionStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionStatus(ctx, field.Selections, res)
+	return ec.marshalOCompositeResourceDefinitionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinition_raw(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
@@ -4967,7 +4967,7 @@ func (ec *executionContext) _CompositeResourceDefinition_events(ctx context.Cont
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResources(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
@@ -5009,7 +5009,7 @@ func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResourc
 	}
 	res := resTmp.(*model.CompositeResourceConnection)
 	fc.Result = res
-	return ec.marshalNCompositeResourceConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResourceClaims(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
@@ -5051,7 +5051,7 @@ func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResourc
 	}
 	res := resTmp.(*model.CompositeResourceClaimConnection)
 	fc.Result = res
-	return ec.marshalNCompositeResourceClaimConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceClaimConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionControllerStatus_compositeResourceType(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionControllerStatus) (ret graphql.Marshaler) {
@@ -5083,7 +5083,7 @@ func (ec *executionContext) _CompositeResourceDefinitionControllerStatus_composi
 	}
 	res := resTmp.(*model.TypeReference)
 	fc.Result = res
-	return ec.marshalOTypeReference2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx, field.Selections, res)
+	return ec.marshalOTypeReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionControllerStatus_compositeResourceClaimType(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionControllerStatus) (ret graphql.Marshaler) {
@@ -5115,7 +5115,7 @@ func (ec *executionContext) _CompositeResourceDefinitionControllerStatus_composi
 	}
 	res := resTmp.(*model.TypeReference)
 	fc.Result = res
-	return ec.marshalOTypeReference2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx, field.Selections, res)
+	return ec.marshalOTypeReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionList_items(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionList) (ret graphql.Marshaler) {
@@ -5147,7 +5147,7 @@ func (ec *executionContext) _CompositeResourceDefinitionList_items(ctx context.C
 	}
 	res := resTmp.([]model.CompositeResourceDefinition)
 	fc.Result = res
-	return ec.marshalOCompositeResourceDefinition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCompositeResourceDefinition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionList_count(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionList) (ret graphql.Marshaler) {
@@ -5450,7 +5450,7 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec_names(ctx context.C
 	}
 	res := resTmp.(*model.CompositeResourceDefinitionNames)
 	fc.Result = res
-	return ec.marshalNCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionSpec_claimNames(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionSpec) (ret graphql.Marshaler) {
@@ -5482,7 +5482,7 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec_claimNames(ctx cont
 	}
 	res := resTmp.(*model.CompositeResourceDefinitionNames)
 	fc.Result = res
-	return ec.marshalOCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx, field.Selections, res)
+	return ec.marshalOCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionSpec_connectionSecretKeys(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionSpec) (ret graphql.Marshaler) {
@@ -5546,7 +5546,7 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec_defaultComposition(
 	}
 	res := resTmp.(*model.Composition)
 	fc.Result = res
-	return ec.marshalOComposition2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx, field.Selections, res)
+	return ec.marshalOComposition2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionSpec_enforcedComposition(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionSpec) (ret graphql.Marshaler) {
@@ -5578,7 +5578,7 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec_enforcedComposition
 	}
 	res := resTmp.(*model.Composition)
 	fc.Result = res
-	return ec.marshalOComposition2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx, field.Selections, res)
+	return ec.marshalOComposition2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionSpec_versions(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionSpec) (ret graphql.Marshaler) {
@@ -5610,7 +5610,7 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec_versions(ctx contex
 	}
 	res := resTmp.([]model.CompositeResourceDefinitionVersion)
 	fc.Result = res
-	return ec.marshalOCompositeResourceDefinitionVersion2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionVersionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCompositeResourceDefinitionVersion2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionVersionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionStatus_conditions(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionStatus) (ret graphql.Marshaler) {
@@ -5642,7 +5642,7 @@ func (ec *executionContext) _CompositeResourceDefinitionStatus_conditions(ctx co
 	}
 	res := resTmp.([]model.Condition)
 	fc.Result = res
-	return ec.marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionStatus_controllers(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionStatus) (ret graphql.Marshaler) {
@@ -5674,7 +5674,7 @@ func (ec *executionContext) _CompositeResourceDefinitionStatus_controllers(ctx c
 	}
 	res := resTmp.(*model.CompositeResourceDefinitionControllerStatus)
 	fc.Result = res
-	return ec.marshalOCompositeResourceDefinitionControllerStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionControllerStatus(ctx, field.Selections, res)
+	return ec.marshalOCompositeResourceDefinitionControllerStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionControllerStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionVersion_name(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionVersion) (ret graphql.Marshaler) {
@@ -5811,7 +5811,7 @@ func (ec *executionContext) _CompositeResourceDefinitionVersion_schema(ctx conte
 	}
 	res := resTmp.(*model.CompositeResourceValidation)
 	fc.Result = res
-	return ec.marshalOCompositeResourceValidation2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceValidation(ctx, field.Selections, res)
+	return ec.marshalOCompositeResourceValidation2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceValidation(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceSpec_composition(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceSpec) (ret graphql.Marshaler) {
@@ -5843,7 +5843,7 @@ func (ec *executionContext) _CompositeResourceSpec_composition(ctx context.Conte
 	}
 	res := resTmp.(*model.Composition)
 	fc.Result = res
-	return ec.marshalOComposition2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx, field.Selections, res)
+	return ec.marshalOComposition2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceSpec_compositionSelector(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceSpec) (ret graphql.Marshaler) {
@@ -5875,7 +5875,7 @@ func (ec *executionContext) _CompositeResourceSpec_compositionSelector(ctx conte
 	}
 	res := resTmp.(*model.LabelSelector)
 	fc.Result = res
-	return ec.marshalOLabelSelector2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐLabelSelector(ctx, field.Selections, res)
+	return ec.marshalOLabelSelector2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐLabelSelector(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceSpec_claim(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceSpec) (ret graphql.Marshaler) {
@@ -5907,7 +5907,7 @@ func (ec *executionContext) _CompositeResourceSpec_claim(ctx context.Context, fi
 	}
 	res := resTmp.(*model.CompositeResourceClaim)
 	fc.Result = res
-	return ec.marshalOCompositeResourceClaim2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaim(ctx, field.Selections, res)
+	return ec.marshalOCompositeResourceClaim2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaim(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceSpec_writesConnectionSecretTo(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceSpec) (ret graphql.Marshaler) {
@@ -5939,7 +5939,7 @@ func (ec *executionContext) _CompositeResourceSpec_writesConnectionSecretTo(ctx 
 	}
 	res := resTmp.(*model.Secret)
 	fc.Result = res
-	return ec.marshalOSecret2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx, field.Selections, res)
+	return ec.marshalOSecret2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceSpec_resources(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceSpec) (ret graphql.Marshaler) {
@@ -5978,7 +5978,7 @@ func (ec *executionContext) _CompositeResourceSpec_resources(ctx context.Context
 	}
 	res := resTmp.(*model.ComposedResourceConnection)
 	fc.Result = res
-	return ec.marshalOComposedResourceConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceConnection(ctx, field.Selections, res)
+	return ec.marshalOComposedResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceStatus_conditions(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceStatus) (ret graphql.Marshaler) {
@@ -6010,7 +6010,7 @@ func (ec *executionContext) _CompositeResourceStatus_conditions(ctx context.Cont
 	}
 	res := resTmp.([]model.Condition)
 	fc.Result = res
-	return ec.marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceStatus_connectionDetails(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceStatus) (ret graphql.Marshaler) {
@@ -6042,7 +6042,7 @@ func (ec *executionContext) _CompositeResourceStatus_connectionDetails(ctx conte
 	}
 	res := resTmp.(*model.CompositeResourceConnectionDetails)
 	fc.Result = res
-	return ec.marshalOCompositeResourceConnectionDetails2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnectionDetails(ctx, field.Selections, res)
+	return ec.marshalOCompositeResourceConnectionDetails2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnectionDetails(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceValidation_openAPIV3Schema(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceValidation) (ret graphql.Marshaler) {
@@ -6179,7 +6179,7 @@ func (ec *executionContext) _Composition_metadata(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Composition_spec(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
@@ -6214,7 +6214,7 @@ func (ec *executionContext) _Composition_spec(ctx context.Context, field graphql
 	}
 	res := resTmp.(*model.CompositionSpec)
 	fc.Result = res
-	return ec.marshalNCompositionSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx, field.Selections, res)
+	return ec.marshalNCompositionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Composition_status(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
@@ -6246,7 +6246,7 @@ func (ec *executionContext) _Composition_status(ctx context.Context, field graph
 	}
 	res := resTmp.(*model.CompositionStatus)
 	fc.Result = res
-	return ec.marshalOCompositionStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionStatus(ctx, field.Selections, res)
+	return ec.marshalOCompositionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Composition_raw(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
@@ -6323,7 +6323,7 @@ func (ec *executionContext) _Composition_events(ctx context.Context, field graph
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositionList_items(ctx context.Context, field graphql.CollectedField, obj *model.CompositionList) (ret graphql.Marshaler) {
@@ -6355,7 +6355,7 @@ func (ec *executionContext) _CompositionList_items(ctx context.Context, field gr
 	}
 	res := resTmp.([]model.Composition)
 	fc.Result = res
-	return ec.marshalOComposition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionᚄ(ctx, field.Selections, res)
+	return ec.marshalOComposition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositionList_count(ctx context.Context, field graphql.CollectedField, obj *model.CompositionList) (ret graphql.Marshaler) {
@@ -6425,7 +6425,7 @@ func (ec *executionContext) _CompositionSpec_compositeTypeRef(ctx context.Contex
 	}
 	res := resTmp.(*model.TypeReference)
 	fc.Result = res
-	return ec.marshalNTypeReference2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx, field.Selections, res)
+	return ec.marshalNTypeReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositionSpec_writeConnectionSecretsToNamespace(ctx context.Context, field graphql.CollectedField, obj *model.CompositionSpec) (ret graphql.Marshaler) {
@@ -6489,7 +6489,7 @@ func (ec *executionContext) _CompositionStatus_conditions(ctx context.Context, f
 	}
 	res := resTmp.([]model.Condition)
 	fc.Result = res
-	return ec.marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Condition_type(ctx context.Context, field graphql.CollectedField, obj *model.Condition) (ret graphql.Marshaler) {
@@ -6559,7 +6559,7 @@ func (ec *executionContext) _Condition_status(ctx context.Context, field graphql
 	}
 	res := resTmp.(model.ConditionStatus)
 	fc.Result = res
-	return ec.marshalNConditionStatus2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionStatus(ctx, field.Selections, res)
+	return ec.marshalNConditionStatus2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Condition_lastTransitionTime(ctx context.Context, field graphql.CollectedField, obj *model.Condition) (ret graphql.Marshaler) {
@@ -6766,7 +6766,7 @@ func (ec *executionContext) _Configuration_metadata(ctx context.Context, field g
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Configuration_spec(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
@@ -6801,7 +6801,7 @@ func (ec *executionContext) _Configuration_spec(ctx context.Context, field graph
 	}
 	res := resTmp.(*model.ConfigurationSpec)
 	fc.Result = res
-	return ec.marshalNConfigurationSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationSpec(ctx, field.Selections, res)
+	return ec.marshalNConfigurationSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Configuration_status(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
@@ -6833,7 +6833,7 @@ func (ec *executionContext) _Configuration_status(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.ConfigurationStatus)
 	fc.Result = res
-	return ec.marshalOConfigurationStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationStatus(ctx, field.Selections, res)
+	return ec.marshalOConfigurationStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Configuration_raw(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
@@ -6910,7 +6910,7 @@ func (ec *executionContext) _Configuration_events(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Configuration_revisions(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
@@ -6952,7 +6952,7 @@ func (ec *executionContext) _Configuration_revisions(ctx context.Context, field 
 	}
 	res := resTmp.(*model.ConfigurationRevisionConnection)
 	fc.Result = res
-	return ec.marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
+	return ec.marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationList_items(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationList) (ret graphql.Marshaler) {
@@ -6984,7 +6984,7 @@ func (ec *executionContext) _ConfigurationList_items(ctx context.Context, field 
 	}
 	res := resTmp.([]model.Configuration)
 	fc.Result = res
-	return ec.marshalOConfiguration2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationᚄ(ctx, field.Selections, res)
+	return ec.marshalOConfiguration2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationList_count(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationList) (ret graphql.Marshaler) {
@@ -7124,7 +7124,7 @@ func (ec *executionContext) _ConfigurationRevision_metadata(ctx context.Context,
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationRevision_spec(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevision) (ret graphql.Marshaler) {
@@ -7159,7 +7159,7 @@ func (ec *executionContext) _ConfigurationRevision_spec(ctx context.Context, fie
 	}
 	res := resTmp.(*model.ConfigurationRevisionSpec)
 	fc.Result = res
-	return ec.marshalNConfigurationRevisionSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionSpec(ctx, field.Selections, res)
+	return ec.marshalNConfigurationRevisionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationRevision_status(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevision) (ret graphql.Marshaler) {
@@ -7191,7 +7191,7 @@ func (ec *executionContext) _ConfigurationRevision_status(ctx context.Context, f
 	}
 	res := resTmp.(*model.ConfigurationRevisionStatus)
 	fc.Result = res
-	return ec.marshalOConfigurationRevisionStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionStatus(ctx, field.Selections, res)
+	return ec.marshalOConfigurationRevisionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationRevision_raw(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevision) (ret graphql.Marshaler) {
@@ -7268,7 +7268,7 @@ func (ec *executionContext) _ConfigurationRevision_events(ctx context.Context, f
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationRevisionConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevisionConnection) (ret graphql.Marshaler) {
@@ -7300,7 +7300,7 @@ func (ec *executionContext) _ConfigurationRevisionConnection_items(ctx context.C
 	}
 	res := resTmp.([]model.ConfigurationRevision)
 	fc.Result = res
-	return ec.marshalOConfigurationRevision2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionᚄ(ctx, field.Selections, res)
+	return ec.marshalOConfigurationRevision2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationRevisionConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevisionConnection) (ret graphql.Marshaler) {
@@ -7370,7 +7370,7 @@ func (ec *executionContext) _ConfigurationRevisionSpec_desiredState(ctx context.
 	}
 	res := resTmp.(model.PackageRevisionDesiredState)
 	fc.Result = res
-	return ec.marshalNPackageRevisionDesiredState2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackageRevisionDesiredState(ctx, field.Selections, res)
+	return ec.marshalNPackageRevisionDesiredState2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackageRevisionDesiredState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationRevisionSpec_package(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevisionSpec) (ret graphql.Marshaler) {
@@ -7437,7 +7437,7 @@ func (ec *executionContext) _ConfigurationRevisionSpec_packagePullPolicy(ctx con
 	}
 	res := resTmp.(*model.PackagePullPolicy)
 	fc.Result = res
-	return ec.marshalOPackagePullPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackagePullPolicy(ctx, field.Selections, res)
+	return ec.marshalOPackagePullPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackagePullPolicy(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationRevisionSpec_revision(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevisionSpec) (ret graphql.Marshaler) {
@@ -7568,7 +7568,7 @@ func (ec *executionContext) _ConfigurationRevisionStatus_conditions(ctx context.
 	}
 	res := resTmp.([]model.Condition)
 	fc.Result = res
-	return ec.marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationRevisionStatus_foundDependencies(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevisionStatus) (ret graphql.Marshaler) {
@@ -7696,7 +7696,7 @@ func (ec *executionContext) _ConfigurationRevisionStatus_permissionRequests(ctx 
 	}
 	res := resTmp.([]model.PolicyRule)
 	fc.Result = res
-	return ec.marshalOPolicyRule2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRuleᚄ(ctx, field.Selections, res)
+	return ec.marshalOPolicyRule2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRuleᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationRevisionStatus_objects(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevisionStatus) (ret graphql.Marshaler) {
@@ -7738,7 +7738,7 @@ func (ec *executionContext) _ConfigurationRevisionStatus_objects(ctx context.Con
 	}
 	res := resTmp.(*model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationSpec_package(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationSpec) (ret graphql.Marshaler) {
@@ -7805,7 +7805,7 @@ func (ec *executionContext) _ConfigurationSpec_revisionActivationPolicy(ctx cont
 	}
 	res := resTmp.(*model.RevisionActivationPolicy)
 	fc.Result = res
-	return ec.marshalORevisionActivationPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐRevisionActivationPolicy(ctx, field.Selections, res)
+	return ec.marshalORevisionActivationPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐRevisionActivationPolicy(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationSpec_revisionHistoryLimit(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationSpec) (ret graphql.Marshaler) {
@@ -7869,7 +7869,7 @@ func (ec *executionContext) _ConfigurationSpec_packagePullPolicy(ctx context.Con
 	}
 	res := resTmp.(*model.PackagePullPolicy)
 	fc.Result = res
-	return ec.marshalOPackagePullPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackagePullPolicy(ctx, field.Selections, res)
+	return ec.marshalOPackagePullPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackagePullPolicy(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationSpec_ignoreCrossplaneConstraints(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationSpec) (ret graphql.Marshaler) {
@@ -7965,7 +7965,7 @@ func (ec *executionContext) _ConfigurationStatus_conditions(ctx context.Context,
 	}
 	res := resTmp.([]model.Condition)
 	fc.Result = res
-	return ec.marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationStatus_currentRevision(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationStatus) (ret graphql.Marshaler) {
@@ -8134,7 +8134,7 @@ func (ec *executionContext) _CustomResourceDefinition_metadata(ctx context.Conte
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinition_spec(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
@@ -8169,7 +8169,7 @@ func (ec *executionContext) _CustomResourceDefinition_spec(ctx context.Context, 
 	}
 	res := resTmp.(*model.CustomResourceDefinitionSpec)
 	fc.Result = res
-	return ec.marshalNCustomResourceDefinitionSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionSpec(ctx, field.Selections, res)
+	return ec.marshalNCustomResourceDefinitionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinition_status(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
@@ -8201,7 +8201,7 @@ func (ec *executionContext) _CustomResourceDefinition_status(ctx context.Context
 	}
 	res := resTmp.(*model.CustomResourceDefinitionStatus)
 	fc.Result = res
-	return ec.marshalOCustomResourceDefinitionStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionStatus(ctx, field.Selections, res)
+	return ec.marshalOCustomResourceDefinitionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinition_raw(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
@@ -8278,7 +8278,7 @@ func (ec *executionContext) _CustomResourceDefinition_events(ctx context.Context
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinition_definedResources(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
@@ -8320,7 +8320,7 @@ func (ec *executionContext) _CustomResourceDefinition_definedResources(ctx conte
 	}
 	res := resTmp.(*model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinitionNames_plural(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinitionNames) (ret graphql.Marshaler) {
@@ -8588,7 +8588,7 @@ func (ec *executionContext) _CustomResourceDefinitionSpec_names(ctx context.Cont
 	}
 	res := resTmp.(*model.CustomResourceDefinitionNames)
 	fc.Result = res
-	return ec.marshalNCustomResourceDefinitionNames2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx, field.Selections, res)
+	return ec.marshalNCustomResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinitionSpec_versions(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinitionSpec) (ret graphql.Marshaler) {
@@ -8620,7 +8620,7 @@ func (ec *executionContext) _CustomResourceDefinitionSpec_versions(ctx context.C
 	}
 	res := resTmp.([]model.CustomResourceDefinitionVersion)
 	fc.Result = res
-	return ec.marshalOCustomResourceDefinitionVersion2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionVersionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCustomResourceDefinitionVersion2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionVersionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinitionStatus_conditions(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinitionStatus) (ret graphql.Marshaler) {
@@ -8652,7 +8652,7 @@ func (ec *executionContext) _CustomResourceDefinitionStatus_conditions(ctx conte
 	}
 	res := resTmp.([]model.Condition)
 	fc.Result = res
-	return ec.marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinitionVersion_name(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinitionVersion) (ret graphql.Marshaler) {
@@ -8754,7 +8754,7 @@ func (ec *executionContext) _CustomResourceDefinitionVersion_schema(ctx context.
 	}
 	res := resTmp.(*model.CustomResourceValidation)
 	fc.Result = res
-	return ec.marshalOCustomResourceValidation2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceValidation(ctx, field.Selections, res)
+	return ec.marshalOCustomResourceValidation2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceValidation(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceValidation_openAPIV3Schema(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceValidation) (ret graphql.Marshaler) {
@@ -8891,7 +8891,7 @@ func (ec *executionContext) _Event_metadata(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Event_involvedObject(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
@@ -8926,7 +8926,7 @@ func (ec *executionContext) _Event_involvedObject(ctx context.Context, field gra
 	}
 	res := resTmp.(model.KubernetesResource)
 	fc.Result = res
-	return ec.marshalNKubernetesResource2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Event_type(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
@@ -8958,7 +8958,7 @@ func (ec *executionContext) _Event_type(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.(*model.EventType)
 	fc.Result = res
-	return ec.marshalOEventType2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventType(ctx, field.Selections, res)
+	return ec.marshalOEventType2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Event_reason(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
@@ -9054,7 +9054,7 @@ func (ec *executionContext) _Event_source(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(*model.EventSource)
 	fc.Result = res
-	return ec.marshalOEventSource2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventSource(ctx, field.Selections, res)
+	return ec.marshalOEventSource2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventSource(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Event_count(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
@@ -9217,7 +9217,7 @@ func (ec *executionContext) _EventConnection_items(ctx context.Context, field gr
 	}
 	res := resTmp.([]model.Event)
 	fc.Result = res
-	return ec.marshalOEvent2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventᚄ(ctx, field.Selections, res)
+	return ec.marshalOEvent2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _EventConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.EventConnection) (ret graphql.Marshaler) {
@@ -9389,7 +9389,7 @@ func (ec *executionContext) _GenericResource_metadata(ctx context.Context, field
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _GenericResource_raw(ctx context.Context, field graphql.CollectedField, obj *model.GenericResource) (ret graphql.Marshaler) {
@@ -9466,7 +9466,7 @@ func (ec *executionContext) _GenericResource_events(ctx context.Context, field g
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _KubernetesResourceConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.KubernetesResourceConnection) (ret graphql.Marshaler) {
@@ -9498,7 +9498,7 @@ func (ec *executionContext) _KubernetesResourceConnection_items(ctx context.Cont
 	}
 	res := resTmp.([]model.KubernetesResource)
 	fc.Result = res
-	return ec.marshalOKubernetesResource2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceᚄ(ctx, field.Selections, res)
+	return ec.marshalOKubernetesResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _KubernetesResourceConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.KubernetesResourceConnection) (ret graphql.Marshaler) {
@@ -9670,7 +9670,7 @@ func (ec *executionContext) _ManagedResource_metadata(ctx context.Context, field
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResource_spec(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
@@ -9705,7 +9705,7 @@ func (ec *executionContext) _ManagedResource_spec(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.ManagedResourceSpec)
 	fc.Result = res
-	return ec.marshalNManagedResourceSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx, field.Selections, res)
+	return ec.marshalNManagedResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResource_status(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
@@ -9740,7 +9740,7 @@ func (ec *executionContext) _ManagedResource_status(ctx context.Context, field g
 	}
 	res := resTmp.(*model.ManagedResourceStatus)
 	fc.Result = res
-	return ec.marshalNManagedResourceStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceStatus(ctx, field.Selections, res)
+	return ec.marshalNManagedResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResource_raw(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
@@ -9817,7 +9817,7 @@ func (ec *executionContext) _ManagedResource_events(ctx context.Context, field g
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResourceSpec_connectionSecret(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResourceSpec) (ret graphql.Marshaler) {
@@ -9849,7 +9849,7 @@ func (ec *executionContext) _ManagedResourceSpec_connectionSecret(ctx context.Co
 	}
 	res := resTmp.(*model.Secret)
 	fc.Result = res
-	return ec.marshalOSecret2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx, field.Selections, res)
+	return ec.marshalOSecret2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResourceSpec_providerConfig(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResourceSpec) (ret graphql.Marshaler) {
@@ -9881,7 +9881,7 @@ func (ec *executionContext) _ManagedResourceSpec_providerConfig(ctx context.Cont
 	}
 	res := resTmp.(*model.ProviderConfig)
 	fc.Result = res
-	return ec.marshalOProviderConfig2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfig(ctx, field.Selections, res)
+	return ec.marshalOProviderConfig2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfig(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResourceSpec_deletionPolicy(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResourceSpec) (ret graphql.Marshaler) {
@@ -9913,7 +9913,7 @@ func (ec *executionContext) _ManagedResourceSpec_deletionPolicy(ctx context.Cont
 	}
 	res := resTmp.(*model.DeletionPolicy)
 	fc.Result = res
-	return ec.marshalODeletionPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeletionPolicy(ctx, field.Selections, res)
+	return ec.marshalODeletionPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeletionPolicy(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResourceStatus_conditions(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResourceStatus) (ret graphql.Marshaler) {
@@ -9945,7 +9945,7 @@ func (ec *executionContext) _ManagedResourceStatus_conditions(ctx context.Contex
 	}
 	res := resTmp.([]model.Condition)
 	fc.Result = res
-	return ec.marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ObjectMeta_name(ctx context.Context, field graphql.CollectedField, obj *model.ObjectMeta) (ret graphql.Marshaler) {
@@ -10322,7 +10322,7 @@ func (ec *executionContext) _ObjectMeta_owners(ctx context.Context, field graphq
 	}
 	res := resTmp.(*model.OwnerConnection)
 	fc.Result = res
-	return ec.marshalNOwnerConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx, field.Selections, res)
+	return ec.marshalNOwnerConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Owner_resource(ctx context.Context, field graphql.CollectedField, obj *model.Owner) (ret graphql.Marshaler) {
@@ -10357,7 +10357,7 @@ func (ec *executionContext) _Owner_resource(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(model.KubernetesResource)
 	fc.Result = res
-	return ec.marshalNKubernetesResource2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Owner_controller(ctx context.Context, field graphql.CollectedField, obj *model.Owner) (ret graphql.Marshaler) {
@@ -10421,7 +10421,7 @@ func (ec *executionContext) _OwnerConnection_items(ctx context.Context, field gr
 	}
 	res := resTmp.([]model.Owner)
 	fc.Result = res
-	return ec.marshalOOwner2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerᚄ(ctx, field.Selections, res)
+	return ec.marshalOOwner2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _OwnerConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.OwnerConnection) (ret graphql.Marshaler) {
@@ -10724,7 +10724,7 @@ func (ec *executionContext) _Provider_metadata(ctx context.Context, field graphq
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Provider_spec(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
@@ -10759,7 +10759,7 @@ func (ec *executionContext) _Provider_spec(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*model.ProviderSpec)
 	fc.Result = res
-	return ec.marshalNProviderSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderSpec(ctx, field.Selections, res)
+	return ec.marshalNProviderSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Provider_status(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
@@ -10791,7 +10791,7 @@ func (ec *executionContext) _Provider_status(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*model.ProviderStatus)
 	fc.Result = res
-	return ec.marshalOProviderStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderStatus(ctx, field.Selections, res)
+	return ec.marshalOProviderStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Provider_raw(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
@@ -10868,7 +10868,7 @@ func (ec *executionContext) _Provider_events(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Provider_revisions(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
@@ -10910,7 +10910,7 @@ func (ec *executionContext) _Provider_revisions(ctx context.Context, field graph
 	}
 	res := resTmp.(*model.ProviderRevisionConnection)
 	fc.Result = res
-	return ec.marshalNProviderRevisionConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx, field.Selections, res)
+	return ec.marshalNProviderRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderConfig_apiVersion(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
@@ -11015,7 +11015,7 @@ func (ec *executionContext) _ProviderConfig_metadata(ctx context.Context, field 
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderConfig_status(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
@@ -11047,7 +11047,7 @@ func (ec *executionContext) _ProviderConfig_status(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.ProviderConfigStatus)
 	fc.Result = res
-	return ec.marshalOProviderConfigStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigStatus(ctx, field.Selections, res)
+	return ec.marshalOProviderConfigStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderConfig_events(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
@@ -11089,7 +11089,7 @@ func (ec *executionContext) _ProviderConfig_events(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderConfig_raw(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
@@ -11156,7 +11156,7 @@ func (ec *executionContext) _ProviderConfigStatus_conditions(ctx context.Context
 	}
 	res := resTmp.([]model.Condition)
 	fc.Result = res
-	return ec.marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderConfigStatus_users(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfigStatus) (ret graphql.Marshaler) {
@@ -11220,7 +11220,7 @@ func (ec *executionContext) _ProviderList_items(ctx context.Context, field graph
 	}
 	res := resTmp.([]model.Provider)
 	fc.Result = res
-	return ec.marshalOProvider2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderᚄ(ctx, field.Selections, res)
+	return ec.marshalOProvider2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderList_count(ctx context.Context, field graphql.CollectedField, obj *model.ProviderList) (ret graphql.Marshaler) {
@@ -11360,7 +11360,7 @@ func (ec *executionContext) _ProviderRevision_metadata(ctx context.Context, fiel
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderRevision_spec(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevision) (ret graphql.Marshaler) {
@@ -11395,7 +11395,7 @@ func (ec *executionContext) _ProviderRevision_spec(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.ProviderRevisionSpec)
 	fc.Result = res
-	return ec.marshalNProviderRevisionSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionSpec(ctx, field.Selections, res)
+	return ec.marshalNProviderRevisionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderRevision_status(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevision) (ret graphql.Marshaler) {
@@ -11427,7 +11427,7 @@ func (ec *executionContext) _ProviderRevision_status(ctx context.Context, field 
 	}
 	res := resTmp.(*model.ProviderRevisionStatus)
 	fc.Result = res
-	return ec.marshalOProviderRevisionStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionStatus(ctx, field.Selections, res)
+	return ec.marshalOProviderRevisionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderRevision_raw(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevision) (ret graphql.Marshaler) {
@@ -11504,7 +11504,7 @@ func (ec *executionContext) _ProviderRevision_events(ctx context.Context, field 
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderRevisionConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevisionConnection) (ret graphql.Marshaler) {
@@ -11536,7 +11536,7 @@ func (ec *executionContext) _ProviderRevisionConnection_items(ctx context.Contex
 	}
 	res := resTmp.([]model.ProviderRevision)
 	fc.Result = res
-	return ec.marshalOProviderRevision2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionᚄ(ctx, field.Selections, res)
+	return ec.marshalOProviderRevision2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderRevisionConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevisionConnection) (ret graphql.Marshaler) {
@@ -11606,7 +11606,7 @@ func (ec *executionContext) _ProviderRevisionSpec_desiredState(ctx context.Conte
 	}
 	res := resTmp.(model.PackageRevisionDesiredState)
 	fc.Result = res
-	return ec.marshalNPackageRevisionDesiredState2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackageRevisionDesiredState(ctx, field.Selections, res)
+	return ec.marshalNPackageRevisionDesiredState2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackageRevisionDesiredState(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderRevisionSpec_package(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevisionSpec) (ret graphql.Marshaler) {
@@ -11673,7 +11673,7 @@ func (ec *executionContext) _ProviderRevisionSpec_packagePullPolicy(ctx context.
 	}
 	res := resTmp.(*model.PackagePullPolicy)
 	fc.Result = res
-	return ec.marshalOPackagePullPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackagePullPolicy(ctx, field.Selections, res)
+	return ec.marshalOPackagePullPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackagePullPolicy(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderRevisionSpec_revision(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevisionSpec) (ret graphql.Marshaler) {
@@ -11804,7 +11804,7 @@ func (ec *executionContext) _ProviderRevisionStatus_conditions(ctx context.Conte
 	}
 	res := resTmp.([]model.Condition)
 	fc.Result = res
-	return ec.marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderRevisionStatus_foundDependencies(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevisionStatus) (ret graphql.Marshaler) {
@@ -11932,7 +11932,7 @@ func (ec *executionContext) _ProviderRevisionStatus_permissionRequests(ctx conte
 	}
 	res := resTmp.([]model.PolicyRule)
 	fc.Result = res
-	return ec.marshalOPolicyRule2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRuleᚄ(ctx, field.Selections, res)
+	return ec.marshalOPolicyRule2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRuleᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderRevisionStatus_objects(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevisionStatus) (ret graphql.Marshaler) {
@@ -11974,7 +11974,7 @@ func (ec *executionContext) _ProviderRevisionStatus_objects(ctx context.Context,
 	}
 	res := resTmp.(*model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderSpec_package(ctx context.Context, field graphql.CollectedField, obj *model.ProviderSpec) (ret graphql.Marshaler) {
@@ -12041,7 +12041,7 @@ func (ec *executionContext) _ProviderSpec_revisionActivationPolicy(ctx context.C
 	}
 	res := resTmp.(*model.RevisionActivationPolicy)
 	fc.Result = res
-	return ec.marshalORevisionActivationPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐRevisionActivationPolicy(ctx, field.Selections, res)
+	return ec.marshalORevisionActivationPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐRevisionActivationPolicy(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderSpec_revisionHistoryLimit(ctx context.Context, field graphql.CollectedField, obj *model.ProviderSpec) (ret graphql.Marshaler) {
@@ -12105,7 +12105,7 @@ func (ec *executionContext) _ProviderSpec_packagePullPolicy(ctx context.Context,
 	}
 	res := resTmp.(*model.PackagePullPolicy)
 	fc.Result = res
-	return ec.marshalOPackagePullPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackagePullPolicy(ctx, field.Selections, res)
+	return ec.marshalOPackagePullPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackagePullPolicy(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderSpec_ignoreCrossplaneConstraints(ctx context.Context, field graphql.CollectedField, obj *model.ProviderSpec) (ret graphql.Marshaler) {
@@ -12201,7 +12201,7 @@ func (ec *executionContext) _ProviderStatus_conditions(ctx context.Context, fiel
 	}
 	res := resTmp.([]model.Condition)
 	fc.Result = res
-	return ec.marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderStatus_currentRevision(ctx context.Context, field graphql.CollectedField, obj *model.ProviderStatus) (ret graphql.Marshaler) {
@@ -12307,7 +12307,7 @@ func (ec *executionContext) _Query_providers(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*model.ProviderList)
 	fc.Result = res
-	return ec.marshalNProviderList2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderList(ctx, field.Selections, res)
+	return ec.marshalNProviderList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_configurations(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -12349,7 +12349,7 @@ func (ec *executionContext) _Query_configurations(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.ConfigurationList)
 	fc.Result = res
-	return ec.marshalNConfigurationList2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationList(ctx, field.Selections, res)
+	return ec.marshalNConfigurationList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_compositeResourceDefinitions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -12391,7 +12391,7 @@ func (ec *executionContext) _Query_compositeResourceDefinitions(ctx context.Cont
 	}
 	res := resTmp.(*model.CompositeResourceDefinitionList)
 	fc.Result = res
-	return ec.marshalNCompositeResourceDefinitionList2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionList(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceDefinitionList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_compositions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -12433,7 +12433,7 @@ func (ec *executionContext) _Query_compositions(ctx context.Context, field graph
 	}
 	res := resTmp.(*model.CompositionList)
 	fc.Result = res
-	return ec.marshalNCompositionList2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionList(ctx, field.Selections, res)
+	return ec.marshalNCompositionList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionList(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -12609,7 +12609,7 @@ func (ec *executionContext) _Secret_metadata(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Secret_data(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
@@ -12718,7 +12718,7 @@ func (ec *executionContext) _Secret_events(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SecretConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.SecretConnection) (ret graphql.Marshaler) {
@@ -12750,7 +12750,7 @@ func (ec *executionContext) _SecretConnection_items(ctx context.Context, field g
 	}
 	res := resTmp.([]model.Secret)
 	fc.Result = res
-	return ec.marshalOSecret2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretᚄ(ctx, field.Selections, res)
+	return ec.marshalOSecret2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SecretConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.SecretConnection) (ret graphql.Marshaler) {
@@ -17142,7 +17142,7 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNComposedResource2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResource(ctx context.Context, sel ast.SelectionSet, v model.ComposedResource) graphql.Marshaler {
+func (ec *executionContext) marshalNComposedResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResource(ctx context.Context, sel ast.SelectionSet, v model.ComposedResource) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17152,11 +17152,11 @@ func (ec *executionContext) marshalNComposedResource2githubᚗcomᚋnegzᚋxgql�
 	return ec._ComposedResource(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompositeResource2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx context.Context, sel ast.SelectionSet, v model.CompositeResource) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx context.Context, sel ast.SelectionSet, v model.CompositeResource) graphql.Marshaler {
 	return ec._CompositeResource(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResource2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResource) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResource2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResource) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17166,15 +17166,15 @@ func (ec *executionContext) marshalNCompositeResource2ᚖgithubᚗcomᚋnegzᚋx
 	return ec._CompositeResource(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceClaim2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaim(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceClaim) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceClaim2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaim(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceClaim) graphql.Marshaler {
 	return ec._CompositeResourceClaim(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceClaimConnection2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceClaimConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceClaimConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceClaimConnection) graphql.Marshaler {
 	return ec._CompositeResourceClaimConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceClaimConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceClaimConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17184,7 +17184,7 @@ func (ec *executionContext) marshalNCompositeResourceClaimConnection2ᚖgithub�
 	return ec._CompositeResourceClaimConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceClaimSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimSpec) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceClaimSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimSpec) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17194,7 +17194,7 @@ func (ec *executionContext) marshalNCompositeResourceClaimSpec2ᚖgithubᚗcom�
 	return ec._CompositeResourceClaimSpec(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceClaimStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceClaimStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimStatus) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17204,11 +17204,11 @@ func (ec *executionContext) marshalNCompositeResourceClaimStatus2ᚖgithubᚗcom
 	return ec._CompositeResourceClaimStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceConnection2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceConnection) graphql.Marshaler {
 	return ec._CompositeResourceConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17218,15 +17218,15 @@ func (ec *executionContext) marshalNCompositeResourceConnection2ᚖgithubᚗcom�
 	return ec._CompositeResourceConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceDefinition2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinition(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinition) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceDefinition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinition(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinition) graphql.Marshaler {
 	return ec._CompositeResourceDefinition(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceDefinitionList2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionList(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinitionList) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceDefinitionList2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionList(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinitionList) graphql.Marshaler {
 	return ec._CompositeResourceDefinitionList(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceDefinitionList2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionList(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionList) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceDefinitionList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionList(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionList) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17236,7 +17236,7 @@ func (ec *executionContext) marshalNCompositeResourceDefinitionList2ᚖgithubᚗ
 	return ec._CompositeResourceDefinitionList(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionNames) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionNames) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17246,7 +17246,7 @@ func (ec *executionContext) marshalNCompositeResourceDefinitionNames2ᚖgithub�
 	return ec._CompositeResourceDefinitionNames(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceDefinitionSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionSpec) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceDefinitionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionSpec) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17256,11 +17256,11 @@ func (ec *executionContext) marshalNCompositeResourceDefinitionSpec2ᚖgithubᚗ
 	return ec._CompositeResourceDefinitionSpec(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceDefinitionVersion2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinitionVersion) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceDefinitionVersion2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinitionVersion) graphql.Marshaler {
 	return ec._CompositeResourceDefinitionVersion(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceSpec) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceSpec) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17270,7 +17270,7 @@ func (ec *executionContext) marshalNCompositeResourceSpec2ᚖgithubᚗcomᚋnegz
 	return ec._CompositeResourceSpec(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceStatus) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17280,15 +17280,15 @@ func (ec *executionContext) marshalNCompositeResourceStatus2ᚖgithubᚗcomᚋne
 	return ec._CompositeResourceStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNComposition2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx context.Context, sel ast.SelectionSet, v model.Composition) graphql.Marshaler {
+func (ec *executionContext) marshalNComposition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx context.Context, sel ast.SelectionSet, v model.Composition) graphql.Marshaler {
 	return ec._Composition(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositionList2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionList(ctx context.Context, sel ast.SelectionSet, v model.CompositionList) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositionList2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionList(ctx context.Context, sel ast.SelectionSet, v model.CompositionList) graphql.Marshaler {
 	return ec._CompositionList(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositionList2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionList(ctx context.Context, sel ast.SelectionSet, v *model.CompositionList) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositionList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionList(ctx context.Context, sel ast.SelectionSet, v *model.CompositionList) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17298,7 +17298,7 @@ func (ec *executionContext) marshalNCompositionList2ᚖgithubᚗcomᚋnegzᚋxgq
 	return ec._CompositionList(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompositionSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositionSpec) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositionSpec) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17308,29 +17308,29 @@ func (ec *executionContext) marshalNCompositionSpec2ᚖgithubᚗcomᚋnegzᚋxgq
 	return ec._CompositionSpec(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCondition2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCondition(ctx context.Context, sel ast.SelectionSet, v model.Condition) graphql.Marshaler {
+func (ec *executionContext) marshalNCondition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCondition(ctx context.Context, sel ast.SelectionSet, v model.Condition) graphql.Marshaler {
 	return ec._Condition(ctx, sel, &v)
 }
 
-func (ec *executionContext) unmarshalNConditionStatus2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionStatus(ctx context.Context, v interface{}) (model.ConditionStatus, error) {
+func (ec *executionContext) unmarshalNConditionStatus2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionStatus(ctx context.Context, v interface{}) (model.ConditionStatus, error) {
 	var res model.ConditionStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNConditionStatus2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionStatus(ctx context.Context, sel ast.SelectionSet, v model.ConditionStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNConditionStatus2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionStatus(ctx context.Context, sel ast.SelectionSet, v model.ConditionStatus) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNConfiguration2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfiguration(ctx context.Context, sel ast.SelectionSet, v model.Configuration) graphql.Marshaler {
+func (ec *executionContext) marshalNConfiguration2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfiguration(ctx context.Context, sel ast.SelectionSet, v model.Configuration) graphql.Marshaler {
 	return ec._Configuration(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigurationList2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationList(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationList) graphql.Marshaler {
+func (ec *executionContext) marshalNConfigurationList2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationList(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationList) graphql.Marshaler {
 	return ec._ConfigurationList(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigurationList2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationList(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationList) graphql.Marshaler {
+func (ec *executionContext) marshalNConfigurationList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationList(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationList) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17340,15 +17340,15 @@ func (ec *executionContext) marshalNConfigurationList2ᚖgithubᚗcomᚋnegzᚋx
 	return ec._ConfigurationList(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNConfigurationRevision2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevision(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationRevision) graphql.Marshaler {
+func (ec *executionContext) marshalNConfigurationRevision2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevision(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationRevision) graphql.Marshaler {
 	return ec._ConfigurationRevision(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigurationRevisionConnection2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationRevisionConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNConfigurationRevisionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationRevisionConnection) graphql.Marshaler {
 	return ec._ConfigurationRevisionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationRevisionConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationRevisionConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17358,7 +17358,7 @@ func (ec *executionContext) marshalNConfigurationRevisionConnection2ᚖgithubᚗ
 	return ec._ConfigurationRevisionConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNConfigurationRevisionSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionSpec(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationRevisionSpec) graphql.Marshaler {
+func (ec *executionContext) marshalNConfigurationRevisionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionSpec(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationRevisionSpec) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17368,7 +17368,7 @@ func (ec *executionContext) marshalNConfigurationRevisionSpec2ᚖgithubᚗcomᚋ
 	return ec._ConfigurationRevisionSpec(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNConfigurationSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationSpec(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationSpec) graphql.Marshaler {
+func (ec *executionContext) marshalNConfigurationSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationSpec(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationSpec) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17378,7 +17378,7 @@ func (ec *executionContext) marshalNConfigurationSpec2ᚖgithubᚗcomᚋnegzᚋx
 	return ec._ConfigurationSpec(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCustomResourceDefinitionNames2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionNames) graphql.Marshaler {
+func (ec *executionContext) marshalNCustomResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionNames) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17388,7 +17388,7 @@ func (ec *executionContext) marshalNCustomResourceDefinitionNames2ᚖgithubᚗco
 	return ec._CustomResourceDefinitionNames(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCustomResourceDefinitionSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionSpec) graphql.Marshaler {
+func (ec *executionContext) marshalNCustomResourceDefinitionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionSpec) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17398,19 +17398,19 @@ func (ec *executionContext) marshalNCustomResourceDefinitionSpec2ᚖgithubᚗcom
 	return ec._CustomResourceDefinitionSpec(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCustomResourceDefinitionVersion2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinitionVersion) graphql.Marshaler {
+func (ec *executionContext) marshalNCustomResourceDefinitionVersion2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinitionVersion) graphql.Marshaler {
 	return ec._CustomResourceDefinitionVersion(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNEvent2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEvent(ctx context.Context, sel ast.SelectionSet, v model.Event) graphql.Marshaler {
+func (ec *executionContext) marshalNEvent2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEvent(ctx context.Context, sel ast.SelectionSet, v model.Event) graphql.Marshaler {
 	return ec._Event(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNEventConnection2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx context.Context, sel ast.SelectionSet, v model.EventConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx context.Context, sel ast.SelectionSet, v model.EventConnection) graphql.Marshaler {
 	return ec._EventConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx context.Context, sel ast.SelectionSet, v *model.EventConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx context.Context, sel ast.SelectionSet, v *model.EventConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17465,7 +17465,7 @@ func (ec *executionContext) marshalNJSONObject2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalNKubernetesResource2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx context.Context, sel ast.SelectionSet, v model.KubernetesResource) graphql.Marshaler {
+func (ec *executionContext) marshalNKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx context.Context, sel ast.SelectionSet, v model.KubernetesResource) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17475,11 +17475,11 @@ func (ec *executionContext) marshalNKubernetesResource2githubᚗcomᚋnegzᚋxgq
 	return ec._KubernetesResource(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNKubernetesResourceConnection2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx context.Context, sel ast.SelectionSet, v model.KubernetesResourceConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNKubernetesResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx context.Context, sel ast.SelectionSet, v model.KubernetesResourceConnection) graphql.Marshaler {
 	return ec._KubernetesResourceConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.KubernetesResourceConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.KubernetesResourceConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17489,7 +17489,7 @@ func (ec *executionContext) marshalNKubernetesResourceConnection2ᚖgithubᚗcom
 	return ec._KubernetesResourceConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNManagedResourceSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx context.Context, sel ast.SelectionSet, v *model.ManagedResourceSpec) graphql.Marshaler {
+func (ec *executionContext) marshalNManagedResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx context.Context, sel ast.SelectionSet, v *model.ManagedResourceSpec) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17499,7 +17499,7 @@ func (ec *executionContext) marshalNManagedResourceSpec2ᚖgithubᚗcomᚋnegz�
 	return ec._ManagedResourceSpec(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNManagedResourceStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceStatus(ctx context.Context, sel ast.SelectionSet, v *model.ManagedResourceStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNManagedResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceStatus(ctx context.Context, sel ast.SelectionSet, v *model.ManagedResourceStatus) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17509,7 +17509,7 @@ func (ec *executionContext) marshalNManagedResourceStatus2ᚖgithubᚗcomᚋnegz
 	return ec._ManagedResourceStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx context.Context, sel ast.SelectionSet, v *model.ObjectMeta) graphql.Marshaler {
+func (ec *executionContext) marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx context.Context, sel ast.SelectionSet, v *model.ObjectMeta) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17519,15 +17519,15 @@ func (ec *executionContext) marshalNObjectMeta2ᚖgithubᚗcomᚋnegzᚋxgqlᚋi
 	return ec._ObjectMeta(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNOwner2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwner(ctx context.Context, sel ast.SelectionSet, v model.Owner) graphql.Marshaler {
+func (ec *executionContext) marshalNOwner2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwner(ctx context.Context, sel ast.SelectionSet, v model.Owner) graphql.Marshaler {
 	return ec._Owner(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNOwnerConnection2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx context.Context, sel ast.SelectionSet, v model.OwnerConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNOwnerConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx context.Context, sel ast.SelectionSet, v model.OwnerConnection) graphql.Marshaler {
 	return ec._OwnerConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNOwnerConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx context.Context, sel ast.SelectionSet, v *model.OwnerConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNOwnerConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx context.Context, sel ast.SelectionSet, v *model.OwnerConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17537,29 +17537,29 @@ func (ec *executionContext) marshalNOwnerConnection2ᚖgithubᚗcomᚋnegzᚋxgq
 	return ec._OwnerConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNPackageRevisionDesiredState2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackageRevisionDesiredState(ctx context.Context, v interface{}) (model.PackageRevisionDesiredState, error) {
+func (ec *executionContext) unmarshalNPackageRevisionDesiredState2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackageRevisionDesiredState(ctx context.Context, v interface{}) (model.PackageRevisionDesiredState, error) {
 	var res model.PackageRevisionDesiredState
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNPackageRevisionDesiredState2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackageRevisionDesiredState(ctx context.Context, sel ast.SelectionSet, v model.PackageRevisionDesiredState) graphql.Marshaler {
+func (ec *executionContext) marshalNPackageRevisionDesiredState2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackageRevisionDesiredState(ctx context.Context, sel ast.SelectionSet, v model.PackageRevisionDesiredState) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNPolicyRule2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRule(ctx context.Context, sel ast.SelectionSet, v model.PolicyRule) graphql.Marshaler {
+func (ec *executionContext) marshalNPolicyRule2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRule(ctx context.Context, sel ast.SelectionSet, v model.PolicyRule) graphql.Marshaler {
 	return ec._PolicyRule(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProvider2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProvider(ctx context.Context, sel ast.SelectionSet, v model.Provider) graphql.Marshaler {
+func (ec *executionContext) marshalNProvider2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProvider(ctx context.Context, sel ast.SelectionSet, v model.Provider) graphql.Marshaler {
 	return ec._Provider(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProviderList2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderList(ctx context.Context, sel ast.SelectionSet, v model.ProviderList) graphql.Marshaler {
+func (ec *executionContext) marshalNProviderList2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderList(ctx context.Context, sel ast.SelectionSet, v model.ProviderList) graphql.Marshaler {
 	return ec._ProviderList(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProviderList2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderList(ctx context.Context, sel ast.SelectionSet, v *model.ProviderList) graphql.Marshaler {
+func (ec *executionContext) marshalNProviderList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderList(ctx context.Context, sel ast.SelectionSet, v *model.ProviderList) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17569,15 +17569,15 @@ func (ec *executionContext) marshalNProviderList2ᚖgithubᚗcomᚋnegzᚋxgql�
 	return ec._ProviderList(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProviderRevision2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevision(ctx context.Context, sel ast.SelectionSet, v model.ProviderRevision) graphql.Marshaler {
+func (ec *executionContext) marshalNProviderRevision2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevision(ctx context.Context, sel ast.SelectionSet, v model.ProviderRevision) graphql.Marshaler {
 	return ec._ProviderRevision(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProviderRevisionConnection2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx context.Context, sel ast.SelectionSet, v model.ProviderRevisionConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNProviderRevisionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx context.Context, sel ast.SelectionSet, v model.ProviderRevisionConnection) graphql.Marshaler {
 	return ec._ProviderRevisionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProviderRevisionConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx context.Context, sel ast.SelectionSet, v *model.ProviderRevisionConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNProviderRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx context.Context, sel ast.SelectionSet, v *model.ProviderRevisionConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17587,7 +17587,7 @@ func (ec *executionContext) marshalNProviderRevisionConnection2ᚖgithubᚗcom�
 	return ec._ProviderRevisionConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProviderRevisionSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionSpec(ctx context.Context, sel ast.SelectionSet, v *model.ProviderRevisionSpec) graphql.Marshaler {
+func (ec *executionContext) marshalNProviderRevisionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionSpec(ctx context.Context, sel ast.SelectionSet, v *model.ProviderRevisionSpec) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17597,7 +17597,7 @@ func (ec *executionContext) marshalNProviderRevisionSpec2ᚖgithubᚗcomᚋnegz�
 	return ec._ProviderRevisionSpec(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProviderSpec2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderSpec(ctx context.Context, sel ast.SelectionSet, v *model.ProviderSpec) graphql.Marshaler {
+func (ec *executionContext) marshalNProviderSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderSpec(ctx context.Context, sel ast.SelectionSet, v *model.ProviderSpec) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17607,7 +17607,7 @@ func (ec *executionContext) marshalNProviderSpec2ᚖgithubᚗcomᚋnegzᚋxgql�
 	return ec._ProviderSpec(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNSecret2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx context.Context, sel ast.SelectionSet, v model.Secret) graphql.Marshaler {
+func (ec *executionContext) marshalNSecret2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx context.Context, sel ast.SelectionSet, v model.Secret) graphql.Marshaler {
 	return ec._Secret(ctx, sel, &v)
 }
 
@@ -17671,7 +17671,7 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalNTypeReference2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx context.Context, sel ast.SelectionSet, v *model.TypeReference) graphql.Marshaler {
+func (ec *executionContext) marshalNTypeReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx context.Context, sel ast.SelectionSet, v *model.TypeReference) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -17934,7 +17934,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
-func (ec *executionContext) marshalOComposedResource2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ComposedResource) graphql.Marshaler {
+func (ec *executionContext) marshalOComposedResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ComposedResource) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -17961,7 +17961,7 @@ func (ec *executionContext) marshalOComposedResource2ᚕgithubᚗcomᚋnegzᚋxg
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNComposedResource2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResource(ctx, sel, v[i])
+			ret[i] = ec.marshalNComposedResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResource(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -17974,14 +17974,14 @@ func (ec *executionContext) marshalOComposedResource2ᚕgithubᚗcomᚋnegzᚋxg
 	return ret
 }
 
-func (ec *executionContext) marshalOComposedResourceConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.ComposedResourceConnection) graphql.Marshaler {
+func (ec *executionContext) marshalOComposedResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.ComposedResourceConnection) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ComposedResourceConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCompositeResource2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CompositeResource) graphql.Marshaler {
+func (ec *executionContext) marshalOCompositeResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CompositeResource) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18008,7 +18008,7 @@ func (ec *executionContext) marshalOCompositeResource2ᚕgithubᚗcomᚋnegzᚋx
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCompositeResource2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx, sel, v[i])
+			ret[i] = ec.marshalNCompositeResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18021,7 +18021,7 @@ func (ec *executionContext) marshalOCompositeResource2ᚕgithubᚗcomᚋnegzᚋx
 	return ret
 }
 
-func (ec *executionContext) marshalOCompositeResourceClaim2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CompositeResourceClaim) graphql.Marshaler {
+func (ec *executionContext) marshalOCompositeResourceClaim2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CompositeResourceClaim) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18048,7 +18048,7 @@ func (ec *executionContext) marshalOCompositeResourceClaim2ᚕgithubᚗcomᚋneg
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCompositeResourceClaim2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaim(ctx, sel, v[i])
+			ret[i] = ec.marshalNCompositeResourceClaim2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaim(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18061,28 +18061,28 @@ func (ec *executionContext) marshalOCompositeResourceClaim2ᚕgithubᚗcomᚋneg
 	return ret
 }
 
-func (ec *executionContext) marshalOCompositeResourceClaim2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaim(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaim) graphql.Marshaler {
+func (ec *executionContext) marshalOCompositeResourceClaim2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaim(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaim) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CompositeResourceClaim(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCompositeResourceClaimConnectionDetails2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnectionDetails(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimConnectionDetails) graphql.Marshaler {
+func (ec *executionContext) marshalOCompositeResourceClaimConnectionDetails2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnectionDetails(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimConnectionDetails) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CompositeResourceClaimConnectionDetails(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCompositeResourceConnectionDetails2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnectionDetails(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceConnectionDetails) graphql.Marshaler {
+func (ec *executionContext) marshalOCompositeResourceConnectionDetails2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnectionDetails(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceConnectionDetails) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CompositeResourceConnectionDetails(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCompositeResourceDefinition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CompositeResourceDefinition) graphql.Marshaler {
+func (ec *executionContext) marshalOCompositeResourceDefinition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CompositeResourceDefinition) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18109,7 +18109,7 @@ func (ec *executionContext) marshalOCompositeResourceDefinition2ᚕgithubᚗcom�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCompositeResourceDefinition2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinition(ctx, sel, v[i])
+			ret[i] = ec.marshalNCompositeResourceDefinition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinition(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18122,28 +18122,28 @@ func (ec *executionContext) marshalOCompositeResourceDefinition2ᚕgithubᚗcom�
 	return ret
 }
 
-func (ec *executionContext) marshalOCompositeResourceDefinitionControllerStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionControllerStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionControllerStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOCompositeResourceDefinitionControllerStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionControllerStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionControllerStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CompositeResourceDefinitionControllerStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionNames) graphql.Marshaler {
+func (ec *executionContext) marshalOCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionNames) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CompositeResourceDefinitionNames(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCompositeResourceDefinitionStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOCompositeResourceDefinitionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CompositeResourceDefinitionStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCompositeResourceDefinitionVersion2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionVersionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CompositeResourceDefinitionVersion) graphql.Marshaler {
+func (ec *executionContext) marshalOCompositeResourceDefinitionVersion2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionVersionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CompositeResourceDefinitionVersion) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18170,7 +18170,7 @@ func (ec *executionContext) marshalOCompositeResourceDefinitionVersion2ᚕgithub
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCompositeResourceDefinitionVersion2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionVersion(ctx, sel, v[i])
+			ret[i] = ec.marshalNCompositeResourceDefinitionVersion2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionVersion(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18183,14 +18183,14 @@ func (ec *executionContext) marshalOCompositeResourceDefinitionVersion2ᚕgithub
 	return ret
 }
 
-func (ec *executionContext) marshalOCompositeResourceValidation2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceValidation(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceValidation) graphql.Marshaler {
+func (ec *executionContext) marshalOCompositeResourceValidation2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceValidation(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceValidation) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CompositeResourceValidation(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOComposition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Composition) graphql.Marshaler {
+func (ec *executionContext) marshalOComposition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Composition) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18217,7 +18217,7 @@ func (ec *executionContext) marshalOComposition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNComposition2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx, sel, v[i])
+			ret[i] = ec.marshalNComposition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18230,21 +18230,21 @@ func (ec *executionContext) marshalOComposition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalOComposition2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx context.Context, sel ast.SelectionSet, v *model.Composition) graphql.Marshaler {
+func (ec *executionContext) marshalOComposition2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx context.Context, sel ast.SelectionSet, v *model.Composition) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Composition(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCompositionStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositionStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOCompositionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositionStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CompositionStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Condition) graphql.Marshaler {
+func (ec *executionContext) marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Condition) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18271,7 +18271,7 @@ func (ec *executionContext) marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋin
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCondition2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCondition(ctx, sel, v[i])
+			ret[i] = ec.marshalNCondition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCondition(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18284,7 +18284,7 @@ func (ec *executionContext) marshalOCondition2ᚕgithubᚗcomᚋnegzᚋxgqlᚋin
 	return ret
 }
 
-func (ec *executionContext) marshalOConfiguration2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Configuration) graphql.Marshaler {
+func (ec *executionContext) marshalOConfiguration2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Configuration) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18311,7 +18311,7 @@ func (ec *executionContext) marshalOConfiguration2ᚕgithubᚗcomᚋnegzᚋxgql�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNConfiguration2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfiguration(ctx, sel, v[i])
+			ret[i] = ec.marshalNConfiguration2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfiguration(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18324,7 +18324,7 @@ func (ec *executionContext) marshalOConfiguration2ᚕgithubᚗcomᚋnegzᚋxgql�
 	return ret
 }
 
-func (ec *executionContext) marshalOConfigurationRevision2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ConfigurationRevision) graphql.Marshaler {
+func (ec *executionContext) marshalOConfigurationRevision2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ConfigurationRevision) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18351,7 +18351,7 @@ func (ec *executionContext) marshalOConfigurationRevision2ᚕgithubᚗcomᚋnegz
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNConfigurationRevision2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevision(ctx, sel, v[i])
+			ret[i] = ec.marshalNConfigurationRevision2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevision(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18364,28 +18364,28 @@ func (ec *executionContext) marshalOConfigurationRevision2ᚕgithubᚗcomᚋnegz
 	return ret
 }
 
-func (ec *executionContext) marshalOConfigurationRevisionStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionStatus(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationRevisionStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOConfigurationRevisionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionStatus(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationRevisionStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ConfigurationRevisionStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOConfigurationStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationStatus(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOConfigurationStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationStatus(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ConfigurationStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCustomResourceDefinitionStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionStatus(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOCustomResourceDefinitionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionStatus(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CustomResourceDefinitionStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOCustomResourceDefinitionVersion2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionVersionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CustomResourceDefinitionVersion) graphql.Marshaler {
+func (ec *executionContext) marshalOCustomResourceDefinitionVersion2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionVersionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CustomResourceDefinitionVersion) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18412,7 +18412,7 @@ func (ec *executionContext) marshalOCustomResourceDefinitionVersion2ᚕgithubᚗ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCustomResourceDefinitionVersion2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionVersion(ctx, sel, v[i])
+			ret[i] = ec.marshalNCustomResourceDefinitionVersion2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionVersion(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18425,14 +18425,14 @@ func (ec *executionContext) marshalOCustomResourceDefinitionVersion2ᚕgithubᚗ
 	return ret
 }
 
-func (ec *executionContext) marshalOCustomResourceValidation2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceValidation(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceValidation) graphql.Marshaler {
+func (ec *executionContext) marshalOCustomResourceValidation2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceValidation(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceValidation) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._CustomResourceValidation(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalODeletionPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeletionPolicy(ctx context.Context, v interface{}) (*model.DeletionPolicy, error) {
+func (ec *executionContext) unmarshalODeletionPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeletionPolicy(ctx context.Context, v interface{}) (*model.DeletionPolicy, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -18441,14 +18441,14 @@ func (ec *executionContext) unmarshalODeletionPolicy2ᚖgithubᚗcomᚋnegzᚋxg
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalODeletionPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeletionPolicy(ctx context.Context, sel ast.SelectionSet, v *model.DeletionPolicy) graphql.Marshaler {
+func (ec *executionContext) marshalODeletionPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeletionPolicy(ctx context.Context, sel ast.SelectionSet, v *model.DeletionPolicy) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) marshalOEvent2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Event) graphql.Marshaler {
+func (ec *executionContext) marshalOEvent2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Event) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18475,7 +18475,7 @@ func (ec *executionContext) marshalOEvent2ᚕgithubᚗcomᚋnegzᚋxgqlᚋintern
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNEvent2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEvent(ctx, sel, v[i])
+			ret[i] = ec.marshalNEvent2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEvent(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18488,14 +18488,14 @@ func (ec *executionContext) marshalOEvent2ᚕgithubᚗcomᚋnegzᚋxgqlᚋintern
 	return ret
 }
 
-func (ec *executionContext) marshalOEventSource2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventSource(ctx context.Context, sel ast.SelectionSet, v *model.EventSource) graphql.Marshaler {
+func (ec *executionContext) marshalOEventSource2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventSource(ctx context.Context, sel ast.SelectionSet, v *model.EventSource) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._EventSource(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOEventType2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventType(ctx context.Context, v interface{}) (*model.EventType, error) {
+func (ec *executionContext) unmarshalOEventType2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventType(ctx context.Context, v interface{}) (*model.EventType, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -18504,7 +18504,7 @@ func (ec *executionContext) unmarshalOEventType2ᚖgithubᚗcomᚋnegzᚋxgqlᚋ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOEventType2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventType(ctx context.Context, sel ast.SelectionSet, v *model.EventType) graphql.Marshaler {
+func (ec *executionContext) marshalOEventType2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventType(ctx context.Context, sel ast.SelectionSet, v *model.EventType) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18541,7 +18541,7 @@ func (ec *executionContext) marshalOJSONObject2ᚖstring(ctx context.Context, se
 	return graphql.MarshalString(*v)
 }
 
-func (ec *executionContext) marshalOKubernetesResource2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.KubernetesResource) graphql.Marshaler {
+func (ec *executionContext) marshalOKubernetesResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.KubernetesResource) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18568,7 +18568,7 @@ func (ec *executionContext) marshalOKubernetesResource2ᚕgithubᚗcomᚋnegzᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNKubernetesResource2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, sel, v[i])
+			ret[i] = ec.marshalNKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18581,7 +18581,7 @@ func (ec *executionContext) marshalOKubernetesResource2ᚕgithubᚗcomᚋnegzᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalOLabelSelector2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐLabelSelector(ctx context.Context, sel ast.SelectionSet, v *model.LabelSelector) graphql.Marshaler {
+func (ec *executionContext) marshalOLabelSelector2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐLabelSelector(ctx context.Context, sel ast.SelectionSet, v *model.LabelSelector) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18603,7 +18603,7 @@ func (ec *executionContext) marshalOMap2map(ctx context.Context, sel ast.Selecti
 	return graphql.MarshalMap(v)
 }
 
-func (ec *executionContext) marshalOOwner2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Owner) graphql.Marshaler {
+func (ec *executionContext) marshalOOwner2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Owner) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18630,7 +18630,7 @@ func (ec *executionContext) marshalOOwner2ᚕgithubᚗcomᚋnegzᚋxgqlᚋintern
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNOwner2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwner(ctx, sel, v[i])
+			ret[i] = ec.marshalNOwner2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwner(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18643,7 +18643,7 @@ func (ec *executionContext) marshalOOwner2ᚕgithubᚗcomᚋnegzᚋxgqlᚋintern
 	return ret
 }
 
-func (ec *executionContext) unmarshalOPackagePullPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackagePullPolicy(ctx context.Context, v interface{}) (*model.PackagePullPolicy, error) {
+func (ec *executionContext) unmarshalOPackagePullPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackagePullPolicy(ctx context.Context, v interface{}) (*model.PackagePullPolicy, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -18652,14 +18652,14 @@ func (ec *executionContext) unmarshalOPackagePullPolicy2ᚖgithubᚗcomᚋnegz�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOPackagePullPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackagePullPolicy(ctx context.Context, sel ast.SelectionSet, v *model.PackagePullPolicy) graphql.Marshaler {
+func (ec *executionContext) marshalOPackagePullPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackagePullPolicy(ctx context.Context, sel ast.SelectionSet, v *model.PackagePullPolicy) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) marshalOPolicyRule2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRuleᚄ(ctx context.Context, sel ast.SelectionSet, v []model.PolicyRule) graphql.Marshaler {
+func (ec *executionContext) marshalOPolicyRule2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRuleᚄ(ctx context.Context, sel ast.SelectionSet, v []model.PolicyRule) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18686,7 +18686,7 @@ func (ec *executionContext) marshalOPolicyRule2ᚕgithubᚗcomᚋnegzᚋxgqlᚋi
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNPolicyRule2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRule(ctx, sel, v[i])
+			ret[i] = ec.marshalNPolicyRule2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRule(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18699,7 +18699,7 @@ func (ec *executionContext) marshalOPolicyRule2ᚕgithubᚗcomᚋnegzᚋxgqlᚋi
 	return ret
 }
 
-func (ec *executionContext) marshalOProvider2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Provider) graphql.Marshaler {
+func (ec *executionContext) marshalOProvider2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Provider) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18726,7 +18726,7 @@ func (ec *executionContext) marshalOProvider2ᚕgithubᚗcomᚋnegzᚋxgqlᚋint
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNProvider2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProvider(ctx, sel, v[i])
+			ret[i] = ec.marshalNProvider2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProvider(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18739,21 +18739,21 @@ func (ec *executionContext) marshalOProvider2ᚕgithubᚗcomᚋnegzᚋxgqlᚋint
 	return ret
 }
 
-func (ec *executionContext) marshalOProviderConfig2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfig(ctx context.Context, sel ast.SelectionSet, v *model.ProviderConfig) graphql.Marshaler {
+func (ec *executionContext) marshalOProviderConfig2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfig(ctx context.Context, sel ast.SelectionSet, v *model.ProviderConfig) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ProviderConfig(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOProviderConfigStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigStatus(ctx context.Context, sel ast.SelectionSet, v *model.ProviderConfigStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOProviderConfigStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigStatus(ctx context.Context, sel ast.SelectionSet, v *model.ProviderConfigStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ProviderConfigStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOProviderRevision2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ProviderRevision) graphql.Marshaler {
+func (ec *executionContext) marshalOProviderRevision2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ProviderRevision) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18780,7 +18780,7 @@ func (ec *executionContext) marshalOProviderRevision2ᚕgithubᚗcomᚋnegzᚋxg
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNProviderRevision2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevision(ctx, sel, v[i])
+			ret[i] = ec.marshalNProviderRevision2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevision(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18793,21 +18793,21 @@ func (ec *executionContext) marshalOProviderRevision2ᚕgithubᚗcomᚋnegzᚋxg
 	return ret
 }
 
-func (ec *executionContext) marshalOProviderRevisionStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionStatus(ctx context.Context, sel ast.SelectionSet, v *model.ProviderRevisionStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOProviderRevisionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionStatus(ctx context.Context, sel ast.SelectionSet, v *model.ProviderRevisionStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ProviderRevisionStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOProviderStatus2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderStatus(ctx context.Context, sel ast.SelectionSet, v *model.ProviderStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOProviderStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderStatus(ctx context.Context, sel ast.SelectionSet, v *model.ProviderStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ProviderStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalORevisionActivationPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐRevisionActivationPolicy(ctx context.Context, v interface{}) (*model.RevisionActivationPolicy, error) {
+func (ec *executionContext) unmarshalORevisionActivationPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐRevisionActivationPolicy(ctx context.Context, v interface{}) (*model.RevisionActivationPolicy, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -18816,14 +18816,14 @@ func (ec *executionContext) unmarshalORevisionActivationPolicy2ᚖgithubᚗcom�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalORevisionActivationPolicy2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐRevisionActivationPolicy(ctx context.Context, sel ast.SelectionSet, v *model.RevisionActivationPolicy) graphql.Marshaler {
+func (ec *executionContext) marshalORevisionActivationPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐRevisionActivationPolicy(ctx context.Context, sel ast.SelectionSet, v *model.RevisionActivationPolicy) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) marshalOSecret2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Secret) graphql.Marshaler {
+func (ec *executionContext) marshalOSecret2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Secret) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18850,7 +18850,7 @@ func (ec *executionContext) marshalOSecret2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinter
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNSecret2githubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx, sel, v[i])
+			ret[i] = ec.marshalNSecret2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -18863,7 +18863,7 @@ func (ec *executionContext) marshalOSecret2ᚕgithubᚗcomᚋnegzᚋxgqlᚋinter
 	return ret
 }
 
-func (ec *executionContext) marshalOSecret2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx context.Context, sel ast.SelectionSet, v *model.Secret) graphql.Marshaler {
+func (ec *executionContext) marshalOSecret2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx context.Context, sel ast.SelectionSet, v *model.Secret) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -18945,7 +18945,7 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 	return graphql.MarshalTime(*v)
 }
 
-func (ec *executionContext) marshalOTypeReference2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx context.Context, sel ast.SelectionSet, v *model.TypeReference) graphql.Marshaler {
+func (ec *executionContext) marshalOTypeReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx context.Context, sel ast.SelectionSet, v *model.TypeReference) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
