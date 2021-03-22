@@ -378,9 +378,9 @@ type ComplexityRoot struct {
 	}
 
 	ManagedResourceSpec struct {
-		DeletionPolicy           func(childComplexity int) int
-		ProviderConfig           func(childComplexity int) int
-		WritesConnectionSecretTo func(childComplexity int) int
+		ConnectionSecret func(childComplexity int) int
+		DeletionPolicy   func(childComplexity int) int
+		ProviderConfig   func(childComplexity int) int
 	}
 
 	ManagedResourceStatus struct {
@@ -578,7 +578,7 @@ type ManagedResourceResolver interface {
 	Events(ctx context.Context, obj *model.ManagedResource, limit *int) (*model.EventConnection, error)
 }
 type ManagedResourceSpecResolver interface {
-	WritesConnectionSecretTo(ctx context.Context, obj *model.ManagedResourceSpec) (*model.Secret, error)
+	ConnectionSecret(ctx context.Context, obj *model.ManagedResourceSpec) (*model.Secret, error)
 	ProviderConfig(ctx context.Context, obj *model.ManagedResourceSpec) (*model.ProviderConfig, error)
 }
 type ObjectMetaResolver interface {
@@ -1936,6 +1936,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ManagedResource.Status(childComplexity), true
 
+	case "ManagedResourceSpec.connectionSecret":
+		if e.complexity.ManagedResourceSpec.ConnectionSecret == nil {
+			break
+		}
+
+		return e.complexity.ManagedResourceSpec.ConnectionSecret(childComplexity), true
+
 	case "ManagedResourceSpec.deletionPolicy":
 		if e.complexity.ManagedResourceSpec.DeletionPolicy == nil {
 			break
@@ -1949,13 +1956,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ManagedResourceSpec.ProviderConfig(childComplexity), true
-
-	case "ManagedResourceSpec.writesConnectionSecretTo":
-		if e.complexity.ManagedResourceSpec.WritesConnectionSecretTo == nil {
-			break
-		}
-
-		return e.complexity.ManagedResourceSpec.WritesConnectionSecretTo(childComplexity), true
 
 	case "ManagedResourceStatus.conditions":
 		if e.complexity.ManagedResourceStatus.Conditions == nil {
@@ -3076,7 +3076,7 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
 }
 
 type ManagedResourceSpec {
-  writesConnectionSecretTo: Secret @goField(forceResolver: true)
+  connectionSecret: Secret @goField(forceResolver: true)
   providerConfig: ProviderConfig @goField(forceResolver: true)
   deletionPolicy: DeletionPolicy
 }
@@ -9802,7 +9802,7 @@ func (ec *executionContext) _ManagedResource_events(ctx context.Context, field g
 	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋnegzᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ManagedResourceSpec_writesConnectionSecretTo(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResourceSpec) (ret graphql.Marshaler) {
+func (ec *executionContext) _ManagedResourceSpec_connectionSecret(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResourceSpec) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -9820,7 +9820,7 @@ func (ec *executionContext) _ManagedResourceSpec_writesConnectionSecretTo(ctx co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ManagedResourceSpec().WritesConnectionSecretTo(rctx, obj)
+		return ec.resolvers.ManagedResourceSpec().ConnectionSecret(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15991,7 +15991,7 @@ func (ec *executionContext) _ManagedResourceSpec(ctx context.Context, sel ast.Se
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ManagedResourceSpec")
-		case "writesConnectionSecretTo":
+		case "connectionSecret":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -15999,7 +15999,7 @@ func (ec *executionContext) _ManagedResourceSpec(ctx context.Context, sel ast.Se
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._ManagedResourceSpec_writesConnectionSecretTo(ctx, field, obj)
+				res = ec._ManagedResourceSpec_connectionSecret(ctx, field, obj)
 				return res
 			})
 		case "providerConfig":

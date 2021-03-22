@@ -118,7 +118,7 @@ func (r *Root) ManagedResource() generated.ManagedResourceResolver {
 // ManagedResourceSpec resolves properties of the CustomResourceDefinition GraphQL
 // type.
 func (r *Root) ManagedResourceSpec() generated.ManagedResourceSpecResolver {
-	return nil
+	return &managedResourceSpec{clients: r.clients}
 }
 
 // Provider resolves properties of the Provider GraphQL type.
