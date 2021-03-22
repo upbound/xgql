@@ -3,7 +3,7 @@ package resolvers
 import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/negz/xgql/internal/graph/generated"
+	"github.com/upbound/xgql/internal/graph/generated"
 )
 
 // A ClientCache can produce a client for a given token.

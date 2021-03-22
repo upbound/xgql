@@ -24,10 +24,10 @@ import (
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
-	"github.com/negz/xgql/internal/clients"
-	"github.com/negz/xgql/internal/graph/generated"
-	"github.com/negz/xgql/internal/graph/resolvers"
-	"github.com/negz/xgql/internal/token"
+	"github.com/upbound/xgql/internal/clients"
+	"github.com/upbound/xgql/internal/graph/generated"
+	"github.com/upbound/xgql/internal/graph/resolvers"
+	"github.com/upbound/xgql/internal/token"
 )
 
 func main() {

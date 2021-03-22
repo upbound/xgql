@@ -13,8 +13,8 @@ import (
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
-	"github.com/negz/xgql/internal/graph/model"
-	"github.com/negz/xgql/internal/token"
+	"github.com/upbound/xgql/internal/graph/model"
+	"github.com/upbound/xgql/internal/token"
 )
 
 type configuration struct {

@@ -1,4 +1,4 @@
-module github.com/negz/xgql
+module github.com/upbound/xgql
 
 go 1.16
 

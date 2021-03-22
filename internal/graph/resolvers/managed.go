@@ -8,8 +8,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/json"
 
-	"github.com/negz/xgql/internal/graph/model"
-	"github.com/negz/xgql/internal/token"
+	"github.com/upbound/xgql/internal/graph/model"
+	"github.com/upbound/xgql/internal/token"
 )
 
 type managedResourceSpec struct {
