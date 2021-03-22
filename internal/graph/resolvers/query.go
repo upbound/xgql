@@ -30,16 +30,13 @@ func (r *query) Providers(ctx context.Context, limit *int) (*model.ProviderList,
 		return nil, errors.Wrap(err, "cannot list providers")
 	}
 
-	// Trim our input list early to avoid doing more conversions than we must.
-	items := in.Items[:getLimit(limit, len(in.Items))]
-
 	out := &model.ProviderList{
+		Items: make([]model.Provider, getLimit(limit, len(in.Items))),
 		Count: len(in.Items),
-		Items: make([]model.Provider, len(items)),
 	}
 
-	for i := range items {
-		p := items[i] // So we don't take the address of a range variable.
+	for i := range out.Items {
+		p := in.Items[i]
 
 		raw, err := json.Marshal(p)
 		if err != nil {

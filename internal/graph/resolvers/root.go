@@ -96,7 +96,7 @@ func (r *Root) ConfigurationRevisionStatus() generated.ConfigurationRevisionStat
 // CustomResourceDefinition resolves properties of the CustomResourceDefinition
 // GraphQL type.
 func (r *Root) CustomResourceDefinition() generated.CustomResourceDefinitionResolver {
-	return nil
+	return &crd{clients: r.clients}
 }
 
 // Event resolves properties of the Event GraphQL type.

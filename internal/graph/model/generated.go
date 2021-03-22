@@ -367,12 +367,6 @@ type ManagedResource struct {
 func (ManagedResource) IsComposedResource()   {}
 func (ManagedResource) IsKubernetesResource() {}
 
-type ManagedResourceSpec struct {
-	WritesConnectionSecretTo *Secret         `json:"writesConnectionSecretTo"`
-	ProviderConfig           *ProviderConfig `json:"providerConfig"`
-	DeletionPolicy           *DeletionPolicy `json:"deletionPolicy"`
-}
-
 type ManagedResourceStatus struct {
 	Conditions []Condition `json:"conditions"`
 }
