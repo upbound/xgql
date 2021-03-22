@@ -40,14 +40,47 @@ gqlgen magically matches types in the `model` package by name and won't generate
 them if they already exist. Generation of resolver stubs is disabled because it
 is somewhat confusing and of little benefit.
 
-To build:
+To try it out:
+
 ```console
 # Running a bare 'make' may be required to pull down the build submodule.
 make
 
-# Run code generation, linting, tests, and build artifacts.
+# Lint, test, and build xgql
 make reviewable test build
+
+# Spin up a kind cluster.
+./cluster/local/kind.sh up
+
+# Install xgql
+./cluster/local/kind.sh helm-install
+
+# Install the latest Crossplane release (using Helm 3)
+helm repo add crossplane-stable https://charts.crossplane.io/stable
+helm install crossplane --namespace crossplane-system crossplane-stable/crossplane
+
+# Install the Crossplane CLI - be sure to follow the instructions.
+curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh
+
+# Install a Crossplane configuration.
+# See https://crossplane.io/docs for the latest getting started configs.
+kubectl crossplane install configuration registry.upbound.io/xp/getting-started-with-aws-with-vpc:v1.1.0
+
+
+# Forward a local port
+kubectl -n crossplane-system port-forward deployment/xgql 8080
+
+# Open the GraphQL playground at http://localhost:8080
 ```
+
+You may to avoid deploying `xqgl` via Helm while developing. Instead you can
+spin up a `kind` cluster, install Crossplane and run `xgql` outside the cluster
+by running`go run cmd/xgql/main.go --debug`. Note that in this mode `xgql` will
+attempt to find and authenticate to a cluster by reading your `~/.kube/config`
+file. Typically this file uses a client certificate rather than a bearer token
+to authentication to the cluster. Due to the way `xgql` Kubernetes API clients
+are wired up this will result in it using a single client for token `""` that in
+fact uses your client certificate to interact with the API server.
 
 ## Example queries
 Querying configurations:
