@@ -46,9 +46,6 @@ func Config() (*rest.Config, error) {
 		return nil, errors.Wrap(err, "cannot create in-cluster configuration")
 	}
 
-	cfg.BearerTokenFile = ""
-	cfg.BearerToken = ""
-
 	// ctrl.GetConfig tunes QPS and burst for Kubernetes controllers. We're not
 	// a controller and we expect to be creating many clients, so we tune these
 	// back down to the client-go defaults.
