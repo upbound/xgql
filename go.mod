@@ -7,6 +7,7 @@ require (
 	github.com/crossplane/crossplane v1.1.0
 	github.com/crossplane/crossplane-runtime v0.13.0
 	github.com/go-chi/chi/v5 v5.0.1
+	github.com/google/go-cmp v0.5.2
 	github.com/pkg/errors v0.9.1
 	github.com/vektah/gqlparser/v2 v2.1.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6

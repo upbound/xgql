@@ -20,7 +20,24 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
 )
 
-const expiry = 5 * time.Minute
+const (
+	errNewClient        = "cannot create new write client"
+	errNewCache         = "cannot create new read cache"
+	errDelegClient      = "cannot create cache-backed client"
+	errWaitForCacheSync = "cannot sync client cache"
+)
+
+// A NewCacheFn creates a new controller-runtime cache.
+type NewCacheFn func(cfg *rest.Config, o cache.Options) (cache.Cache, error)
+
+// A NewClientFn creates a new controller-runtime client.
+type NewClientFn func(cfg *rest.Config, o client.Options) (client.Client, error)
+
+// The default new cache and new controller functions.
+var (
+	DefaultNewCacheFn  NewCacheFn  = cache.New
+	DefaultNewClientFn NewClientFn = client.New
+)
 
 // Config returns a REST config.
 func Config() (*rest.Config, error) {
@@ -76,6 +93,10 @@ type Cache struct {
 	scheme  *runtime.Scheme
 	mapper  meta.RESTMapper
 	nocache []client.Object
+	expiry  time.Duration
+
+	newCache  NewCacheFn
+	newClient NewClientFn
 
 	salt []byte
 	log  logging.Logger
@@ -100,6 +121,15 @@ func WithRESTMapper(m meta.RESTMapper) CacheOption {
 	}
 }
 
+// WithExpiry configures the duration until each client expires. Each time any
+// of a client's methods are called the expiry time is reset to this value. When
+// a client expires its cache will be garbage collected.
+func WithExpiry(d time.Duration) CacheOption {
+	return func(c *Cache) {
+		c.expiry = d
+	}
+}
+
 // DoNotCache configures clients not to cache objects of the supplied types.
 // Note that the cache machinery extracts a GVK from these objects, so they can
 // either be types known to the scheme or *unstructured.Unstructured with their
@@ -119,10 +149,16 @@ func NewCache(s *runtime.Scheme, c *rest.Config, o ...CacheOption) *Cache {
 
 	ch := &Cache{
 		active: make(map[string]*session),
+
 		cfg:    c,
 		scheme: s,
-		salt:   salt,
-		log:    logging.NewNopLogger(),
+		expiry: 5 * time.Minute,
+
+		newCache:  DefaultNewCacheFn,
+		newClient: DefaultNewClientFn,
+
+		salt: salt,
+		log:  logging.NewNopLogger(),
 	}
 
 	for _, fn := range o {
@@ -181,14 +217,14 @@ func (c *Cache) Get(token string, o ...GetOption) (client.Client, error) {
 	cfg.BearerToken = token
 	cfg.BearerTokenFile = ""
 
-	wc, err := client.New(cfg, client.Options{Scheme: c.scheme, Mapper: c.mapper})
+	wc, err := c.newClient(cfg, client.Options{Scheme: c.scheme, Mapper: c.mapper})
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot create write client")
+		return nil, errors.Wrap(err, errNewClient)
 	}
 
-	ca, err := cache.New(cfg, cache.Options{Scheme: c.scheme, Mapper: c.mapper})
+	ca, err := c.newCache(cfg, cache.Options{Scheme: c.scheme, Mapper: c.mapper})
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot create cache")
+		return nil, errors.Wrap(err, errNewCache)
 	}
 
 	dci := client.NewDelegatingClientInput{
@@ -205,23 +241,24 @@ func (c *Cache) Get(token string, o ...GetOption) (client.Client, error) {
 	}
 	dc, err := client.NewDelegatingClient(dci)
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot create delegating client")
+		return nil, errors.Wrap(err, errDelegClient)
 	}
 
-	// We use a distinct expiry ticker rather than a context deadline or timeout
+	// We use a distinct s.expiry ticker rather than a context deadline or timeout
 	// because it's not possible to extend a context's deadline or timeout, but it
 	// is possible to 'reset' (i.e. extend) a ticker.
-	expired := time.NewTicker(expiry)
-	newExpiry := time.Now().Add(expiry)
+	expired := time.NewTicker(c.expiry)
+	newExpiry := time.Now().Add(c.expiry)
 	ctx, cancel := context.WithCancel(context.Background())
-	sn = &session{client: dc, cancel: cancel, expired: expired, log: log}
+	sn = &session{client: dc, cancel: cancel, expiry: c.expiry, expired: expired, log: log}
 
 	c.mx.Lock()
 	c.active[id] = sn
 	c.mx.Unlock()
 
 	go func() {
-		_ = ca.Start(ctx)
+		err := ca.Start(ctx)
+		log.Debug("Cache stopped", "error", err)
 
 		// Start blocks until ctx is closed, or it encounters an error. If we make
 		// it here either the cache crashed, or the context was cancelled (e.g.
@@ -234,8 +271,10 @@ func (c *Cache) Get(token string, o ...GetOption) (client.Client, error) {
 		select {
 		case <-expired.C:
 			// We expired, and should remove ourself from the session cache.
+			log.Debug("Client expired")
 			c.remove(id)
 		case <-ctx.Done():
+			log.Debug("Client stopped")
 			// We're done for some other reason (e.g. the cache crashed). We assume
 			// whatever cancelled our context did so by calling done() - we just need
 			// to let this goroutine finish.
@@ -244,10 +283,10 @@ func (c *Cache) Get(token string, o ...GetOption) (client.Client, error) {
 
 	if !ca.WaitForCacheSync(ctx) {
 		c.remove(id)
-		return nil, errors.New("cannot sync cache")
+		return nil, errors.New(errWaitForCacheSync)
 	}
 
-	log.Debug("Created new client",
+	log.Debug("Created client",
 		"duration", time.Since(started),
 		"new-expiry", newExpiry,
 	)
@@ -263,13 +302,14 @@ func (c *Cache) remove(id string) {
 		sn.cancel()
 		sn.expired.Stop()
 		delete(c.active, id)
-		c.log.Debug("Removed client from cache", "client-id", id)
+		c.log.Debug("Removed client cache", "client-id", id)
 	}
 }
 
 type session struct {
 	client  client.Client
 	cancel  context.CancelFunc
+	expiry  time.Duration
 	expired *time.Ticker
 
 	log logging.Logger
@@ -277,120 +317,120 @@ type session struct {
 
 func (s *session) Get(ctx context.Context, key client.ObjectKey, obj client.Object) error {
 	t := time.Now()
-	s.expired.Reset(expiry)
+	s.expired.Reset(s.expiry)
 	err := s.client.Get(ctx, key, obj)
 	s.log.Debug("Client called",
 		"operation", "Get",
 		"duration", time.Since(t),
-		"new-expiry", t.Add(expiry),
+		"new-expiry", t.Add(s.expiry),
 	)
 	return err
 }
 
 func (s *session) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
 	t := time.Now()
-	s.expired.Reset(expiry)
+	s.expired.Reset(s.expiry)
 	err := s.client.List(ctx, list, opts...)
 	s.log.Debug("Client called",
 		"operation", "List",
 		"duration", time.Since(t),
-		"new-expiry", t.Add(expiry),
+		"new-expiry", t.Add(s.expiry),
 	)
 	return err
 }
 
 func (s *session) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
 	t := time.Now()
-	s.expired.Reset(expiry)
+	s.expired.Reset(s.expiry)
 	err := s.client.Create(ctx, obj, opts...)
 	s.log.Debug("Client called",
 		"operation", "Create",
 		"duration", time.Since(t),
-		"new-expiry", t.Add(expiry),
+		"new-expiry", t.Add(s.expiry),
 	)
 	return err
 }
 
 func (s *session) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
 	t := time.Now()
-	s.expired.Reset(expiry)
+	s.expired.Reset(s.expiry)
 	err := s.client.Delete(ctx, obj, opts...)
 	s.log.Debug("Client called",
 		"operation", "Delete",
 		"duration", time.Since(t),
-		"new-expiry", t.Add(expiry),
+		"new-expiry", t.Add(s.expiry),
 	)
 	return err
 }
 
 func (s *session) Update(ctx context.Context, obj client.Object, opts ...client.UpdateOption) error {
 	t := time.Now()
-	s.expired.Reset(expiry)
+	s.expired.Reset(s.expiry)
 	err := s.client.Update(ctx, obj, opts...)
 	s.log.Debug("Client called",
 		"operation", "Update",
 		"duration", time.Since(t),
-		"new-expiry", t.Add(expiry),
+		"new-expiry", t.Add(s.expiry),
 	)
 	return err
 }
 
 func (s *session) Patch(ctx context.Context, obj client.Object, patch client.Patch, opts ...client.PatchOption) error {
 	t := time.Now()
-	s.expired.Reset(expiry)
+	s.expired.Reset(s.expiry)
 	err := s.client.Patch(ctx, obj, patch, opts...)
 	s.log.Debug("Client called",
 		"operation", "Patch",
 		"duration", time.Since(t),
-		"new-expiry", t.Add(expiry),
+		"new-expiry", t.Add(s.expiry),
 	)
 	return err
 }
 
 func (s *session) DeleteAllOf(ctx context.Context, obj client.Object, opts ...client.DeleteAllOfOption) error {
 	t := time.Now()
-	s.expired.Reset(expiry)
+	s.expired.Reset(s.expiry)
 	err := s.client.DeleteAllOf(ctx, obj, opts...)
 	s.log.Debug("Client called",
 		"operation", "DeleteallOf",
 		"duration", time.Since(t),
-		"new-expiry", t.Add(expiry),
+		"new-expiry", t.Add(s.expiry),
 	)
 	return err
 }
 
 func (s *session) Status() client.StatusWriter {
 	t := time.Now()
-	s.expired.Reset(expiry)
+	s.expired.Reset(s.expiry)
 	err := s.client.Status()
 	s.log.Debug("Client called",
 		"operation", "Status",
 		"duration", time.Since(t),
-		"new-expiry", t.Add(expiry),
+		"new-expiry", t.Add(s.expiry),
 	)
 	return err
 }
 
 func (s *session) Scheme() *runtime.Scheme {
 	t := time.Now()
-	s.expired.Reset(expiry)
+	s.expired.Reset(s.expiry)
 	err := s.client.Scheme()
 	s.log.Debug("Client called",
 		"operation", "Scheme",
 		"duration", time.Since(t),
-		"new-expiry", t.Add(expiry),
+		"new-expiry", t.Add(s.expiry),
 	)
 	return err
 }
 
 func (s *session) RESTMapper() meta.RESTMapper {
 	t := time.Now()
-	s.expired.Reset(expiry)
+	s.expired.Reset(s.expiry)
 	err := s.client.RESTMapper()
 	s.log.Debug("Client called",
 		"operation", "Scheme",
 		"duration", time.Since(t),
-		"new-expiry", t.Add(expiry),
+		"new-expiry", t.Add(s.expiry),
 	)
 	return err
 }
