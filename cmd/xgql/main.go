@@ -92,10 +92,10 @@ func main() {
 	cfg, err := clients.Config()
 	kingpin.FatalIfError(err, "cannot create client config")
 
-	// TODO(negz): We create a global REST mapper here with _our_ credentials
-	// (not the bearer token of each caller) because doing is very slow; it can
-	// take ~10 seconds. Is there some more performant way to do this? Is this a
-	// security risk - i.e. does RBAC apply to discovery APIs?
+	// We create a global REST mapper once here with _our_ credentials (not the
+	// bearer token of each caller) because doing so is very slow; it can take
+	// 10-15 seconds. Kubernetes allows any authenticated user to access the
+	// discovery API via the system:discovery ClusterRoleBinding.
 	t := time.Now()
 	rm, err := apiutil.NewDynamicRESTMapper(cfg)
 	kingpin.FatalIfError(err, "cannot create REST mapper")
