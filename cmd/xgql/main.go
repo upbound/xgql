@@ -11,15 +11,15 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
+	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
@@ -67,6 +67,16 @@ func main() {
 
 	zl := zap.New(zap.UseDevMode(*debug))
 	log := logging.NewLogrLogger(zl.WithName("xgql"))
+
+	// NOTE(negz): This handler is called when a cache can't watch a type that
+	// it would like to, for example because the user doesn't have RBAC access
+	// to watch that type, or because it was defined by a CRD that is now gone.
+	// Ideally we'd terminate any cache in this state, but controller-runtime
+	// does not surface the configurable watch error handling of the underlying
+	// client-go machinery, so instead we just log it. The errors will persist
+	// until they are resolved (e.g. the user is granted the RBAC access they
+	// need) or the cache expires.
+	utilruntime.ErrorHandlers = []func(error){func(err error) { log.Debug("Kubernetes runtime error", "err", err) }}
 
 	rt := chi.NewRouter()
 	rt.Use(middleware.RequestLogger(&formatter{log}), token.Middleware)
