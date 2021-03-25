@@ -10,6 +10,10 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/metric/prometheus"
+	"go.opentelemetry.io/otel/sdk/metric/controller/basic"
+	"go.opentelemetry.io/otel/sdk/resource"
 	"gopkg.in/alecthomas/kingpin.v2"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -28,6 +32,7 @@ import (
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/resolvers"
+	"github.com/upbound/xgql/internal/opentelemetry"
 	"github.com/upbound/xgql/internal/token"
 )
 
@@ -107,11 +112,19 @@ func main() {
 		clients.DoNotCache(noCache),
 		clients.WithLogger(log),
 	)
-	rt.Handle("/query", handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)})))
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
+	srv.Use(opentelemetry.Tracer{})
+
+	rt.Handle("/query", srv)
 
 	if *play {
 		rt.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	}
+
+	res := resource.NewWithAttributes(attribute.Key("service.name").String("crossplane.io/xgql"))
+	exp, err := prometheus.InstallNewPipeline(prometheus.Config{}, basic.WithResource(res))
+	kingpin.FatalIfError(err, "cannot create OpenTelemetry Prometheus exporter")
+	rt.Handle("/metrics", exp)
 
 	kingpin.FatalIfError(http.ListenAndServe(*listen, rt), "cannot listen for HTTP")
 }
