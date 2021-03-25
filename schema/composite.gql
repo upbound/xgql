@@ -53,7 +53,7 @@ type CompositeResourceClaim implements KubernetesResource {
 type CompositeResourceClaimSpec {
   composition: Composition @goField(forceResolver: true)
   compositionSelector: LabelSelector
-  resource: CompositeResource! @goField(forceResolver: true)
+  resource: CompositeResource @goField(forceResolver: true)
   writesConnectionSecretTo: Secret @goField(forceResolver: true)
 }
 

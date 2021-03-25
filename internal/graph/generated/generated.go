@@ -2964,7 +2964,7 @@ type CompositeResourceClaim implements KubernetesResource {
 type CompositeResourceClaimSpec {
   composition: Composition @goField(forceResolver: true)
   compositionSelector: LabelSelector
-  resource: CompositeResource! @goField(forceResolver: true)
+  resource: CompositeResource @goField(forceResolver: true)
   writesConnectionSecretTo: Secret @goField(forceResolver: true)
 }
 
@@ -4516,14 +4516,11 @@ func (ec *executionContext) _CompositeResourceClaimSpec_resource(ctx context.Con
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.CompositeResource)
 	fc.Result = res
-	return ec.marshalNCompositeResource2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx, field.Selections, res)
+	return ec.marshalOCompositeResource2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaimSpec_writesConnectionSecretTo(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimSpec) (ret graphql.Marshaler) {
@@ -14409,9 +14406,6 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 					}
 				}()
 				res = ec._CompositeResourceClaimSpec_resource(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			})
 		case "writesConnectionSecretTo":
@@ -17156,16 +17150,6 @@ func (ec *executionContext) marshalNCompositeResource2githubᚗcomᚋupboundᚋx
 	return ec._CompositeResource(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResource2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResource) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResource(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNCompositeResourceClaim2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaim(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceClaim) graphql.Marshaler {
 	return ec._CompositeResourceClaim(ctx, sel, &v)
 }
@@ -18019,6 +18003,13 @@ func (ec *executionContext) marshalOCompositeResource2ᚕgithubᚗcomᚋupbound�
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) marshalOCompositeResource2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResource) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CompositeResource(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOCompositeResourceClaim2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CompositeResourceClaim) graphql.Marshaler {
