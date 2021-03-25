@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,12 +33,14 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, limit *in
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot get client")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		return nil, nil
 	}
 
 	in := &pkgv1.ProviderRevisionList{}
 	if err := c.List(ctx, in); err != nil {
-		return nil, errors.Wrap(err, "cannot list providers")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot list providers"))
+		return nil, nil
 	}
 
 	out := &model.ProviderRevisionConnection{
@@ -68,7 +71,8 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, limit *in
 
 		i, err := model.GetProviderRevision(&pr)
 		if err != nil {
-			return nil, errors.Wrap(err, "cannot model provider revision")
+			graphql.AddError(ctx, errors.Wrap(err, "cannot model provider revision"))
+			continue
 		}
 
 		out.Items = append(out.Items, i)
@@ -94,7 +98,8 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot get client")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		return nil, nil
 	}
 
 	out := &model.KubernetesResourceConnection{
@@ -121,12 +126,14 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 
 		crd := &kextv1.CustomResourceDefinition{}
 		if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, crd); err != nil {
-			return nil, errors.Wrap(err, "cannot get CustomResourceDefinition")
+			graphql.AddError(ctx, errors.Wrap(err, "cannot get CustomResourceDefinition"))
+			continue
 		}
 
 		i, err := model.GetCustomResourceDefinition(crd)
 		if err != nil {
-			return nil, errors.Wrap(err, "cannot model custom resource definition")
+			graphql.AddError(ctx, errors.Wrap(err, "cannot model custom resource definition"))
+			continue
 		}
 
 		out.Items = append(out.Items, i)

@@ -3,6 +3,7 @@ package resolvers
 import (
 	"context"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
@@ -20,23 +21,29 @@ func (r *query) Providers(ctx context.Context, limit *int) (*model.ProviderList,
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot get client")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		return nil, nil
 	}
 
 	in := &pkgv1.ProviderList{}
 	if err := c.List(ctx, in); err != nil {
-		return nil, errors.Wrap(err, "cannot list providers")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot list providers"))
+		return nil, nil
 	}
 
+	lim := getLimit(limit, len(in.Items))
 	out := &model.ProviderList{
-		Items: make([]model.Provider, getLimit(limit, len(in.Items))),
+		Items: make([]model.Provider, 0, lim),
 		Count: len(in.Items),
 	}
 
-	for i := range out.Items {
-		if out.Items[i], err = model.GetProvider(&in.Items[i]); err != nil {
-			return nil, errors.Wrap(err, "cannot model provider")
+	for i := range in.Items[:lim] {
+		p, err := model.GetProvider(&in.Items[i])
+		if err != nil {
+			graphql.AddError(ctx, errors.Wrap(err, "cannot model provider"))
+			continue
 		}
+		out.Items = append(out.Items, p)
 	}
 
 	return out, nil
@@ -47,23 +54,29 @@ func (r *query) Configurations(ctx context.Context, limit *int) (*model.Configur
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot get client")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		return nil, nil
 	}
 
 	in := &pkgv1.ConfigurationList{}
 	if err := c.List(ctx, in); err != nil {
-		return nil, errors.Wrap(err, "cannot list configurations")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot list configurations"))
+		return nil, nil
 	}
 
+	lim := getLimit(limit, len(in.Items))
 	out := &model.ConfigurationList{
-		Items: make([]model.Configuration, getLimit(limit, len(in.Items))),
+		Items: make([]model.Configuration, 0, lim),
 		Count: len(in.Items),
 	}
 
-	for i := range out.Items {
-		if out.Items[i], err = model.GetConfiguration(&in.Items[i]); err != nil {
-			return nil, errors.Wrap(err, "cannot model configuration")
+	for i := range in.Items[:lim] {
+		c, err := model.GetConfiguration(&in.Items[i])
+		if err != nil {
+			graphql.AddError(ctx, errors.Wrap(err, "cannot model configuration"))
+			continue
 		}
+		out.Items = append(out.Items, c)
 	}
 
 	return out, nil

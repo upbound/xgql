@@ -3,6 +3,7 @@ package resolvers
 import (
 	"context"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -24,7 +25,8 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot get client")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		return nil, nil
 	}
 
 	gv := schema.GroupVersion{Group: obj.Spec.Group}
@@ -43,18 +45,23 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 	}
 
 	if err := c.List(ctx, in); err != nil {
-		return nil, errors.Wrap(err, "cannot list resources")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot list resources"))
+		return nil, nil
 	}
 
+	lim := getLimit(limit, len(in.Items))
 	out := &model.CompositeResourceConnection{
-		Items: make([]model.CompositeResource, getLimit(limit, len(in.Items))),
+		Items: make([]model.CompositeResource, 0, lim),
 		Count: len(in.Items),
 	}
 
-	for i := range out.Items {
-		if out.Items[i], err = model.GetCompositeResource(&in.Items[i]); err != nil {
-			return nil, errors.Wrap(err, "cannot get composite resource")
+	for i := range in.Items[:lim] {
+		cr, err := model.GetCompositeResource(&in.Items[i])
+		if err != nil {
+			graphql.AddError(ctx, errors.Wrap(err, "cannot model composite resource"))
+			continue
 		}
+		out.Items = append(out.Items, cr)
 	}
 
 	return out, nil
