@@ -28,6 +28,15 @@ import (
 // TODO(negz): This is mostly straight from crossplane-runtime; dedupe with
 // github.com/crossplane-runtime/pkg/resource/unstructured/composite.
 
+// ProbablyComposite returns true if the supplied *Unstructured is probably a
+// composite resource. It considers any resource with an array of object refs at
+// spec.resourceRefs to probably be a composite resource.
+func ProbablyComposite(u *unstructured.Unstructured) bool {
+	r := []corev1.ObjectReference{}
+	err := fieldpath.Pave(u.Object).GetValueInto("spec.resourceRefs", &r)
+	return err == nil
+}
+
 // A Composite resource.
 type Composite struct {
 	unstructured.Unstructured

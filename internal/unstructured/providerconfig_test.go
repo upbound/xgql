@@ -8,7 +8,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
-	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 )
@@ -26,17 +25,17 @@ func TestProbablyProviderConfig(t *testing.T) {
 	}{
 		"Probably": {
 			u: func() *unstructured.Unstructured {
-				o := map[string]interface{}{}
-				fieldpath.Pave(o).SetString("spec.credentials.source", "Secret")
-				return &unstructured.Unstructured{Object: o}
+				u := &unstructured.Unstructured{Object: map[string]interface{}{}}
+				u.SetKind("ProviderConfig")
+				return u
 			}(),
 			want: true,
 		},
 		"ProbablyNot": {
 			u: func() *unstructured.Unstructured {
-				o := map[string]interface{}{}
-				fieldpath.Pave(o).SetValue("spec.credentials.source", 42) // Not a string.
-				return &unstructured.Unstructured{Object: o}
+				u := &unstructured.Unstructured{Object: map[string]interface{}{}}
+				u.SetKind("Elephant")
+				return u
 			}(),
 			want: false,
 		},

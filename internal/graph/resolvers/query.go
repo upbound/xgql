@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/util/json"
-	"k8s.io/utils/pointer"
 
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
@@ -36,31 +34,8 @@ func (r *query) Providers(ctx context.Context, limit *int) (*model.ProviderList,
 	}
 
 	for i := range out.Items {
-		p := in.Items[i]
-
-		raw, err := json.Marshal(p)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not marshal JSON")
-		}
-
-		out.Items[i] = model.Provider{
-			APIVersion: p.APIVersion,
-			Kind:       p.Kind,
-			Metadata:   model.GetObjectMeta(&p),
-			Spec: &model.ProviderSpec{
-				Package:                     p.Spec.Package,
-				RevisionActivationPolicy:    model.GetRevisionActivationPolicy(p.Spec.RevisionActivationPolicy),
-				RevisionHistoryLimit:        getIntPtr(p.Spec.RevisionHistoryLimit),
-				PackagePullPolicy:           model.GetPackagePullPolicy(p.Spec.PackagePullPolicy),
-				IgnoreCrossplaneConstraints: p.Spec.IgnoreCrossplaneConstraints,
-				SkipDependencyResolution:    p.Spec.SkipDependencyResolution,
-			},
-			Status: &model.ProviderStatus{
-				Conditions:        model.GetConditions(p.Status.Conditions),
-				CurrentRevision:   pointer.StringPtr(p.Status.CurrentRevision),
-				CurrentIdentifier: &p.Status.CurrentIdentifier,
-			},
-			Raw: string(raw),
+		if out.Items[i], err = model.GetProvider(&in.Items[i]); err != nil {
+			return nil, errors.Wrap(err, "cannot model provider")
 		}
 	}
 
@@ -86,31 +61,8 @@ func (r *query) Configurations(ctx context.Context, limit *int) (*model.Configur
 	}
 
 	for i := range out.Items {
-		p := in.Items[i]
-
-		raw, err := json.Marshal(p)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not marshal JSON")
-		}
-
-		out.Items[i] = model.Configuration{
-			APIVersion: p.APIVersion,
-			Kind:       p.Kind,
-			Metadata:   model.GetObjectMeta(&p),
-			Spec: &model.ConfigurationSpec{
-				Package:                     p.Spec.Package,
-				RevisionActivationPolicy:    model.GetRevisionActivationPolicy(p.Spec.RevisionActivationPolicy),
-				RevisionHistoryLimit:        getIntPtr(p.Spec.RevisionHistoryLimit),
-				PackagePullPolicy:           model.GetPackagePullPolicy(p.Spec.PackagePullPolicy),
-				IgnoreCrossplaneConstraints: p.Spec.IgnoreCrossplaneConstraints,
-				SkipDependencyResolution:    p.Spec.SkipDependencyResolution,
-			},
-			Status: &model.ConfigurationStatus{
-				Conditions:        model.GetConditions(p.Status.Conditions),
-				CurrentRevision:   pointer.StringPtr(p.Status.CurrentRevision),
-				CurrentIdentifier: &p.Status.CurrentIdentifier,
-			},
-			Raw: string(raw),
+		if out.Items[i], err = model.GetConfiguration(&in.Items[i]); err != nil {
+			return nil, errors.Wrap(err, "cannot model configuration")
 		}
 	}
 

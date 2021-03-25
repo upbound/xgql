@@ -12,6 +12,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 )
@@ -20,6 +21,42 @@ var _ resource.Composite = &Composite{}
 
 func emptyXR() *Composite {
 	return &Composite{Unstructured: unstructured.Unstructured{Object: map[string]interface{}{}}}
+}
+func TestProbablyComposite(t *testing.T) {
+	cases := map[string]struct {
+		u    *unstructured.Unstructured
+		want bool
+	}{
+		"Probably": {
+			u: func() *unstructured.Unstructured {
+				o := map[string]interface{}{}
+				fieldpath.Pave(o).SetValue("spec.resourceRefs", []corev1.ObjectReference{{
+					APIVersion: "example.org/v1",
+					Kind:       "Example",
+					Name:       "coolexample",
+				}})
+				return &unstructured.Unstructured{Object: o}
+			}(),
+			want: true,
+		},
+		"ProbablyNot": {
+			u: func() *unstructured.Unstructured {
+				o := map[string]interface{}{}
+				fieldpath.Pave(o).SetValue("spec.resourceRefs", []string{"wat"}) // Not object refs.
+				return &unstructured.Unstructured{Object: o}
+			}(),
+			want: false,
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			got := ProbablyComposite(tc.u)
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("\nProbablyComposite(...): -want, +got:\n%s", diff)
+			}
+		})
+	}
 }
 
 func TestCompositeCondition(t *testing.T) {

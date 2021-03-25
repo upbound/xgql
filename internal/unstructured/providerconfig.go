@@ -8,11 +8,10 @@ import (
 )
 
 // ProbablyProviderConfig returns true if the supplied *Unstructured is probably
-// a provider config. It considers any resource with a string value at field
-// path spec.credentials.source to probably be a provider config.
+// a provider config. It considers any resource of kind: ProviderConfig to
+// probably be a provider config.
 func ProbablyProviderConfig(u *unstructured.Unstructured) bool {
-	_, err := fieldpath.Pave(u.Object).GetString("spec.credentials.source")
-	return err == nil
+	return u.GetKind() == "ProviderConfig"
 }
 
 // A ProviderConfig resource.
