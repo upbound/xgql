@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/json"
 
 	"github.com/upbound/xgql/internal/graph/model"
 	"github.com/upbound/xgql/internal/token"
@@ -64,49 +63,22 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 	for i := range out.Items {
 		u := in.Items[i]
 
-		raw, err := json.Marshal(u)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not marshal JSON")
-		}
-
 		switch {
 		case hasCategory(obj.Spec.Names, "managed"), unstructured.ProbablyManaged(&u):
-			m := &unstructured.Managed{Unstructured: u}
-			out.Items[i] = model.ManagedResource{
-				APIVersion: u.GetAPIVersion(),
-				Kind:       u.GetKind(),
-				Metadata:   model.GetObjectMeta(&u),
-				Spec: &model.ManagedResourceSpec{
-					WritesConnectionSecretToRef: m.GetWriteConnectionSecretToReference(),
-					ProviderConfigRef:           m.GetProviderConfigReference(),
-					DeletionPolicy:              model.GetDeletionPolicy(m.GetDeletionPolicy()),
-				},
-				Status: &model.ManagedResourceStatus{
-					Conditions: model.GetConditions(m.GetConditions()),
-				},
-				Raw: string(raw),
+			if out.Items[i], err = model.GetManagedResource(&u); err != nil {
+				return nil, errors.Wrap(err, "cannot get managed resource")
 			}
 
-		case hasCategory(obj.Spec.Names, "provider") && obj.Spec.Names.Kind != "ProviderConfigUsage", unstructured.ProbablyProviderConfig(&u):
-			pc := &unstructured.ProviderConfig{Unstructured: u}
-			users := int(pc.GetUsers())
-			out.Items[i] = model.ProviderConfig{
-				APIVersion: u.GetAPIVersion(),
-				Kind:       u.GetKind(),
-				Metadata:   model.GetObjectMeta(&u),
-				Status: &model.ProviderConfigStatus{
-					Conditions: model.GetConditions(pc.GetConditions()),
-					Users:      &users,
-				},
-				Raw: string(raw),
+		// We're less consistent about putting ProviderConfigs in the 'provider'
+		// category, and that category includes ProviderConfigUseages.
+		case unstructured.ProbablyProviderConfig(&u):
+			if out.Items[i], err = model.GetProviderConfig(&u); err != nil {
+				return nil, errors.Wrap(err, "cannot get provider config")
 			}
 
 		default:
-			out.Items[i] = model.GenericResource{
-				APIVersion: u.GetAPIVersion(),
-				Kind:       u.GetKind(),
-				Metadata:   model.GetObjectMeta(&u),
-				Raw:        string(raw),
+			if out.Items[i], err = model.GetGenericResource(&u); err != nil {
+				return nil, errors.Wrap(err, "cannot get Kubernetes resource")
 			}
 		}
 

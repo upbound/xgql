@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/json"
 	"k8s.io/utils/pointer"
 
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
@@ -46,17 +45,17 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration,
 	}
 
 	for i := range in.Items {
-		pr := in.Items[i] // So we don't take the address of a range variable.
+		cr := in.Items[i] // So we don't take the address of a range variable.
 
 		// We're not the controller reference of this ConfigurationRevision;
 		// it's not one of ours.
 		// https://github.com/kubernetes/community/blob/0331e/contributors/design-proposals/api-machinery/controller-ref.md
-		if c := metav1.GetControllerOf(&pr); c == nil || c.UID != types.UID(obj.Metadata.UID) {
+		if c := metav1.GetControllerOf(&cr); c == nil || c.UID != types.UID(obj.Metadata.UID) {
 			continue
 		}
 
 		// We only want the active PackageRevision, and this isn't it.
-		if pointer.BoolPtrDerefOr(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
+		if pointer.BoolPtrDerefOr(active, false) && cr.Spec.DesiredState != pkgv1.PackageRevisionActive {
 			continue
 		}
 
@@ -67,33 +66,12 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration,
 			continue
 		}
 
-		raw, err := json.Marshal(pr)
+		i, err := model.GetConfigurationRevision(&cr)
 		if err != nil {
-			return nil, errors.Wrap(err, "could not marshal JSON")
+			return nil, errors.Wrap(err, "cannot model configuration revision")
 		}
 
-		out.Items = append(out.Items, model.ConfigurationRevision{
-			APIVersion: pr.APIVersion,
-			Kind:       pr.Kind,
-			Metadata:   model.GetObjectMeta(&pr),
-			Spec: &model.ConfigurationRevisionSpec{
-				DesiredState:                model.PackageRevisionDesiredState(pr.Spec.DesiredState),
-				Package:                     pr.Spec.Package,
-				PackagePullPolicy:           model.GetPackagePullPolicy(pr.Spec.PackagePullPolicy),
-				Revision:                    int(pr.Spec.Revision),
-				IgnoreCrossplaneConstraints: pr.Spec.IgnoreCrossplaneConstraints,
-				SkipDependencyResolution:    pr.Spec.SkipDependencyResolution,
-			},
-			Status: &model.ConfigurationRevisionStatus{
-				Conditions:            model.GetConditions(pr.Status.Conditions),
-				FoundDependencies:     getIntPtr(&pr.Status.FoundDependencies),
-				InstalledDependencies: getIntPtr(&pr.Status.InstalledDependencies),
-				InvalidDependencies:   getIntPtr(&pr.Status.InvalidDependencies),
-				PermissionRequests:    model.GetPolicyRules(pr.Status.PermissionRequests),
-				ObjectRefs:            pr.Status.ObjectRefs,
-			},
-			Raw: string(raw),
-		})
+		out.Items = append(out.Items, i)
 	}
 
 	return out, nil
@@ -151,62 +129,24 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 				return nil, errors.Wrap(err, "cannot get CompositeResourceDefinition")
 			}
 
-			raw, err := json.Marshal(xrd)
+			i, err := model.GetCompositeResourceDefinition(xrd)
 			if err != nil {
-				return nil, errors.Wrap(err, "could not marshal JSON")
+				return nil, errors.Wrap(err, "cannot model composite resource definition")
 			}
 
-			out.Items = append(out.Items, model.CompositeResourceDefinition{
-				APIVersion: xrd.APIVersion,
-				Kind:       xrd.Kind,
-				Metadata:   model.GetObjectMeta(xrd),
-				Spec: &model.CompositeResourceDefinitionSpec{
-					Group: xrd.Spec.Group,
-					Names: &model.CompositeResourceDefinitionNames{
-						Plural:     xrd.Spec.Names.Plural,
-						Singular:   &xrd.Spec.Names.Singular,
-						ShortNames: xrd.Spec.Names.ShortNames,
-						Kind:       xrd.Spec.Names.Kind,
-						ListKind:   &xrd.Spec.Names.ListKind,
-						Categories: xrd.Spec.Names.Categories,
-					},
-					ClaimNames:             model.GetCompositeResourceDefinitionClaimNames(xrd.Spec.ClaimNames),
-					Versions:               model.GetCompositeResourceDefinitionVersions(xrd.Spec.Versions),
-					DefaultCompositionRef:  xrd.Spec.DefaultCompositionRef,
-					EnforcedCompositionRef: xrd.Spec.EnforcedCompositionRef,
-				},
-				Status: &model.CompositeResourceDefinitionStatus{
-					Conditions: model.GetConditions(xrd.Status.Conditions),
-				},
-				Raw: string(raw),
-			})
+			out.Items = append(out.Items, i)
 		case extv1.CompositionKind:
 			cmp := &extv1.Composition{}
 			if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, cmp); err != nil {
 				return nil, errors.Wrap(err, "cannot get Composition")
 			}
 
-			raw, err := json.Marshal(cmp)
+			i, err := model.GetComposition(cmp)
 			if err != nil {
-				return nil, errors.Wrap(err, "could not marshal JSON")
+				return nil, errors.Wrap(err, "cannot model composition")
 			}
 
-			out.Items = append(out.Items, model.Composition{
-				APIVersion: cmp.APIVersion,
-				Kind:       cmp.Kind,
-				Metadata:   model.GetObjectMeta(cmp),
-				Spec: &model.CompositionSpec{
-					CompositeTypeRef: &model.TypeReference{
-						APIVersion: cmp.Spec.CompositeTypeRef.APIVersion,
-						Kind:       cmp.Spec.CompositeTypeRef.Kind,
-					},
-					WriteConnectionSecretsToNamespace: cmp.Spec.WriteConnectionSecretsToNamespace,
-				},
-				Status: &model.CompositionStatus{
-					Conditions: model.GetConditions(cmp.Status.Conditions),
-				},
-				Raw: string(raw),
-			})
+			out.Items = append(out.Items, i)
 		}
 
 	}

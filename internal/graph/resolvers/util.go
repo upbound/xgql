@@ -6,12 +6,3 @@ func getLimit(limit *int, len int) int {
 	}
 	return *limit
 }
-
-func getIntPtr(i *int64) *int {
-	if i == nil {
-		return nil
-	}
-
-	out := int(*i)
-	return &out
-}

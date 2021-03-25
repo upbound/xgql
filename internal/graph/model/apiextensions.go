@@ -4,6 +4,8 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/util/json"
 
+	"github.com/pkg/errors"
+
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 )
@@ -58,4 +60,66 @@ func GetCompositeResourceDefinitionVersions(in []extv1.CompositeResourceDefiniti
 		}
 	}
 	return out
+}
+
+// GetCompositeResourceDefinition from the supplied Crossplane XRD.
+func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) (CompositeResourceDefinition, error) {
+	raw, err := json.Marshal(xrd)
+	if err != nil {
+		return CompositeResourceDefinition{}, errors.Wrap(err, "could not marshal JSON")
+	}
+
+	out := CompositeResourceDefinition{
+		APIVersion: xrd.APIVersion,
+		Kind:       xrd.Kind,
+		Metadata:   GetObjectMeta(xrd),
+		Spec: &CompositeResourceDefinitionSpec{
+			Group: xrd.Spec.Group,
+			Names: &CompositeResourceDefinitionNames{
+				Plural:     xrd.Spec.Names.Plural,
+				Singular:   &xrd.Spec.Names.Singular,
+				ShortNames: xrd.Spec.Names.ShortNames,
+				Kind:       xrd.Spec.Names.Kind,
+				ListKind:   &xrd.Spec.Names.ListKind,
+				Categories: xrd.Spec.Names.Categories,
+			},
+			ClaimNames:             GetCompositeResourceDefinitionClaimNames(xrd.Spec.ClaimNames),
+			Versions:               GetCompositeResourceDefinitionVersions(xrd.Spec.Versions),
+			DefaultCompositionRef:  xrd.Spec.DefaultCompositionRef,
+			EnforcedCompositionRef: xrd.Spec.EnforcedCompositionRef,
+		},
+		Status: &CompositeResourceDefinitionStatus{
+			Conditions: GetConditions(xrd.Status.Conditions),
+		},
+		Raw: string(raw),
+	}
+
+	return out, nil
+}
+
+// GetComposition from the supplied Crossplane Composition.
+func GetComposition(cmp *extv1.Composition) (Composition, error) {
+	raw, err := json.Marshal(cmp)
+	if err != nil {
+		return Composition{}, errors.Wrap(err, "could not marshal JSON")
+	}
+
+	out := Composition{
+		APIVersion: cmp.APIVersion,
+		Kind:       cmp.Kind,
+		Metadata:   GetObjectMeta(cmp),
+		Spec: &CompositionSpec{
+			CompositeTypeRef: &TypeReference{
+				APIVersion: cmp.Spec.CompositeTypeRef.APIVersion,
+				Kind:       cmp.Spec.CompositeTypeRef.Kind,
+			},
+			WriteConnectionSecretsToNamespace: cmp.Spec.WriteConnectionSecretsToNamespace,
+		},
+		Status: &CompositionStatus{
+			Conditions: GetConditions(cmp.Status.Conditions),
+		},
+		Raw: string(raw),
+	}
+
+	return out, nil
 }

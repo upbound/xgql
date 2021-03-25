@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/json"
 	"k8s.io/utils/pointer"
 
 	"github.com/upbound/xgql/internal/graph/model"
@@ -40,19 +39,10 @@ func (r *objectMetaResolver) Owners(ctx context.Context, obj *model.ObjectMeta, 
 			return nil, errors.Wrap(err, "cannot get owner")
 		}
 
-		raw, err := json.Marshal(u.Object)
-		if err != nil {
-			return nil, errors.Wrap(err, "cannot marshal JSON")
-		}
+		owner := model.Owner{Controller: ref.Controller}
 
-		owner := model.Owner{
-			Controller: ref.Controller,
-			Resource: model.GenericResource{
-				APIVersion: u.GetAPIVersion(),
-				Kind:       u.GetKind(),
-				Metadata:   model.GetObjectMeta(u),
-				Raw:        string(raw),
-			},
+		if owner.Resource, err = model.GetGenericResource(u); err != nil {
+			return nil, errors.Wrap(err, "cannot model Kubernetes resource")
 		}
 
 		// There can be only one controller reference.

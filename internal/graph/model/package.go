@@ -1,8 +1,11 @@
 package model
 
 import (
+	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
+	"k8s.io/apimachinery/pkg/util/json"
+	"k8s.io/utils/pointer"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
@@ -69,4 +72,130 @@ func GetPolicyRules(in []rbacv1.PolicyRule) []PolicyRule {
 		}
 	}
 	return out
+}
+
+// GetProvider from the supplied Kubernetes provider.
+func GetProvider(p *pkgv1.Provider) (Provider, error) {
+	raw, err := json.Marshal(p)
+	if err != nil {
+		return Provider{}, errors.Wrap(err, "could not marshal JSON")
+	}
+
+	out := Provider{
+		APIVersion: p.APIVersion,
+		Kind:       p.Kind,
+		Metadata:   GetObjectMeta(p),
+		Spec: &ProviderSpec{
+			Package:                     p.Spec.Package,
+			RevisionActivationPolicy:    GetRevisionActivationPolicy(p.Spec.RevisionActivationPolicy),
+			RevisionHistoryLimit:        getIntPtr(p.Spec.RevisionHistoryLimit),
+			PackagePullPolicy:           GetPackagePullPolicy(p.Spec.PackagePullPolicy),
+			IgnoreCrossplaneConstraints: p.Spec.IgnoreCrossplaneConstraints,
+			SkipDependencyResolution:    p.Spec.SkipDependencyResolution,
+		},
+		Status: &ProviderStatus{
+			Conditions:        GetConditions(p.Status.Conditions),
+			CurrentRevision:   pointer.StringPtr(p.Status.CurrentRevision),
+			CurrentIdentifier: &p.Status.CurrentIdentifier,
+		},
+		Raw: string(raw),
+	}
+
+	return out, nil
+}
+
+// GetProviderRevision from the supplied Kubernetes provider revision.
+func GetProviderRevision(pr *pkgv1.ProviderRevision) (ProviderRevision, error) {
+	raw, err := json.Marshal(pr)
+	if err != nil {
+		return ProviderRevision{}, errors.Wrap(err, "could not marshal JSON")
+	}
+
+	out := ProviderRevision{
+		APIVersion: pr.APIVersion,
+		Kind:       pr.Kind,
+		Metadata:   GetObjectMeta(pr),
+		Spec: &ProviderRevisionSpec{
+			DesiredState:                PackageRevisionDesiredState(pr.Spec.DesiredState),
+			Package:                     pr.Spec.Package,
+			PackagePullPolicy:           GetPackagePullPolicy(pr.Spec.PackagePullPolicy),
+			Revision:                    int(pr.Spec.Revision),
+			IgnoreCrossplaneConstraints: pr.Spec.IgnoreCrossplaneConstraints,
+			SkipDependencyResolution:    pr.Spec.SkipDependencyResolution,
+		},
+		Status: &ProviderRevisionStatus{
+			Conditions:            GetConditions(pr.Status.Conditions),
+			FoundDependencies:     getIntPtr(&pr.Status.FoundDependencies),
+			InstalledDependencies: getIntPtr(&pr.Status.InstalledDependencies),
+			InvalidDependencies:   getIntPtr(&pr.Status.InvalidDependencies),
+			PermissionRequests:    GetPolicyRules(pr.Status.PermissionRequests),
+			ObjectRefs:            pr.Status.ObjectRefs,
+		},
+		Raw: string(raw),
+	}
+
+	return out, nil
+}
+
+// GetConfiguration from the supplied Kubernetes configuration.
+func GetConfiguration(c *pkgv1.Configuration) (Configuration, error) {
+	raw, err := json.Marshal(c)
+	if err != nil {
+		return Configuration{}, errors.Wrap(err, "could not marshal JSON")
+	}
+
+	out := Configuration{
+		APIVersion: c.APIVersion,
+		Kind:       c.Kind,
+		Metadata:   GetObjectMeta(c),
+		Spec: &ConfigurationSpec{
+			Package:                     c.Spec.Package,
+			RevisionActivationPolicy:    GetRevisionActivationPolicy(c.Spec.RevisionActivationPolicy),
+			RevisionHistoryLimit:        getIntPtr(c.Spec.RevisionHistoryLimit),
+			PackagePullPolicy:           GetPackagePullPolicy(c.Spec.PackagePullPolicy),
+			IgnoreCrossplaneConstraints: c.Spec.IgnoreCrossplaneConstraints,
+			SkipDependencyResolution:    c.Spec.SkipDependencyResolution,
+		},
+		Status: &ConfigurationStatus{
+			Conditions:        GetConditions(c.Status.Conditions),
+			CurrentRevision:   pointer.StringPtr(c.Status.CurrentRevision),
+			CurrentIdentifier: &c.Status.CurrentIdentifier,
+		},
+		Raw: string(raw),
+	}
+
+	return out, nil
+}
+
+// GetConfigurationRevision from the supplied Kubernetes provider revision.
+func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision) (ConfigurationRevision, error) {
+	raw, err := json.Marshal(cr)
+	if err != nil {
+		return ConfigurationRevision{}, errors.Wrap(err, "could not marshal JSON")
+	}
+
+	out := ConfigurationRevision{
+		APIVersion: cr.APIVersion,
+		Kind:       cr.Kind,
+		Metadata:   GetObjectMeta(cr),
+		Spec: &ConfigurationRevisionSpec{
+			DesiredState:                PackageRevisionDesiredState(cr.Spec.DesiredState),
+			Package:                     cr.Spec.Package,
+			PackagePullPolicy:           GetPackagePullPolicy(cr.Spec.PackagePullPolicy),
+			Revision:                    int(cr.Spec.Revision),
+			IgnoreCrossplaneConstraints: cr.Spec.IgnoreCrossplaneConstraints,
+			SkipDependencyResolution:    cr.Spec.SkipDependencyResolution,
+		},
+		Status: &ConfigurationRevisionStatus{
+			Conditions:            GetConditions(cr.Status.Conditions),
+			FoundDependencies:     getIntPtr(&cr.Status.FoundDependencies),
+			InstalledDependencies: getIntPtr(&cr.Status.InstalledDependencies),
+			InvalidDependencies:   getIntPtr(&cr.Status.InvalidDependencies),
+			PermissionRequests:    GetPolicyRules(cr.Status.PermissionRequests),
+			ObjectRefs:            cr.Status.ObjectRefs,
+		},
+		Raw: string(raw),
+	}
+
+	return out, nil
 }

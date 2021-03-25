@@ -6,11 +6,9 @@ import (
 	"github.com/pkg/errors"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/json"
 
 	"github.com/upbound/xgql/internal/graph/model"
 	"github.com/upbound/xgql/internal/token"
-	"github.com/upbound/xgql/internal/unstructured"
 )
 
 type xrd struct {
@@ -54,31 +52,8 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 	}
 
 	for i := range out.Items {
-		xr := &unstructured.Composite{Unstructured: in.Items[i]}
-
-		raw, err := json.Marshal(xr)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not marshal JSON")
-		}
-
-		out.Items[i] = model.CompositeResource{
-			APIVersion: xr.GetAPIVersion(),
-			Kind:       xr.GetKind(),
-			Metadata:   model.GetObjectMeta(xr),
-			Spec: &model.CompositeResourceSpec{
-				CompositionSelector:               model.GetLabelSelector(xr.GetCompositionSelector()),
-				CompositionReference:              xr.GetCompositionReference(),
-				ClaimReference:                    xr.GetClaimReference(),
-				ResourceReferences:                xr.GetResourceReferences(),
-				WritesConnectionSecretToReference: xr.GetWriteConnectionSecretToReference(),
-			},
-			Status: &model.CompositeResourceStatus{
-				Conditions: model.GetConditions(xr.GetConditions()),
-				ConnectionDetails: &model.CompositeResourceConnectionDetails{
-					LastPublishedTime: model.GetConnectionDetailsLastPublishedTime(xr.GetConnectionDetailsLastPublishedTime()),
-				},
-			},
-			Raw: string(raw),
+		if out.Items[i], err = model.GetCompositeResource(&in.Items[i]); err != nil {
+			return nil, errors.Wrap(err, "cannot get composite resource")
 		}
 	}
 

@@ -8,7 +8,6 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/json"
 	"k8s.io/utils/pointer"
 
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
@@ -67,33 +66,12 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, limit *in
 			continue
 		}
 
-		raw, err := json.Marshal(pr)
+		i, err := model.GetProviderRevision(&pr)
 		if err != nil {
-			return nil, errors.Wrap(err, "could not marshal JSON")
+			return nil, errors.Wrap(err, "cannot model provider revision")
 		}
 
-		out.Items = append(out.Items, model.ProviderRevision{
-			APIVersion: pr.APIVersion,
-			Kind:       pr.Kind,
-			Metadata:   model.GetObjectMeta(&pr),
-			Spec: &model.ProviderRevisionSpec{
-				DesiredState:                model.PackageRevisionDesiredState(pr.Spec.DesiredState),
-				Package:                     pr.Spec.Package,
-				PackagePullPolicy:           model.GetPackagePullPolicy(pr.Spec.PackagePullPolicy),
-				Revision:                    int(pr.Spec.Revision),
-				IgnoreCrossplaneConstraints: pr.Spec.IgnoreCrossplaneConstraints,
-				SkipDependencyResolution:    pr.Spec.SkipDependencyResolution,
-			},
-			Status: &model.ProviderRevisionStatus{
-				Conditions:            model.GetConditions(pr.Status.Conditions),
-				FoundDependencies:     getIntPtr(&pr.Status.FoundDependencies),
-				InstalledDependencies: getIntPtr(&pr.Status.InstalledDependencies),
-				InvalidDependencies:   getIntPtr(&pr.Status.InvalidDependencies),
-				PermissionRequests:    model.GetPolicyRules(pr.Status.PermissionRequests),
-				ObjectRefs:            pr.Status.ObjectRefs,
-			},
-			Raw: string(raw),
-		})
+		out.Items = append(out.Items, i)
 	}
 
 	return out, nil
@@ -146,33 +124,12 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 			return nil, errors.Wrap(err, "cannot get CustomResourceDefinition")
 		}
 
-		raw, err := json.Marshal(crd)
+		i, err := model.GetCustomResourceDefinition(crd)
 		if err != nil {
-			return nil, errors.Wrap(err, "could not marshal JSON")
+			return nil, errors.Wrap(err, "cannot model custom resource definition")
 		}
 
-		out.Items = append(out.Items, model.CustomResourceDefinition{
-			APIVersion: crd.APIVersion,
-			Kind:       crd.Kind,
-			Metadata:   model.GetObjectMeta(crd),
-			Spec: &model.CustomResourceDefinitionSpec{
-				Group: crd.Spec.Group,
-				Names: &model.CustomResourceDefinitionNames{
-					Plural:     crd.Spec.Names.Plural,
-					Singular:   &crd.Spec.Names.Singular,
-					ShortNames: crd.Spec.Names.ShortNames,
-					Kind:       crd.Spec.Names.Kind,
-					ListKind:   &crd.Spec.Names.ListKind,
-					Categories: crd.Spec.Names.Categories,
-				},
-				Versions: model.GetCustomResourceDefinitionVersions(crd.Spec.Versions),
-			},
-			Status: &model.CustomResourceDefinitionStatus{
-				Conditions: model.GetCustomResourceDefinitionConditions(crd.Status.Conditions),
-			},
-			Raw: string(raw),
-		})
-
+		out.Items = append(out.Items, i)
 	}
 
 	return out, nil
