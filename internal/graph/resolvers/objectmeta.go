@@ -6,6 +6,8 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/pointer"
 
@@ -18,8 +20,7 @@ import (
 )
 
 type objectMetaResolver struct {
-	clients   ClientCache
-	converter ObjectConvertor
+	clients ClientCache
 }
 
 func (r *objectMetaResolver) Owners(ctx context.Context, obj *model.ObjectMeta, limit *int, controller *bool) (*model.OwnerConnection, error) { //nolint:gocyclo
@@ -72,7 +73,7 @@ func (r *objectMetaResolver) Owners(ctx context.Context, obj *model.ObjectMeta, 
 			}
 		case u.GroupVersionKind() == pkgv1.ProviderGroupVersionKind:
 			p := &pkgv1.Provider{}
-			if err := r.converter.Convert(u, p, nil); err != nil {
+			if err := convert(u, p); err != nil {
 				graphql.AddError(ctx, errors.Wrap(err, "cannot convert provider"))
 				continue
 			}
@@ -82,7 +83,7 @@ func (r *objectMetaResolver) Owners(ctx context.Context, obj *model.ObjectMeta, 
 			}
 		case u.GroupVersionKind() == pkgv1.ProviderRevisionGroupVersionKind:
 			pr := &pkgv1.ProviderRevision{}
-			if err := r.converter.Convert(u, pr, nil); err != nil {
+			if err := convert(u, pr); err != nil {
 				graphql.AddError(ctx, errors.Wrap(err, "cannot convert provider revision"))
 				continue
 			}
@@ -92,7 +93,7 @@ func (r *objectMetaResolver) Owners(ctx context.Context, obj *model.ObjectMeta, 
 			}
 		case u.GroupVersionKind() == pkgv1.ConfigurationGroupVersionKind:
 			c := &pkgv1.Configuration{}
-			if err := r.converter.Convert(u, c, nil); err != nil {
+			if err := convert(u, c); err != nil {
 				graphql.AddError(ctx, errors.Wrap(err, "cannot convert configuration"))
 				continue
 			}
@@ -102,7 +103,7 @@ func (r *objectMetaResolver) Owners(ctx context.Context, obj *model.ObjectMeta, 
 			}
 		case u.GroupVersionKind() == pkgv1.ConfigurationRevisionGroupVersionKind:
 			cr := &pkgv1.ConfigurationRevision{}
-			if err := r.converter.Convert(u, cr, nil); err != nil {
+			if err := convert(u, cr); err != nil {
 				graphql.AddError(ctx, errors.Wrap(err, "cannot convert configuration revision"))
 				continue
 			}
@@ -112,7 +113,7 @@ func (r *objectMetaResolver) Owners(ctx context.Context, obj *model.ObjectMeta, 
 			}
 		case u.GroupVersionKind() == extv1.CompositeResourceDefinitionGroupVersionKind:
 			xrd := &extv1.CompositeResourceDefinition{}
-			if err := r.converter.Convert(u, xrd, nil); err != nil {
+			if err := convert(u, xrd); err != nil {
 				graphql.AddError(ctx, errors.Wrap(err, "cannot convert composite resource definition"))
 				continue
 			}
@@ -141,4 +142,16 @@ func (r *objectMetaResolver) Owners(ctx context.Context, obj *model.ObjectMeta, 
 	}
 
 	return &model.OwnerConnection{Items: owners, Count: len(obj.OwnerReferences)}, nil
+}
+
+func convert(from *kunstructured.Unstructured, to runtime.Object) error {
+	c := runtime.DefaultUnstructuredConverter
+	if err := c.FromUnstructured(from.Object, to); err != nil {
+		return errors.Wrap(err, "could not convert unstructured object")
+	}
+	// For whatever reason the *Unstructured's GVK doesn't seem to make it
+	// through the conversion process.
+	gvk := schema.FromAPIVersionAndKind(from.GetAPIVersion(), from.GetKind())
+	to.GetObjectKind().SetGroupVersionKind(gvk)
+	return nil
 }

@@ -107,7 +107,7 @@ func main() {
 		clients.DoNotCache(noCache),
 		clients.WithLogger(log),
 	)
-	rt.Handle("/query", handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca, s)})))
+	rt.Handle("/query", handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)})))
 
 	if *play {
 		rt.Handle("/", playground.Handler("GraphQL playground", "/query"))
