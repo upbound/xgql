@@ -3,6 +3,7 @@ package resolvers
 import (
 	"context"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -24,7 +25,8 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot get client")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		return nil, nil
 	}
 
 	gv := schema.GroupVersion{Group: obj.Spec.Group}
@@ -52,34 +54,45 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 	// (and fail) to list namespaced resources across all namespaces, so we may
 	// also need a way to fetch a client with a namespaced cache.
 	if err := c.List(ctx, in); err != nil {
-		return nil, errors.Wrap(err, "cannot list resources")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot list resources"))
+		return nil, nil
 	}
 
+	lim := getLimit(limit, len(in.Items))
 	out := &model.KubernetesResourceConnection{
-		Items: make([]model.KubernetesResource, getLimit(limit, len(in.Items))),
+		Items: make([]model.KubernetesResource, 0, lim),
 		Count: len(in.Items),
 	}
 
-	for i := range out.Items {
+	for i := range in.Items[:lim] {
 		u := in.Items[i]
 
 		switch {
 		case hasCategory(obj.Spec.Names, "managed"), unstructured.ProbablyManaged(&u):
-			if out.Items[i], err = model.GetManagedResource(&u); err != nil {
-				return nil, errors.Wrap(err, "cannot get managed resource")
+			mr, err := model.GetManagedResource(&u)
+			if err != nil {
+				graphql.AddError(ctx, errors.Wrap(err, "cannot model managed resource"))
+				continue
 			}
+			out.Items = append(out.Items, mr)
 
 		// We're less consistent about putting ProviderConfigs in the 'provider'
 		// category, and that category includes ProviderConfigUseages.
 		case unstructured.ProbablyProviderConfig(&u):
-			if out.Items[i], err = model.GetProviderConfig(&u); err != nil {
-				return nil, errors.Wrap(err, "cannot get provider config")
+			pc, err := model.GetProviderConfig(&u)
+			if err != nil {
+				graphql.AddError(ctx, errors.Wrap(err, "cannot model provider config"))
+				continue
 			}
+			out.Items = append(out.Items, pc)
 
 		default:
-			if out.Items[i], err = model.GetGenericResource(&u); err != nil {
-				return nil, errors.Wrap(err, "cannot get Kubernetes resource")
+			gr, err := model.GetGenericResource(&u)
+			if err != nil {
+				graphql.AddError(ctx, errors.Wrap(err, "cannot model Kubernetes resource"))
+				continue
 			}
+			out.Items = append(out.Items, gr)
 		}
 
 	}

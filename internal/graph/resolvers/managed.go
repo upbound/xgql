@@ -3,6 +3,7 @@ package resolvers
 import (
 	"context"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -24,7 +25,8 @@ func (r *managedResourceSpec) ConnectionSecret(ctx context.Context, obj *model.M
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot get client")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		return nil, nil
 	}
 
 	s := &corev1.Secret{}
@@ -33,11 +35,15 @@ func (r *managedResourceSpec) ConnectionSecret(ctx context.Context, obj *model.M
 		Name:      obj.WritesConnectionSecretToRef.Name,
 	}
 	if err := c.Get(ctx, nn, s); err != nil {
-		return nil, errors.Wrap(err, "cannot get secret")
+		graphql.AddError(ctx, errors.Wrap(err, "cannot get Secret"))
+		return nil, nil
 	}
 
 	out, err := model.GetSecret(s)
-	return &out, errors.Wrap(err, "cannot model secret")
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, "cannot get Secret"))
+	}
+	return &out, nil
 }
 
 func (r *managedResourceSpec) ProviderConfig(ctx context.Context, obj *model.ManagedResourceSpec) (*model.ProviderConfig, error) {
