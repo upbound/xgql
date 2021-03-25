@@ -12,21 +12,14 @@ type ClientCache interface {
 	Get(token string, o ...clients.GetOption) (client.Client, error)
 }
 
-// ObjectConvertor converts an object to a different version. It's a subset of
-// the Kubernetes runtime.ObjectConvertor interface.
-type ObjectConvertor interface {
-	Convert(in, out, context interface{}) error
-}
-
 // The Root resolver.
 type Root struct {
-	clients   ClientCache
-	converter ObjectConvertor
+	clients ClientCache
 }
 
 // New returns a new root resolver.
-func New(cc ClientCache, oc ObjectConvertor) *Root {
-	return &Root{clients: cc, converter: oc}
+func New(cc ClientCache) *Root {
+	return &Root{clients: cc}
 }
 
 // Query resolves GraphQL queries.
@@ -36,7 +29,7 @@ func (r *Root) Query() generated.QueryResolver {
 
 // ObjectMeta resolves properties of the ObjectMeta GraphQL type.
 func (r *Root) ObjectMeta() generated.ObjectMetaResolver {
-	return &objectMetaResolver{clients: r.clients, converter: r.converter}
+	return &objectMetaResolver{clients: r.clients}
 }
 
 // Secret resolves properties of the Secret GraphQL type.
