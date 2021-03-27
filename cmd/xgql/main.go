@@ -115,7 +115,7 @@ func main() {
 		clients.WithLogger(log),
 	)
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
-	srv.Use(opentelemetry.Tracer{})
+	srv.Use(opentelemetry.MetricEmitter{})
 	rt.Handle("/query", otelhttp.NewHandler(srv, "/query"))
 
 	kingpin.FatalIfError(otelruntime.Start(), "cannot add OpenTelemetry runtime instrumentation")

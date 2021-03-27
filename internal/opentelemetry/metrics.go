@@ -5,30 +5,24 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/unit"
 )
 
-// A Tracer that exports OpenTelemetry metrics and traces.
-type Tracer struct{}
+// A MetricEmitter that exports OpenTelemetry metrics.
+type MetricEmitter struct{}
 
 var _ interface {
 	graphql.HandlerExtension
 	graphql.OperationInterceptor
 	graphql.ResponseInterceptor
 	graphql.FieldInterceptor
-} = Tracer{}
+} = MetricEmitter{}
 
 // OpenTelemetry metrics.
 var (
 	meter = global.GetMeterProvider().Meter("crossplane.io/xgql")
-
-	operation = attribute.Key("crossplane.io/qgl-operation")
-	status    = attribute.Key("crossplane.io/qgl-operation-status")
-	object    = attribute.Key("crossplane.io/gql-object")
-	field     = attribute.Key("crossplane.io/gql-field")
 
 	reqStarted = metric.Must(meter).NewInt64Counter("request.started.total",
 		metric.WithDescription("Total number of requests started"),
@@ -56,24 +50,24 @@ var (
 )
 
 // ExtensionName of this extension.
-func (t Tracer) ExtensionName() string {
-	return "OpenTelemetry"
+func (t MetricEmitter) ExtensionName() string {
+	return "OpenTelemetryMetrics"
 }
 
 // Validate this extension (a no-op).
-func (t Tracer) Validate(schema graphql.ExecutableSchema) error {
+func (t MetricEmitter) Validate(schema graphql.ExecutableSchema) error {
 	return nil
 }
 
 // InterceptOperation to produce metrics and traces.
-func (t Tracer) InterceptOperation(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
+func (t MetricEmitter) InterceptOperation(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
 	oc := graphql.GetOperationContext(ctx)
 	reqStarted.Add(ctx, 1, operation.String(oc.OperationName))
 	return next(ctx)
 }
 
 // InterceptResponse to produce metrics and traces.
-func (t Tracer) InterceptResponse(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
+func (t MetricEmitter) InterceptResponse(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
 	// TODO(negz): Better attributes? This isn't boolean - it's more "were any
 	// errors encountered".
 	s := "succeeded"
@@ -90,7 +84,7 @@ func (t Tracer) InterceptResponse(ctx context.Context, next graphql.ResponseHand
 }
 
 // InterceptField to produce metrics and traces.
-func (t Tracer) InterceptField(ctx context.Context, next graphql.Resolver) (interface{}, error) {
+func (t MetricEmitter) InterceptField(ctx context.Context, next graphql.Resolver) (interface{}, error) {
 	fc := graphql.GetFieldContext(ctx)
 
 	resStarted.Add(ctx, 1, object.String(fc.Object), field.String(fc.Field.Name))
