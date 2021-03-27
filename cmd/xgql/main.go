@@ -7,13 +7,18 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/apollotracing"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	otelruntime "go.opentelemetry.io/contrib/instrumentation/runtime"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
+	"go.opentelemetry.io/otel/exporters/trace/jaeger"
 	"go.opentelemetry.io/otel/sdk/metric/controller/basic"
 	"go.opentelemetry.io/otel/sdk/resource"
+	"go.opentelemetry.io/otel/sdk/trace"
 	"gopkg.in/alecthomas/kingpin.v2"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -64,14 +69,32 @@ var noCache = []client.Object{
 func main() {
 	var (
 		app    = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
-		debug  = app.Flag("debug", "Enable debug logging").Short('d').Bool()
-		listen = app.Flag("listen", "Address to listen at").Default(":8080").String()
-		play   = app.Flag("enable-playground", "Serve a GraphQL Playground").Bool()
+		debug  = app.Flag("debug", "Enable debug logging.").Short('d').Bool()
+		listen = app.Flag("listen", "Address to listen at.").Default(":8080").String()
+		play   = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
+		agent  = app.Flag("trace-agent", "Address of the Jaeger trace agent. Leave unset to disable tracing.").String()
+		ratio  = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
 	)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	zl := zap.New(zap.UseDevMode(*debug))
 	log := logging.NewLogrLogger(zl.WithName("xgql"))
+
+	kingpin.FatalIfError(otelruntime.Start(), "cannot add OpenTelemetry runtime instrumentation")
+	res := resource.NewWithAttributes(attribute.String("service.name", "crossplane.io/gql"))
+
+	// OpenTelemetry metrics.
+	prom, err := prometheus.InstallNewPipeline(prometheus.Config{}, basic.WithResource(res))
+	kingpin.FatalIfError(err, "cannot create OpenTelemetry Prometheus exporter")
+
+	// OpenTelemetry tracing.
+	if *agent != "" {
+		flush, err := jaeger.InstallNewPipeline(jaeger.WithAgentEndpoint(*agent), jaeger.WithSDKOptions(
+			trace.WithSampler(trace.ParentBased(trace.TraceIDRatioBased(*ratio))),
+			trace.WithResource(res)))
+		kingpin.FatalIfError(err, "cannot create OpenTelemetry Jaeger exporter")
+		defer flush()
+	}
 
 	// NOTE(negz): This handler is called when a cache can't watch a type that
 	// it would like to, for example because the user doesn't have RBAC access
@@ -113,18 +136,15 @@ func main() {
 		clients.WithLogger(log),
 	)
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
+	srv.Use(opentelemetry.MetricEmitter{})
 	srv.Use(opentelemetry.Tracer{})
+	srv.Use(apollotracing.Tracer{})
 
-	rt.Handle("/query", srv)
-
+	rt.Handle("/query", otelhttp.NewHandler(srv, "/query"))
+	rt.Handle("/metrics", prom)
 	if *play {
 		rt.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	}
-
-	res := resource.NewWithAttributes(attribute.Key("service.name").String("crossplane.io/xgql"))
-	exp, err := prometheus.InstallNewPipeline(prometheus.Config{}, basic.WithResource(res))
-	kingpin.FatalIfError(err, "cannot create OpenTelemetry Prometheus exporter")
-	rt.Handle("/metrics", exp)
 
 	kingpin.FatalIfError(http.ListenAndServe(*listen, rt), "cannot listen for HTTP")
 }
