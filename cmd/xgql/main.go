@@ -10,6 +10,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	otelruntime "go.opentelemetry.io/contrib/instrumentation/runtime"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
 	"go.opentelemetry.io/otel/sdk/metric/controller/basic"
@@ -114,17 +116,17 @@ func main() {
 	)
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
 	srv.Use(opentelemetry.Tracer{})
+	rt.Handle("/query", otelhttp.NewHandler(srv, "/query"))
 
-	rt.Handle("/query", srv)
-
-	if *play {
-		rt.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	}
-
+	kingpin.FatalIfError(otelruntime.Start(), "cannot add OpenTelemetry runtime instrumentation")
 	res := resource.NewWithAttributes(attribute.Key("service.name").String("crossplane.io/xgql"))
 	exp, err := prometheus.InstallNewPipeline(prometheus.Config{}, basic.WithResource(res))
 	kingpin.FatalIfError(err, "cannot create OpenTelemetry Prometheus exporter")
 	rt.Handle("/metrics", exp)
+
+	if *play {
+		rt.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	}
 
 	kingpin.FatalIfError(http.ListenAndServe(*listen, rt), "cannot listen for HTTP")
 }
