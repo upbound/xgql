@@ -59,47 +59,45 @@ func (t MetricEmitter) Validate(schema graphql.ExecutableSchema) error {
 	return nil
 }
 
-// InterceptOperation to produce metrics and traces.
+// InterceptOperation to produce metrics .
 func (t MetricEmitter) InterceptOperation(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
-	oc := graphql.GetOperationContext(ctx)
-	reqStarted.Add(ctx, 1, operation.String(oc.OperationName))
+	if graphql.HasOperationContext(ctx) {
+		oc := graphql.GetOperationContext(ctx)
+		reqStarted.Add(ctx, 1, operation.String(oc.OperationName))
+	}
 	return next(ctx)
 }
 
-// InterceptResponse to produce metrics and traces.
+// InterceptResponse to produce metrics .
 func (t MetricEmitter) InterceptResponse(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
-	// TODO(negz): Better attributes? This isn't boolean - it's more "were any
-	// errors encountered".
-	s := "succeeded"
-	if len(graphql.GetErrors(ctx)) > 0 {
-		s = "failed"
+	if graphql.HasOperationContext(ctx) {
+		errs := graphql.GetErrors(ctx)
+		oc := graphql.GetOperationContext(ctx)
+		ms := time.Since(oc.Stats.OperationStart).Milliseconds()
+		reqCompleted.Add(ctx, 1, operation.String(oc.OperationName), success.Bool(len(errs) > 0))
+		reqDuration.Record(ctx, ms, operation.String(oc.OperationName), success.Bool(len(errs) > 0))
 	}
 
-	oc := graphql.GetOperationContext(ctx)
-	ms := time.Since(oc.Stats.OperationStart).Milliseconds()
-	reqCompleted.Add(ctx, 1, operation.String(oc.OperationName), status.String(s))
-	reqDuration.Record(ctx, ms, operation.String(oc.OperationName), status.String(s))
-
 	return next(ctx)
 }
 
-// InterceptField to produce metrics and traces.
+// InterceptField to produce metrics .
 func (t MetricEmitter) InterceptField(ctx context.Context, next graphql.Resolver) (interface{}, error) {
 	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return next(ctx)
+	}
 
 	resStarted.Add(ctx, 1, object.String(fc.Object), field.String(fc.Field.Name))
 
 	started := time.Now()
 	rsp, err := next(ctx)
 
-	s := "succeeded"
-	if err != nil {
-		s = "failed"
-	}
 	ms := time.Since(started).Milliseconds()
+	errs := graphql.GetFieldErrors(ctx, fc)
 
-	resCompleted.Add(ctx, 1, object.String(fc.Object), field.String(fc.Field.Name), status.String(s))
-	resDuration.Record(ctx, ms, object.String(fc.Object), field.String(fc.Field.Name), status.String(s))
+	resCompleted.Add(ctx, 1, object.String(fc.Object), field.String(fc.Field.Name), success.Bool(errs != nil))
+	resDuration.Record(ctx, ms, object.String(fc.Object), field.String(fc.Field.Name), success.Bool(errs != nil))
 
 	return rsp, err
 }
