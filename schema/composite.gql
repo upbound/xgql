@@ -1,4 +1,6 @@
-type CompositeResource implements KubernetesResource {
+type CompositeResource implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!
@@ -38,7 +40,9 @@ type CompositeResourceConnectionDetails {
   lastPublishedTime: Time
 }
 
-type CompositeResourceClaim implements KubernetesResource {
+type CompositeResourceClaim implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!

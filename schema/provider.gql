@@ -1,4 +1,6 @@
-type Provider implements KubernetesResource {
+type Provider implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!
@@ -38,7 +40,9 @@ type ProviderStatus implements ConditionedStatus {
   currentIdentifier: String
 }
 
-type ProviderRevision implements KubernetesResource {
+type ProviderRevision implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!
