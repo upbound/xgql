@@ -1,10 +1,10 @@
 ---
 name: Feature Request
-about: Help us make Crossplane more useful
+about: Help us make xgql more useful
 labels: enhancement
 ---
 <!--
-Thank you for helping to improve Crossplane!
+Thank you for helping to improve xgql!
 
 Please be sure to search for open issues before raising a new one. We use issues
 for bug reports and feature requests. Please find us at https://slack.crossplane.io
@@ -18,7 +18,7 @@ Leading with this context helps frame the feature request so we can ensure we
 implement it sensibly.
 --->
 
-### How could Crossplane help solve your problem?
+### How could xgql help solve your problem?
 <!--
-Let us know how you think Crossplane could help with your use case. 
+Let us know how you think xgql could help with your use case. 
 -->
