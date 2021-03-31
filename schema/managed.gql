@@ -1,4 +1,6 @@
-type ManagedResource implements KubernetesResource {
+type ManagedResource implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!

@@ -1,4 +1,6 @@
-type Configuration implements KubernetesResource {
+type Configuration implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!
@@ -38,7 +40,9 @@ type ConfigurationStatus implements ConditionedStatus {
   currentIdentifier: String
 }
 
-type ConfigurationRevision implements KubernetesResource {
+type ConfigurationRevision implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!

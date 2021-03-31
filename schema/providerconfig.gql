@@ -1,4 +1,6 @@
-type ProviderConfig implements KubernetesResource {
+type ProviderConfig implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!

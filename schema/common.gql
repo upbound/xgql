@@ -2,7 +2,13 @@ scalar Time
 scalar Map
 scalar JSONObject
 
+interface Node {
+  id: ID!
+}
+
 interface KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!
@@ -21,7 +27,9 @@ type KubernetesResourceConnection {
   count: Int!
 }
 
-type GenericResource implements KubernetesResource {
+type GenericResource implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!
@@ -36,7 +44,7 @@ type ObjectMeta {
   name: String!
   generateName: String
   namespace: String
-  uid: ID!
+  uid: String!
   resourceVersion: String!
   generation: Int!
   creationTime: Time!
@@ -89,7 +97,13 @@ type LabelSelector {
   matchLabels: Map
 }
 
-type Event {
+# NOTE(negz): Event does not implement KubernetesResource simply because an
+# event does not have events. We might consider creating a distinct
+# InvolvedObject interface (or something like that) for the events field.
+
+type Event implements Node {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!
@@ -114,7 +128,9 @@ enum EventType {
   Warning
 }
 
-type Secret implements KubernetesResource {
+type Secret implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!
@@ -130,7 +146,9 @@ type SecretConnection {
   count: Int!
 }
 
-type CustomResourceDefinition implements KubernetesResource {
+type CustomResourceDefinition implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!

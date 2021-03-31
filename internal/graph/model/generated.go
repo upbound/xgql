@@ -21,12 +21,17 @@ type KubernetesResource interface {
 	IsKubernetesResource()
 }
 
+type Node interface {
+	IsNode()
+}
+
 type ComposedResourceConnection struct {
 	Items []ComposedResource `json:"items"`
 	Count int                `json:"count"`
 }
 
 type CompositeResource struct {
+	ID         ReferenceID              `json:"id"`
 	APIVersion string                   `json:"apiVersion"`
 	Kind       string                   `json:"kind"`
 	Metadata   *ObjectMeta              `json:"metadata"`
@@ -36,10 +41,12 @@ type CompositeResource struct {
 	Events     *EventConnection         `json:"events"`
 }
 
+func (CompositeResource) IsNode()               {}
 func (CompositeResource) IsKubernetesResource() {}
 func (CompositeResource) IsComposedResource()   {}
 
 type CompositeResourceClaim struct {
+	ID         ReferenceID                   `json:"id"`
 	APIVersion string                        `json:"apiVersion"`
 	Kind       string                        `json:"kind"`
 	Metadata   *ObjectMeta                   `json:"metadata"`
@@ -49,6 +56,7 @@ type CompositeResourceClaim struct {
 	Events     *EventConnection              `json:"events"`
 }
 
+func (CompositeResourceClaim) IsNode()               {}
 func (CompositeResourceClaim) IsKubernetesResource() {}
 
 type CompositeResourceClaimConnection struct {
@@ -84,6 +92,7 @@ type CompositeResourceConnectionDetails struct {
 }
 
 type CompositeResourceDefinition struct {
+	ID                             ReferenceID                        `json:"id"`
 	APIVersion                     string                             `json:"apiVersion"`
 	Kind                           string                             `json:"kind"`
 	Metadata                       *ObjectMeta                        `json:"metadata"`
@@ -95,6 +104,7 @@ type CompositeResourceDefinition struct {
 	DefinedCompositeResourceClaims *CompositeResourceClaimConnection  `json:"definedCompositeResourceClaims"`
 }
 
+func (CompositeResourceDefinition) IsNode()               {}
 func (CompositeResourceDefinition) IsKubernetesResource() {}
 
 type CompositeResourceDefinitionControllerStatus struct {
@@ -142,6 +152,7 @@ type CompositeResourceValidation struct {
 }
 
 type Composition struct {
+	ID         ReferenceID        `json:"id"`
 	APIVersion string             `json:"apiVersion"`
 	Kind       string             `json:"kind"`
 	Metadata   *ObjectMeta        `json:"metadata"`
@@ -151,6 +162,7 @@ type Composition struct {
 	Events     *EventConnection   `json:"events"`
 }
 
+func (Composition) IsNode()               {}
 func (Composition) IsKubernetesResource() {}
 
 type CompositionList struct {
@@ -178,6 +190,7 @@ type Condition struct {
 }
 
 type Configuration struct {
+	ID         ReferenceID                      `json:"id"`
 	APIVersion string                           `json:"apiVersion"`
 	Kind       string                           `json:"kind"`
 	Metadata   *ObjectMeta                      `json:"metadata"`
@@ -188,6 +201,7 @@ type Configuration struct {
 	Revisions  *ConfigurationRevisionConnection `json:"revisions"`
 }
 
+func (Configuration) IsNode()               {}
 func (Configuration) IsKubernetesResource() {}
 
 type ConfigurationList struct {
@@ -196,6 +210,7 @@ type ConfigurationList struct {
 }
 
 type ConfigurationRevision struct {
+	ID         ReferenceID                  `json:"id"`
 	APIVersion string                       `json:"apiVersion"`
 	Kind       string                       `json:"kind"`
 	Metadata   *ObjectMeta                  `json:"metadata"`
@@ -205,6 +220,7 @@ type ConfigurationRevision struct {
 	Events     *EventConnection             `json:"events"`
 }
 
+func (ConfigurationRevision) IsNode()               {}
 func (ConfigurationRevision) IsKubernetesResource() {}
 
 type ConfigurationRevisionConnection struct {
@@ -239,6 +255,7 @@ type ConfigurationStatus struct {
 func (ConfigurationStatus) IsConditionedStatus() {}
 
 type CustomResourceDefinition struct {
+	ID               ReferenceID                     `json:"id"`
 	APIVersion       string                          `json:"apiVersion"`
 	Kind             string                          `json:"kind"`
 	Metadata         *ObjectMeta                     `json:"metadata"`
@@ -249,6 +266,7 @@ type CustomResourceDefinition struct {
 	DefinedResources *KubernetesResourceConnection   `json:"definedResources"`
 }
 
+func (CustomResourceDefinition) IsNode()               {}
 func (CustomResourceDefinition) IsKubernetesResource() {}
 
 type CustomResourceDefinitionNames struct {
@@ -283,6 +301,7 @@ type CustomResourceValidation struct {
 }
 
 type Event struct {
+	ID             ReferenceID        `json:"id"`
 	APIVersion     string             `json:"apiVersion"`
 	Kind           string             `json:"kind"`
 	Metadata       *ObjectMeta        `json:"metadata"`
@@ -297,6 +316,8 @@ type Event struct {
 	Raw            string             `json:"raw"`
 }
 
+func (Event) IsNode() {}
+
 type EventConnection struct {
 	Items []Event `json:"items"`
 	Count int     `json:"count"`
@@ -307,6 +328,7 @@ type EventSource struct {
 }
 
 type GenericResource struct {
+	ID         ReferenceID      `json:"id"`
 	APIVersion string           `json:"apiVersion"`
 	Kind       string           `json:"kind"`
 	Metadata   *ObjectMeta      `json:"metadata"`
@@ -314,6 +336,7 @@ type GenericResource struct {
 	Events     *EventConnection `json:"events"`
 }
 
+func (GenericResource) IsNode()               {}
 func (GenericResource) IsKubernetesResource() {}
 
 type KubernetesResourceConnection struct {
@@ -326,6 +349,7 @@ type LabelSelector struct {
 }
 
 type ManagedResource struct {
+	ID         ReferenceID            `json:"id"`
 	APIVersion string                 `json:"apiVersion"`
 	Kind       string                 `json:"kind"`
 	Metadata   *ObjectMeta            `json:"metadata"`
@@ -336,6 +360,7 @@ type ManagedResource struct {
 }
 
 func (ManagedResource) IsComposedResource()   {}
+func (ManagedResource) IsNode()               {}
 func (ManagedResource) IsKubernetesResource() {}
 
 type ManagedResourceStatus struct {
@@ -363,6 +388,7 @@ type PolicyRule struct {
 }
 
 type Provider struct {
+	ID         ReferenceID                 `json:"id"`
 	APIVersion string                      `json:"apiVersion"`
 	Kind       string                      `json:"kind"`
 	Metadata   *ObjectMeta                 `json:"metadata"`
@@ -373,9 +399,11 @@ type Provider struct {
 	Revisions  *ProviderRevisionConnection `json:"revisions"`
 }
 
+func (Provider) IsNode()               {}
 func (Provider) IsKubernetesResource() {}
 
 type ProviderConfig struct {
+	ID         ReferenceID           `json:"id"`
 	APIVersion string                `json:"apiVersion"`
 	Kind       string                `json:"kind"`
 	Metadata   *ObjectMeta           `json:"metadata"`
@@ -384,6 +412,7 @@ type ProviderConfig struct {
 	Raw        string                `json:"raw"`
 }
 
+func (ProviderConfig) IsNode()               {}
 func (ProviderConfig) IsKubernetesResource() {}
 
 type ProviderConfigStatus struct {
@@ -399,6 +428,7 @@ type ProviderList struct {
 }
 
 type ProviderRevision struct {
+	ID         ReferenceID             `json:"id"`
 	APIVersion string                  `json:"apiVersion"`
 	Kind       string                  `json:"kind"`
 	Metadata   *ObjectMeta             `json:"metadata"`
@@ -408,6 +438,7 @@ type ProviderRevision struct {
 	Events     *EventConnection        `json:"events"`
 }
 
+func (ProviderRevision) IsNode()               {}
 func (ProviderRevision) IsKubernetesResource() {}
 
 type ProviderRevisionConnection struct {
@@ -442,6 +473,7 @@ type ProviderStatus struct {
 func (ProviderStatus) IsConditionedStatus() {}
 
 type Secret struct {
+	ID         ReferenceID      `json:"id"`
 	APIVersion string           `json:"apiVersion"`
 	Kind       string           `json:"kind"`
 	Metadata   *ObjectMeta      `json:"metadata"`
@@ -450,6 +482,7 @@ type Secret struct {
 	Events     *EventConnection `json:"events"`
 }
 
+func (Secret) IsNode()               {}
 func (Secret) IsKubernetesResource() {}
 
 type SecretConnection struct {

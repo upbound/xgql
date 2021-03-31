@@ -1,4 +1,6 @@
-type CompositeResourceDefinition implements KubernetesResource {
+type CompositeResourceDefinition implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!
@@ -67,7 +69,9 @@ type TypeReference {
   kind: String!
 }
 
-type Composition implements KubernetesResource {
+type Composition implements Node & KubernetesResource {
+  id: ID!
+
   apiVersion: String!
   kind: String!
   metadata: ObjectMeta!

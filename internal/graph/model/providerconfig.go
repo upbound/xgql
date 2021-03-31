@@ -19,6 +19,12 @@ func GetProviderConfig(u *kunstructured.Unstructured) (ProviderConfig, error) {
 	}
 
 	out := ProviderConfig{
+		ID: ReferenceID{
+			APIVersion: pc.GetAPIVersion(),
+			Kind:       pc.GetKind(),
+			Name:       pc.GetName(),
+		},
+
 		APIVersion: pc.GetAPIVersion(),
 		Kind:       pc.GetKind(),
 		Metadata:   GetObjectMeta(pc),

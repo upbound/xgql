@@ -33,6 +33,12 @@ func GetManagedResource(u *kunstructured.Unstructured) (ManagedResource, error) 
 	}
 
 	out := ManagedResource{
+		ID: ReferenceID{
+			APIVersion: mg.GetAPIVersion(),
+			Kind:       mg.GetKind(),
+			Name:       mg.GetName(),
+		},
+
 		APIVersion: mg.GetAPIVersion(),
 		Kind:       mg.GetKind(),
 		Metadata:   GetObjectMeta(mg),

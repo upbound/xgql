@@ -82,6 +82,12 @@ func GetProvider(p *pkgv1.Provider) (Provider, error) {
 	}
 
 	out := Provider{
+		ID: ReferenceID{
+			APIVersion: p.APIVersion,
+			Kind:       p.Kind,
+			Name:       p.GetName(),
+		},
+
 		APIVersion: p.APIVersion,
 		Kind:       p.Kind,
 		Metadata:   GetObjectMeta(p),
@@ -112,6 +118,12 @@ func GetProviderRevision(pr *pkgv1.ProviderRevision) (ProviderRevision, error) {
 	}
 
 	out := ProviderRevision{
+		ID: ReferenceID{
+			APIVersion: pr.APIVersion,
+			Kind:       pr.Kind,
+			Name:       pr.GetName(),
+		},
+
 		APIVersion: pr.APIVersion,
 		Kind:       pr.Kind,
 		Metadata:   GetObjectMeta(pr),
@@ -145,6 +157,12 @@ func GetConfiguration(c *pkgv1.Configuration) (Configuration, error) {
 	}
 
 	out := Configuration{
+		ID: ReferenceID{
+			APIVersion: c.APIVersion,
+			Kind:       c.Kind,
+			Name:       c.GetName(),
+		},
+
 		APIVersion: c.APIVersion,
 		Kind:       c.Kind,
 		Metadata:   GetObjectMeta(c),
@@ -175,6 +193,12 @@ func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision) (ConfigurationRev
 	}
 
 	out := ConfigurationRevision{
+		ID: ReferenceID{
+			APIVersion: cr.APIVersion,
+			Kind:       cr.Kind,
+			Name:       cr.GetName(),
+		},
+
 		APIVersion: cr.APIVersion,
 		Kind:       cr.Kind,
 		Metadata:   GetObjectMeta(cr),

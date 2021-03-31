@@ -42,6 +42,12 @@ func GetCompositeResource(u *kunstructured.Unstructured) (CompositeResource, err
 	}
 
 	out := CompositeResource{
+		ID: ReferenceID{
+			APIVersion: xr.GetAPIVersion(),
+			Kind:       xr.GetKind(),
+			Name:       xr.GetName(),
+		},
+
 		APIVersion: xr.GetAPIVersion(),
 		Kind:       xr.GetKind(),
 		Metadata:   GetObjectMeta(xr),
