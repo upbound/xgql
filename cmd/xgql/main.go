@@ -39,6 +39,7 @@ import (
 	"github.com/upbound/xgql/internal/graph/resolvers"
 	"github.com/upbound/xgql/internal/opentelemetry"
 	"github.com/upbound/xgql/internal/token"
+	"github.com/upbound/xgql/internal/version"
 )
 
 // A set of resources that we never want to cache. Clients take a watch on any
@@ -75,6 +76,7 @@ func main() {
 		agent  = app.Flag("trace-agent", "Address of the Jaeger trace agent. Leave unset to disable tracing.").String()
 		ratio  = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
 	)
+	app.Version(version.Version)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	zl := zap.New(zap.UseDevMode(*debug))
@@ -107,7 +109,9 @@ func main() {
 	utilruntime.ErrorHandlers = []func(error){func(err error) { log.Debug("Kubernetes runtime error", "err", err) }}
 
 	rt := chi.NewRouter()
-	rt.Use(middleware.RequestLogger(&formatter{log}), token.Middleware)
+	rt.Use(middleware.RequestLogger(&formatter{log}))
+	rt.Use(token.Middleware)
+	rt.Use(version.Middleware)
 
 	s := runtime.NewScheme()
 	kingpin.FatalIfError(corev1.AddToScheme(s), "cannot add Kubernetes core/v1 to scheme")
@@ -142,6 +146,7 @@ func main() {
 
 	rt.Handle("/query", otelhttp.NewHandler(srv, "/query"))
 	rt.Handle("/metrics", prom)
+	rt.Handle("/version", version.Handler())
 	if *play {
 		rt.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	}
