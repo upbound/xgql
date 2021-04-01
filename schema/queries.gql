@@ -1,8 +1,8 @@
 type Query {
-    providers(limit: Int): ProviderConnection!
-    configurations(limit: Int): ConfigurationConnection!
-    compositeResourceDefinitions(limit: Int, dangling: Boolean = false): CompositeResourceDefinitionConnection!
-    compositions(limit: Int, dangling: Boolean = false): CompositionConnection!
+    providers: ProviderConnection!
+    configurations: ConfigurationConnection!
+    compositeResourceDefinitions(dangling: Boolean = false): CompositeResourceDefinitionConnection!
+    compositions(dangling: Boolean = false): CompositionConnection!
 }
 
 type ProviderConnection {

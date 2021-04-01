@@ -23,7 +23,7 @@ type objectMetaResolver struct {
 	clients ClientCache
 }
 
-func (r *objectMetaResolver) Owners(ctx context.Context, obj *model.ObjectMeta, limit *int, controller *bool) (*model.OwnerConnection, error) { //nolint:gocyclo
+func (r *objectMetaResolver) Owners(ctx context.Context, obj *model.ObjectMeta, controller *bool) (*model.OwnerConnection, error) { //nolint:gocyclo
 	// TODO(negz): This method is way over our complexity goal, mostly due to
 	// the big switch. Break it out?
 
@@ -39,8 +39,10 @@ func (r *objectMetaResolver) Owners(ctx context.Context, obj *model.ObjectMeta, 
 		return nil, nil
 	}
 
-	lim := getLimit(limit, len(obj.OwnerReferences))
-	owners := make([]model.Owner, 0, lim)
+	out := &model.OwnerConnection{
+		Items: make([]model.Owner, 0, len(obj.OwnerReferences)),
+		Count: len(obj.OwnerReferences),
+	}
 
 	for _, ref := range obj.OwnerReferences {
 		u := &kunstructured.Unstructured{}
@@ -134,14 +136,10 @@ func (r *objectMetaResolver) Owners(ctx context.Context, obj *model.ObjectMeta, 
 			return &model.OwnerConnection{Items: []model.Owner{owner}, Count: 1}, nil
 		}
 
-		owners = append(owners, owner)
+		out.Items = append(out.Items, owner)
 	}
 
-	if limit != nil && *limit < len(owners) {
-		owners = owners[:*limit]
-	}
-
-	return &model.OwnerConnection{Items: owners, Count: len(obj.OwnerReferences)}, nil
+	return out, nil
 }
 
 func convert(from *kunstructured.Unstructured, to runtime.Object) error {

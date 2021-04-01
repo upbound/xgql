@@ -16,7 +16,7 @@ type query struct {
 	clients ClientCache
 }
 
-func (r *query) Providers(ctx context.Context, limit *int) (*model.ProviderConnection, error) {
+func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
@@ -31,13 +31,12 @@ func (r *query) Providers(ctx context.Context, limit *int) (*model.ProviderConne
 		return nil, nil
 	}
 
-	lim := getLimit(limit, len(in.Items))
 	out := &model.ProviderConnection{
-		Items: make([]model.Provider, 0, lim),
+		Items: make([]model.Provider, 0, len(in.Items)),
 		Count: len(in.Items),
 	}
 
-	for i := range in.Items[:lim] {
+	for i := range in.Items {
 		p, err := model.GetProvider(&in.Items[i])
 		if err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, "cannot model provider"))
@@ -49,7 +48,7 @@ func (r *query) Providers(ctx context.Context, limit *int) (*model.ProviderConne
 	return out, nil
 }
 
-func (r *query) Configurations(ctx context.Context, limit *int) (*model.ConfigurationConnection, error) {
+func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
@@ -64,13 +63,12 @@ func (r *query) Configurations(ctx context.Context, limit *int) (*model.Configur
 		return nil, nil
 	}
 
-	lim := getLimit(limit, len(in.Items))
 	out := &model.ConfigurationConnection{
-		Items: make([]model.Configuration, 0, lim),
+		Items: make([]model.Configuration, 0, len(in.Items)),
 		Count: len(in.Items),
 	}
 
-	for i := range in.Items[:lim] {
+	for i := range in.Items {
 		c, err := model.GetConfiguration(&in.Items[i])
 		if err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, "cannot model configuration"))
@@ -82,10 +80,10 @@ func (r *query) Configurations(ctx context.Context, limit *int) (*model.Configur
 	return out, nil
 }
 
-func (r *query) CompositeResourceDefinitions(ctx context.Context, limit *int, dangling *bool) (*model.CompositeResourceDefinitionConnection, error) {
+func (r *query) CompositeResourceDefinitions(ctx context.Context, dangling *bool) (*model.CompositeResourceDefinitionConnection, error) {
 	return nil, nil
 }
 
-func (r *query) Compositions(ctx context.Context, limit *int, dangling *bool) (*model.CompositionConnection, error) {
+func (r *query) Compositions(ctx context.Context, dangling *bool) (*model.CompositionConnection, error) {
 	return nil, nil
 }

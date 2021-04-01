@@ -9,8 +9,8 @@ type Configuration implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! @goField(forceResolver: true)
-  revisions(limit: Int, active: Boolean): ConfigurationRevisionConnection! @goField(forceResolver: true)
+  events: EventConnection! @goField(forceResolver: true)
+  revisions(active: Boolean): ConfigurationRevisionConnection! @goField(forceResolver: true)
 }
 
 type ConfigurationRevisionConnection {
@@ -51,7 +51,7 @@ type ConfigurationRevision implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! @goField(forceResolver: true)
+  events: EventConnection! @goField(forceResolver: true)
 }
 
 type ConfigurationRevisionSpec {
@@ -76,5 +76,5 @@ type ConfigurationRevisionStatus implements ConditionedStatus {
   # KubernetesResource here because doing so allows us to package different
   # types in future without a breaking GraphQL schema change.
 
-  objects(limit: Int): KubernetesResourceConnection! @goField(forceResolver: true)
+  objects: KubernetesResourceConnection! @goField(forceResolver: true)
 }

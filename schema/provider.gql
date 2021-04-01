@@ -9,8 +9,8 @@ type Provider implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! @goField(forceResolver: true)
-  revisions(limit: Int, active: Boolean): ProviderRevisionConnection! @goField(forceResolver: true)
+  events: EventConnection! @goField(forceResolver: true)
+  revisions(active: Boolean): ProviderRevisionConnection! @goField(forceResolver: true)
 }
 
 type ProviderRevisionConnection {
@@ -51,7 +51,7 @@ type ProviderRevision implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! @goField(forceResolver: true)
+  events: EventConnection! @goField(forceResolver: true)
 }
 
 type ProviderRevisionSpec {
@@ -77,5 +77,5 @@ type ProviderRevisionStatus implements ConditionedStatus {
   # because doing so allows us to package different types in future without a
   # breaking GraphQL schema change.
 
-  objects(limit: Int): KubernetesResourceConnection! @goField(forceResolver: true)
+  objects: KubernetesResourceConnection! @goField(forceResolver: true)
 }

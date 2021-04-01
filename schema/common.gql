@@ -14,7 +14,7 @@ interface KubernetesResource {
   metadata: ObjectMeta!
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! 
+  events: EventConnection! 
 }
 
 type EventConnection {
@@ -35,7 +35,7 @@ type GenericResource implements Node & KubernetesResource {
   metadata: ObjectMeta!
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! @goField(forceResolver: true)
+  events: EventConnection! @goField(forceResolver: true)
 }
 
 # Corresponds to v1 object metadata
@@ -52,7 +52,7 @@ type ObjectMeta {
   labels: Map
   annotations: Map
 
-  owners(limit: Int, controller: Boolean): OwnerConnection! @goField(forceResolver: true)
+  owners(controller: Boolean): OwnerConnection! @goField(forceResolver: true)
 }
 
 type OwnerConnection {
@@ -138,7 +138,7 @@ type Secret implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! @goField(forceResolver: true)
+  events: EventConnection! @goField(forceResolver: true)
 }
 
 type SecretConnection {
@@ -157,8 +157,8 @@ type CustomResourceDefinition implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection!
-  definedResources(limit: Int, version: String): KubernetesResourceConnection! @goField(forceResolver: true)
+  events: EventConnection!
+  definedResources(version: String): KubernetesResourceConnection! @goField(forceResolver: true)
 }
 
 type CustomResourceDefinitionSpec {

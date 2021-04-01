@@ -9,7 +9,7 @@ type ManagedResource implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! @goField(forceResolver: true)
+  events: EventConnection! @goField(forceResolver: true)
 }
 
 type ManagedResourceSpec {

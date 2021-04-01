@@ -9,7 +9,7 @@ type CompositeResource implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! @goField(forceResolver: true)
+  events: EventConnection! @goField(forceResolver: true)
 }
 
 type CompositeResourceSpec {
@@ -18,7 +18,7 @@ type CompositeResourceSpec {
   claim: CompositeResourceClaim @goField(forceResolver: true)
   writesConnectionSecretTo: Secret @goField(forceResolver: true)
 
-  resources(limit: Int): ComposedResourceConnection @goField(forceResolver: true)
+  resources: ComposedResourceConnection @goField(forceResolver: true)
 }
 
 type ComposedResourceConnection {
@@ -51,7 +51,7 @@ type CompositeResourceClaim implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! @goField(forceResolver: true)
+  events: EventConnection! @goField(forceResolver: true)
 }
 
 type CompositeResourceClaimSpec {

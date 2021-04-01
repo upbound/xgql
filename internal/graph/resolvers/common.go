@@ -17,7 +17,7 @@ type crd struct {
 	clients ClientCache
 }
 
-func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, limit *int, version *string) (*model.KubernetesResourceConnection, error) { //nolint:gocyclo
+func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error) { //nolint:gocyclo
 	// TODO(negz): This method is over our complexity goal; it may be worth
 	// breaking the switch out into its own function.
 
@@ -58,13 +58,12 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 		return nil, nil
 	}
 
-	lim := getLimit(limit, len(in.Items))
 	out := &model.KubernetesResourceConnection{
-		Items: make([]model.KubernetesResource, 0, lim),
+		Items: make([]model.KubernetesResource, 0, len(in.Items)),
 		Count: len(in.Items),
 	}
 
-	for i := range in.Items[:lim] {
+	for i := range in.Items {
 		u := in.Items[i]
 
 		switch {
