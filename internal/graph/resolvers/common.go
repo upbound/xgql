@@ -17,6 +17,10 @@ type crd struct {
 	clients ClientCache
 }
 
+func (r *crd) Events(ctx context.Context, obj *model.CustomResourceDefinition) (*model.EventConnection, error) {
+	return nil, nil
+}
+
 func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error) { //nolint:gocyclo
 	// TODO(negz): This method is over our complexity goal; it may be worth
 	// breaking the switch out into its own function.

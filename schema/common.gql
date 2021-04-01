@@ -157,7 +157,7 @@ type CustomResourceDefinition implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events: EventConnection!
+  events: EventConnection! @goField(forceResolver: true)
   definedResources(version: String): KubernetesResourceConnection! @goField(forceResolver: true)
 }
 

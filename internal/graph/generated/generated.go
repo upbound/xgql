@@ -580,6 +580,7 @@ type ConfigurationRevisionStatusResolver interface {
 	Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (*model.KubernetesResourceConnection, error)
 }
 type CustomResourceDefinitionResolver interface {
+	Events(ctx context.Context, obj *model.CustomResourceDefinition) (*model.EventConnection, error)
 	DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error)
 }
 type EventResolver interface {
@@ -2921,7 +2922,7 @@ type CustomResourceDefinition implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events: EventConnection!
+  events: EventConnection! @goField(forceResolver: true)
   definedResources(version: String): KubernetesResourceConnection! @goField(forceResolver: true)
 }
 
@@ -8154,14 +8155,14 @@ func (ec *executionContext) _CustomResourceDefinition_events(ctx context.Context
 		Object:     "CustomResourceDefinition",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Events, nil
+		return ec.resolvers.CustomResourceDefinition().Events(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15742,10 +15743,19 @@ func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel a
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
-			out.Values[i] = ec._CustomResourceDefinition_events(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CustomResourceDefinition_events(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "definedResources":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
