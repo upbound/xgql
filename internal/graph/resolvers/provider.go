@@ -21,11 +21,11 @@ type provider struct {
 	clients ClientCache
 }
 
-func (r *provider) Events(ctx context.Context, obj *model.Provider, limit *int) (*model.EventConnection, error) {
+func (r *provider) Events(ctx context.Context, obj *model.Provider) (*model.EventConnection, error) {
 	return nil, nil
 }
 
-func (r *provider) Revisions(ctx context.Context, obj *model.Provider, limit *int, active *bool) (*model.ProviderRevisionConnection, error) { //nolint:gocyclo
+func (r *provider) Revisions(ctx context.Context, obj *model.Provider, active *bool) (*model.ProviderRevisionConnection, error) { //nolint:gocyclo
 	// NOTE(negz): This method is a little over our complexity goal. Be wary of
 	// making it more complex.
 
@@ -62,13 +62,6 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, limit *in
 			continue
 		}
 
-		out.Count++
-
-		// We've hit our limit; we only want to count from hereon out.
-		if limit != nil && *limit < out.Count {
-			continue
-		}
-
 		i, err := model.GetProviderRevision(&pr)
 		if err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, "cannot model provider revision"))
@@ -76,6 +69,7 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, limit *in
 		}
 
 		out.Items = append(out.Items, i)
+		out.Count++
 	}
 
 	return out, nil
@@ -85,7 +79,7 @@ type providerRevision struct {
 	clients ClientCache
 }
 
-func (r *providerRevision) Events(ctx context.Context, obj *model.ProviderRevision, limit *int) (*model.EventConnection, error) {
+func (r *providerRevision) Events(ctx context.Context, obj *model.ProviderRevision) (*model.EventConnection, error) {
 	return nil, nil
 }
 
@@ -93,7 +87,7 @@ type providerRevisionStatus struct {
 	clients ClientCache
 }
 
-func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.ProviderRevisionStatus, limit *int) (*model.KubernetesResourceConnection, error) {
+func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.ProviderRevisionStatus) (*model.KubernetesResourceConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
@@ -117,13 +111,6 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 			continue
 		}
 
-		out.Count++
-
-		// We've hit our limit; we only want to count from hereon out.
-		if limit != nil && *limit < out.Count {
-			continue
-		}
-
 		crd := &kextv1.CustomResourceDefinition{}
 		if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, crd); err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, "cannot get CustomResourceDefinition"))
@@ -137,6 +124,7 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 		}
 
 		out.Items = append(out.Items, i)
+		out.Count++
 	}
 
 	return out, nil

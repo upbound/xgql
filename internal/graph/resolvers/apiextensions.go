@@ -16,11 +16,11 @@ type xrd struct {
 	clients ClientCache
 }
 
-func (r *xrd) Events(ctx context.Context, obj *model.CompositeResourceDefinition, limit *int) (*model.EventConnection, error) {
+func (r *xrd) Events(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.EventConnection, error) {
 	return nil, nil
 }
 
-func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, limit *int, version *string) (*model.CompositeResourceConnection, error) {
+func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string) (*model.CompositeResourceConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
@@ -49,13 +49,12 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 		return nil, nil
 	}
 
-	lim := getLimit(limit, len(in.Items))
 	out := &model.CompositeResourceConnection{
-		Items: make([]model.CompositeResource, 0, lim),
+		Items: make([]model.CompositeResource, 0, len(in.Items)),
 		Count: len(in.Items),
 	}
 
-	for i := range in.Items[:lim] {
+	for i := range in.Items {
 		cr, err := model.GetCompositeResource(&in.Items[i])
 		if err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, "cannot model composite resource"))
@@ -67,7 +66,7 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 	return out, nil
 }
 
-func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, limit *int, version, namespace *string) (*model.CompositeResourceClaimConnection, error) {
+func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version, namespace *string) (*model.CompositeResourceClaimConnection, error) {
 	return nil, nil
 }
 

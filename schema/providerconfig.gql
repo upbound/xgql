@@ -6,7 +6,7 @@ type ProviderConfig implements Node & KubernetesResource {
   metadata: ObjectMeta!
   status: ProviderConfigStatus
 
-  events(limit: Int): EventConnection! @goField(forceResolver: true)
+  events: EventConnection! @goField(forceResolver: true)
 
   raw: JSONObject!
 }

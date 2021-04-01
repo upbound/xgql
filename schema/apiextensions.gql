@@ -9,9 +9,9 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! @goField(forceResolver: true)
-  definedCompositeResources(limit: Int, version: String): CompositeResourceConnection! @goField(forceResolver: true)
-  definedCompositeResourceClaims(limit: Int, version: String, namespace: String): CompositeResourceClaimConnection! @goField(forceResolver: true)
+  events: EventConnection! @goField(forceResolver: true)
+  definedCompositeResources(version: String): CompositeResourceConnection! @goField(forceResolver: true)
+  definedCompositeResourceClaims(version: String, namespace: String): CompositeResourceClaimConnection! @goField(forceResolver: true)
 }
 
 type CompositeResourceConnection {
@@ -80,7 +80,7 @@ type Composition implements Node & KubernetesResource {
 
   raw: JSONObject!
 
-  events(limit: Int): EventConnection! @goField(forceResolver: true)
+  events: EventConnection! @goField(forceResolver: true)
 }
 
 type CompositionSpec {

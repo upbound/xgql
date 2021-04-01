@@ -21,11 +21,11 @@ type configuration struct {
 	clients ClientCache
 }
 
-func (r *configuration) Events(ctx context.Context, obj *model.Configuration, limit *int) (*model.EventConnection, error) {
+func (r *configuration) Events(ctx context.Context, obj *model.Configuration) (*model.EventConnection, error) {
 	return nil, nil
 }
 
-func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration, limit *int, active *bool) (*model.ConfigurationRevisionConnection, error) { //nolint:gocyclo
+func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration, active *bool) (*model.ConfigurationRevisionConnection, error) { //nolint:gocyclo
 	// NOTE(negz): This method is a little over our complexity goal. Be wary of
 	// making it more complex.
 
@@ -62,19 +62,13 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration,
 			continue
 		}
 
-		out.Count++
-
-		// We've hit our limit; we only want to count from hereon out.
-		if limit != nil && *limit < out.Count {
-			continue
-		}
-
 		i, err := model.GetConfigurationRevision(&cr)
 		if err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, "cannot model configuration revision"))
 		}
 
 		out.Items = append(out.Items, i)
+		out.Count++
 	}
 
 	return out, nil
@@ -84,7 +78,7 @@ type configurationRevision struct {
 	clients ClientCache
 }
 
-func (r *configurationRevision) Events(ctx context.Context, obj *model.ConfigurationRevision, limit *int) (*model.EventConnection, error) {
+func (r *configurationRevision) Events(ctx context.Context, obj *model.ConfigurationRevision) (*model.EventConnection, error) {
 	return nil, nil
 }
 
@@ -92,7 +86,7 @@ type configurationRevisionStatus struct {
 	clients ClientCache
 }
 
-func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus, limit *int) (*model.KubernetesResourceConnection, error) { //nolint:gocyclo
+func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (*model.KubernetesResourceConnection, error) { //nolint:gocyclo
 	// TODO(negz): This method is over our complexity goal. Maybe break the
 	// switch out into its own function?
 
@@ -116,16 +110,6 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 			continue
 		}
 
-		// Currently only two types exist in the apiextensions.crossplane.io API
-		// group, so we assume that if we've found a resource in that group it
-		// will be handled by the switch on ref.Kind below.
-		out.Count++
-
-		// We've hit our limit; we only want to count from hereon out.
-		if limit != nil && *limit < out.Count {
-			continue
-		}
-
 		switch ref.Kind {
 		case extv1.CompositeResourceDefinitionKind:
 			xrd := &extv1.CompositeResourceDefinition{}
@@ -141,6 +125,7 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 			}
 
 			out.Items = append(out.Items, i)
+			out.Count++
 		case extv1.CompositionKind:
 			cmp := &extv1.Composition{}
 			if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, cmp); err != nil {
@@ -155,8 +140,8 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 			}
 
 			out.Items = append(out.Items, i)
+			out.Count++
 		}
-
 	}
 
 	return out, nil
