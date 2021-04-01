@@ -1,26 +1,26 @@
 type Query {
-    providers(limit: Int): ProviderList!
-    configurations(limit: Int): ConfigurationList!
-    compositeResourceDefinitions(limit: Int, dangling: Boolean = false): CompositeResourceDefinitionList!
-    compositions(limit: Int, dangling: Boolean = false): CompositionList!
+    providers(limit: Int): ProviderConnection!
+    configurations(limit: Int): ConfigurationConnection!
+    compositeResourceDefinitions(limit: Int, dangling: Boolean = false): CompositeResourceDefinitionConnection!
+    compositions(limit: Int, dangling: Boolean = false): CompositionConnection!
 }
 
-type ProviderList {
+type ProviderConnection {
     items: [Provider!]
     count: Int!
 }
 
-type ConfigurationList {
+type ConfigurationConnection {
     items: [Configuration!]
     count: Int!
 }
 
-type CompositeResourceDefinitionList {
+type CompositeResourceDefinitionConnection {
     items: [CompositeResourceDefinition!]
     count: Int!
 }
 
-type CompositionList {
+type CompositionConnection {
     items: [Composition!]
     count: Int!
 }

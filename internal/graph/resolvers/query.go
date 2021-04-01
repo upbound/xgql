@@ -16,7 +16,7 @@ type query struct {
 	clients ClientCache
 }
 
-func (r *query) Providers(ctx context.Context, limit *int) (*model.ProviderList, error) {
+func (r *query) Providers(ctx context.Context, limit *int) (*model.ProviderConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
@@ -32,7 +32,7 @@ func (r *query) Providers(ctx context.Context, limit *int) (*model.ProviderList,
 	}
 
 	lim := getLimit(limit, len(in.Items))
-	out := &model.ProviderList{
+	out := &model.ProviderConnection{
 		Items: make([]model.Provider, 0, lim),
 		Count: len(in.Items),
 	}
@@ -49,7 +49,7 @@ func (r *query) Providers(ctx context.Context, limit *int) (*model.ProviderList,
 	return out, nil
 }
 
-func (r *query) Configurations(ctx context.Context, limit *int) (*model.ConfigurationList, error) {
+func (r *query) Configurations(ctx context.Context, limit *int) (*model.ConfigurationConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
@@ -65,7 +65,7 @@ func (r *query) Configurations(ctx context.Context, limit *int) (*model.Configur
 	}
 
 	lim := getLimit(limit, len(in.Items))
-	out := &model.ConfigurationList{
+	out := &model.ConfigurationConnection{
 		Items: make([]model.Configuration, 0, lim),
 		Count: len(in.Items),
 	}
@@ -82,10 +82,10 @@ func (r *query) Configurations(ctx context.Context, limit *int) (*model.Configur
 	return out, nil
 }
 
-func (r *query) CompositeResourceDefinitions(ctx context.Context, limit *int, dangling *bool) (*model.CompositeResourceDefinitionList, error) {
+func (r *query) CompositeResourceDefinitions(ctx context.Context, limit *int, dangling *bool) (*model.CompositeResourceDefinitionConnection, error) {
 	return nil, nil
 }
 
-func (r *query) Compositions(ctx context.Context, limit *int, dangling *bool) (*model.CompositionList, error) {
+func (r *query) Compositions(ctx context.Context, limit *int, dangling *bool) (*model.CompositionConnection, error) {
 	return nil, nil
 }

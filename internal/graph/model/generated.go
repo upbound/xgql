@@ -107,14 +107,14 @@ type CompositeResourceDefinition struct {
 func (CompositeResourceDefinition) IsNode()               {}
 func (CompositeResourceDefinition) IsKubernetesResource() {}
 
+type CompositeResourceDefinitionConnection struct {
+	Items []CompositeResourceDefinition `json:"items"`
+	Count int                           `json:"count"`
+}
+
 type CompositeResourceDefinitionControllerStatus struct {
 	CompositeResourceType      *TypeReference `json:"compositeResourceType"`
 	CompositeResourceClaimType *TypeReference `json:"compositeResourceClaimType"`
-}
-
-type CompositeResourceDefinitionList struct {
-	Items []CompositeResourceDefinition `json:"items"`
-	Count int                           `json:"count"`
 }
 
 type CompositeResourceDefinitionNames struct {
@@ -165,7 +165,7 @@ type Composition struct {
 func (Composition) IsNode()               {}
 func (Composition) IsKubernetesResource() {}
 
-type CompositionList struct {
+type CompositionConnection struct {
 	Items []Composition `json:"items"`
 	Count int           `json:"count"`
 }
@@ -204,7 +204,7 @@ type Configuration struct {
 func (Configuration) IsNode()               {}
 func (Configuration) IsKubernetesResource() {}
 
-type ConfigurationList struct {
+type ConfigurationConnection struct {
 	Items []Configuration `json:"items"`
 	Count int             `json:"count"`
 }
@@ -422,7 +422,7 @@ type ProviderConfigStatus struct {
 
 func (ProviderConfigStatus) IsConditionedStatus() {}
 
-type ProviderList struct {
+type ProviderConnection struct {
 	Items []Provider `json:"items"`
 	Count int        `json:"count"`
 }

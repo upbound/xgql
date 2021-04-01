@@ -135,14 +135,14 @@ type ComplexityRoot struct {
 		Status                         func(childComplexity int) int
 	}
 
+	CompositeResourceDefinitionConnection struct {
+		Count func(childComplexity int) int
+		Items func(childComplexity int) int
+	}
+
 	CompositeResourceDefinitionControllerStatus struct {
 		CompositeResourceClaimType func(childComplexity int) int
 		CompositeResourceType      func(childComplexity int) int
-	}
-
-	CompositeResourceDefinitionList struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
 	}
 
 	CompositeResourceDefinitionNames struct {
@@ -204,7 +204,7 @@ type ComplexityRoot struct {
 		Status     func(childComplexity int) int
 	}
 
-	CompositionList struct {
+	CompositionConnection struct {
 		Count func(childComplexity int) int
 		Items func(childComplexity int) int
 	}
@@ -238,7 +238,7 @@ type ComplexityRoot struct {
 		Status     func(childComplexity int) int
 	}
 
-	ConfigurationList struct {
+	ConfigurationConnection struct {
 		Count func(childComplexity int) int
 		Items func(childComplexity int) int
 	}
@@ -456,7 +456,7 @@ type ComplexityRoot struct {
 		Users      func(childComplexity int) int
 	}
 
-	ProviderList struct {
+	ProviderConnection struct {
 		Count func(childComplexity int) int
 		Items func(childComplexity int) int
 	}
@@ -612,10 +612,10 @@ type ProviderRevisionStatusResolver interface {
 	Objects(ctx context.Context, obj *model.ProviderRevisionStatus, limit *int) (*model.KubernetesResourceConnection, error)
 }
 type QueryResolver interface {
-	Providers(ctx context.Context, limit *int) (*model.ProviderList, error)
-	Configurations(ctx context.Context, limit *int) (*model.ConfigurationList, error)
-	CompositeResourceDefinitions(ctx context.Context, limit *int, dangling *bool) (*model.CompositeResourceDefinitionList, error)
-	Compositions(ctx context.Context, limit *int, dangling *bool) (*model.CompositionList, error)
+	Providers(ctx context.Context, limit *int) (*model.ProviderConnection, error)
+	Configurations(ctx context.Context, limit *int) (*model.ConfigurationConnection, error)
+	CompositeResourceDefinitions(ctx context.Context, limit *int, dangling *bool) (*model.CompositeResourceDefinitionConnection, error)
+	Compositions(ctx context.Context, limit *int, dangling *bool) (*model.CompositionConnection, error)
 }
 type SecretResolver interface {
 	Events(ctx context.Context, obj *model.Secret, limit *int) (*model.EventConnection, error)
@@ -941,6 +941,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResourceDefinition.Status(childComplexity), true
 
+	case "CompositeResourceDefinitionConnection.count":
+		if e.complexity.CompositeResourceDefinitionConnection.Count == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceDefinitionConnection.Count(childComplexity), true
+
+	case "CompositeResourceDefinitionConnection.items":
+		if e.complexity.CompositeResourceDefinitionConnection.Items == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceDefinitionConnection.Items(childComplexity), true
+
 	case "CompositeResourceDefinitionControllerStatus.compositeResourceClaimType":
 		if e.complexity.CompositeResourceDefinitionControllerStatus.CompositeResourceClaimType == nil {
 			break
@@ -954,20 +968,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CompositeResourceDefinitionControllerStatus.CompositeResourceType(childComplexity), true
-
-	case "CompositeResourceDefinitionList.count":
-		if e.complexity.CompositeResourceDefinitionList.Count == nil {
-			break
-		}
-
-		return e.complexity.CompositeResourceDefinitionList.Count(childComplexity), true
-
-	case "CompositeResourceDefinitionList.items":
-		if e.complexity.CompositeResourceDefinitionList.Items == nil {
-			break
-		}
-
-		return e.complexity.CompositeResourceDefinitionList.Items(childComplexity), true
 
 	case "CompositeResourceDefinitionNames.categories":
 		if e.complexity.CompositeResourceDefinitionNames.Categories == nil {
@@ -1224,19 +1224,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Composition.Status(childComplexity), true
 
-	case "CompositionList.count":
-		if e.complexity.CompositionList.Count == nil {
+	case "CompositionConnection.count":
+		if e.complexity.CompositionConnection.Count == nil {
 			break
 		}
 
-		return e.complexity.CompositionList.Count(childComplexity), true
+		return e.complexity.CompositionConnection.Count(childComplexity), true
 
-	case "CompositionList.items":
-		if e.complexity.CompositionList.Items == nil {
+	case "CompositionConnection.items":
+		if e.complexity.CompositionConnection.Items == nil {
 			break
 		}
 
-		return e.complexity.CompositionList.Items(childComplexity), true
+		return e.complexity.CompositionConnection.Items(childComplexity), true
 
 	case "CompositionSpec.compositeTypeRef":
 		if e.complexity.CompositionSpec.CompositeTypeRef == nil {
@@ -1367,19 +1367,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Configuration.Status(childComplexity), true
 
-	case "ConfigurationList.count":
-		if e.complexity.ConfigurationList.Count == nil {
+	case "ConfigurationConnection.count":
+		if e.complexity.ConfigurationConnection.Count == nil {
 			break
 		}
 
-		return e.complexity.ConfigurationList.Count(childComplexity), true
+		return e.complexity.ConfigurationConnection.Count(childComplexity), true
 
-	case "ConfigurationList.items":
-		if e.complexity.ConfigurationList.Items == nil {
+	case "ConfigurationConnection.items":
+		if e.complexity.ConfigurationConnection.Items == nil {
 			break
 		}
 
-		return e.complexity.ConfigurationList.Items(childComplexity), true
+		return e.complexity.ConfigurationConnection.Items(childComplexity), true
 
 	case "ConfigurationRevision.apiVersion":
 		if e.complexity.ConfigurationRevision.APIVersion == nil {
@@ -2334,19 +2334,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProviderConfigStatus.Users(childComplexity), true
 
-	case "ProviderList.count":
-		if e.complexity.ProviderList.Count == nil {
+	case "ProviderConnection.count":
+		if e.complexity.ProviderConnection.Count == nil {
 			break
 		}
 
-		return e.complexity.ProviderList.Count(childComplexity), true
+		return e.complexity.ProviderConnection.Count(childComplexity), true
 
-	case "ProviderList.items":
-		if e.complexity.ProviderList.Items == nil {
+	case "ProviderConnection.items":
+		if e.complexity.ProviderConnection.Items == nil {
 			break
 		}
 
-		return e.complexity.ProviderList.Items(childComplexity), true
+		return e.complexity.ProviderConnection.Items(childComplexity), true
 
 	case "ProviderRevision.apiVersion":
 		if e.complexity.ProviderRevision.APIVersion == nil {
@@ -3351,28 +3351,28 @@ type ProviderConfigStatus implements ConditionedStatus {
   users: Int
 }`, BuiltIn: false},
 	{Name: "schema/queries.gql", Input: `type Query {
-    providers(limit: Int): ProviderList!
-    configurations(limit: Int): ConfigurationList!
-    compositeResourceDefinitions(limit: Int, dangling: Boolean = false): CompositeResourceDefinitionList!
-    compositions(limit: Int, dangling: Boolean = false): CompositionList!
+    providers(limit: Int): ProviderConnection!
+    configurations(limit: Int): ConfigurationConnection!
+    compositeResourceDefinitions(limit: Int, dangling: Boolean = false): CompositeResourceDefinitionConnection!
+    compositions(limit: Int, dangling: Boolean = false): CompositionConnection!
 }
 
-type ProviderList {
+type ProviderConnection {
     items: [Provider!]
     count: Int!
 }
 
-type ConfigurationList {
+type ConfigurationConnection {
     items: [Configuration!]
     count: Int!
 }
 
-type CompositeResourceDefinitionList {
+type CompositeResourceDefinitionConnection {
     items: [CompositeResourceDefinition!]
     count: Int!
 }
 
-type CompositionList {
+type CompositionConnection {
     items: [Composition!]
     count: Int!
 }`, BuiltIn: false},
@@ -5306,6 +5306,73 @@ func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResourc
 	return ec.marshalNCompositeResourceClaimConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _CompositeResourceDefinitionConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CompositeResourceDefinitionConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.CompositeResourceDefinition)
+	fc.Result = res
+	return ec.marshalOCompositeResourceDefinition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CompositeResourceDefinitionConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CompositeResourceDefinitionConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _CompositeResourceDefinitionControllerStatus_compositeResourceType(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionControllerStatus) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -5368,73 +5435,6 @@ func (ec *executionContext) _CompositeResourceDefinitionControllerStatus_composi
 	res := resTmp.(*model.TypeReference)
 	fc.Result = res
 	return ec.marshalOTypeReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _CompositeResourceDefinitionList_items(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionList) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "CompositeResourceDefinitionList",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]model.CompositeResourceDefinition)
-	fc.Result = res
-	return ec.marshalOCompositeResourceDefinition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _CompositeResourceDefinitionList_count(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionList) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "CompositeResourceDefinitionList",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinitionNames_plural(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionNames) (ret graphql.Marshaler) {
@@ -6613,7 +6613,7 @@ func (ec *executionContext) _Composition_events(ctx context.Context, field graph
 	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositionList_items(ctx context.Context, field graphql.CollectedField, obj *model.CompositionList) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositionConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.CompositionConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6621,7 +6621,7 @@ func (ec *executionContext) _CompositionList_items(ctx context.Context, field gr
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "CompositionList",
+		Object:     "CompositionConnection",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -6645,7 +6645,7 @@ func (ec *executionContext) _CompositionList_items(ctx context.Context, field gr
 	return ec.marshalOComposition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositionList_count(ctx context.Context, field graphql.CollectedField, obj *model.CompositionList) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositionConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.CompositionConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6653,7 +6653,7 @@ func (ec *executionContext) _CompositionList_count(ctx context.Context, field gr
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "CompositionList",
+		Object:     "CompositionConnection",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -7277,7 +7277,7 @@ func (ec *executionContext) _Configuration_revisions(ctx context.Context, field 
 	return ec.marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ConfigurationList_items(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationList) (ret graphql.Marshaler) {
+func (ec *executionContext) _ConfigurationConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -7285,7 +7285,7 @@ func (ec *executionContext) _ConfigurationList_items(ctx context.Context, field 
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "ConfigurationList",
+		Object:     "ConfigurationConnection",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -7309,7 +7309,7 @@ func (ec *executionContext) _ConfigurationList_items(ctx context.Context, field 
 	return ec.marshalOConfiguration2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ConfigurationList_count(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationList) (ret graphql.Marshaler) {
+func (ec *executionContext) _ConfigurationConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -7317,7 +7317,7 @@ func (ec *executionContext) _ConfigurationList_count(ctx context.Context, field 
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "ConfigurationList",
+		Object:     "ConfigurationConnection",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -11758,7 +11758,7 @@ func (ec *executionContext) _ProviderConfigStatus_users(ctx context.Context, fie
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProviderList_items(ctx context.Context, field graphql.CollectedField, obj *model.ProviderList) (ret graphql.Marshaler) {
+func (ec *executionContext) _ProviderConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11766,7 +11766,7 @@ func (ec *executionContext) _ProviderList_items(ctx context.Context, field graph
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "ProviderList",
+		Object:     "ProviderConnection",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -11790,7 +11790,7 @@ func (ec *executionContext) _ProviderList_items(ctx context.Context, field graph
 	return ec.marshalOProvider2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProviderList_count(ctx context.Context, field graphql.CollectedField, obj *model.ProviderList) (ret graphql.Marshaler) {
+func (ec *executionContext) _ProviderConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11798,7 +11798,7 @@ func (ec *executionContext) _ProviderList_count(ctx context.Context, field graph
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "ProviderList",
+		Object:     "ProviderConnection",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -12907,9 +12907,9 @@ func (ec *executionContext) _Query_providers(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProviderList)
+	res := resTmp.(*model.ProviderConnection)
 	fc.Result = res
-	return ec.marshalNProviderList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderList(ctx, field.Selections, res)
+	return ec.marshalNProviderConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_configurations(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -12949,9 +12949,9 @@ func (ec *executionContext) _Query_configurations(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ConfigurationList)
+	res := resTmp.(*model.ConfigurationConnection)
 	fc.Result = res
-	return ec.marshalNConfigurationList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationList(ctx, field.Selections, res)
+	return ec.marshalNConfigurationConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_compositeResourceDefinitions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -12991,9 +12991,9 @@ func (ec *executionContext) _Query_compositeResourceDefinitions(ctx context.Cont
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceDefinitionList)
+	res := resTmp.(*model.CompositeResourceDefinitionConnection)
 	fc.Result = res
-	return ec.marshalNCompositeResourceDefinitionList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionList(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceDefinitionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_compositions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -13033,9 +13033,9 @@ func (ec *executionContext) _Query_compositions(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositionList)
+	res := resTmp.(*model.CompositionConnection)
 	fc.Result = res
-	return ec.marshalNCompositionList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionList(ctx, field.Selections, res)
+	return ec.marshalNCompositionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -15362,6 +15362,35 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 	return out
 }
 
+var compositeResourceDefinitionConnectionImplementors = []string{"CompositeResourceDefinitionConnection"}
+
+func (ec *executionContext) _CompositeResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionConnection")
+		case "items":
+			out.Values[i] = ec._CompositeResourceDefinitionConnection_items(ctx, field, obj)
+		case "count":
+			out.Values[i] = ec._CompositeResourceDefinitionConnection_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var compositeResourceDefinitionControllerStatusImplementors = []string{"CompositeResourceDefinitionControllerStatus"}
 
 func (ec *executionContext) _CompositeResourceDefinitionControllerStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionControllerStatus) graphql.Marshaler {
@@ -15377,35 +15406,6 @@ func (ec *executionContext) _CompositeResourceDefinitionControllerStatus(ctx con
 			out.Values[i] = ec._CompositeResourceDefinitionControllerStatus_compositeResourceType(ctx, field, obj)
 		case "compositeResourceClaimType":
 			out.Values[i] = ec._CompositeResourceDefinitionControllerStatus_compositeResourceClaimType(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var compositeResourceDefinitionListImplementors = []string{"CompositeResourceDefinitionList"}
-
-func (ec *executionContext) _CompositeResourceDefinitionList(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionList) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionListImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionList")
-		case "items":
-			out.Values[i] = ec._CompositeResourceDefinitionList_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._CompositeResourceDefinitionList_count(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15768,21 +15768,21 @@ func (ec *executionContext) _Composition(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var compositionListImplementors = []string{"CompositionList"}
+var compositionConnectionImplementors = []string{"CompositionConnection"}
 
-func (ec *executionContext) _CompositionList(ctx context.Context, sel ast.SelectionSet, obj *model.CompositionList) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, compositionListImplementors)
+func (ec *executionContext) _CompositionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CompositionConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, compositionConnectionImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("CompositionList")
+			out.Values[i] = graphql.MarshalString("CompositionConnection")
 		case "items":
-			out.Values[i] = ec._CompositionList_items(ctx, field, obj)
+			out.Values[i] = ec._CompositionConnection_items(ctx, field, obj)
 		case "count":
-			out.Values[i] = ec._CompositionList_count(ctx, field, obj)
+			out.Values[i] = ec._CompositionConnection_count(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -15976,21 +15976,21 @@ func (ec *executionContext) _Configuration(ctx context.Context, sel ast.Selectio
 	return out
 }
 
-var configurationListImplementors = []string{"ConfigurationList"}
+var configurationConnectionImplementors = []string{"ConfigurationConnection"}
 
-func (ec *executionContext) _ConfigurationList(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationList) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, configurationListImplementors)
+func (ec *executionContext) _ConfigurationConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, configurationConnectionImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ConfigurationList")
+			out.Values[i] = graphql.MarshalString("ConfigurationConnection")
 		case "items":
-			out.Values[i] = ec._ConfigurationList_items(ctx, field, obj)
+			out.Values[i] = ec._ConfigurationConnection_items(ctx, field, obj)
 		case "count":
-			out.Values[i] = ec._ConfigurationList_count(ctx, field, obj)
+			out.Values[i] = ec._ConfigurationConnection_count(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -17203,21 +17203,21 @@ func (ec *executionContext) _ProviderConfigStatus(ctx context.Context, sel ast.S
 	return out
 }
 
-var providerListImplementors = []string{"ProviderList"}
+var providerConnectionImplementors = []string{"ProviderConnection"}
 
-func (ec *executionContext) _ProviderList(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderList) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, providerListImplementors)
+func (ec *executionContext) _ProviderConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, providerConnectionImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ProviderList")
+			out.Values[i] = graphql.MarshalString("ProviderConnection")
 		case "items":
-			out.Values[i] = ec._ProviderList_items(ctx, field, obj)
+			out.Values[i] = ec._ProviderConnection_items(ctx, field, obj)
 		case "count":
-			out.Values[i] = ec._ProviderList_count(ctx, field, obj)
+			out.Values[i] = ec._ProviderConnection_count(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -18023,18 +18023,18 @@ func (ec *executionContext) marshalNCompositeResourceDefinition2githubᚗcomᚋu
 	return ec._CompositeResourceDefinition(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceDefinitionList2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionList(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinitionList) graphql.Marshaler {
-	return ec._CompositeResourceDefinitionList(ctx, sel, &v)
+func (ec *executionContext) marshalNCompositeResourceDefinitionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinitionConnection) graphql.Marshaler {
+	return ec._CompositeResourceDefinitionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceDefinitionList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionList(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionList) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositeResourceDefinitionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._CompositeResourceDefinitionList(ctx, sel, v)
+	return ec._CompositeResourceDefinitionConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionNames) graphql.Marshaler {
@@ -18085,18 +18085,18 @@ func (ec *executionContext) marshalNComposition2githubᚗcomᚋupboundᚋxgqlᚋ
 	return ec._Composition(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositionList2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionList(ctx context.Context, sel ast.SelectionSet, v model.CompositionList) graphql.Marshaler {
-	return ec._CompositionList(ctx, sel, &v)
+func (ec *executionContext) marshalNCompositionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionConnection(ctx context.Context, sel ast.SelectionSet, v model.CompositionConnection) graphql.Marshaler {
+	return ec._CompositionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositionList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionList(ctx context.Context, sel ast.SelectionSet, v *model.CompositionList) graphql.Marshaler {
+func (ec *executionContext) marshalNCompositionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositionConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._CompositionList(ctx, sel, v)
+	return ec._CompositionConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNCompositionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositionSpec) graphql.Marshaler {
@@ -18127,18 +18127,18 @@ func (ec *executionContext) marshalNConfiguration2githubᚗcomᚋupboundᚋxgql�
 	return ec._Configuration(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigurationList2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationList(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationList) graphql.Marshaler {
-	return ec._ConfigurationList(ctx, sel, &v)
+func (ec *executionContext) marshalNConfigurationConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationConnection(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationConnection) graphql.Marshaler {
+	return ec._ConfigurationConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigurationList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationList(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationList) graphql.Marshaler {
+func (ec *executionContext) marshalNConfigurationConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationConnection(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._ConfigurationList(ctx, sel, v)
+	return ec._ConfigurationConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNConfigurationRevision2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevision(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationRevision) graphql.Marshaler {
@@ -18351,18 +18351,18 @@ func (ec *executionContext) marshalNProvider2githubᚗcomᚋupboundᚋxgqlᚋint
 	return ec._Provider(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProviderList2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderList(ctx context.Context, sel ast.SelectionSet, v model.ProviderList) graphql.Marshaler {
-	return ec._ProviderList(ctx, sel, &v)
+func (ec *executionContext) marshalNProviderConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConnection(ctx context.Context, sel ast.SelectionSet, v model.ProviderConnection) graphql.Marshaler {
+	return ec._ProviderConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProviderList2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderList(ctx context.Context, sel ast.SelectionSet, v *model.ProviderList) graphql.Marshaler {
+func (ec *executionContext) marshalNProviderConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConnection(ctx context.Context, sel ast.SelectionSet, v *model.ProviderConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._ProviderList(ctx, sel, v)
+	return ec._ProviderConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNProviderRevision2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevision(ctx context.Context, sel ast.SelectionSet, v model.ProviderRevision) graphql.Marshaler {
