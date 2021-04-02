@@ -1,5 +1,4 @@
-[![CI](https://github.com/upbound/xgql/actions/workflows/ci.yml/badge.svg)](https://github.com/upbound/xgql/actions/workflows/ci.yml) [![Codecov](https://codecov.io/gh/upbound/xgql/branch/main/graph/badge.svg?token=QCRHAiqe1T)](https://codecov.io/gh/upbound/xgql)
-# xgql
+# xgql [![CI](https://github.com/upbound/xgql/actions/workflows/ci.yml/badge.svg)](https://github.com/upbound/xgql/actions/workflows/ci.yml) [![Codecov](https://codecov.io/gh/upbound/xgql/branch/main/graph/badge.svg?token=QCRHAiqe1T)](https://codecov.io/gh/upbound/xgql)
 An experimental @crossplane GraphQL API.
 
 Crossplane is built atop the Kubernetes API, and makes heavy use of types that
