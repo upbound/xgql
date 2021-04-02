@@ -13,7 +13,6 @@ import (
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 
 	"github.com/upbound/xgql/internal/clients"
@@ -25,18 +24,6 @@ func TestCRDDefinedResources(t *testing.T) {
 
 	gr := unstructured.Unstructured{}
 	ggr := model.GetGenericResource(&gr)
-
-	// This unstructured object passes the test we use to infer whether it is
-	// probably a managed resource.
-	mr := unstructured.Unstructured{Object: make(map[string]interface{})}
-	fieldpath.Pave(mr.Object).SetString("spec.providerConfigRef.name", "cool")
-	gmr := model.GetManagedResource(&mr)
-
-	// This unstructured object passes the test we use to infer whether it is
-	// probably a provider config.
-	pc := unstructured.Unstructured{Object: make(map[string]interface{})}
-	pc.SetKind("ProviderConfig")
-	gpc := model.GetProviderConfig(&pc)
 
 	group := "example.org"
 	version := "v1"
@@ -196,94 +183,6 @@ func TestCRDDefinedResources(t *testing.T) {
 			want: want{
 				krc: &model.KubernetesResourceConnection{
 					Items: []model.KubernetesResource{ggr},
-					Count: 1,
-				},
-			},
-		},
-		"ManagedResourceCategory": {
-			reason: "We should successfully list and return any stated managed resources that we can detect, list and model.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
-				return &test.MockClient{
-					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{mr}}
-						return nil
-					}),
-				}, nil
-			}),
-			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CustomResourceDefinition{
-					Spec: &model.CustomResourceDefinitionSpec{
-						Group: group,
-						Names: &model.CustomResourceDefinitionNames{
-							Kind:       kind,
-							Categories: []string{categoryManaged},
-						},
-					},
-				},
-				version: pointer.StringPtr(version),
-			},
-			want: want{
-				krc: &model.KubernetesResourceConnection{
-					Items: []model.KubernetesResource{gmr},
-					Count: 1,
-				},
-			},
-		},
-		"ProbablyManagedResource": {
-			reason: "We should successfully list and return any probably managed resources that we can detect, list and model.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
-				return &test.MockClient{
-					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{mr}}
-						return nil
-					}),
-				}, nil
-			}),
-			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CustomResourceDefinition{
-					Spec: &model.CustomResourceDefinitionSpec{
-						Group: group,
-						Names: &model.CustomResourceDefinitionNames{
-							Kind: kind,
-						},
-					},
-				},
-				version: pointer.StringPtr(version),
-			},
-			want: want{
-				krc: &model.KubernetesResourceConnection{
-					Items: []model.KubernetesResource{gmr},
-					Count: 1,
-				},
-			},
-		},
-		"ProbablyProviderConfig": {
-			reason: "We should successfully list and return any probable provider configs that we can detect, list and model.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
-				return &test.MockClient{
-					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{pc}}
-						return nil
-					}),
-				}, nil
-			}),
-			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CustomResourceDefinition{
-					Spec: &model.CustomResourceDefinitionSpec{
-						Group: group,
-						Names: &model.CustomResourceDefinitionNames{
-							Kind: kind,
-						},
-					},
-				},
-				version: pointer.StringPtr(version),
-			},
-			want: want{
-				krc: &model.KubernetesResourceConnection{
-					Items: []model.KubernetesResource{gpc},
 					Count: 1,
 				},
 			},

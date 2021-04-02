@@ -84,10 +84,7 @@ type configurationRevisionStatus struct {
 	clients ClientCache
 }
 
-func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (*model.KubernetesResourceConnection, error) { //nolint:gocyclo
-	// TODO(negz): This method is over our complexity goal. Maybe break the
-	// switch out into its own function?
-
+func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (*model.KubernetesResourceConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)

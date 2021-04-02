@@ -10,11 +10,11 @@ import (
 
 	"github.com/upbound/xgql/internal/graph/model"
 	"github.com/upbound/xgql/internal/token"
-	"github.com/upbound/xgql/internal/unstructured"
 )
 
-// Most managed resources have this CRD category.
-const categoryManaged = "managed"
+const (
+	errModelDefined = "cannot model defined resource"
+)
 
 type crd struct {
 	clients ClientCache
@@ -24,7 +24,7 @@ func (r *crd) Events(ctx context.Context, obj *model.CustomResourceDefinition) (
 	return nil, nil
 }
 
-func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error) { //nolint:gocyclo
+func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
@@ -66,22 +66,14 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 		Count: len(in.Items),
 	}
 
-	// TODO(negz): Replace this switch with model.GetKubernetesResource?
 	for i := range in.Items {
 		u := in.Items[i]
 
-		switch {
-		case hasCategory(obj.Spec.Names, categoryManaged), unstructured.ProbablyManaged(&u):
-			out.Items = append(out.Items, model.GetManagedResource(&u))
-
-		// We're less consistent about putting ProviderConfigs in the 'provider'
-		// category, and that category includes ProviderConfigUseages.
-		case unstructured.ProbablyProviderConfig(&u):
-			out.Items = append(out.Items, model.GetProviderConfig(&u))
-
-		default:
-			out.Items = append(out.Items, model.GetGenericResource(&u))
+		kr, err := model.GetKubernetesResource(&u)
+		if err != nil {
+			graphql.AddError(ctx, errors.Wrap(err, errModelDefined))
 		}
+		out.Items = append(out.Items, kr)
 	}
 
 	return out, nil
@@ -99,17 +91,4 @@ func pickCRDVersion(vs []model.CustomResourceDefinitionVersion) string {
 
 	// We shouldn't get here, unless the CRD is serving no versions?
 	return ""
-}
-
-func hasCategory(n *model.CustomResourceDefinitionNames, cat string) bool {
-	if n == nil {
-		return false
-	}
-
-	for _, c := range n.Categories {
-		if c == cat {
-			return true
-		}
-	}
-	return false
 }
