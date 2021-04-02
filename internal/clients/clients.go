@@ -244,10 +244,10 @@ func (c *Cache) Get(token string, o ...GetOption) (client.Client, error) {
 	// We use a distinct s.expiry ticker rather than a context deadline or timeout
 	// because it's not possible to extend a context's deadline or timeout, but it
 	// is possible to 'reset' (i.e. extend) a ticker.
-	expired := time.NewTicker(c.expiry)
+	expiration := &tickerExpiration{t: time.NewTicker(c.expiry)}
 	newExpiry := time.Now().Add(c.expiry)
 	ctx, cancel := context.WithCancel(context.Background())
-	sn = &session{client: dc, cancel: cancel, expiry: c.expiry, expired: expired, log: log}
+	sn = &session{client: dc, cancel: cancel, expiry: c.expiry, expiration: expiration, log: log}
 
 	c.mx.Lock()
 	c.active[id] = sn
@@ -266,7 +266,7 @@ func (c *Cache) Get(token string, o ...GetOption) (client.Client, error) {
 	// Stop our cache when we expire.
 	go func() {
 		select {
-		case <-expired.C:
+		case <-expiration.C():
 			// We expired, and should remove ourself from the session cache.
 			log.Debug("Client expired")
 			c.remove(id)
@@ -297,24 +297,36 @@ func (c *Cache) remove(id string) {
 
 	if sn, ok := c.active[id]; ok {
 		sn.cancel()
-		sn.expired.Stop()
+		sn.expiration.Stop()
 		delete(c.active, id)
 		c.log.Debug("Removed client cache", "client-id", id)
 	}
 }
 
+type expiration interface {
+	Reset(d time.Duration)
+	Stop()
+	C() <-chan time.Time
+}
+
+type tickerExpiration struct{ t *time.Ticker }
+
+func (e *tickerExpiration) Reset(d time.Duration) { e.t.Reset(d) }
+func (e *tickerExpiration) Stop()                 { e.t.Stop() }
+func (e *tickerExpiration) C() <-chan time.Time   { return e.t.C }
+
 type session struct {
-	client  client.Client
-	cancel  context.CancelFunc
-	expiry  time.Duration
-	expired *time.Ticker
+	client     client.Client
+	cancel     context.CancelFunc
+	expiry     time.Duration
+	expiration expiration
 
 	log logging.Logger
 }
 
 func (s *session) Get(ctx context.Context, key client.ObjectKey, obj client.Object) error {
 	t := time.Now()
-	s.expired.Reset(s.expiry)
+	s.expiration.Reset(s.expiry)
 	err := s.client.Get(ctx, key, obj)
 	s.log.Debug("Client called",
 		"operation", "Get",
@@ -326,7 +338,7 @@ func (s *session) Get(ctx context.Context, key client.ObjectKey, obj client.Obje
 
 func (s *session) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
 	t := time.Now()
-	s.expired.Reset(s.expiry)
+	s.expiration.Reset(s.expiry)
 	err := s.client.List(ctx, list, opts...)
 	s.log.Debug("Client called",
 		"operation", "List",
@@ -338,7 +350,7 @@ func (s *session) List(ctx context.Context, list client.ObjectList, opts ...clie
 
 func (s *session) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
 	t := time.Now()
-	s.expired.Reset(s.expiry)
+	s.expiration.Reset(s.expiry)
 	err := s.client.Create(ctx, obj, opts...)
 	s.log.Debug("Client called",
 		"operation", "Create",
@@ -350,7 +362,7 @@ func (s *session) Create(ctx context.Context, obj client.Object, opts ...client.
 
 func (s *session) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
 	t := time.Now()
-	s.expired.Reset(s.expiry)
+	s.expiration.Reset(s.expiry)
 	err := s.client.Delete(ctx, obj, opts...)
 	s.log.Debug("Client called",
 		"operation", "Delete",
@@ -362,7 +374,7 @@ func (s *session) Delete(ctx context.Context, obj client.Object, opts ...client.
 
 func (s *session) Update(ctx context.Context, obj client.Object, opts ...client.UpdateOption) error {
 	t := time.Now()
-	s.expired.Reset(s.expiry)
+	s.expiration.Reset(s.expiry)
 	err := s.client.Update(ctx, obj, opts...)
 	s.log.Debug("Client called",
 		"operation", "Update",
@@ -374,7 +386,7 @@ func (s *session) Update(ctx context.Context, obj client.Object, opts ...client.
 
 func (s *session) Patch(ctx context.Context, obj client.Object, patch client.Patch, opts ...client.PatchOption) error {
 	t := time.Now()
-	s.expired.Reset(s.expiry)
+	s.expiration.Reset(s.expiry)
 	err := s.client.Patch(ctx, obj, patch, opts...)
 	s.log.Debug("Client called",
 		"operation", "Patch",
@@ -386,7 +398,7 @@ func (s *session) Patch(ctx context.Context, obj client.Object, patch client.Pat
 
 func (s *session) DeleteAllOf(ctx context.Context, obj client.Object, opts ...client.DeleteAllOfOption) error {
 	t := time.Now()
-	s.expired.Reset(s.expiry)
+	s.expiration.Reset(s.expiry)
 	err := s.client.DeleteAllOf(ctx, obj, opts...)
 	s.log.Debug("Client called",
 		"operation", "DeleteallOf",
@@ -398,36 +410,36 @@ func (s *session) DeleteAllOf(ctx context.Context, obj client.Object, opts ...cl
 
 func (s *session) Status() client.StatusWriter {
 	t := time.Now()
-	s.expired.Reset(s.expiry)
-	err := s.client.Status()
+	s.expiration.Reset(s.expiry)
+	sw := s.client.Status()
 	s.log.Debug("Client called",
 		"operation", "Status",
 		"duration", time.Since(t),
 		"new-expiry", t.Add(s.expiry),
 	)
-	return err
+	return sw
 }
 
 func (s *session) Scheme() *runtime.Scheme {
 	t := time.Now()
-	s.expired.Reset(s.expiry)
-	err := s.client.Scheme()
+	s.expiration.Reset(s.expiry)
+	sc := s.client.Scheme()
 	s.log.Debug("Client called",
 		"operation", "Scheme",
 		"duration", time.Since(t),
 		"new-expiry", t.Add(s.expiry),
 	)
-	return err
+	return sc
 }
 
 func (s *session) RESTMapper() meta.RESTMapper {
 	t := time.Now()
-	s.expired.Reset(s.expiry)
-	err := s.client.RESTMapper()
+	s.expiration.Reset(s.expiry)
+	rm := s.client.RESTMapper()
 	s.log.Debug("Client called",
 		"operation", "Scheme",
 		"duration", time.Since(t),
 		"new-expiry", t.Add(s.expiry),
 	)
-	return err
+	return rm
 }
