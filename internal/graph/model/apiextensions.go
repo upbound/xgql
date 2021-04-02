@@ -63,6 +63,11 @@ func GetCompositeResourceDefinitionVersions(in []extv1.CompositeResourceDefiniti
 // GetCompositeResourceDefinition from the supplied Crossplane XRD.
 func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) CompositeResourceDefinition {
 	return CompositeResourceDefinition{
+		ID: ReferenceID{
+			APIVersion: xrd.APIVersion,
+			Kind:       xrd.Kind,
+			Name:       xrd.GetName(),
+		},
 		APIVersion: xrd.APIVersion,
 		Kind:       xrd.Kind,
 		Metadata:   GetObjectMeta(xrd),
@@ -91,6 +96,11 @@ func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) Comp
 // GetComposition from the supplied Crossplane Composition.
 func GetComposition(cmp *extv1.Composition) Composition {
 	return Composition{
+		ID: ReferenceID{
+			APIVersion: cmp.APIVersion,
+			Kind:       cmp.Kind,
+			Name:       cmp.GetName(),
+		},
 		APIVersion: cmp.APIVersion,
 		Kind:       cmp.Kind,
 		Metadata:   GetObjectMeta(cmp),
