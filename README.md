@@ -1,3 +1,4 @@
+[![CI](https://github.com/upbound/xgql/actions/workflows/ci.yml/badge.svg)](https://github.com/upbound/xgql/actions/workflows/ci.yml) [![Codecov](https://codecov.io/gh/upbound/xgql/branch/main/graph/badge.svg?token=QCRHAiqe1T)](https://codecov.io/gh/upbound/xgql)
 # xgql
 An experimental @crossplane GraphQL API.
 
