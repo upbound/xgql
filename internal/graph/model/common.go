@@ -7,13 +7,18 @@ import (
 
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
-	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/json"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
+	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
+
+	"github.com/upbound/xgql/internal/unstructured"
 )
 
 // Reference ID separator.
@@ -225,7 +230,7 @@ func GetSecret(s *corev1.Secret) (Secret, error) {
 }
 
 // GetCustomResourceDefinition from the suppled Kubernetes CRD.
-func GetCustomResourceDefinition(crd *extv1.CustomResourceDefinition) (CustomResourceDefinition, error) {
+func GetCustomResourceDefinition(crd *kextv1.CustomResourceDefinition) (CustomResourceDefinition, error) {
 	raw, err := json.Marshal(crd)
 	if err != nil {
 		return CustomResourceDefinition{}, errors.Wrap(err, "cannot marshal JSON")
@@ -260,6 +265,85 @@ func GetCustomResourceDefinition(crd *extv1.CustomResourceDefinition) (CustomRes
 	}
 
 	return out, nil
+}
+
+// GetKubernetesResource from the supplied unstructured Kubernetes resource.
+// GetKubernetesResource attempts to determine what type of resource the
+// unstructured data contains (e.g. a managed resource, a provider, etc) and
+// return the appropriate model type. If no type can be detected it returns a
+// GenericResource.
+func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, error) { //nolint:gocyclo
+	// This isn't _really_ that complex; it's a long but simple switch.
+
+	switch {
+	case unstructured.ProbablyManaged(u):
+		out, err := GetManagedResource(u)
+		return out, errors.Wrap(err, "cannot model managed resource")
+
+	case unstructured.ProbablyProviderConfig(u):
+		out, err := GetProviderConfig(u)
+		return out, errors.Wrap(err, "cannot model provider config")
+
+	case unstructured.ProbablyComposite(u):
+		out, err := GetCompositeResource(u)
+		return out, errors.Wrap(err, "cannot model composite resource")
+
+	case u.GroupVersionKind() == pkgv1.ProviderGroupVersionKind:
+		p := &pkgv1.Provider{}
+		if err := convert(u, p); err != nil {
+			return nil, errors.Wrap(err, "cannot convert provider")
+		}
+		out, err := GetProvider(p)
+		return out, errors.Wrap(err, "cannot model provider")
+
+	case u.GroupVersionKind() == pkgv1.ProviderRevisionGroupVersionKind:
+		pr := &pkgv1.ProviderRevision{}
+		if err := convert(u, pr); err != nil {
+			return nil, errors.Wrap(err, "cannot convert provider revision")
+		}
+		out, err := GetProviderRevision(pr)
+		return out, errors.Wrap(err, "cannot model provider revision")
+
+	case u.GroupVersionKind() == pkgv1.ConfigurationGroupVersionKind:
+		c := &pkgv1.Configuration{}
+		if err := convert(u, c); err != nil {
+			return nil, errors.Wrap(err, "cannot convert configuration")
+		}
+		out, err := GetConfiguration(c)
+		return out, errors.Wrap(err, "cannot model configuration")
+
+	case u.GroupVersionKind() == pkgv1.ConfigurationRevisionGroupVersionKind:
+		cr := &pkgv1.ConfigurationRevision{}
+		if err := convert(u, cr); err != nil {
+			return nil, errors.Wrap(err, "cannot convert configuration revision")
+		}
+		out, err := GetConfigurationRevision(cr)
+		return out, errors.Wrap(err, "cannot model configuration revision")
+
+	case u.GroupVersionKind() == extv1.CompositeResourceDefinitionGroupVersionKind:
+		xrd := &extv1.CompositeResourceDefinition{}
+		if err := convert(u, xrd); err != nil {
+			return nil, errors.Wrap(err, "cannot convert composite resource definition")
+		}
+		out, err := GetCompositeResourceDefinition(xrd)
+		return out, errors.Wrap(err, "cannot model composite resource definition")
+
+	default:
+		out, err := GetGenericResource(u)
+		return out, errors.Wrap(err, "cannot model generic resource")
+	}
+}
+
+func convert(from *kunstructured.Unstructured, to runtime.Object) error {
+	c := runtime.DefaultUnstructuredConverter
+	if err := c.FromUnstructured(from.Object, to); err != nil {
+		return errors.Wrap(err, "could not convert unstructured object")
+	}
+	// For whatever reason the *Unstructured's GVK doesn't seem to make it
+	// through the conversion process.
+	gvk := schema.FromAPIVersionAndKind(from.GetAPIVersion(), from.GetKind())
+	to.GetObjectKind().SetGroupVersionKind(gvk)
+	return nil
 }
 
 func getIntPtr(i *int64) *int {
