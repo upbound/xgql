@@ -4,8 +4,6 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/util/json"
 
-	"github.com/pkg/errors"
-
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 )
@@ -63,13 +61,8 @@ func GetCompositeResourceDefinitionVersions(in []extv1.CompositeResourceDefiniti
 }
 
 // GetCompositeResourceDefinition from the supplied Crossplane XRD.
-func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) (CompositeResourceDefinition, error) {
-	raw, err := json.Marshal(xrd)
-	if err != nil {
-		return CompositeResourceDefinition{}, errors.Wrap(err, "could not marshal JSON")
-	}
-
-	out := CompositeResourceDefinition{
+func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) CompositeResourceDefinition {
+	return CompositeResourceDefinition{
 		APIVersion: xrd.APIVersion,
 		Kind:       xrd.Kind,
 		Metadata:   GetObjectMeta(xrd),
@@ -91,20 +84,13 @@ func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) (Com
 		Status: &CompositeResourceDefinitionStatus{
 			Conditions: GetConditions(xrd.Status.Conditions),
 		},
-		Raw: string(raw),
+		Raw: raw(xrd),
 	}
-
-	return out, nil
 }
 
 // GetComposition from the supplied Crossplane Composition.
-func GetComposition(cmp *extv1.Composition) (Composition, error) {
-	raw, err := json.Marshal(cmp)
-	if err != nil {
-		return Composition{}, errors.Wrap(err, "could not marshal JSON")
-	}
-
-	out := Composition{
+func GetComposition(cmp *extv1.Composition) Composition {
+	return Composition{
 		APIVersion: cmp.APIVersion,
 		Kind:       cmp.Kind,
 		Metadata:   GetObjectMeta(cmp),
@@ -118,8 +104,6 @@ func GetComposition(cmp *extv1.Composition) (Composition, error) {
 		Status: &CompositionStatus{
 			Conditions: GetConditions(cmp.Status.Conditions),
 		},
-		Raw: string(raw),
+		Raw: raw(cmp),
 	}
-
-	return out, nil
 }

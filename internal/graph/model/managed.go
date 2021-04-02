@@ -1,9 +1,7 @@
 package model
 
 import (
-	"github.com/pkg/errors"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/util/json"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 
@@ -24,15 +22,9 @@ func GetDeletionPolicy(p xpv1.DeletionPolicy) *DeletionPolicy {
 }
 
 // GetManagedResource from the supplied Crossplane resource.
-func GetManagedResource(u *kunstructured.Unstructured) (ManagedResource, error) {
+func GetManagedResource(u *kunstructured.Unstructured) ManagedResource {
 	mg := &unstructured.Managed{Unstructured: *u}
-
-	raw, err := json.Marshal(mg)
-	if err != nil {
-		return ManagedResource{}, errors.Wrap(err, "cannot marshal JSON")
-	}
-
-	out := ManagedResource{
+	return ManagedResource{
 		ID: ReferenceID{
 			APIVersion: mg.GetAPIVersion(),
 			Kind:       mg.GetKind(),
@@ -50,8 +42,6 @@ func GetManagedResource(u *kunstructured.Unstructured) (ManagedResource, error) 
 		Status: &ManagedResourceStatus{
 			Conditions: GetConditions(mg.GetConditions()),
 		},
-		Raw: string(raw),
+		Raw: raw(mg),
 	}
-
-	return out, nil
 }

@@ -19,11 +19,8 @@ import (
 
 const (
 	errListConfigRevs = "cannot list configuration revisions"
-	errModelConfigRev = "cannot model configuration revision"
 	errGetXRD         = "cannot get composite resource definition"
-	errModelXRD       = "cannot model composite resource definition"
 	errGetComp        = "cannot get composition"
-	errModelComp      = "cannot model composition"
 )
 
 type configuration struct {
@@ -34,10 +31,7 @@ func (r *configuration) Events(ctx context.Context, obj *model.Configuration) (*
 	return nil, nil
 }
 
-func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration, active *bool) (*model.ConfigurationRevisionConnection, error) { //nolint:gocyclo
-	// NOTE(negz): This method is a little over our complexity goal. Be wary of
-	// making it more complex.
-
+func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration, active *bool) (*model.ConfigurationRevisionConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
@@ -71,12 +65,7 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration,
 			continue
 		}
 
-		i, err := model.GetConfigurationRevision(&cr)
-		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, errModelConfigRev))
-		}
-
-		out.Items = append(out.Items, i)
+		out.Items = append(out.Items, model.GetConfigurationRevision(&cr))
 		out.Count++
 	}
 
@@ -127,13 +116,7 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 				continue
 			}
 
-			i, err := model.GetCompositeResourceDefinition(xrd)
-			if err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, errModelXRD))
-				continue
-			}
-
-			out.Items = append(out.Items, i)
+			out.Items = append(out.Items, model.GetCompositeResourceDefinition(xrd))
 			out.Count++
 		case extv1.CompositionKind:
 			cmp := &extv1.Composition{}
@@ -142,13 +125,7 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 				continue
 			}
 
-			i, err := model.GetComposition(cmp)
-			if err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, errModelComp))
-				continue
-			}
-
-			out.Items = append(out.Items, i)
+			out.Items = append(out.Items, model.GetComposition(cmp))
 			out.Count++
 		}
 	}

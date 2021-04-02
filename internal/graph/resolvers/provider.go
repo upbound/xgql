@@ -19,9 +19,7 @@ import (
 
 const (
 	errListProviderRevs = "cannot list provider revisions"
-	errModelProviderRev = "cannot model provider revision"
 	errGetCRD           = "cannot get custom resource definition"
-	errModelCRD         = "cannot model custom resource definition"
 )
 
 type provider struct {
@@ -32,10 +30,7 @@ func (r *provider) Events(ctx context.Context, obj *model.Provider) (*model.Even
 	return nil, nil
 }
 
-func (r *provider) Revisions(ctx context.Context, obj *model.Provider, active *bool) (*model.ProviderRevisionConnection, error) { //nolint:gocyclo
-	// NOTE(negz): This method is a little over our complexity goal. Be wary of
-	// making it more complex.
-
+func (r *provider) Revisions(ctx context.Context, obj *model.Provider, active *bool) (*model.ProviderRevisionConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
@@ -69,13 +64,7 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, active *b
 			continue
 		}
 
-		i, err := model.GetProviderRevision(&pr)
-		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, errModelProviderRev))
-			continue
-		}
-
-		out.Items = append(out.Items, i)
+		out.Items = append(out.Items, model.GetProviderRevision(&pr))
 		out.Count++
 	}
 
@@ -124,13 +113,7 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 			continue
 		}
 
-		i, err := model.GetCustomResourceDefinition(crd)
-		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, errModelCRD))
-			continue
-		}
-
-		out.Items = append(out.Items, i)
+		out.Items = append(out.Items, model.GetCustomResourceDefinition(crd))
 		out.Count++
 	}
 

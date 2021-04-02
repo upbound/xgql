@@ -24,7 +24,7 @@ var _ generated.ManagedResourceSpecResolver = &managedResourceSpec{}
 func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gsec, _ := model.GetSecret(&corev1.Secret{})
+	gsec := model.GetSecret(&corev1.Secret{})
 
 	type args struct {
 		ctx context.Context

@@ -1,10 +1,8 @@
 package model
 
 import (
-	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	"k8s.io/apimachinery/pkg/util/json"
 	"k8s.io/utils/pointer"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -75,13 +73,8 @@ func GetPolicyRules(in []rbacv1.PolicyRule) []PolicyRule {
 }
 
 // GetProvider from the supplied Kubernetes provider.
-func GetProvider(p *pkgv1.Provider) (Provider, error) {
-	raw, err := json.Marshal(p)
-	if err != nil {
-		return Provider{}, errors.Wrap(err, "could not marshal JSON")
-	}
-
-	out := Provider{
+func GetProvider(p *pkgv1.Provider) Provider {
+	return Provider{
 		ID: ReferenceID{
 			APIVersion: p.APIVersion,
 			Kind:       p.Kind,
@@ -104,20 +97,13 @@ func GetProvider(p *pkgv1.Provider) (Provider, error) {
 			CurrentRevision:   pointer.StringPtr(p.Status.CurrentRevision),
 			CurrentIdentifier: &p.Status.CurrentIdentifier,
 		},
-		Raw: string(raw),
+		Raw: raw(p),
 	}
-
-	return out, nil
 }
 
 // GetProviderRevision from the supplied Kubernetes provider revision.
-func GetProviderRevision(pr *pkgv1.ProviderRevision) (ProviderRevision, error) {
-	raw, err := json.Marshal(pr)
-	if err != nil {
-		return ProviderRevision{}, errors.Wrap(err, "could not marshal JSON")
-	}
-
-	out := ProviderRevision{
+func GetProviderRevision(pr *pkgv1.ProviderRevision) ProviderRevision {
+	return ProviderRevision{
 		ID: ReferenceID{
 			APIVersion: pr.APIVersion,
 			Kind:       pr.Kind,
@@ -143,20 +129,13 @@ func GetProviderRevision(pr *pkgv1.ProviderRevision) (ProviderRevision, error) {
 			PermissionRequests:    GetPolicyRules(pr.Status.PermissionRequests),
 			ObjectRefs:            pr.Status.ObjectRefs,
 		},
-		Raw: string(raw),
+		Raw: raw(pr),
 	}
-
-	return out, nil
 }
 
 // GetConfiguration from the supplied Kubernetes configuration.
-func GetConfiguration(c *pkgv1.Configuration) (Configuration, error) {
-	raw, err := json.Marshal(c)
-	if err != nil {
-		return Configuration{}, errors.Wrap(err, "could not marshal JSON")
-	}
-
-	out := Configuration{
+func GetConfiguration(c *pkgv1.Configuration) Configuration {
+	return Configuration{
 		ID: ReferenceID{
 			APIVersion: c.APIVersion,
 			Kind:       c.Kind,
@@ -179,20 +158,13 @@ func GetConfiguration(c *pkgv1.Configuration) (Configuration, error) {
 			CurrentRevision:   pointer.StringPtr(c.Status.CurrentRevision),
 			CurrentIdentifier: &c.Status.CurrentIdentifier,
 		},
-		Raw: string(raw),
+		Raw: raw(c),
 	}
-
-	return out, nil
 }
 
 // GetConfigurationRevision from the supplied Kubernetes provider revision.
-func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision) (ConfigurationRevision, error) {
-	raw, err := json.Marshal(cr)
-	if err != nil {
-		return ConfigurationRevision{}, errors.Wrap(err, "could not marshal JSON")
-	}
-
-	out := ConfigurationRevision{
+func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision) ConfigurationRevision {
+	return ConfigurationRevision{
 		ID: ReferenceID{
 			APIVersion: cr.APIVersion,
 			Kind:       cr.Kind,
@@ -218,8 +190,6 @@ func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision) (ConfigurationRev
 			PermissionRequests:    GetPolicyRules(cr.Status.PermissionRequests),
 			ObjectRefs:            cr.Status.ObjectRefs,
 		},
-		Raw: string(raw),
+		Raw: raw(cr),
 	}
-
-	return out, nil
 }

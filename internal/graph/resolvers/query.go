@@ -15,9 +15,7 @@ import (
 const (
 	errGetClient     = "cannot get client"
 	errListProviders = "cannot list providers"
-	errModelProvider = "cannot model provider"
 	errListConfigs   = "cannot list configurations"
-	errModelConfig   = "cannot model configuration"
 )
 
 type query struct {
@@ -45,12 +43,7 @@ func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error
 	}
 
 	for i := range in.Items {
-		p, err := model.GetProvider(&in.Items[i])
-		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, errModelProvider))
-			continue
-		}
-		out.Items = append(out.Items, p)
+		out.Items = append(out.Items, model.GetProvider(&in.Items[i]))
 	}
 
 	return out, nil
@@ -77,12 +70,7 @@ func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnect
 	}
 
 	for i := range in.Items {
-		c, err := model.GetConfiguration(&in.Items[i])
-		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, errModelConfig))
-			continue
-		}
-		out.Items = append(out.Items, c)
+		out.Items = append(out.Items, model.GetConfiguration(&in.Items[i]))
 	}
 
 	return out, nil

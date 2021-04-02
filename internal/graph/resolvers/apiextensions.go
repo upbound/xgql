@@ -14,7 +14,6 @@ import (
 
 const (
 	errListResources = "cannot list defined resources"
-	errModelResource = "cannot model defined resource"
 )
 
 type xrd struct {
@@ -60,12 +59,7 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 	}
 
 	for i := range in.Items {
-		cr, err := model.GetCompositeResource(&in.Items[i])
-		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, errModelResource))
-			continue
-		}
-		out.Items = append(out.Items, cr)
+		out.Items = append(out.Items, model.GetCompositeResource(&in.Items[i]))
 	}
 
 	return out, nil

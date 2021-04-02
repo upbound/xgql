@@ -23,7 +23,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	xr := unstructured.Unstructured{}
-	gxr, _ := model.GetCompositeResource(&xr)
+	gxr := model.GetCompositeResource(&xr)
 
 	group := "example.org"
 	version := "v1"

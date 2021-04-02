@@ -44,7 +44,7 @@ func TestConfigurationRevisions(t *testing.T) {
 		},
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
-	gactive, _ := model.GetConfigurationRevision(&active)
+	gactive := model.GetConfigurationRevision(&active)
 
 	// A ConfigurationRevision we control, but that is inactive.
 	inactive := pkgv1.ConfigurationRevision{
@@ -54,7 +54,7 @@ func TestConfigurationRevisions(t *testing.T) {
 		},
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
 	}
-	ginactive, _ := model.GetConfigurationRevision(&inactive)
+	ginactive := model.GetConfigurationRevision(&inactive)
 
 	// A ConfigurationRevision which we do not control.
 	other := pkgv1.ConfigurationRevision{ObjectMeta: metav1.ObjectMeta{Name: "not-ours"}}
@@ -184,8 +184,8 @@ func TestConfigurationRevisions(t *testing.T) {
 func TestConfigurationRevisionStatusObjects(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gxrd, _ := model.GetCompositeResourceDefinition(&extv1.CompositeResourceDefinition{})
-	gcmp, _ := model.GetComposition(&extv1.Composition{})
+	gxrd := model.GetCompositeResourceDefinition(&extv1.CompositeResourceDefinition{})
+	gcmp := model.GetComposition(&extv1.Composition{})
 
 	type args struct {
 		ctx context.Context

@@ -10,8 +10,6 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/json"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -183,13 +181,8 @@ func GetCustomResourceDefinitionConditions(in []kextv1.CustomResourceDefinitionC
 }
 
 // GetGenericResource from the suppled Kubernetes resource.
-func GetGenericResource(u *kunstructured.Unstructured) (GenericResource, error) {
-	raw, err := json.Marshal(u)
-	if err != nil {
-		return GenericResource{}, errors.Wrap(err, "cannot marshal JSON")
-	}
-
-	out := GenericResource{
+func GetGenericResource(u *kunstructured.Unstructured) GenericResource {
+	return GenericResource{
 		ID: ReferenceID{
 			APIVersion: u.GetAPIVersion(),
 			Kind:       u.GetKind(),
@@ -199,20 +192,15 @@ func GetGenericResource(u *kunstructured.Unstructured) (GenericResource, error) 
 		APIVersion: u.GetAPIVersion(),
 		Kind:       u.GetKind(),
 		Metadata:   GetObjectMeta(u),
-		Raw:        string(raw),
+		Raw:        raw(u),
 	}
-
-	return out, nil
 }
 
-// GetSecret from the suppled Kubernetes Secret
-func GetSecret(s *corev1.Secret) (Secret, error) {
-	raw, err := json.Marshal(s)
-	if err != nil {
-		return Secret{}, errors.Wrap(err, "cannot marshal JSON")
-	}
+// TODO(negz): Does this need to exist? It's identical to GenericResource.
 
-	out := Secret{
+// GetSecret from the suppled Kubernetes Secret
+func GetSecret(s *corev1.Secret) Secret {
+	return Secret{
 		ID: ReferenceID{
 			APIVersion: s.APIVersion,
 			Kind:       s.Kind,
@@ -223,20 +211,13 @@ func GetSecret(s *corev1.Secret) (Secret, error) {
 		APIVersion: s.APIVersion,
 		Kind:       s.Kind,
 		Metadata:   GetObjectMeta(s),
-		Raw:        string(raw),
+		Raw:        raw(s),
 	}
-
-	return out, nil
 }
 
 // GetCustomResourceDefinition from the suppled Kubernetes CRD.
-func GetCustomResourceDefinition(crd *kextv1.CustomResourceDefinition) (CustomResourceDefinition, error) {
-	raw, err := json.Marshal(crd)
-	if err != nil {
-		return CustomResourceDefinition{}, errors.Wrap(err, "cannot marshal JSON")
-	}
-
-	out := CustomResourceDefinition{
+func GetCustomResourceDefinition(crd *kextv1.CustomResourceDefinition) CustomResourceDefinition {
+	return CustomResourceDefinition{
 		ID: ReferenceID{
 			APIVersion: crd.APIVersion,
 			Kind:       crd.Kind,
@@ -261,10 +242,8 @@ func GetCustomResourceDefinition(crd *kextv1.CustomResourceDefinition) (CustomRe
 		Status: &CustomResourceDefinitionStatus{
 			Conditions: GetCustomResourceDefinitionConditions(crd.Status.Conditions),
 		},
-		Raw: string(raw),
+		Raw: raw(crd),
 	}
-
-	return out, nil
 }
 
 // GetKubernetesResource from the supplied unstructured Kubernetes resource.
@@ -277,80 +256,50 @@ func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, e
 
 	switch {
 	case unstructured.ProbablyManaged(u):
-		out, err := GetManagedResource(u)
-		return out, errors.Wrap(err, "cannot model managed resource")
+		return GetManagedResource(u), nil
 
 	case unstructured.ProbablyProviderConfig(u):
-		out, err := GetProviderConfig(u)
-		return out, errors.Wrap(err, "cannot model provider config")
+		return GetProviderConfig(u), nil
 
 	case unstructured.ProbablyComposite(u):
-		out, err := GetCompositeResource(u)
-		return out, errors.Wrap(err, "cannot model composite resource")
+		return GetCompositeResource(u), nil
 
 	case u.GroupVersionKind() == pkgv1.ProviderGroupVersionKind:
 		p := &pkgv1.Provider{}
 		if err := convert(u, p); err != nil {
 			return nil, errors.Wrap(err, "cannot convert provider")
 		}
-		out, err := GetProvider(p)
-		return out, errors.Wrap(err, "cannot model provider")
+		return GetProvider(p), nil
 
 	case u.GroupVersionKind() == pkgv1.ProviderRevisionGroupVersionKind:
 		pr := &pkgv1.ProviderRevision{}
 		if err := convert(u, pr); err != nil {
 			return nil, errors.Wrap(err, "cannot convert provider revision")
 		}
-		out, err := GetProviderRevision(pr)
-		return out, errors.Wrap(err, "cannot model provider revision")
+		return GetProviderRevision(pr), nil
 
 	case u.GroupVersionKind() == pkgv1.ConfigurationGroupVersionKind:
 		c := &pkgv1.Configuration{}
 		if err := convert(u, c); err != nil {
 			return nil, errors.Wrap(err, "cannot convert configuration")
 		}
-		out, err := GetConfiguration(c)
-		return out, errors.Wrap(err, "cannot model configuration")
+		return GetConfiguration(c), nil
 
 	case u.GroupVersionKind() == pkgv1.ConfigurationRevisionGroupVersionKind:
 		cr := &pkgv1.ConfigurationRevision{}
 		if err := convert(u, cr); err != nil {
 			return nil, errors.Wrap(err, "cannot convert configuration revision")
 		}
-		out, err := GetConfigurationRevision(cr)
-		return out, errors.Wrap(err, "cannot model configuration revision")
+		return GetConfigurationRevision(cr), nil
 
 	case u.GroupVersionKind() == extv1.CompositeResourceDefinitionGroupVersionKind:
 		xrd := &extv1.CompositeResourceDefinition{}
 		if err := convert(u, xrd); err != nil {
 			return nil, errors.Wrap(err, "cannot convert composite resource definition")
 		}
-		out, err := GetCompositeResourceDefinition(xrd)
-		return out, errors.Wrap(err, "cannot model composite resource definition")
+		return GetCompositeResourceDefinition(xrd), nil
 
 	default:
-		out, err := GetGenericResource(u)
-		return out, errors.Wrap(err, "cannot model generic resource")
+		return GetGenericResource(u), nil
 	}
-}
-
-func convert(from *kunstructured.Unstructured, to runtime.Object) error {
-	c := runtime.DefaultUnstructuredConverter
-	if err := c.FromUnstructured(from.Object, to); err != nil {
-		return errors.Wrap(err, "could not convert unstructured object")
-	}
-	// For whatever reason the *Unstructured's GVK doesn't seem to make it
-	// through the conversion process.
-	gvk := schema.FromAPIVersionAndKind(from.GetAPIVersion(), from.GetKind())
-	to.GetObjectKind().SetGroupVersionKind(gvk)
-	return nil
-}
-
-func getIntPtr(i *int64) *int {
-	if i == nil {
-		return nil
-	}
-
-	out := int(*i)
-	return &out
 }

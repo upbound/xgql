@@ -25,9 +25,6 @@ func (r *crd) Events(ctx context.Context, obj *model.CustomResourceDefinition) (
 }
 
 func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error) { //nolint:gocyclo
-	// TODO(negz): This method is over our complexity goal; it may be worth
-	// breaking the switch out into its own function.
-
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
@@ -69,37 +66,22 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 		Count: len(in.Items),
 	}
 
+	// TODO(negz): Replace this switch with model.GetKubernetesResource?
 	for i := range in.Items {
 		u := in.Items[i]
 
 		switch {
 		case hasCategory(obj.Spec.Names, categoryManaged), unstructured.ProbablyManaged(&u):
-			mr, err := model.GetManagedResource(&u)
-			if err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot model managed resource"))
-				continue
-			}
-			out.Items = append(out.Items, mr)
+			out.Items = append(out.Items, model.GetManagedResource(&u))
 
 		// We're less consistent about putting ProviderConfigs in the 'provider'
 		// category, and that category includes ProviderConfigUseages.
 		case unstructured.ProbablyProviderConfig(&u):
-			pc, err := model.GetProviderConfig(&u)
-			if err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot model provider config"))
-				continue
-			}
-			out.Items = append(out.Items, pc)
+			out.Items = append(out.Items, model.GetProviderConfig(&u))
 
 		default:
-			gr, err := model.GetGenericResource(&u)
-			if err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot model Kubernetes resource"))
-				continue
-			}
-			out.Items = append(out.Items, gr)
+			out.Items = append(out.Items, model.GetGenericResource(&u))
 		}
-
 	}
 
 	return out, nil

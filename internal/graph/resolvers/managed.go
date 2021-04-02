@@ -13,8 +13,7 @@ import (
 )
 
 const (
-	errGetSecret   = "cannot get secret"
-	errModelSecret = "cannot model secret"
+	errGetSecret = "cannot get secret"
 )
 
 type managedResourceSpec struct {
@@ -44,10 +43,7 @@ func (r *managedResourceSpec) ConnectionSecret(ctx context.Context, obj *model.M
 		return nil, nil
 	}
 
-	out, err := model.GetSecret(s)
-	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, errModelSecret))
-	}
+	out := model.GetSecret(s)
 	return &out, nil
 }
 

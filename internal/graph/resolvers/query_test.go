@@ -26,7 +26,7 @@ func TestQueryProviders(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	p := pkgv1.Provider{ObjectMeta: metav1.ObjectMeta{Name: "coolprovider"}}
-	gp, _ := model.GetProvider(&p)
+	gp := model.GetProvider(&p)
 
 	type args struct {
 		ctx context.Context
@@ -121,7 +121,7 @@ func TestQueryConfigurations(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	c := pkgv1.Configuration{ObjectMeta: metav1.ObjectMeta{Name: "coolconfig"}}
-	gc, _ := model.GetConfiguration(&c)
+	gc := model.GetConfiguration(&c)
 
 	type args struct {
 		ctx context.Context

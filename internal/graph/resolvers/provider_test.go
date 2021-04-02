@@ -44,7 +44,7 @@ func TestProviderRevisions(t *testing.T) {
 		},
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
-	gactive, _ := model.GetProviderRevision(&active)
+	gactive := model.GetProviderRevision(&active)
 
 	// A ProviderRevision we control, but that is inactive.
 	inactive := pkgv1.ProviderRevision{
@@ -54,7 +54,7 @@ func TestProviderRevisions(t *testing.T) {
 		},
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
 	}
-	ginactive, _ := model.GetProviderRevision(&inactive)
+	ginactive := model.GetProviderRevision(&inactive)
 
 	// A ProviderRevision which we do not control.
 	other := pkgv1.ProviderRevision{ObjectMeta: metav1.ObjectMeta{Name: "not-ours"}}
@@ -184,7 +184,7 @@ func TestProviderRevisions(t *testing.T) {
 func TestProviderRevisionStatusObjects(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gcrd, _ := model.GetCustomResourceDefinition(&kextv1.CustomResourceDefinition{})
+	gcrd := model.GetCustomResourceDefinition(&kextv1.CustomResourceDefinition{})
 
 	type args struct {
 		ctx context.Context

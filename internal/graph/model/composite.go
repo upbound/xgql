@@ -3,11 +3,9 @@ package model
 import (
 	"time"
 
-	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/util/json"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 
@@ -33,15 +31,9 @@ func GetConnectionDetailsLastPublishedTime(t *metav1.Time) *time.Time {
 }
 
 // GetCompositeResource from the supplied Crossplane resource.
-func GetCompositeResource(u *kunstructured.Unstructured) (CompositeResource, error) {
+func GetCompositeResource(u *kunstructured.Unstructured) CompositeResource {
 	xr := &unstructured.Composite{Unstructured: *u}
-
-	raw, err := json.Marshal(xr)
-	if err != nil {
-		return CompositeResource{}, errors.Wrap(err, "cannot marshal JSON")
-	}
-
-	out := CompositeResource{
+	return CompositeResource{
 		ID: ReferenceID{
 			APIVersion: xr.GetAPIVersion(),
 			Kind:       xr.GetKind(),
@@ -64,8 +56,6 @@ func GetCompositeResource(u *kunstructured.Unstructured) (CompositeResource, err
 				LastPublishedTime: GetConnectionDetailsLastPublishedTime(xr.GetConnectionDetailsLastPublishedTime()),
 			},
 		},
-		Raw: string(raw),
+		Raw: raw(xr),
 	}
-
-	return out, nil
 }

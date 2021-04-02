@@ -24,19 +24,19 @@ func TestCRDDefinedResources(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	gr := unstructured.Unstructured{}
-	ggr, _ := model.GetGenericResource(&gr)
+	ggr := model.GetGenericResource(&gr)
 
 	// This unstructured object passes the test we use to infer whether it is
 	// probably a managed resource.
 	mr := unstructured.Unstructured{Object: make(map[string]interface{})}
 	fieldpath.Pave(mr.Object).SetString("spec.providerConfigRef.name", "cool")
-	gmr, _ := model.GetManagedResource(&mr)
+	gmr := model.GetManagedResource(&mr)
 
 	// This unstructured object passes the test we use to infer whether it is
 	// probably a provider config.
 	pc := unstructured.Unstructured{Object: make(map[string]interface{})}
 	pc.SetKind("ProviderConfig")
-	gpc, _ := model.GetProviderConfig(&pc)
+	gpc := model.GetProviderConfig(&pc)
 
 	group := "example.org"
 	version := "v1"
