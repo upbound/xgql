@@ -10,7 +10,10 @@ import (
 
 	"github.com/upbound/xgql/internal/graph/model"
 	"github.com/upbound/xgql/internal/token"
-	"github.com/upbound/xgql/internal/unstructured"
+)
+
+const (
+	errModelDefined = "cannot model defined resource"
 )
 
 type crd struct {
@@ -21,15 +24,12 @@ func (r *crd) Events(ctx context.Context, obj *model.CustomResourceDefinition) (
 	return nil, nil
 }
 
-func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error) { //nolint:gocyclo
-	// TODO(negz): This method is over our complexity goal; it may be worth
-	// breaking the switch out into its own function.
-
+func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
 	}
 
@@ -54,11 +54,10 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 	// used by platform operators to list managed resources, which are cluster
 	// scoped, but in theory a CRD could define any kind of custom resource. We
 	// could accept an optional 'namespace' argument and pass client.InNamespace
-	// to c.List, but I believe the underlying cache's ListWatch will still try
-	// (and fail) to list namespaced resources across all namespaces, so we may
-	// also need a way to fetch a client with a namespaced cache.
+	// to c.List. We'd also need to fetch client with a namespaced cache by
+	// passing clients.WithNamespace to r.clients.Get above.
 	if err := c.List(ctx, in); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot list resources"))
+		graphql.AddError(ctx, errors.Wrap(err, errListResources))
 		return nil, nil
 	}
 
@@ -70,34 +69,11 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 	for i := range in.Items {
 		u := in.Items[i]
 
-		switch {
-		case hasCategory(obj.Spec.Names, "managed"), unstructured.ProbablyManaged(&u):
-			mr, err := model.GetManagedResource(&u)
-			if err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot model managed resource"))
-				continue
-			}
-			out.Items = append(out.Items, mr)
-
-		// We're less consistent about putting ProviderConfigs in the 'provider'
-		// category, and that category includes ProviderConfigUseages.
-		case unstructured.ProbablyProviderConfig(&u):
-			pc, err := model.GetProviderConfig(&u)
-			if err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot model provider config"))
-				continue
-			}
-			out.Items = append(out.Items, pc)
-
-		default:
-			gr, err := model.GetGenericResource(&u)
-			if err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot model Kubernetes resource"))
-				continue
-			}
-			out.Items = append(out.Items, gr)
+		kr, err := model.GetKubernetesResource(&u)
+		if err != nil {
+			graphql.AddError(ctx, errors.Wrap(err, errModelDefined))
 		}
-
+		out.Items = append(out.Items, kr)
 	}
 
 	return out, nil
@@ -107,30 +83,12 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 // rather than returning the first served one. There's no guarantee versions
 // will actually follow this convention, but it's ubiquitous.
 func pickCRDVersion(vs []model.CustomResourceDefinitionVersion) string {
-	candidates := make([]string, 0, len(vs))
-
 	for _, v := range vs {
 		if v.Served {
-			candidates = append(candidates, v.Name)
+			return v.Name
 		}
 	}
 
-	if len(candidates) == 0 {
-		return ""
-	}
-
-	return candidates[0]
-}
-
-func hasCategory(n *model.CustomResourceDefinitionNames, cat string) bool {
-	if n == nil {
-		return false
-	}
-
-	for _, c := range n.Categories {
-		if c == cat {
-			return true
-		}
-	}
-	return false
+	// We shouldn't get here, unless the CRD is serving no versions?
+	return ""
 }

@@ -19,11 +19,11 @@ import (
 	"github.com/upbound/xgql/internal/graph/model"
 )
 
-func TestXRDDefinedCompositeResources(t *testing.T) {
+func TestCRDDefinedResources(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	xr := unstructured.Unstructured{}
-	gxr := model.GetCompositeResource(&xr)
+	gr := unstructured.Unstructured{}
+	ggr := model.GetGenericResource(&gr)
 
 	group := "example.org"
 	version := "v1"
@@ -35,11 +35,11 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 
 	type args struct {
 		ctx     context.Context
-		obj     *model.CompositeResourceDefinition
+		obj     *model.CustomResourceDefinition
 		version *string
 	}
 	type want struct {
-		crc  *model.CompositeResourceConnection
+		krc  *model.KubernetesResourceConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -64,7 +64,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 				},
 			},
 		},
-		"ListDefinedCompositeResourcesError": {
+		"ListDefinedResourcesError": {
 			reason: "If we can't list defined resources we should add the error to the GraphQL context and return early.",
 			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
@@ -73,66 +73,16 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			}),
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+				obj: &model.CustomResourceDefinition{
+					Spec: &model.CustomResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{Kind: kind},
+						Names: &model.CustomResourceDefinitionNames{Kind: kind},
 					},
 				},
 			},
 			want: want{
 				errs: gqlerror.List{
 					gqlerror.Errorf(errors.Wrap(errBoom, errListResources).Error()),
-				},
-			},
-		},
-		"InferReferencableVersion": {
-			reason: "We should successfully infer the referencable version and return any defined resources we can list and model.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
-				return &test.MockClient{
-					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						u := *obj.(*unstructured.UnstructuredList)
-
-						// Ensure we're being asked to list the expected GVK.
-						got := u.GetObjectKind().GroupVersionKind()
-						want := schema.GroupVersionKind{Group: group, Version: version, Kind: listKind}
-						if diff := cmp.Diff(want, got); diff != "" {
-							t.Errorf("-want GVK, +got GVK:\n%s", diff)
-						}
-
-						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xr}}
-						return nil
-					}),
-				}, nil
-			}),
-			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
-						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{
-							Kind:     kind,
-							ListKind: pointer.StringPtr(listKind),
-						},
-						Versions: []model.CompositeResourceDefinitionVersion{
-							{
-								// This version appears first, but we should
-								// ignore it in favor of the referencable one.
-								Name:   "v2",
-								Served: true,
-							},
-							{
-								Name:          version,
-								Referenceable: true,
-							},
-						},
-					},
-				},
-			},
-			want: want{
-				crc: &model.CompositeResourceConnection{
-					Items: []model.CompositeResource{gxr},
-					Count: 1,
 				},
 			},
 		},
@@ -150,21 +100,21 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 							t.Errorf("-want GVK, +got GVK:\n%s", diff)
 						}
 
-						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xr}}
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{gr}}
 						return nil
 					}),
 				}, nil
 			}),
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+				obj: &model.CustomResourceDefinition{
+					Spec: &model.CustomResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{
+						Names: &model.CustomResourceDefinitionNames{
 							Kind:     kind,
 							ListKind: pointer.StringPtr(listKind),
 						},
-						Versions: []model.CompositeResourceDefinitionVersion{
+						Versions: []model.CustomResourceDefinitionVersion{
 							// This version should be ignored because it is
 							// neither referenceable nor served.
 							{
@@ -179,8 +129,8 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 				},
 			},
 			want: want{
-				crc: &model.CompositeResourceConnection{
-					Items: []model.CompositeResource{gxr},
+				krc: &model.KubernetesResourceConnection{
+					Items: []model.KubernetesResource{ggr},
 					Count: 1,
 				},
 			},
@@ -199,21 +149,21 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 							t.Errorf("-want GVK, +got GVK:\n%s", diff)
 						}
 
-						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xr}}
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{gr}}
 						return nil
 					}),
 				}, nil
 			}),
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+				obj: &model.CustomResourceDefinition{
+					Spec: &model.CustomResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{
+						Names: &model.CustomResourceDefinitionNames{
 							Kind:     kind,
 							ListKind: pointer.StringPtr(listKind),
 						},
-						Versions: []model.CompositeResourceDefinitionVersion{
+						Versions: []model.CustomResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
 							// this case the caller asked us to list a specific
 							// version.
@@ -231,8 +181,8 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 				version: pointer.StringPtr(version),
 			},
 			want: want{
-				crc: &model.CompositeResourceConnection{
-					Items: []model.CompositeResource{gxr},
+				krc: &model.KubernetesResourceConnection{
+					Items: []model.KubernetesResource{ggr},
 					Count: 1,
 				},
 			},
@@ -241,21 +191,21 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			x := &xrd{clients: tc.clients}
+			x := &crd{clients: tc.clients}
 
 			// Our GraphQL resolvers never return errors. We instead add an
 			// error to the GraphQL context and return early.
-			got, err := x.DefinedCompositeResources(tc.args.ctx, tc.args.obj, tc.args.version)
+			got, err := x.DefinedResources(tc.args.ctx, tc.args.obj, tc.args.version)
 			errs := graphql.GetErrors(tc.args.ctx)
 
 			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
-				t.Errorf("\n%s\nq.DefinedCompositeResources(...): -want error, +got error:\n%s\n", tc.reason, diff)
+				t.Errorf("\n%s\nq.DefinedResources(...): -want error, +got error:\n%s\n", tc.reason, diff)
 			}
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
-				t.Errorf("\n%s\nq.DefinedCompositeResources(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+				t.Errorf("\n%s\nq.DefinedResources(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.crc, got); diff != "" {
-				t.Errorf("\n%s\nq.DefinedCompositeResources(...): -want, +got:\n%s\n", tc.reason, diff)
+			if diff := cmp.Diff(tc.want.krc, got); diff != "" {
+				t.Errorf("\n%s\nq.DefinedResources(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
 	}

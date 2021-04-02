@@ -17,6 +17,11 @@ import (
 	"github.com/upbound/xgql/internal/token"
 )
 
+const (
+	errListProviderRevs = "cannot list provider revisions"
+	errGetCRD           = "cannot get custom resource definition"
+)
+
 type provider struct {
 	clients ClientCache
 }
@@ -25,21 +30,18 @@ func (r *provider) Events(ctx context.Context, obj *model.Provider) (*model.Even
 	return nil, nil
 }
 
-func (r *provider) Revisions(ctx context.Context, obj *model.Provider, active *bool) (*model.ProviderRevisionConnection, error) { //nolint:gocyclo
-	// NOTE(negz): This method is a little over our complexity goal. Be wary of
-	// making it more complex.
-
+func (r *provider) Revisions(ctx context.Context, obj *model.Provider, active *bool) (*model.ProviderRevisionConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
 	}
 
 	in := &pkgv1.ProviderRevisionList{}
 	if err := c.List(ctx, in); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot list providers"))
+		graphql.AddError(ctx, errors.Wrap(err, errListProviderRevs))
 		return nil, nil
 	}
 
@@ -62,13 +64,7 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, active *b
 			continue
 		}
 
-		i, err := model.GetProviderRevision(&pr)
-		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, "cannot model provider revision"))
-			continue
-		}
-
-		out.Items = append(out.Items, i)
+		out.Items = append(out.Items, model.GetProviderRevision(&pr))
 		out.Count++
 	}
 
@@ -92,7 +88,7 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
 	}
 
@@ -113,17 +109,11 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 
 		crd := &kextv1.CustomResourceDefinition{}
 		if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, crd); err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, "cannot get CustomResourceDefinition"))
+			graphql.AddError(ctx, errors.Wrap(err, errGetCRD))
 			continue
 		}
 
-		i, err := model.GetCustomResourceDefinition(crd)
-		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, "cannot model custom resource definition"))
-			continue
-		}
-
-		out.Items = append(out.Items, i)
+		out.Items = append(out.Items, model.GetCustomResourceDefinition(crd))
 		out.Count++
 	}
 

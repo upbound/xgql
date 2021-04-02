@@ -12,6 +12,10 @@ import (
 	"github.com/upbound/xgql/internal/token"
 )
 
+const (
+	errListResources = "cannot list defined resources"
+)
+
 type xrd struct {
 	clients ClientCache
 }
@@ -25,7 +29,7 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
 	}
 
@@ -45,7 +49,7 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 	}
 
 	if err := c.List(ctx, in); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot list resources"))
+		graphql.AddError(ctx, errors.Wrap(err, errListResources))
 		return nil, nil
 	}
 
@@ -55,12 +59,7 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 	}
 
 	for i := range in.Items {
-		cr, err := model.GetCompositeResource(&in.Items[i])
-		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, "cannot model composite resource"))
-			continue
-		}
-		out.Items = append(out.Items, cr)
+		out.Items = append(out.Items, model.GetCompositeResource(&in.Items[i]))
 	}
 
 	return out, nil

@@ -7,13 +7,16 @@ import (
 
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
-	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/json"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
+	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
+
+	"github.com/upbound/xgql/internal/unstructured"
 )
 
 // Reference ID separator.
@@ -178,13 +181,8 @@ func GetCustomResourceDefinitionConditions(in []kextv1.CustomResourceDefinitionC
 }
 
 // GetGenericResource from the suppled Kubernetes resource.
-func GetGenericResource(u *kunstructured.Unstructured) (GenericResource, error) {
-	raw, err := json.Marshal(u)
-	if err != nil {
-		return GenericResource{}, errors.Wrap(err, "cannot marshal JSON")
-	}
-
-	out := GenericResource{
+func GetGenericResource(u *kunstructured.Unstructured) GenericResource {
+	return GenericResource{
 		ID: ReferenceID{
 			APIVersion: u.GetAPIVersion(),
 			Kind:       u.GetKind(),
@@ -194,20 +192,15 @@ func GetGenericResource(u *kunstructured.Unstructured) (GenericResource, error) 
 		APIVersion: u.GetAPIVersion(),
 		Kind:       u.GetKind(),
 		Metadata:   GetObjectMeta(u),
-		Raw:        string(raw),
+		Raw:        raw(u),
 	}
-
-	return out, nil
 }
 
-// GetSecret from the suppled Kubernetes Secret
-func GetSecret(s *corev1.Secret) (Secret, error) {
-	raw, err := json.Marshal(s)
-	if err != nil {
-		return Secret{}, errors.Wrap(err, "cannot marshal JSON")
-	}
+// TODO(negz): Does this need to exist? It's identical to GenericResource.
 
-	out := Secret{
+// GetSecret from the suppled Kubernetes Secret
+func GetSecret(s *corev1.Secret) Secret {
+	return Secret{
 		ID: ReferenceID{
 			APIVersion: s.APIVersion,
 			Kind:       s.Kind,
@@ -218,20 +211,13 @@ func GetSecret(s *corev1.Secret) (Secret, error) {
 		APIVersion: s.APIVersion,
 		Kind:       s.Kind,
 		Metadata:   GetObjectMeta(s),
-		Raw:        string(raw),
+		Raw:        raw(s),
 	}
-
-	return out, nil
 }
 
 // GetCustomResourceDefinition from the suppled Kubernetes CRD.
-func GetCustomResourceDefinition(crd *extv1.CustomResourceDefinition) (CustomResourceDefinition, error) {
-	raw, err := json.Marshal(crd)
-	if err != nil {
-		return CustomResourceDefinition{}, errors.Wrap(err, "cannot marshal JSON")
-	}
-
-	out := CustomResourceDefinition{
+func GetCustomResourceDefinition(crd *kextv1.CustomResourceDefinition) CustomResourceDefinition {
+	return CustomResourceDefinition{
 		ID: ReferenceID{
 			APIVersion: crd.APIVersion,
 			Kind:       crd.Kind,
@@ -256,17 +242,64 @@ func GetCustomResourceDefinition(crd *extv1.CustomResourceDefinition) (CustomRes
 		Status: &CustomResourceDefinitionStatus{
 			Conditions: GetCustomResourceDefinitionConditions(crd.Status.Conditions),
 		},
-		Raw: string(raw),
+		Raw: raw(crd),
 	}
-
-	return out, nil
 }
 
-func getIntPtr(i *int64) *int {
-	if i == nil {
-		return nil
-	}
+// GetKubernetesResource from the supplied unstructured Kubernetes resource.
+// GetKubernetesResource attempts to determine what type of resource the
+// unstructured data contains (e.g. a managed resource, a provider, etc) and
+// return the appropriate model type. If no type can be detected it returns a
+// GenericResource.
+func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, error) { //nolint:gocyclo
+	// This isn't _really_ that complex; it's a long but simple switch.
 
-	out := int(*i)
-	return &out
+	switch {
+	case unstructured.ProbablyManaged(u):
+		return GetManagedResource(u), nil
+
+	case unstructured.ProbablyProviderConfig(u):
+		return GetProviderConfig(u), nil
+
+	case unstructured.ProbablyComposite(u):
+		return GetCompositeResource(u), nil
+
+	case u.GroupVersionKind() == pkgv1.ProviderGroupVersionKind:
+		p := &pkgv1.Provider{}
+		if err := convert(u, p); err != nil {
+			return nil, errors.Wrap(err, "cannot convert provider")
+		}
+		return GetProvider(p), nil
+
+	case u.GroupVersionKind() == pkgv1.ProviderRevisionGroupVersionKind:
+		pr := &pkgv1.ProviderRevision{}
+		if err := convert(u, pr); err != nil {
+			return nil, errors.Wrap(err, "cannot convert provider revision")
+		}
+		return GetProviderRevision(pr), nil
+
+	case u.GroupVersionKind() == pkgv1.ConfigurationGroupVersionKind:
+		c := &pkgv1.Configuration{}
+		if err := convert(u, c); err != nil {
+			return nil, errors.Wrap(err, "cannot convert configuration")
+		}
+		return GetConfiguration(c), nil
+
+	case u.GroupVersionKind() == pkgv1.ConfigurationRevisionGroupVersionKind:
+		cr := &pkgv1.ConfigurationRevision{}
+		if err := convert(u, cr); err != nil {
+			return nil, errors.Wrap(err, "cannot convert configuration revision")
+		}
+		return GetConfigurationRevision(cr), nil
+
+	case u.GroupVersionKind() == extv1.CompositeResourceDefinitionGroupVersionKind:
+		xrd := &extv1.CompositeResourceDefinition{}
+		if err := convert(u, xrd); err != nil {
+			return nil, errors.Wrap(err, "cannot convert composite resource definition")
+		}
+		return GetCompositeResourceDefinition(xrd), nil
+
+	default:
+		return GetGenericResource(u), nil
+	}
 }

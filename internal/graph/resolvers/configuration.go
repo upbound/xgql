@@ -17,6 +17,12 @@ import (
 	"github.com/upbound/xgql/internal/token"
 )
 
+const (
+	errListConfigRevs = "cannot list configuration revisions"
+	errGetXRD         = "cannot get composite resource definition"
+	errGetComp        = "cannot get composition"
+)
+
 type configuration struct {
 	clients ClientCache
 }
@@ -25,21 +31,18 @@ func (r *configuration) Events(ctx context.Context, obj *model.Configuration) (*
 	return nil, nil
 }
 
-func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration, active *bool) (*model.ConfigurationRevisionConnection, error) { //nolint:gocyclo
-	// NOTE(negz): This method is a little over our complexity goal. Be wary of
-	// making it more complex.
-
+func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration, active *bool) (*model.ConfigurationRevisionConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
 	}
 
 	in := &pkgv1.ConfigurationRevisionList{}
 	if err := c.List(ctx, in); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot list configuration revisions"))
+		graphql.AddError(ctx, errors.Wrap(err, errListConfigRevs))
 		return nil, nil
 	}
 
@@ -62,12 +65,7 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration,
 			continue
 		}
 
-		i, err := model.GetConfigurationRevision(&cr)
-		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, "cannot model configuration revision"))
-		}
-
-		out.Items = append(out.Items, i)
+		out.Items = append(out.Items, model.GetConfigurationRevision(&cr))
 		out.Count++
 	}
 
@@ -86,15 +84,12 @@ type configurationRevisionStatus struct {
 	clients ClientCache
 }
 
-func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (*model.KubernetesResourceConnection, error) { //nolint:gocyclo
-	// TODO(negz): This method is over our complexity goal. Maybe break the
-	// switch out into its own function?
-
+func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (*model.KubernetesResourceConnection, error) {
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
 	}
 
@@ -114,32 +109,20 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 		case extv1.CompositeResourceDefinitionKind:
 			xrd := &extv1.CompositeResourceDefinition{}
 			if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, xrd); err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot get CompositeResourceDefinition"))
+				graphql.AddError(ctx, errors.Wrap(err, errGetXRD))
 				continue
 			}
 
-			i, err := model.GetCompositeResourceDefinition(xrd)
-			if err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot model composite resource definition"))
-				continue
-			}
-
-			out.Items = append(out.Items, i)
+			out.Items = append(out.Items, model.GetCompositeResourceDefinition(xrd))
 			out.Count++
 		case extv1.CompositionKind:
 			cmp := &extv1.Composition{}
 			if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, cmp); err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot get Composition"))
+				graphql.AddError(ctx, errors.Wrap(err, errGetComp))
 				continue
 			}
 
-			i, err := model.GetComposition(cmp)
-			if err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot model composition"))
-				continue
-			}
-
-			out.Items = append(out.Items, i)
+			out.Items = append(out.Items, model.GetComposition(cmp))
 			out.Count++
 		}
 	}

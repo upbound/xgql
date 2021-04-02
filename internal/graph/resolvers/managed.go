@@ -12,6 +12,10 @@ import (
 	"github.com/upbound/xgql/internal/token"
 )
 
+const (
+	errGetSecret = "cannot get secret"
+)
+
 type managedResourceSpec struct {
 	clients ClientCache
 }
@@ -25,7 +29,7 @@ func (r *managedResourceSpec) ConnectionSecret(ctx context.Context, obj *model.M
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
 	}
 
@@ -35,14 +39,11 @@ func (r *managedResourceSpec) ConnectionSecret(ctx context.Context, obj *model.M
 		Name:      obj.WritesConnectionSecretToRef.Name,
 	}
 	if err := c.Get(ctx, nn, s); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get Secret"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetSecret))
 		return nil, nil
 	}
 
-	out, err := model.GetSecret(s)
-	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get Secret"))
-	}
+	out := model.GetSecret(s)
 	return &out, nil
 }
 

@@ -9,7 +9,16 @@ import (
 
 // A ClientCache can produce a client for a given token.
 type ClientCache interface {
+	// Get a client for the given token.
 	Get(token string, o ...clients.GetOption) (client.Client, error)
+}
+
+// A ClientCacheFn is a function that can produce a client for a given token.
+type ClientCacheFn func(token string, o ...clients.GetOption) (client.Client, error)
+
+// Get a client for the given token.
+func (fn ClientCacheFn) Get(token string, o ...clients.GetOption) (client.Client, error) {
+	return fn(token, o...)
 }
 
 // The Root resolver.
@@ -29,7 +38,7 @@ func (r *Root) Query() generated.QueryResolver {
 
 // ObjectMeta resolves properties of the ObjectMeta GraphQL type.
 func (r *Root) ObjectMeta() generated.ObjectMetaResolver {
-	return &objectMetaResolver{clients: r.clients}
+	return &objectMeta{clients: r.clients}
 }
 
 // Secret resolves properties of the Secret GraphQL type.
