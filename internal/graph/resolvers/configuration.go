@@ -17,6 +17,15 @@ import (
 	"github.com/upbound/xgql/internal/token"
 )
 
+const (
+	errListConfigRevs = "cannot list configuration revisions"
+	errModelConfigRev = "cannot model configuration revision"
+	errGetXRD         = "cannot get composite resource definition"
+	errModelXRD       = "cannot model composite resource definition"
+	errGetComp        = "cannot get composition"
+	errModelComp      = "cannot model composition"
+)
+
 type configuration struct {
 	clients ClientCache
 }
@@ -33,13 +42,13 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration,
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
 	}
 
 	in := &pkgv1.ConfigurationRevisionList{}
 	if err := c.List(ctx, in); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot list configuration revisions"))
+		graphql.AddError(ctx, errors.Wrap(err, errListConfigRevs))
 		return nil, nil
 	}
 
@@ -64,7 +73,7 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration,
 
 		i, err := model.GetConfigurationRevision(&cr)
 		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, "cannot model configuration revision"))
+			graphql.AddError(ctx, errors.Wrap(err, errModelConfigRev))
 		}
 
 		out.Items = append(out.Items, i)
@@ -94,7 +103,7 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
 	}
 
@@ -114,13 +123,13 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 		case extv1.CompositeResourceDefinitionKind:
 			xrd := &extv1.CompositeResourceDefinition{}
 			if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, xrd); err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot get CompositeResourceDefinition"))
+				graphql.AddError(ctx, errors.Wrap(err, errGetXRD))
 				continue
 			}
 
 			i, err := model.GetCompositeResourceDefinition(xrd)
 			if err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot model composite resource definition"))
+				graphql.AddError(ctx, errors.Wrap(err, errModelXRD))
 				continue
 			}
 
@@ -129,13 +138,13 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 		case extv1.CompositionKind:
 			cmp := &extv1.Composition{}
 			if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, cmp); err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot get Composition"))
+				graphql.AddError(ctx, errors.Wrap(err, errGetComp))
 				continue
 			}
 
 			i, err := model.GetComposition(cmp)
 			if err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, "cannot model composition"))
+				graphql.AddError(ctx, errors.Wrap(err, errModelComp))
 				continue
 			}
 

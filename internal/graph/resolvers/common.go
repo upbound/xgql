@@ -13,6 +13,9 @@ import (
 	"github.com/upbound/xgql/internal/unstructured"
 )
 
+// Most managed resources have this CRD category.
+const categoryManaged = "managed"
+
 type crd struct {
 	clients ClientCache
 }
@@ -29,7 +32,7 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
 	}
 
@@ -54,11 +57,10 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 	// used by platform operators to list managed resources, which are cluster
 	// scoped, but in theory a CRD could define any kind of custom resource. We
 	// could accept an optional 'namespace' argument and pass client.InNamespace
-	// to c.List, but I believe the underlying cache's ListWatch will still try
-	// (and fail) to list namespaced resources across all namespaces, so we may
-	// also need a way to fetch a client with a namespaced cache.
+	// to c.List. We'd also need to fetch client with a namespaced cache by
+	// passing clients.WithNamespace to r.clients.Get above.
 	if err := c.List(ctx, in); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot list resources"))
+		graphql.AddError(ctx, errors.Wrap(err, errListResources))
 		return nil, nil
 	}
 
@@ -71,7 +73,7 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 		u := in.Items[i]
 
 		switch {
-		case hasCategory(obj.Spec.Names, "managed"), unstructured.ProbablyManaged(&u):
+		case hasCategory(obj.Spec.Names, categoryManaged), unstructured.ProbablyManaged(&u):
 			mr, err := model.GetManagedResource(&u)
 			if err != nil {
 				graphql.AddError(ctx, errors.Wrap(err, "cannot model managed resource"))
@@ -107,19 +109,14 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 // rather than returning the first served one. There's no guarantee versions
 // will actually follow this convention, but it's ubiquitous.
 func pickCRDVersion(vs []model.CustomResourceDefinitionVersion) string {
-	candidates := make([]string, 0, len(vs))
-
 	for _, v := range vs {
 		if v.Served {
-			candidates = append(candidates, v.Name)
+			return v.Name
 		}
 	}
 
-	if len(candidates) == 0 {
-		return ""
-	}
-
-	return candidates[0]
+	// We shouldn't get here, unless the CRD is serving no versions?
+	return ""
 }
 
 func hasCategory(n *model.CustomResourceDefinitionNames, cat string) bool {

@@ -12,6 +12,14 @@ import (
 	"github.com/upbound/xgql/internal/token"
 )
 
+const (
+	errGetClient     = "cannot get client"
+	errListProviders = "cannot list providers"
+	errModelProvider = "cannot model provider"
+	errListConfigs   = "cannot list configurations"
+	errModelConfig   = "cannot model configuration"
+)
+
 type query struct {
 	clients ClientCache
 }
@@ -21,13 +29,13 @@ func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
 	}
 
 	in := &pkgv1.ProviderList{}
 	if err := c.List(ctx, in); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot list providers"))
+		graphql.AddError(ctx, errors.Wrap(err, errListProviders))
 		return nil, nil
 	}
 
@@ -39,7 +47,7 @@ func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error
 	for i := range in.Items {
 		p, err := model.GetProvider(&in.Items[i])
 		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, "cannot model provider"))
+			graphql.AddError(ctx, errors.Wrap(err, errModelProvider))
 			continue
 		}
 		out.Items = append(out.Items, p)
@@ -53,13 +61,13 @@ func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnect
 
 	c, err := r.clients.Get(t)
 	if err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot get client"))
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
 	}
 
 	in := &pkgv1.ConfigurationList{}
 	if err := c.List(ctx, in); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, "cannot list configurations"))
+		graphql.AddError(ctx, errors.Wrap(err, errListConfigs))
 		return nil, nil
 	}
 
@@ -71,7 +79,7 @@ func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnect
 	for i := range in.Items {
 		c, err := model.GetConfiguration(&in.Items[i])
 		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, "cannot model configuration"))
+			graphql.AddError(ctx, errors.Wrap(err, errModelConfig))
 			continue
 		}
 		out.Items = append(out.Items, c)
