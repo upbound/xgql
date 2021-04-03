@@ -3,7 +3,8 @@ package model
 import (
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	"k8s.io/utils/pointer"
+
+	"github.com/google/go-cmp/cmp"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
@@ -59,6 +60,10 @@ func GetPackagePullPolicy(in *corev1.PullPolicy) *PackagePullPolicy {
 
 // GetPolicyRules from the supplied Kubernetes policy rules.
 func GetPolicyRules(in []rbacv1.PolicyRule) []PolicyRule {
+	if in == nil {
+		return nil
+	}
+
 	out := make([]PolicyRule, len(in))
 	for i := range in {
 		out[i] = PolicyRule{
@@ -68,6 +73,21 @@ func GetPolicyRules(in []rbacv1.PolicyRule) []PolicyRule {
 			ResourceNames:   in[i].ResourceNames,
 			NonResourceURLs: in[i].NonResourceURLs,
 		}
+	}
+	return out
+}
+
+// GetProviderStatus from the supplied Kubernetes status.
+func GetProviderStatus(in pkgv1.ProviderStatus) *ProviderStatus {
+	out := &ProviderStatus{Conditions: GetConditions(in.Conditions)}
+	if in.CurrentRevision != "" {
+		out.CurrentRevision = &in.CurrentRevision
+	}
+	if in.CurrentIdentifier != "" {
+		out.CurrentIdentifier = &in.CurrentIdentifier
+	}
+	if cmp.Equal(out, &ProviderStatus{}) {
+		return nil
 	}
 	return out
 }
@@ -92,16 +112,28 @@ func GetProvider(p *pkgv1.Provider) Provider {
 			IgnoreCrossplaneConstraints: p.Spec.IgnoreCrossplaneConstraints,
 			SkipDependencyResolution:    p.Spec.SkipDependencyResolution,
 		},
-		Status: &ProviderStatus{
-			Conditions:        GetConditions(p.Status.Conditions),
-			CurrentRevision:   pointer.StringPtr(p.Status.CurrentRevision),
-			CurrentIdentifier: &p.Status.CurrentIdentifier,
-		},
-		Raw: raw(p),
+		Status: GetProviderStatus(p.Status),
+		Raw:    raw(p),
 	}
 }
 
-// GetProviderRevision from the supplied Kubernetes provider revision.
+// GetProviderRevisionStatus from the supplied Crossplane provider revision.
+func GetProviderRevisionStatus(in pkgv1.PackageRevisionStatus) *ProviderRevisionStatus {
+	out := &ProviderRevisionStatus{
+		Conditions:            GetConditions(in.Conditions),
+		ObjectRefs:            in.ObjectRefs,
+		FoundDependencies:     getIntPtr(&in.FoundDependencies),
+		InstalledDependencies: getIntPtr(&in.InstalledDependencies),
+		InvalidDependencies:   getIntPtr(&in.InvalidDependencies),
+		PermissionRequests:    GetPolicyRules(in.PermissionRequests),
+	}
+	if cmp.Equal(out, &ProviderRevisionStatus{}) {
+		return nil
+	}
+	return out
+}
+
+// GetProviderRevision from the supplied Crossplane provider revision.
 func GetProviderRevision(pr *pkgv1.ProviderRevision) ProviderRevision {
 	return ProviderRevision{
 		ID: ReferenceID{
@@ -121,16 +153,24 @@ func GetProviderRevision(pr *pkgv1.ProviderRevision) ProviderRevision {
 			IgnoreCrossplaneConstraints: pr.Spec.IgnoreCrossplaneConstraints,
 			SkipDependencyResolution:    pr.Spec.SkipDependencyResolution,
 		},
-		Status: &ProviderRevisionStatus{
-			Conditions:            GetConditions(pr.Status.Conditions),
-			FoundDependencies:     getIntPtr(&pr.Status.FoundDependencies),
-			InstalledDependencies: getIntPtr(&pr.Status.InstalledDependencies),
-			InvalidDependencies:   getIntPtr(&pr.Status.InvalidDependencies),
-			PermissionRequests:    GetPolicyRules(pr.Status.PermissionRequests),
-			ObjectRefs:            pr.Status.ObjectRefs,
-		},
-		Raw: raw(pr),
+		Status: GetProviderRevisionStatus(pr.Status),
+		Raw:    raw(pr),
 	}
+}
+
+// GetConfigurationStatus from the supplied Kubernetes status.
+func GetConfigurationStatus(in pkgv1.ConfigurationStatus) *ConfigurationStatus {
+	out := &ConfigurationStatus{Conditions: GetConditions(in.Conditions)}
+	if in.CurrentRevision != "" {
+		out.CurrentRevision = &in.CurrentRevision
+	}
+	if in.CurrentIdentifier != "" {
+		out.CurrentIdentifier = &in.CurrentIdentifier
+	}
+	if cmp.Equal(out, &ConfigurationStatus{}) {
+		return nil
+	}
+	return out
 }
 
 // GetConfiguration from the supplied Kubernetes configuration.
@@ -153,13 +193,25 @@ func GetConfiguration(c *pkgv1.Configuration) Configuration {
 			IgnoreCrossplaneConstraints: c.Spec.IgnoreCrossplaneConstraints,
 			SkipDependencyResolution:    c.Spec.SkipDependencyResolution,
 		},
-		Status: &ConfigurationStatus{
-			Conditions:        GetConditions(c.Status.Conditions),
-			CurrentRevision:   pointer.StringPtr(c.Status.CurrentRevision),
-			CurrentIdentifier: &c.Status.CurrentIdentifier,
-		},
-		Raw: raw(c),
+		Status: GetConfigurationStatus(c.Status),
+		Raw:    raw(c),
 	}
+}
+
+// GetConfigurationRevisionStatus from the supplied Crossplane provider revision.
+func GetConfigurationRevisionStatus(in pkgv1.PackageRevisionStatus) *ConfigurationRevisionStatus {
+	out := &ConfigurationRevisionStatus{
+		Conditions:            GetConditions(in.Conditions),
+		ObjectRefs:            in.ObjectRefs,
+		FoundDependencies:     getIntPtr(&in.FoundDependencies),
+		InstalledDependencies: getIntPtr(&in.InstalledDependencies),
+		InvalidDependencies:   getIntPtr(&in.InvalidDependencies),
+		PermissionRequests:    GetPolicyRules(in.PermissionRequests),
+	}
+	if cmp.Equal(out, &ConfigurationRevisionStatus{}) {
+		return nil
+	}
+	return out
 }
 
 // GetConfigurationRevision from the supplied Kubernetes provider revision.
@@ -182,14 +234,7 @@ func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision) ConfigurationRevi
 			IgnoreCrossplaneConstraints: cr.Spec.IgnoreCrossplaneConstraints,
 			SkipDependencyResolution:    cr.Spec.SkipDependencyResolution,
 		},
-		Status: &ConfigurationRevisionStatus{
-			Conditions:            GetConditions(cr.Status.Conditions),
-			FoundDependencies:     getIntPtr(&cr.Status.FoundDependencies),
-			InstalledDependencies: getIntPtr(&cr.Status.InstalledDependencies),
-			InvalidDependencies:   getIntPtr(&cr.Status.InvalidDependencies),
-			PermissionRequests:    GetPolicyRules(cr.Status.PermissionRequests),
-			ObjectRefs:            cr.Status.ObjectRefs,
-		},
-		Raw: raw(cr),
+		Status: GetConfigurationRevisionStatus(cr.Status),
+		Raw:    raw(cr),
 	}
 }
