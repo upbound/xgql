@@ -32,7 +32,7 @@ func convert(from *kunstructured.Unstructured, to runtime.Object) error {
 }
 
 func getIntPtr(i *int64) *int {
-	if i == nil {
+	if i == nil || *i == 0 {
 		return nil
 	}
 

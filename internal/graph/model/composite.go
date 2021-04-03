@@ -1,10 +1,8 @@
 package model
 
 import (
-	"time"
-
+	"github.com/google/go-cmp/cmp"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -22,12 +20,24 @@ type CompositeResourceSpec struct {
 	WritesConnectionSecretToReference *xpv1.SecretReference
 }
 
-// GetConnectionDetailsLastPublishedTime from the supplied Kubernetes time.
-func GetConnectionDetailsLastPublishedTime(t *metav1.Time) *time.Time {
-	if t == nil {
+// GetCompositeResourceStatus from the supplied Crossplane composite.
+func GetCompositeResourceStatus(xr *unstructured.Composite) *CompositeResourceStatus {
+	c := xr.GetConditions()
+	t := xr.GetConnectionDetailsLastPublishedTime()
+
+	out := &CompositeResourceStatus{}
+	if len(c) > 0 {
+		out.Conditions = GetConditions(c)
+	}
+	if t != nil {
+		out.ConnectionDetails = &CompositeResourceConnectionDetails{LastPublishedTime: &t.Time}
+	}
+
+	if cmp.Equal(out, &CompositeResourceStatus{}) {
 		return nil
 	}
-	return &t.Time
+
+	return out
 }
 
 // GetCompositeResource from the supplied Crossplane resource.
@@ -50,12 +60,7 @@ func GetCompositeResource(u *kunstructured.Unstructured) CompositeResource {
 			ResourceReferences:                xr.GetResourceReferences(),
 			WritesConnectionSecretToReference: xr.GetWriteConnectionSecretToReference(),
 		},
-		Status: &CompositeResourceStatus{
-			Conditions: GetConditions(xr.GetConditions()),
-			ConnectionDetails: &CompositeResourceConnectionDetails{
-				LastPublishedTime: GetConnectionDetailsLastPublishedTime(xr.GetConnectionDetailsLastPublishedTime()),
-			},
-		},
-		Raw: raw(xr),
+		Status: GetCompositeResourceStatus(xr),
+		Raw:    raw(xr),
 	}
 }

@@ -4,6 +4,8 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/util/json"
 
+	"github.com/google/go-cmp/cmp"
+
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 )
@@ -21,20 +23,26 @@ type CompositeResourceDefinitionSpec struct {
 	EnforcedCompositionRef *xpv1.Reference
 }
 
-// GetCompositeResourceDefinitionClaimNames from the supplied Crossplane
-// versions.
-func GetCompositeResourceDefinitionClaimNames(in *kextv1.CustomResourceDefinitionNames) *CompositeResourceDefinitionNames {
+// GetCompositeResourceDefinitionNames from the supplied Kubernetes names.
+func GetCompositeResourceDefinitionNames(in *kextv1.CustomResourceDefinitionNames) *CompositeResourceDefinitionNames {
 	if in == nil {
 		return nil
 	}
-	return &CompositeResourceDefinitionNames{
+	out := &CompositeResourceDefinitionNames{
 		Plural:     in.Plural,
-		Singular:   &in.Singular,
 		ShortNames: in.ShortNames,
 		Kind:       in.Kind,
-		ListKind:   &in.ListKind,
 		Categories: in.Categories,
 	}
+
+	if in.Singular != "" {
+		out.Singular = &in.Singular
+	}
+	if in.ListKind != "" {
+		out.ListKind = &in.ListKind
+	}
+
+	return out
 }
 
 // GetCompositeResourceDefinitionVersions from the supplied Kubernetes versions.
@@ -46,8 +54,9 @@ func GetCompositeResourceDefinitionVersions(in []extv1.CompositeResourceDefiniti
 	out := make([]CompositeResourceDefinitionVersion, len(in))
 	for i := range in {
 		out[i] = CompositeResourceDefinitionVersion{
-			Name:   in[i].Name,
-			Served: in[i].Served,
+			Name:          in[i].Name,
+			Served:        in[i].Served,
+			Referenceable: in[i].Referenceable,
 		}
 
 		if s := in[i].Schema; s != nil {
@@ -57,6 +66,42 @@ func GetCompositeResourceDefinitionVersions(in []extv1.CompositeResourceDefiniti
 			}
 		}
 	}
+	return out
+}
+
+// GetCompositeResourceDefinitionControllerStatus from the supplied Crossplane
+// controllers
+func GetCompositeResourceDefinitionControllerStatus(in extv1.CompositeResourceDefinitionControllerStatus) *CompositeResourceDefinitionControllerStatus {
+
+	out := &CompositeResourceDefinitionControllerStatus{
+		CompositeResourceType: &TypeReference{
+			APIVersion: in.CompositeResourceTypeRef.APIVersion,
+			Kind:       in.CompositeResourceTypeRef.Kind,
+		},
+		CompositeResourceClaimType: &TypeReference{
+			APIVersion: in.CompositeResourceClaimTypeRef.APIVersion,
+			Kind:       in.CompositeResourceClaimTypeRef.Kind,
+		},
+	}
+
+	if cmp.Equal(out, &CompositeResourceDefinitionControllerStatus{CompositeResourceType: &TypeReference{}, CompositeResourceClaimType: &TypeReference{}}) {
+		return nil
+	}
+
+	return out
+}
+
+// GetCompositeResourceDefinitionStatus from the supplied Crossplane status.
+func GetCompositeResourceDefinitionStatus(in extv1.CompositeResourceDefinitionStatus) *CompositeResourceDefinitionStatus {
+	out := &CompositeResourceDefinitionStatus{
+		Conditions:  GetConditions(in.Conditions),
+		Controllers: GetCompositeResourceDefinitionControllerStatus(in.Controllers),
+	}
+
+	if cmp.Equal(out, &CompositeResourceDefinitionStatus{}) {
+		return nil
+	}
+
 	return out
 }
 
@@ -72,25 +117,24 @@ func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) Comp
 		Kind:       xrd.Kind,
 		Metadata:   GetObjectMeta(xrd),
 		Spec: &CompositeResourceDefinitionSpec{
-			Group: xrd.Spec.Group,
-			Names: &CompositeResourceDefinitionNames{
-				Plural:     xrd.Spec.Names.Plural,
-				Singular:   &xrd.Spec.Names.Singular,
-				ShortNames: xrd.Spec.Names.ShortNames,
-				Kind:       xrd.Spec.Names.Kind,
-				ListKind:   &xrd.Spec.Names.ListKind,
-				Categories: xrd.Spec.Names.Categories,
-			},
-			ClaimNames:             GetCompositeResourceDefinitionClaimNames(xrd.Spec.ClaimNames),
+			Group:                  xrd.Spec.Group,
+			Names:                  GetCompositeResourceDefinitionNames(&xrd.Spec.Names),
+			ClaimNames:             GetCompositeResourceDefinitionNames(xrd.Spec.ClaimNames),
 			Versions:               GetCompositeResourceDefinitionVersions(xrd.Spec.Versions),
 			DefaultCompositionRef:  xrd.Spec.DefaultCompositionRef,
 			EnforcedCompositionRef: xrd.Spec.EnforcedCompositionRef,
 		},
-		Status: &CompositeResourceDefinitionStatus{
-			Conditions: GetConditions(xrd.Status.Conditions),
-		},
-		Raw: raw(xrd),
+		Status: GetCompositeResourceDefinitionStatus(xrd.Status),
+		Raw:    raw(xrd),
 	}
+}
+
+// GetCompositionStatus from the supplied Crossplane status.
+func GetCompositionStatus(in extv1.CompositionStatus) *CompositionStatus {
+	if len(in.Conditions) == 0 {
+		return nil
+	}
+	return &CompositionStatus{Conditions: GetConditions(in.Conditions)}
 }
 
 // GetComposition from the supplied Crossplane Composition.
@@ -111,9 +155,7 @@ func GetComposition(cmp *extv1.Composition) Composition {
 			},
 			WriteConnectionSecretsToNamespace: cmp.Spec.WriteConnectionSecretsToNamespace,
 		},
-		Status: &CompositionStatus{
-			Conditions: GetConditions(cmp.Status.Conditions),
-		},
-		Raw: raw(cmp),
+		Status: GetCompositionStatus(cmp.Status),
+		Raw:    raw(cmp),
 	}
 }

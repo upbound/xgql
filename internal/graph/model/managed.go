@@ -21,6 +21,15 @@ func GetDeletionPolicy(p xpv1.DeletionPolicy) *DeletionPolicy {
 	return &out
 }
 
+// GetManagedResourceStatus from the supplied Crossplane resource.
+func GetManagedResourceStatus(in *unstructured.Managed) *ManagedResourceStatus {
+	c := in.GetConditions()
+	if len(c) == 0 {
+		return nil
+	}
+	return &ManagedResourceStatus{Conditions: GetConditions(c)}
+}
+
 // GetManagedResource from the supplied Crossplane resource.
 func GetManagedResource(u *kunstructured.Unstructured) ManagedResource {
 	mg := &unstructured.Managed{Unstructured: *u}
@@ -39,9 +48,7 @@ func GetManagedResource(u *kunstructured.Unstructured) ManagedResource {
 			ProviderConfigRef:           mg.GetProviderConfigReference(),
 			DeletionPolicy:              GetDeletionPolicy(mg.GetDeletionPolicy()),
 		},
-		Status: &ManagedResourceStatus{
-			Conditions: GetConditions(mg.GetConditions()),
-		},
-		Raw: raw(mg),
+		Status: GetManagedResourceStatus(mg),
+		Raw:    raw(mg),
 	}
 }

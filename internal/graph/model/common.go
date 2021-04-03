@@ -115,7 +115,9 @@ func GetConditions(in []xpv1.Condition) []Condition {
 			Status:             ConditionStatus(c.Status),
 			LastTransitionTime: c.LastTransitionTime.Time,
 			Reason:             string(c.Reason),
-			Message:            &c.Message,
+		}
+		if c.Message != "" {
+			out[i].Message = &c.Message
 		}
 	}
 	return out
@@ -133,6 +135,60 @@ func GetLabelSelector(s *metav1.LabelSelector) *LabelSelector {
 	}
 
 	return &LabelSelector{MatchLabels: ml}
+}
+
+// GetGenericResource from the suppled Kubernetes resource.
+func GetGenericResource(u *kunstructured.Unstructured) GenericResource {
+	return GenericResource{
+		ID: ReferenceID{
+			APIVersion: u.GetAPIVersion(),
+			Kind:       u.GetKind(),
+			Namespace:  u.GetNamespace(),
+			Name:       u.GetName(),
+		},
+		APIVersion: u.GetAPIVersion(),
+		Kind:       u.GetKind(),
+		Metadata:   GetObjectMeta(u),
+		Raw:        raw(u),
+	}
+}
+
+// TODO(negz): Does this need to exist? It's identical to GenericResource.
+
+// GetSecret from the suppled Kubernetes Secret
+func GetSecret(s *corev1.Secret) Secret {
+	return Secret{
+		ID: ReferenceID{
+			APIVersion: s.APIVersion,
+			Kind:       s.Kind,
+			Namespace:  s.GetNamespace(),
+			Name:       s.GetName(),
+		},
+
+		APIVersion: s.APIVersion,
+		Kind:       s.Kind,
+		Metadata:   GetObjectMeta(s),
+		Raw:        raw(s),
+	}
+}
+
+// GetCustomResourceDefinitionNames from the supplied Kubernetes names.
+func GetCustomResourceDefinitionNames(in kextv1.CustomResourceDefinitionNames) *CustomResourceDefinitionNames {
+	out := &CustomResourceDefinitionNames{
+		Plural:     in.Plural,
+		ShortNames: in.ShortNames,
+		Kind:       in.Kind,
+		Categories: in.Categories,
+	}
+
+	if in.Singular != "" {
+		out.Singular = &in.Singular
+	}
+	if in.ListKind != "" {
+		out.ListKind = &in.ListKind
+	}
+
+	return out
 }
 
 // GetCustomResourceDefinitionVersions from the supplied Kubernetes versions.
@@ -174,45 +230,20 @@ func GetCustomResourceDefinitionConditions(in []kextv1.CustomResourceDefinitionC
 			Status:             ConditionStatus(c.Status),
 			LastTransitionTime: c.LastTransitionTime.Time,
 			Reason:             c.Reason,
-			Message:            &c.Message,
+		}
+		if c.Message != "" {
+			out[i].Message = &c.Message
 		}
 	}
 	return out
 }
 
-// GetGenericResource from the suppled Kubernetes resource.
-func GetGenericResource(u *kunstructured.Unstructured) GenericResource {
-	return GenericResource{
-		ID: ReferenceID{
-			APIVersion: u.GetAPIVersion(),
-			Kind:       u.GetKind(),
-			Namespace:  u.GetNamespace(),
-			Name:       u.GetName(),
-		},
-		APIVersion: u.GetAPIVersion(),
-		Kind:       u.GetKind(),
-		Metadata:   GetObjectMeta(u),
-		Raw:        raw(u),
+// GetCustomResourceDefinitionStatus from the supplied Crossplane status.
+func GetCustomResourceDefinitionStatus(in kextv1.CustomResourceDefinitionStatus) *CustomResourceDefinitionStatus {
+	if len(in.Conditions) == 0 {
+		return nil
 	}
-}
-
-// TODO(negz): Does this need to exist? It's identical to GenericResource.
-
-// GetSecret from the suppled Kubernetes Secret
-func GetSecret(s *corev1.Secret) Secret {
-	return Secret{
-		ID: ReferenceID{
-			APIVersion: s.APIVersion,
-			Kind:       s.Kind,
-			Namespace:  s.GetNamespace(),
-			Name:       s.GetName(),
-		},
-
-		APIVersion: s.APIVersion,
-		Kind:       s.Kind,
-		Metadata:   GetObjectMeta(s),
-		Raw:        raw(s),
-	}
+	return &CustomResourceDefinitionStatus{Conditions: GetCustomResourceDefinitionConditions(in.Conditions)}
 }
 
 // GetCustomResourceDefinition from the suppled Kubernetes CRD.
@@ -228,21 +259,12 @@ func GetCustomResourceDefinition(crd *kextv1.CustomResourceDefinition) CustomRes
 		Kind:       crd.Kind,
 		Metadata:   GetObjectMeta(crd),
 		Spec: &CustomResourceDefinitionSpec{
-			Group: crd.Spec.Group,
-			Names: &CustomResourceDefinitionNames{
-				Plural:     crd.Spec.Names.Plural,
-				Singular:   &crd.Spec.Names.Singular,
-				ShortNames: crd.Spec.Names.ShortNames,
-				Kind:       crd.Spec.Names.Kind,
-				ListKind:   &crd.Spec.Names.ListKind,
-				Categories: crd.Spec.Names.Categories,
-			},
+			Group:    crd.Spec.Group,
+			Names:    GetCustomResourceDefinitionNames(crd.Spec.Names),
 			Versions: GetCustomResourceDefinitionVersions(crd.Spec.Versions),
 		},
-		Status: &CustomResourceDefinitionStatus{
-			Conditions: GetCustomResourceDefinitionConditions(crd.Status.Conditions),
-		},
-		Raw: raw(crd),
+		Status: GetCustomResourceDefinitionStatus(crd.Status),
+		Raw:    raw(crd),
 	}
 }
 
@@ -298,6 +320,8 @@ func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, e
 			return nil, errors.Wrap(err, "cannot convert composite resource definition")
 		}
 		return GetCompositeResourceDefinition(xrd), nil
+
+	// TODO(negz): Support other types; e.g. CRD, Composition, Secret, etc.
 
 	default:
 		return GetGenericResource(u), nil

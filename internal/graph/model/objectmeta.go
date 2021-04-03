@@ -25,32 +25,36 @@ type ObjectMeta struct {
 
 // GetObjectMeta from the supplied Kubernetes object.
 func GetObjectMeta(m metav1.Object) *ObjectMeta {
-	l := map[string]interface{}{}
-	for k, v := range m.GetLabels() {
-		l[k] = v
-	}
-
-	a := map[string]interface{}{}
-	for k, v := range m.GetAnnotations() {
-		a[k] = v
-	}
-
-	var dt *time.Time = nil
-	if t := m.GetDeletionTimestamp(); t != nil {
-		dt = &t.Time
-	}
-
-	return &ObjectMeta{
+	om := &ObjectMeta{
 		Name:            m.GetName(),
-		GenerateName:    pointer.StringPtr(m.GetGenerateName()),
-		Namespace:       pointer.StringPtr(m.GetNamespace()),
 		UID:             string(m.GetUID()),
 		ResourceVersion: m.GetResourceVersion(),
 		Generation:      int(m.GetGeneration()),
 		CreationTime:    m.GetCreationTimestamp().Time,
-		DeletionTime:    dt,
-		Labels:          l,
-		Annotations:     a,
 		OwnerReferences: m.GetOwnerReferences(),
 	}
+
+	if n := m.GetGenerateName(); n != "" {
+		om.GenerateName = pointer.StringPtr(n)
+	}
+	if n := m.GetNamespace(); n != "" {
+		om.Namespace = pointer.StringPtr(n)
+	}
+	if t := m.GetDeletionTimestamp(); t != nil {
+		om.DeletionTime = &t.Time
+	}
+	if in := m.GetLabels(); len(in) > 0 {
+		om.Labels = map[string]interface{}{}
+		for k, v := range in {
+			om.Labels[k] = v
+		}
+	}
+	if in := m.GetAnnotations(); len(in) > 0 {
+		om.Annotations = map[string]interface{}{}
+		for k, v := range in {
+			om.Annotations[k] = v
+		}
+	}
+
+	return om
 }

@@ -3,13 +3,29 @@ package model
 import (
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
+	"github.com/google/go-cmp/cmp"
+
 	"github.com/upbound/xgql/internal/unstructured"
 )
 
-// GetProviderConfig from the suppled Kubernetes ProviderConfig.
+// GetProviderConfigStatus from the supplied Crossplane status.
+func GetProviderConfigStatus(pc *unstructured.ProviderConfig) *ProviderConfigStatus {
+	users := int(pc.GetUsers())
+	out := &ProviderConfigStatus{
+		Conditions: GetConditions(pc.GetConditions()),
+	}
+	if users > 0 {
+		out.Users = &users
+	}
+	if cmp.Equal(out, &ProviderConfigStatus{}) {
+		return nil
+	}
+	return out
+}
+
+// GetProviderConfig from the suppled Crossplane ProviderConfig.
 func GetProviderConfig(u *kunstructured.Unstructured) ProviderConfig {
 	pc := &unstructured.ProviderConfig{Unstructured: *u}
-	users := int(pc.GetUsers())
 	return ProviderConfig{
 		ID: ReferenceID{
 			APIVersion: pc.GetAPIVersion(),
@@ -20,10 +36,7 @@ func GetProviderConfig(u *kunstructured.Unstructured) ProviderConfig {
 		APIVersion: pc.GetAPIVersion(),
 		Kind:       pc.GetKind(),
 		Metadata:   GetObjectMeta(pc),
-		Status: &ProviderConfigStatus{
-			Conditions: GetConditions(pc.GetConditions()),
-			Users:      &users,
-		},
-		Raw: raw(pc),
+		Status:     GetProviderConfigStatus(pc),
+		Raw:        raw(pc),
 	}
 }
