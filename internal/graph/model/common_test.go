@@ -340,6 +340,9 @@ func TestGetKubernetesResource(t *testing.T) {
 		cmpopts.IgnoreFields(Configuration{}, "Raw"),
 		cmpopts.IgnoreFields(ConfigurationRevision{}, "Raw"),
 		cmpopts.IgnoreFields(CompositeResourceDefinition{}, "Raw"),
+		cmpopts.IgnoreFields(Composition{}, "Raw"),
+		cmpopts.IgnoreFields(CustomResourceDefinition{}, "Raw"),
+		cmpopts.IgnoreFields(Secret{}, "Raw"),
 		cmpopts.IgnoreFields(GenericResource{}, "Raw"),
 	}
 
@@ -502,6 +505,69 @@ func TestGetKubernetesResource(t *testing.T) {
 					Spec: &CompositeResourceDefinitionSpec{
 						Names: &CompositeResourceDefinitionNames{},
 					},
+				},
+			},
+		},
+		"Composition": {
+			u: func() *kunstructured.Unstructured {
+				u := &kunstructured.Unstructured{}
+				u.SetAPIVersion(schema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String())
+				u.SetKind(extv1.CompositionKind)
+				return u
+			}(),
+			want: want{
+				kr: Composition{
+					ID: ReferenceID{
+						APIVersion: schema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
+						Kind:       extv1.CompositionKind,
+					},
+					APIVersion: schema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
+					Kind:       extv1.CompositionKind,
+					Metadata:   &ObjectMeta{},
+					Spec: &CompositionSpec{
+						CompositeTypeRef: &TypeReference{},
+					},
+				},
+			},
+		},
+		"CustomResourceDefinition": {
+			u: func() *kunstructured.Unstructured {
+				u := &kunstructured.Unstructured{}
+				u.SetAPIVersion(schema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String())
+				u.SetKind("CustomResourceDefinition")
+				return u
+			}(),
+			want: want{
+				kr: CustomResourceDefinition{
+					ID: ReferenceID{
+						APIVersion: schema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String(),
+						Kind:       "CustomResourceDefinition",
+					},
+					APIVersion: schema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String(),
+					Kind:       "CustomResourceDefinition",
+					Metadata:   &ObjectMeta{},
+					Spec: &CustomResourceDefinitionSpec{
+						Names: &CustomResourceDefinitionNames{},
+					},
+				},
+			},
+		},
+		"Secret": {
+			u: func() *kunstructured.Unstructured {
+				u := &kunstructured.Unstructured{}
+				u.SetAPIVersion(schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String())
+				u.SetKind("Secret")
+				return u
+			}(),
+			want: want{
+				kr: Secret{
+					ID: ReferenceID{
+						APIVersion: schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+						Kind:       "Secret",
+					},
+					APIVersion: schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					Kind:       "Secret",
+					Metadata:   &ObjectMeta{},
 				},
 			},
 		},

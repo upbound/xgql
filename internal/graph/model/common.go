@@ -10,6 +10,7 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/json"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -321,7 +322,26 @@ func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, e
 		}
 		return GetCompositeResourceDefinition(xrd), nil
 
-	// TODO(negz): Support other types; e.g. CRD, Composition, Secret, etc.
+	case u.GroupVersionKind() == extv1.CompositionGroupVersionKind:
+		cmp := &extv1.Composition{}
+		if err := convert(u, cmp); err != nil {
+			return nil, errors.Wrap(err, "cannot convert composition")
+		}
+		return GetComposition(cmp), nil
+
+	case u.GroupVersionKind() == schema.GroupVersionKind{Group: kextv1.GroupName, Version: "v1", Kind: "CustomResourceDefinition"}:
+		crd := &kextv1.CustomResourceDefinition{}
+		if err := convert(u, crd); err != nil {
+			return nil, errors.Wrap(err, "cannot convert custom resource definition")
+		}
+		return GetCustomResourceDefinition(crd), nil
+
+	case u.GroupVersionKind() == schema.GroupVersionKind{Group: corev1.GroupName, Version: "v1", Kind: "Secret"}:
+		sec := &corev1.Secret{}
+		if err := convert(u, sec); err != nil {
+			return nil, errors.Wrap(err, "cannot convert secret")
+		}
+		return GetSecret(sec), nil
 
 	default:
 		return GetGenericResource(u), nil
