@@ -1,16 +1,16 @@
 enum RevisionActivationPolicy {
-  Automatic
-  Manual
+  AUTOMATIC
+  MANUAL
 }
 
 enum PackagePullPolicy {
-  Always
-  Never
-  IfNotPresent
+  ALWAYS
+  NEVER
+  IF_NOT_PRESENT
 }
 
 enum PackageRevisionDesiredState {
-  Inactive
-  Active
+  INACTIVE
+  ACTIVE
 }
 

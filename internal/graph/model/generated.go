@@ -493,9 +493,9 @@ type TypeReference struct {
 type ConditionStatus string
 
 const (
-	ConditionStatusUnknown ConditionStatus = "Unknown"
-	ConditionStatusFalse   ConditionStatus = "False"
-	ConditionStatusTrue    ConditionStatus = "True"
+	ConditionStatusUnknown ConditionStatus = "UNKNOWN"
+	ConditionStatusFalse   ConditionStatus = "FALSE"
+	ConditionStatusTrue    ConditionStatus = "TRUE"
 )
 
 var AllConditionStatus = []ConditionStatus{
@@ -536,8 +536,8 @@ func (e ConditionStatus) MarshalGQL(w io.Writer) {
 type DeletionPolicy string
 
 const (
-	DeletionPolicyDelete DeletionPolicy = "Delete"
-	DeletionPolicyOrphan DeletionPolicy = "Orphan"
+	DeletionPolicyDelete DeletionPolicy = "DELETE"
+	DeletionPolicyOrphan DeletionPolicy = "ORPHAN"
 )
 
 var AllDeletionPolicy = []DeletionPolicy{
@@ -577,8 +577,8 @@ func (e DeletionPolicy) MarshalGQL(w io.Writer) {
 type EventType string
 
 const (
-	EventTypeNormal  EventType = "Normal"
-	EventTypeWarning EventType = "Warning"
+	EventTypeNormal  EventType = "NORMAL"
+	EventTypeWarning EventType = "WARNING"
 )
 
 var AllEventType = []EventType{
@@ -618,9 +618,9 @@ func (e EventType) MarshalGQL(w io.Writer) {
 type PackagePullPolicy string
 
 const (
-	PackagePullPolicyAlways       PackagePullPolicy = "Always"
-	PackagePullPolicyNever        PackagePullPolicy = "Never"
-	PackagePullPolicyIfNotPresent PackagePullPolicy = "IfNotPresent"
+	PackagePullPolicyAlways       PackagePullPolicy = "ALWAYS"
+	PackagePullPolicyNever        PackagePullPolicy = "NEVER"
+	PackagePullPolicyIfNotPresent PackagePullPolicy = "IF_NOT_PRESENT"
 )
 
 var AllPackagePullPolicy = []PackagePullPolicy{
@@ -661,8 +661,8 @@ func (e PackagePullPolicy) MarshalGQL(w io.Writer) {
 type PackageRevisionDesiredState string
 
 const (
-	PackageRevisionDesiredStateInactive PackageRevisionDesiredState = "Inactive"
-	PackageRevisionDesiredStateActive   PackageRevisionDesiredState = "Active"
+	PackageRevisionDesiredStateInactive PackageRevisionDesiredState = "INACTIVE"
+	PackageRevisionDesiredStateActive   PackageRevisionDesiredState = "ACTIVE"
 )
 
 var AllPackageRevisionDesiredState = []PackageRevisionDesiredState{
@@ -702,8 +702,8 @@ func (e PackageRevisionDesiredState) MarshalGQL(w io.Writer) {
 type RevisionActivationPolicy string
 
 const (
-	RevisionActivationPolicyAutomatic RevisionActivationPolicy = "Automatic"
-	RevisionActivationPolicyManual    RevisionActivationPolicy = "Manual"
+	RevisionActivationPolicyAutomatic RevisionActivationPolicy = "AUTOMATIC"
+	RevisionActivationPolicyManual    RevisionActivationPolicy = "MANUAL"
 )
 
 var AllRevisionActivationPolicy = []RevisionActivationPolicy{

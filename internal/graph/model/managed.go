@@ -17,8 +17,16 @@ type ManagedResourceSpec struct {
 
 // GetDeletionPolicy from the supplied Crossplane policy.
 func GetDeletionPolicy(p xpv1.DeletionPolicy) *DeletionPolicy {
-	out := DeletionPolicy(p)
-	return &out
+	switch p {
+	case xpv1.DeletionDelete:
+		out := DeletionPolicyDelete
+		return &out
+	case xpv1.DeletionOrphan:
+		out := DeletionPolicyOrphan
+		return &out
+	default:
+		return nil
+	}
 }
 
 // GetManagedResourceStatus from the supplied Crossplane resource.

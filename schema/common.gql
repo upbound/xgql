@@ -80,9 +80,9 @@ type Condition {
 }
 
 enum ConditionStatus {
-  Unknown
-  False
-  True
+  UNKNOWN
+  FALSE
+  TRUE
 }
 
 type PolicyRule {
@@ -124,8 +124,8 @@ type EventSource {
 }
 
 enum EventType {
-  Normal
-  Warning
+  NORMAL
+  WARNING
 }
 
 type Secret implements Node & KubernetesResource {

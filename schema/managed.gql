@@ -19,8 +19,8 @@ type ManagedResourceSpec {
 }
 
 enum DeletionPolicy {
-  Delete
-  Orphan
+  DELETE
+  ORPHAN
 }
 
 type ManagedResourceStatus implements ConditionedStatus {

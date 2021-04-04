@@ -2826,9 +2826,9 @@ type Condition {
 }
 
 enum ConditionStatus {
-  Unknown
-  False
-  True
+  UNKNOWN
+  FALSE
+  TRUE
 }
 
 type PolicyRule {
@@ -2870,8 +2870,8 @@ type EventSource {
 }
 
 enum EventType {
-  Normal
-  Warning
+  NORMAL
+  WARNING
 }
 
 type Secret implements Node & KubernetesResource {
@@ -3113,8 +3113,8 @@ type ManagedResourceSpec {
 }
 
 enum DeletionPolicy {
-  Delete
-  Orphan
+  DELETE
+  ORPHAN
 }
 
 type ManagedResourceStatus implements ConditionedStatus {
@@ -3122,19 +3122,19 @@ type ManagedResourceStatus implements ConditionedStatus {
 }
 `, BuiltIn: false},
 	{Name: "schema/package.gql", Input: `enum RevisionActivationPolicy {
-  Automatic
-  Manual
+  AUTOMATIC
+  MANUAL
 }
 
 enum PackagePullPolicy {
-  Always
-  Never
-  IfNotPresent
+  ALWAYS
+  NEVER
+  IF_NOT_PRESENT
 }
 
 enum PackageRevisionDesiredState {
-  Inactive
-  Active
+  INACTIVE
+  ACTIVE
 }
 
 `, BuiltIn: false},

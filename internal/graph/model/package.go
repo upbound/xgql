@@ -45,8 +45,15 @@ func GetRevisionActivationPolicy(in *pkgv1.RevisionActivationPolicy) *RevisionAc
 	if in == nil {
 		return nil
 	}
-	out := RevisionActivationPolicy(*in)
-	return &out
+	switch *in {
+	case pkgv1.ManualActivation:
+		out := RevisionActivationPolicyManual
+		return &out
+	case pkgv1.AutomaticActivation:
+		out := RevisionActivationPolicyAutomatic
+		return &out
+	}
+	return nil
 }
 
 // GetPackagePullPolicy from the supplied Kubernetes policy.
@@ -54,8 +61,18 @@ func GetPackagePullPolicy(in *corev1.PullPolicy) *PackagePullPolicy {
 	if in == nil {
 		return nil
 	}
-	out := PackagePullPolicy(*in)
-	return &out
+	switch *in {
+	case corev1.PullAlways:
+		out := PackagePullPolicyAlways
+		return &out
+	case corev1.PullNever:
+		out := PackagePullPolicyNever
+		return &out
+	case corev1.PullIfNotPresent:
+		out := PackagePullPolicyIfNotPresent
+		return &out
+	}
+	return nil
 }
 
 // GetPolicyRules from the supplied Kubernetes policy rules.
@@ -117,6 +134,17 @@ func GetProvider(p *pkgv1.Provider) Provider {
 	}
 }
 
+// GetPackageRevisionDesiredState from the supplies Crossplane state.
+func GetPackageRevisionDesiredState(in pkgv1.PackageRevisionDesiredState) PackageRevisionDesiredState {
+	switch in {
+	case pkgv1.PackageRevisionActive:
+		return PackageRevisionDesiredStateActive
+	case pkgv1.PackageRevisionInactive:
+		return PackageRevisionDesiredStateInactive
+	}
+	return ""
+}
+
 // GetProviderRevisionStatus from the supplied Crossplane provider revision.
 func GetProviderRevisionStatus(in pkgv1.PackageRevisionStatus) *ProviderRevisionStatus {
 	out := &ProviderRevisionStatus{
@@ -146,7 +174,7 @@ func GetProviderRevision(pr *pkgv1.ProviderRevision) ProviderRevision {
 		Kind:       pr.Kind,
 		Metadata:   GetObjectMeta(pr),
 		Spec: &ProviderRevisionSpec{
-			DesiredState:                PackageRevisionDesiredState(pr.Spec.DesiredState),
+			DesiredState:                GetPackageRevisionDesiredState(pr.Spec.DesiredState),
 			Package:                     pr.Spec.Package,
 			PackagePullPolicy:           GetPackagePullPolicy(pr.Spec.PackagePullPolicy),
 			Revision:                    int(pr.Spec.Revision),
@@ -227,7 +255,7 @@ func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision) ConfigurationRevi
 		Kind:       cr.Kind,
 		Metadata:   GetObjectMeta(cr),
 		Spec: &ConfigurationRevisionSpec{
-			DesiredState:                PackageRevisionDesiredState(cr.Spec.DesiredState),
+			DesiredState:                GetPackageRevisionDesiredState(cr.Spec.DesiredState),
 			Package:                     cr.Spec.Package,
 			PackagePullPolicy:           GetPackagePullPolicy(cr.Spec.PackagePullPolicy),
 			Revision:                    int(cr.Spec.Revision),
