@@ -141,11 +141,6 @@ type Secret implements Node & KubernetesResource {
   events: EventConnection! @goField(forceResolver: true)
 }
 
-type SecretConnection {
-  items: [Secret!]
-  count: Int!
-}
-
 type CustomResourceDefinition implements Node & KubernetesResource {
   id: ID!
 

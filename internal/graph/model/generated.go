@@ -485,11 +485,6 @@ type Secret struct {
 func (Secret) IsNode()               {}
 func (Secret) IsKubernetesResource() {}
 
-type SecretConnection struct {
-	Items []Secret `json:"items"`
-	Count int      `json:"count"`
-}
-
 type TypeReference struct {
 	APIVersion string `json:"apiVersion"`
 	Kind       string `json:"kind"`

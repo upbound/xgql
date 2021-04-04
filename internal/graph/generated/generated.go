@@ -527,11 +527,6 @@ type ComplexityRoot struct {
 		Raw        func(childComplexity int) int
 	}
 
-	SecretConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
-	}
-
 	TypeReference struct {
 		APIVersion func(childComplexity int) int
 		Kind       func(childComplexity int) int
@@ -2588,20 +2583,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Secret.Raw(childComplexity), true
 
-	case "SecretConnection.count":
-		if e.complexity.SecretConnection.Count == nil {
-			break
-		}
-
-		return e.complexity.SecretConnection.Count(childComplexity), true
-
-	case "SecretConnection.items":
-		if e.complexity.SecretConnection.Items == nil {
-			break
-		}
-
-		return e.complexity.SecretConnection.Items(childComplexity), true
-
 	case "TypeReference.apiVersion":
 		if e.complexity.TypeReference.APIVersion == nil {
 			break
@@ -2904,11 +2885,6 @@ type Secret implements Node & KubernetesResource {
   raw: JSONObject!
 
   events: EventConnection! @goField(forceResolver: true)
-}
-
-type SecretConnection {
-  items: [Secret!]
-  count: Int!
 }
 
 type CustomResourceDefinition implements Node & KubernetesResource {
@@ -12801,73 +12777,6 @@ func (ec *executionContext) _Secret_events(ctx context.Context, field graphql.Co
 	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _SecretConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.SecretConnection) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SecretConnection",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]model.Secret)
-	fc.Result = res
-	return ec.marshalOSecret2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SecretConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.SecretConnection) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SecretConnection",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _TypeReference_apiVersion(ctx context.Context, field graphql.CollectedField, obj *model.TypeReference) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -17084,35 +16993,6 @@ func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
-var secretConnectionImplementors = []string{"SecretConnection"}
-
-func (ec *executionContext) _SecretConnection(ctx context.Context, sel ast.SelectionSet, obj *model.SecretConnection) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, secretConnectionImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("SecretConnection")
-		case "items":
-			out.Values[i] = ec._SecretConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._SecretConnection_count(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var typeReferenceImplementors = []string{"TypeReference"}
 
 func (ec *executionContext) _TypeReference(ctx context.Context, sel ast.SelectionSet, obj *model.TypeReference) graphql.Marshaler {
@@ -17853,10 +17733,6 @@ func (ec *executionContext) marshalNProviderSpec2ᚖgithubᚗcomᚋupboundᚋxgq
 		return graphql.Null
 	}
 	return ec._ProviderSpec(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNSecret2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx context.Context, sel ast.SelectionSet, v model.Secret) graphql.Marshaler {
-	return ec._Secret(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -19076,46 +18952,6 @@ func (ec *executionContext) marshalORevisionActivationPolicy2ᚖgithubᚗcomᚋu
 		return graphql.Null
 	}
 	return v
-}
-
-func (ec *executionContext) marshalOSecret2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Secret) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNSecret2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
 }
 
 func (ec *executionContext) marshalOSecret2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx context.Context, sel ast.SelectionSet, v *model.Secret) graphql.Marshaler {
