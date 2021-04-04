@@ -1,0 +1,20 @@
+{
+  "rules": [
+    "arguments-have-descriptions",
+    "defined-types-are-used",
+    "deprecations-have-a-reason",
+    "descriptions-are-capitalized",
+    "enum-values-all-caps",
+    "enum-values-have-descriptions",
+    "fields-are-camel-cased",
+    "fields-have-descriptions",
+    "input-object-values-are-camel-cased",
+    "input-object-values-have-descriptions",
+    "relay-connection-types-spec",
+    "types-are-capitalized",
+    "types-have-descriptions"
+  ],
+  "schemaPaths": [
+    "../schema/*.gql"
+  ]
+}
