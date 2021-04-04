@@ -6,21 +6,21 @@ type Query {
 }
 
 type ProviderConnection {
-    items: [Provider!]
-    count: Int!
+    nodes: [Provider!]
+    totalCount: Int!
 }
 
 type ConfigurationConnection {
-    items: [Configuration!]
-    count: Int!
+    nodes: [Configuration!]
+    totalCount: Int!
 }
 
 type CompositeResourceDefinitionConnection {
-    items: [CompositeResourceDefinition!]
-    count: Int!
+    nodes: [CompositeResourceDefinition!]
+    totalCount: Int!
 }
 
 type CompositionConnection {
-    items: [Composition!]
-    count: Int!
+    nodes: [Composition!]
+    totalCount: Int!
 }

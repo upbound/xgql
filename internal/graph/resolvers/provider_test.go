@@ -126,8 +126,8 @@ func TestProviderRevisions(t *testing.T) {
 			},
 			want: want{
 				pc: &model.ProviderRevisionConnection{
-					Items: []model.ProviderRevision{gactive, ginactive},
-					Count: 2,
+					Nodes:      []model.ProviderRevision{gactive, ginactive},
+					TotalCount: 2,
 				},
 			},
 		},
@@ -152,8 +152,8 @@ func TestProviderRevisions(t *testing.T) {
 			},
 			want: want{
 				pc: &model.ProviderRevisionConnection{
-					Items: []model.ProviderRevision{gactive},
-					Count: 1,
+					Nodes:      []model.ProviderRevision{gactive},
+					TotalCount: 1,
 				},
 			},
 		},
@@ -237,8 +237,8 @@ func TestProviderRevisionStatusObjects(t *testing.T) {
 			},
 			want: want{
 				krc: &model.KubernetesResourceConnection{
-					Items: []model.KubernetesResource{},
-					Count: 0,
+					Nodes:      []model.KubernetesResource{},
+					TotalCount: 0,
 				},
 			},
 		},
@@ -262,8 +262,8 @@ func TestProviderRevisionStatusObjects(t *testing.T) {
 			},
 			want: want{
 				krc: &model.KubernetesResourceConnection{
-					Items: []model.KubernetesResource{},
-					Count: 0,
+					Nodes:      []model.KubernetesResource{},
+					TotalCount: 0,
 				},
 				errs: gqlerror.List{
 					gqlerror.Errorf(errors.Wrap(errBoom, errGetCRD).Error()),
@@ -290,8 +290,8 @@ func TestProviderRevisionStatusObjects(t *testing.T) {
 			},
 			want: want{
 				krc: &model.KubernetesResourceConnection{
-					Items: []model.KubernetesResource{gcrd},
-					Count: 1,
+					Nodes:      []model.KubernetesResource{gcrd},
+					TotalCount: 1,
 				},
 			},
 		},

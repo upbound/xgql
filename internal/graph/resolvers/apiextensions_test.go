@@ -131,8 +131,8 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			},
 			want: want{
 				crc: &model.CompositeResourceConnection{
-					Items: []model.CompositeResource{gxr},
-					Count: 1,
+					Nodes:      []model.CompositeResource{gxr},
+					TotalCount: 1,
 				},
 			},
 		},
@@ -180,8 +180,8 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			},
 			want: want{
 				crc: &model.CompositeResourceConnection{
-					Items: []model.CompositeResource{gxr},
-					Count: 1,
+					Nodes:      []model.CompositeResource{gxr},
+					TotalCount: 1,
 				},
 			},
 		},
@@ -232,8 +232,8 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			},
 			want: want{
 				crc: &model.CompositeResourceConnection{
-					Items: []model.CompositeResource{gxr},
-					Count: 1,
+					Nodes:      []model.CompositeResource{gxr},
+					TotalCount: 1,
 				},
 			},
 		},

@@ -15,13 +15,13 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
 }
 
 type CompositeResourceConnection {
-  items: [CompositeResource!]
-  count: Int!
+  nodes: [CompositeResource!]
+  totalCount: Int!
 }
 
 type CompositeResourceClaimConnection {
-  items: [CompositeResourceClaim!]
-  count: Int!
+  nodes: [CompositeResourceClaim!]
+  totalCount: Int!
 }
 
 type CompositeResourceDefinitionSpec {

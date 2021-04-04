@@ -26,8 +26,8 @@ type Node interface {
 }
 
 type ComposedResourceConnection struct {
-	Items []ComposedResource `json:"items"`
-	Count int                `json:"count"`
+	Nodes      []ComposedResource `json:"nodes"`
+	TotalCount int                `json:"totalCount"`
 }
 
 type CompositeResource struct {
@@ -60,8 +60,8 @@ func (CompositeResourceClaim) IsNode()               {}
 func (CompositeResourceClaim) IsKubernetesResource() {}
 
 type CompositeResourceClaimConnection struct {
-	Items []CompositeResourceClaim `json:"items"`
-	Count int                      `json:"count"`
+	Nodes      []CompositeResourceClaim `json:"nodes"`
+	TotalCount int                      `json:"totalCount"`
 }
 
 type CompositeResourceClaimConnectionDetails struct {
@@ -83,8 +83,8 @@ type CompositeResourceClaimStatus struct {
 func (CompositeResourceClaimStatus) IsConditionedStatus() {}
 
 type CompositeResourceConnection struct {
-	Items []CompositeResource `json:"items"`
-	Count int                 `json:"count"`
+	Nodes      []CompositeResource `json:"nodes"`
+	TotalCount int                 `json:"totalCount"`
 }
 
 type CompositeResourceConnectionDetails struct {
@@ -108,8 +108,8 @@ func (CompositeResourceDefinition) IsNode()               {}
 func (CompositeResourceDefinition) IsKubernetesResource() {}
 
 type CompositeResourceDefinitionConnection struct {
-	Items []CompositeResourceDefinition `json:"items"`
-	Count int                           `json:"count"`
+	Nodes      []CompositeResourceDefinition `json:"nodes"`
+	TotalCount int                           `json:"totalCount"`
 }
 
 type CompositeResourceDefinitionControllerStatus struct {
@@ -166,8 +166,8 @@ func (Composition) IsNode()               {}
 func (Composition) IsKubernetesResource() {}
 
 type CompositionConnection struct {
-	Items []Composition `json:"items"`
-	Count int           `json:"count"`
+	Nodes      []Composition `json:"nodes"`
+	TotalCount int           `json:"totalCount"`
 }
 
 type CompositionSpec struct {
@@ -205,8 +205,8 @@ func (Configuration) IsNode()               {}
 func (Configuration) IsKubernetesResource() {}
 
 type ConfigurationConnection struct {
-	Items []Configuration `json:"items"`
-	Count int             `json:"count"`
+	Nodes      []Configuration `json:"nodes"`
+	TotalCount int             `json:"totalCount"`
 }
 
 type ConfigurationRevision struct {
@@ -224,8 +224,8 @@ func (ConfigurationRevision) IsNode()               {}
 func (ConfigurationRevision) IsKubernetesResource() {}
 
 type ConfigurationRevisionConnection struct {
-	Items []ConfigurationRevision `json:"items"`
-	Count int                     `json:"count"`
+	Nodes      []ConfigurationRevision `json:"nodes"`
+	TotalCount int                     `json:"totalCount"`
 }
 
 type ConfigurationRevisionSpec struct {
@@ -310,7 +310,7 @@ type Event struct {
 	Reason         *string            `json:"reason"`
 	Message        *string            `json:"message"`
 	Source         *EventSource       `json:"source"`
-	Count          *int               `json:"count"`
+	TotalCount     *int               `json:"totalCount"`
 	FirstTime      *time.Time         `json:"firstTime"`
 	LastTime       *time.Time         `json:"lastTime"`
 	Raw            string             `json:"raw"`
@@ -319,8 +319,8 @@ type Event struct {
 func (Event) IsNode() {}
 
 type EventConnection struct {
-	Items []Event `json:"items"`
-	Count int     `json:"count"`
+	Nodes      []Event `json:"nodes"`
+	TotalCount int     `json:"totalCount"`
 }
 
 type EventSource struct {
@@ -340,8 +340,8 @@ func (GenericResource) IsNode()               {}
 func (GenericResource) IsKubernetesResource() {}
 
 type KubernetesResourceConnection struct {
-	Items []KubernetesResource `json:"items"`
-	Count int                  `json:"count"`
+	Nodes      []KubernetesResource `json:"nodes"`
+	TotalCount int                  `json:"totalCount"`
 }
 
 type LabelSelector struct {
@@ -375,8 +375,8 @@ type Owner struct {
 }
 
 type OwnerConnection struct {
-	Items []Owner `json:"items"`
-	Count int     `json:"count"`
+	Nodes      []Owner `json:"nodes"`
+	TotalCount int     `json:"totalCount"`
 }
 
 type PolicyRule struct {
@@ -423,8 +423,8 @@ type ProviderConfigStatus struct {
 func (ProviderConfigStatus) IsConditionedStatus() {}
 
 type ProviderConnection struct {
-	Items []Provider `json:"items"`
-	Count int        `json:"count"`
+	Nodes      []Provider `json:"nodes"`
+	TotalCount int        `json:"totalCount"`
 }
 
 type ProviderRevision struct {
@@ -442,8 +442,8 @@ func (ProviderRevision) IsNode()               {}
 func (ProviderRevision) IsKubernetesResource() {}
 
 type ProviderRevisionConnection struct {
-	Items []ProviderRevision `json:"items"`
-	Count int                `json:"count"`
+	Nodes      []ProviderRevision `json:"nodes"`
+	TotalCount int                `json:"totalCount"`
 }
 
 type ProviderRevisionSpec struct {

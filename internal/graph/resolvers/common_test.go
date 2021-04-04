@@ -130,8 +130,8 @@ func TestCRDDefinedResources(t *testing.T) {
 			},
 			want: want{
 				krc: &model.KubernetesResourceConnection{
-					Items: []model.KubernetesResource{ggr},
-					Count: 1,
+					Nodes:      []model.KubernetesResource{ggr},
+					TotalCount: 1,
 				},
 			},
 		},
@@ -182,8 +182,8 @@ func TestCRDDefinedResources(t *testing.T) {
 			},
 			want: want{
 				krc: &model.KubernetesResourceConnection{
-					Items: []model.KubernetesResource{ggr},
-					Count: 1,
+					Nodes:      []model.KubernetesResource{ggr},
+					TotalCount: 1,
 				},
 			},
 		},

@@ -18,13 +18,13 @@ interface KubernetesResource {
 }
 
 type EventConnection {
-  items: [Event!]
-  count: Int!
+  nodes: [Event!]
+  totalCount: Int!
 }
 
 type KubernetesResourceConnection {
-  items: [KubernetesResource!]
-  count: Int!
+  nodes: [KubernetesResource!]
+  totalCount: Int!
 }
 
 type GenericResource implements Node & KubernetesResource {
@@ -56,8 +56,8 @@ type ObjectMeta {
 }
 
 type OwnerConnection {
-  items: [Owner!]
-  count: Int!
+  nodes: [Owner!]
+  totalCount: Int!
 }
 
 type Owner {
@@ -112,7 +112,7 @@ type Event implements Node {
   reason: String
   message: String
   source: EventSource
-  count: Int
+  totalCount: Int
   firstTime: Time
   lastTime: Time
 

@@ -14,8 +14,8 @@ type Provider implements Node & KubernetesResource {
 }
 
 type ProviderRevisionConnection {
-  items: [ProviderRevision!]
-  count: Int!
+  nodes: [ProviderRevision!]
+  totalCount: Int!
 }
 
 # TODO(negz): Include packagePullSecrets? It seems idiomatic to resolve an array

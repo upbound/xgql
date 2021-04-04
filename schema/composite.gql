@@ -22,8 +22,8 @@ type CompositeResourceSpec {
 }
 
 type ComposedResourceConnection {
-  items: [ComposedResource!]
-  count: Int!
+  nodes: [ComposedResource!]
+  totalCount: Int!
 }
 
 # TODO(negz): Do we need to support GenericResource here, just in case? We only

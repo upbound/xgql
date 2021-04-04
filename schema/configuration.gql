@@ -14,8 +14,8 @@ type Configuration implements Node & KubernetesResource {
 }
 
 type ConfigurationRevisionConnection {
-  items: [ConfigurationRevision!]
-  count: Int!
+  nodes: [ConfigurationRevision!]
+  totalCount: Int!
 }
 
 # TODO(negz): Include packagePullSecrets? It seems idiomatic to resolve an array

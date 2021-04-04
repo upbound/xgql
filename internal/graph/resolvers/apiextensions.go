@@ -54,12 +54,12 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 	}
 
 	out := &model.CompositeResourceConnection{
-		Items: make([]model.CompositeResource, 0, len(in.Items)),
-		Count: len(in.Items),
+		Nodes:      make([]model.CompositeResource, 0, len(in.Items)),
+		TotalCount: len(in.Items),
 	}
 
 	for i := range in.Items {
-		out.Items = append(out.Items, model.GetCompositeResource(&in.Items[i]))
+		out.Nodes = append(out.Nodes, model.GetCompositeResource(&in.Items[i]))
 	}
 
 	return out, nil

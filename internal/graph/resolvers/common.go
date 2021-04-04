@@ -62,8 +62,8 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 	}
 
 	out := &model.KubernetesResourceConnection{
-		Items: make([]model.KubernetesResource, 0, len(in.Items)),
-		Count: len(in.Items),
+		Nodes:      make([]model.KubernetesResource, 0, len(in.Items)),
+		TotalCount: len(in.Items),
 	}
 
 	for i := range in.Items {
@@ -73,7 +73,7 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 		if err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errModelDefined))
 		}
-		out.Items = append(out.Items, kr)
+		out.Nodes = append(out.Nodes, kr)
 	}
 
 	return out, nil

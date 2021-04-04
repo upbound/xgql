@@ -10,7 +10,6 @@
     "fields-have-descriptions",
     "input-object-values-are-camel-cased",
     "input-object-values-have-descriptions",
-    "relay-connection-types-spec",
     "types-are-capitalized",
     "types-have-descriptions"
   ],

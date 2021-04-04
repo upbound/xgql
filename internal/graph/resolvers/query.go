@@ -38,12 +38,12 @@ func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error
 	}
 
 	out := &model.ProviderConnection{
-		Items: make([]model.Provider, 0, len(in.Items)),
-		Count: len(in.Items),
+		Nodes:      make([]model.Provider, 0, len(in.Items)),
+		TotalCount: len(in.Items),
 	}
 
 	for i := range in.Items {
-		out.Items = append(out.Items, model.GetProvider(&in.Items[i]))
+		out.Nodes = append(out.Nodes, model.GetProvider(&in.Items[i]))
 	}
 
 	return out, nil
@@ -65,12 +65,12 @@ func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnect
 	}
 
 	out := &model.ConfigurationConnection{
-		Items: make([]model.Configuration, 0, len(in.Items)),
-		Count: len(in.Items),
+		Nodes:      make([]model.Configuration, 0, len(in.Items)),
+		TotalCount: len(in.Items),
 	}
 
 	for i := range in.Items {
-		out.Items = append(out.Items, model.GetConfiguration(&in.Items[i]))
+		out.Nodes = append(out.Nodes, model.GetConfiguration(&in.Items[i]))
 	}
 
 	return out, nil

@@ -46,7 +46,7 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, active *b
 	}
 
 	out := &model.ProviderRevisionConnection{
-		Items: make([]model.ProviderRevision, 0),
+		Nodes: make([]model.ProviderRevision, 0),
 	}
 
 	for i := range in.Items {
@@ -64,8 +64,8 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, active *b
 			continue
 		}
 
-		out.Items = append(out.Items, model.GetProviderRevision(&pr))
-		out.Count++
+		out.Nodes = append(out.Nodes, model.GetProviderRevision(&pr))
+		out.TotalCount++
 	}
 
 	return out, nil
@@ -93,7 +93,7 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 	}
 
 	out := &model.KubernetesResourceConnection{
-		Items: make([]model.KubernetesResource, 0, len(obj.ObjectRefs)),
+		Nodes: make([]model.KubernetesResource, 0, len(obj.ObjectRefs)),
 	}
 
 	for _, ref := range obj.ObjectRefs {
@@ -113,8 +113,8 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 			continue
 		}
 
-		out.Items = append(out.Items, model.GetCustomResourceDefinition(crd))
-		out.Count++
+		out.Nodes = append(out.Nodes, model.GetCustomResourceDefinition(crd))
+		out.TotalCount++
 	}
 
 	return out, nil
