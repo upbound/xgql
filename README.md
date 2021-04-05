@@ -8,28 +8,23 @@ managed resources that belong to this provider" can require _many_ REST API
 calls. `xgql` uses [controller-runtime] client and cache machinery in order to
 provide quick responses where possible.
 
-Each GraphQL caller is expected to supply a valid Kubernetes API token via an
-`Authorization` HTTP header formatted as `Bearer <token>` - the same format used
-to access the Kubernetes REST API directly. `xgql` creates a unique REST client 
-for each bearer token. Each REST client is rate limited to 5 requests per second
-with a 10 request per second burst, and backed by an in-memory cache. Any time a
-client gets or lists a particular type of resource it will begin automatically
-caching that type of resource; the cache machinery takes a watch on the relevant
-type to ensure the cache is always up-to-date. Each client and their cache is
-garbage collected after 5 minutes of inactivity.
+Each GraphQL caller is expected to supply valid Kubernetes API credentials via
+an `Authorization` HTTP header containing either a [bearer token] or basic auth
+credentials. [Impersonation headers] may also be included if the subject of the
+`Authorization` header has been granted RBAC access to impersonate the subject
+of the impersonation headers.
 
-In an unscientific test of Crossplane 1.1 installed on a `kind` cluster running
-on a GCP VM, with three providers installed, 118 CRDs, and a small handful of
-configurations, XRDs, Compositions, XRs, provider configs, and managed resources
-it takes:
+`xgql` creates a unique Kubernetes API client for each unique set of credentials
+(including impersonation details). Each client is rate limited to 5 requests per
+second with a 10 request per second burst, and backed by an in-memory cache. Any
+time a client gets or lists a particular type of resource it will automatically
+begin caching that type of resource; the cache machinery takes a watch on the
+relevant type to ensure the cache is always up-to-date. Each client and their
+cache is garbage collected after 5 minutes of inactivity.
 
-* About 500ms to list (and count) all of the XRDs, Compositions, and XRs related
-  to each installed configuration with a cold cache, and under 10ms with a warm
-  cache.
-* About 600ms to list (and count) all of the managed resources related to each
-  installed provider with a cold cache, and about 50ms with a warm(ish) cache.
-  Note that in this case the cache is warm-ish because we fetch the connection
-  secret for each managed resource, and we don't cache secrets.
+Unscientific tests indicate that xgql's caches reduce GraphQL query times by an
+order of magnitude; for example a query that takes ~500ms with a cold cache
+takes 50ms or less with a warm cache.
 
 ## Developing
 
@@ -64,22 +59,38 @@ curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.
 
 # Install a Crossplane configuration.
 # See https://crossplane.io/docs for the latest getting started configs.
-kubectl crossplane install configuration registry.upbound.io/xp/getting-started-with-aws-with-vpc:v1.1.0
+kubectl crossplane install configuration registry.upbound.io/xp/getting-started-with-gcp:v1.1.0
 
 # Forward a local port
 kubectl -n crossplane-system port-forward deployment/xgql 8080
 
 # Open the GraphQL playground at http://localhost:8080
+
+# Create service account to make GraphQL queries
+SA_NAME=xgql-testing
+kubectl create serviceaccount ${SA_NAME}
+
+# Grant the service acccount access to all things Crossplane
+kubectl create clusterrolebinding ${SA_NAME} \
+  --clusterrole=crossplane-admin \
+  --serviceaccount=default:${SA_NAME}
+
+# Get the service account's token (requires jq)
+SA_SECRET=$(kubectl get -o json serviceaccount ${SA_NAME}|jq -r '.secrets[0].name')
+SA_TOKEN=$(kubectl get -o json secret ${SA_SECRET}|jq -r '.data.token|@base64d')
+
+# Paste this into the HTTP Headers popout in the lower right of the playground
+echo "{\"Authorization\":\"Bearer ${SA_TOKEN}\"}"
 ```
 
-You may to avoid deploying `xqgl` via Helm while developing. Instead you can
-spin up a `kind` cluster, install Crossplane and run `xgql` outside the cluster
-by running`go run cmd/xgql/main.go --debug`. Note that in this mode `xgql` will
+You may want to avoid deploying `xqgl` via Helm while developing. Instead you
+can spin up a `kind` cluster, install Crossplane and run `xgql` outside the
+cluster by running`go run cmd/xgql/main.go --debug`. In this mode `xgql` will
 attempt to find and authenticate to a cluster by reading your `~/.kube/config`
-file. Typically this file uses a client certificate rather than a bearer token
-to authentication to the cluster. Due to the way `xgql` Kubernetes API clients
-are wired up this will result in it using a single client for token `""` that in
-fact uses your client certificate to interact with the API server.
+file. All authentication methods are stripped from the kubeconfig file so
+GraphQL requests must still supply authz headers.
 
 [controller-runtime]: https://github.com/kubernetes-sigs/controller-runtime
 [gqlgen]: https://github.com/99designs/gqlgen
+[bearer token]: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#putting-a-bearer-token-in-a-request
+[Impersonation headers]: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#user-impersonation

@@ -8,8 +8,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/graph/model"
-	"github.com/upbound/xgql/internal/token"
 )
 
 const (
@@ -28,8 +28,8 @@ func (r *managedResourceSpec) ConnectionSecret(ctx context.Context, obj *model.M
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	t, _ := token.FromContext(ctx)
-	c, err := r.clients.Get(t)
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil

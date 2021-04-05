@@ -14,6 +14,7 @@ import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 
+	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/model"
@@ -52,7 +53,7 @@ func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 		},
 		"GetClientError": {
 			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{}, errBoom
 			}),
 			args: args{
@@ -69,7 +70,7 @@ func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 		},
 		"GetSecretError": {
 			reason: "If we can't get the secret we should add the error to the GraphQL context and return early.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockGet: test.NewMockGetFn(errBoom),
 				}, nil
@@ -88,7 +89,7 @@ func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 		},
 		"Success": {
 			reason: "If we can get and model the secret we should return it.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockGet: test.NewMockGetFn(nil),
 				}, nil

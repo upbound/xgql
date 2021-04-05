@@ -15,6 +15,7 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
+	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/model"
@@ -45,7 +46,7 @@ func TestQueryProviders(t *testing.T) {
 	}{
 		"GetClientError": {
 			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{}, errBoom
 			}),
 			args: args{
@@ -59,7 +60,7 @@ func TestQueryProviders(t *testing.T) {
 		},
 		"ListProvidersError": {
 			reason: "If we can't list providers we should add the error to the GraphQL context and return early.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(errBoom),
 				}, nil
@@ -75,7 +76,7 @@ func TestQueryProviders(t *testing.T) {
 		},
 		"Success": {
 			reason: "We should successfully return any providers we can list and model.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
 						*obj.(*pkgv1.ProviderList) = pkgv1.ProviderList{Items: []pkgv1.Provider{p}}
@@ -140,7 +141,7 @@ func TestQueryConfigurations(t *testing.T) {
 	}{
 		"GetClientError": {
 			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{}, errBoom
 			}),
 			args: args{
@@ -154,7 +155,7 @@ func TestQueryConfigurations(t *testing.T) {
 		},
 		"ListConfigurationsError": {
 			reason: "If we can't list configurations we should add the error to the GraphQL context and return early.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(errBoom),
 				}, nil
@@ -170,7 +171,7 @@ func TestQueryConfigurations(t *testing.T) {
 		},
 		"Success": {
 			reason: "We should successfully return any configurations we can list and model.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
 						*obj.(*pkgv1.ConfigurationList) = pkgv1.ConfigurationList{Items: []pkgv1.Configuration{c}}

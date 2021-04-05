@@ -15,6 +15,7 @@ import (
 
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 
+	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/model"
 )
@@ -52,7 +53,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 	}{
 		"GetClientError": {
 			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{}, errBoom
 			}),
 			args: args{
@@ -66,7 +67,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 		},
 		"ListDefinedCompositeResourcesError": {
 			reason: "If we can't list defined resources we should add the error to the GraphQL context and return early.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(errBoom),
 				}, nil
@@ -88,7 +89,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 		},
 		"InferReferencableVersion": {
 			reason: "We should successfully infer the referencable version and return any defined resources we can list and model.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
 						u := *obj.(*unstructured.UnstructuredList)
@@ -138,7 +139,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 		},
 		"InferServedVersion": {
 			reason: "We should successfully infer the served version (if none is referenceable) and return any defined resources we can list and model.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
 						u := *obj.(*unstructured.UnstructuredList)
@@ -187,7 +188,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 		},
 		"SpecificVersion": {
 			reason: "We should successfully return any defined resources of the requested version that we can list and model.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
 						u := *obj.(*unstructured.UnstructuredList)
