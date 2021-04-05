@@ -1,20 +1,47 @@
+"""
+A Configuration extends Crossplane with support for new composite resources.
+"""
 type Configuration implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: ConfigurationSpec!
+
+  "The observed state of this resource."
   status: ConfigurationStatus
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
-  revisions(active: Boolean): ConfigurationRevisionConnection! @goField(forceResolver: true)
+
+  "Revisions of this configuration."
+  revisions(
+    "Return only the active revision."
+    active: Boolean
+  ): ConfigurationRevisionConnection! @goField(forceResolver: true)
 }
 
+"""
+A ConfigurationRevisionConnection represents a connection to configuration
+revisions.
+"""
 type ConfigurationRevisionConnection {
+  "Connected nodes."
   nodes: [ConfigurationRevision!]
+
+  "The total number of connected nodes."
   totalCount: Int!
 }
 
@@ -25,56 +52,178 @@ type ConfigurationRevisionConnection {
 # The Secrets are presumed to be read from the namespace in which Crossplane is
 # running, which we do not know.
 
+"""
+A ConfigurationSpec represents the desired state of a configuration.
+"""
 type ConfigurationSpec {
+  """
+  The name of the configuration package to pull from an OCI registry.
+  """
   package: String!
+
+  """
+	RevisionActivationPolicy specifies how the package controller should update
+  from one revision to the next.
+  """
   revisionActivationPolicy: RevisionActivationPolicy
+
+  """
+	RevisionHistoryLimit dictates how the package controller cleans up old
+  inactive package revisions. Defaults to 1. Can be disabled by explicitly
+  setting to 0.
+  """
   revisionHistoryLimit: Int
+
+  """
+	PackagePullPolicy defines the pull policy for the package.
+  """
   packagePullPolicy: PackagePullPolicy
+
+  """
+	IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+  Crossplane version constraints specified by the package.
+  """
   ignoreCrossplaneConstraints: Boolean
+
+  """
+	SkipDependencyResolution indicates to the package manager whether to skip
+	resolving dependencies for a package.
+  """
   skipDependencyResolution: Boolean
 }
 
+"""
+A ConfigurationRevisionStatus represents the observed state of a configuration.
+"""
 type ConfigurationStatus implements ConditionedStatus {
+  """
+  The observed condition of this resource.
+  """
   conditions: [Condition!]
+
+  """
+	CurrentRevision is the name of the current package revision. It will reflect
+  the most up to date revision, whether it has been activated or not.
+  """
   currentRevision: String
+
+  """
+	CurrentIdentifier is the most recent package source that was used to produce a
+  revision. The package manager uses this field to determine whether to check
+  for package updates for a given source when packagePullPolicy is set to
+  IfNotPresent.
+  """
   currentIdentifier: String
 }
 
+"""
+A ConfigurationRevision represents a revision or 'version' of a configuration.
+"""
 type ConfigurationRevision implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: ConfigurationRevisionSpec!
+
+  "The observed state of this resource."
   status: ConfigurationRevisionStatus
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"""
+A ConfigurationRevisionSpec represents the desired state of a configuration
+revision.
+"""
 type ConfigurationRevisionSpec {
+  """
+  Desired state of the configuration revision.
+  """
   desiredState: PackageRevisionDesiredState!
+
+  """
+  Package image used by the install pod to extract package contents.
+  """
   package: String!
+
+  """
+	PackagePullPolicy defines the pull policy for the package..
+  """
   packagePullPolicy: PackagePullPolicy
+
+  """
+  Revision number. Indicates when the revision will be garbage collected based
+  on the configuration's RevisionHistoryLimit.
+  """
   revision: Int!
+
+  """
+  IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+  Crossplane version constrains specified by the package.
+  """
   ignoreCrossplaneConstraints: Boolean
+
+  """
+  SkipDependencyResolution indicates to the package manager whether to skip
+  resolving dependencies for a package.
+  """
   skipDependencyResolution: Boolean
 }
 
+"""
+A ConfigurationRevisionStatus represents the observed state of a configuration
+revision.
+"""
 type ConfigurationRevisionStatus implements ConditionedStatus {
+  """
+  The observed condition of this resource.
+  """
   conditions: [Condition!]
+
+  """
+  The number of known dependencies.
+  """
   foundDependencies: Int
+
+  """
+  The number of installed dependencies.
+  """
   installedDependencies: Int
+
+  """
+  The number of invalid dependencies.
+  """
   invalidDependencies: Int
+
+  """
+  Permissions requested by this configuration revision.
+  """
   permissionRequests: [PolicyRule!]
 
-  # In practice these objects are currently always a CompositeResourceDefinition
-  # or a Composition. Crossplane lints the content of configuration packages to
-  # enforce this, but it's not enforced at the API level. We return an array of
-  # KubernetesResource here because doing so allows us to package different
-  # types in future without a breaking GraphQL schema change.
+  """
+  Objects owned by this configuration revision - i.e. objects that were created
+  by this configuration revision or that would have been created if they did
+  not already exist.
 
+  In practice these objects are currently always a CompositeResourceDefinition
+  or a Composition. Crossplane lints the content of configuration packages to
+  enforce this, but it's not enforced at the Kubernetes API level. We return an
+  array of KubernetesResource here because doing so allows us to package
+  different types in future without a breaking GraphQL schema change.
+  """
   objects: KubernetesResourceConnection! @goField(forceResolver: true)
 }

@@ -1,99 +1,305 @@
+"""
+Time is a timestamp.
+"""
 scalar Time
+
+"""
+A Map of string to arbitrary values.
+"""
 scalar Map
+
+"""
+A JSONObject contains a JSON object encoded as a string.
+"""
 scalar JSONObject
 
+"""
+An object with an ID.
+"""
 interface Node {
+  "An opaque identifier that is unique across all types."
   id: ID!
 }
 
+"""
+An object that corresponds to a Kubernetes API resource.
+"""
 interface KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! 
 }
 
+"""
+An EventConnection represents a connection to events.
+"""
 type EventConnection {
+  "Connected nodes."
   nodes: [Event!]
+
+  "The total number of connected nodes."
   totalCount: Int!
 }
 
+"""
+A KubernetesResourceConnection represents a connection to Kubernetes resources.
+"""
 type KubernetesResourceConnection {
+  "Connected nodes."
   nodes: [KubernetesResource!]
+
+  "The total number of connected nodes."
   totalCount: Int!
 }
 
+"""
+A GenericResource represents a kind of Kubernetes resource that does not
+correspond to a kind or class of resources that is more specifically modelled 
+by xgql.
+"""
 type GenericResource implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
-# Corresponds to v1 object metadata
-# https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#objectmeta-v1-meta
+
+"""
+ObjectMeta is metadata that is common to all Kubernetes API resources.
+https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#objectmeta-v1-meta
+"""
 type ObjectMeta {
+  """
+  The name of this resource. Unique within its API group and version for
+  cluster scoped resources, and also within its namespace for namespaced
+  resources.
+  """
   name: String!
+
+  """
+  An optional prefix used by the Kubernetes API server to generate a unique
+  name at creation time if a name was not provided.
+  """
   generateName: String
+
+  """
+  The space within each name must be unique, for namespaced resources. An empty
+  namespace is equivalent to the 'default' namespace.
+  """
   namespace: String
+
+  """
+  An opaque identifier of this resource that is unique across time.
+  """
   uid: String!
+
+  """
+  An opaque version that changes whenever the underlying resource changes in the
+  API server. Used for change detection and optimistic concurrency.
+  """
   resourceVersion: String!
+
+  """
+  A sequence number representing the specific generation of the desired state.
+  """
   generation: Int!
+
+  """
+  The time the underlying Kubernetes resource was created in the API server.
+  """
   creationTime: Time!
+
+  """
+  The time at which the underlying Kubernetes resource will be (or was) deleted.
+  Resources may exist past their deletion time while their controllers handle
+  any required cleanup.
+  """
   deletionTime: Time
+
+  """
+	Map of string keys and values that can be used to organize and categorize
+	(scope and select) objects. May match selectors of replication controllers
+	and services.
+	
+  More info: http://kubernetes.io/docs/user-guide/labels
+  """
   labels: Map
+
+  """
+	Map of string keys and values that may be set by external tools to store and
+  retrieve arbitrary metadata.
+
+	More info: http://kubernetes.io/docs/user-guide/annotations
+  """
   annotations: Map
 
-  owners(controller: Boolean): OwnerConnection! @goField(forceResolver: true)
+
+  """
+	Resources depended by this resource. If ALL resources in the list have been
+  deleted, this resource will be garbage collected. If this resource is managed
+  by a controller, then an entry in this list will point to this controller,
+  with the controller field set to true. There cannot be more than one managing
+  controller.
+  """
+  owners(
+    "Return only the owner that represents the controller of this resource."
+    controller: Boolean
+  ): OwnerConnection! @goField(forceResolver: true)
 }
 
+"""
+An OwnerConnection represents a connection to an owner.
+"""
 type OwnerConnection {
+  "Connected nodes."
   nodes: [Owner!]
+  "The total number of connected nodes."
   totalCount: Int!
 }
 
+"""
+An owner of a Kubernetes resource.
+"""
 type Owner {
+  "The owner."
   resource: KubernetesResource!
+
+  "Whether the owner is the controller of the owned Kubernetes resource."
   controller: Boolean,
 }
 
+"""
+A ConditionedStatus represents the observed state of a Kubernetes resource that
+exposes status conditions.
+"""
 interface ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
 }
 
-# Note that type and reason are intentionally not enums; Crossplane does not
-# limit the allowed values at the API level.
+
+"""
+A condition that may apply to a resource.
+
+Note that type and reason are intentionally not enums; Crossplane does not limit
+the allowed values at the API level.
+"""
 type Condition {
+  """
+	Type of this condition. At most one of each condition type may apply to a
+  resource at any point in time.
+  """
   type: String!
+
+  """
+	Status of this condition; is it currently True, False, or Unknown?
+  """
   status: ConditionStatus!
+
+  """
+	LastTransitionTime is the last time this condition transitioned from one
+  status to another.
+  """
   lastTransitionTime: Time!
+
+  """
+	A Reason for this condition's last transition from one status to another.
+  """
   reason: String!
+
+  """
+	A Message containing details about this condition's last transition from one
+  status to another, if any.
+  """
   message: String
 }
 
+
+"""
+A ConditionStatus represensts the status of a condition.
+"""
 enum ConditionStatus {
+  "The status of the condition is unknown."
   UNKNOWN
+
+  "The condition is false."
   FALSE
+
+  "The condition is true."
   TRUE
 }
 
+"""
+A PolicyRule holds information that describes a KubernetesRBAC policy rule.
+"""
 type PolicyRule {
+  """
+	Verbs is a list of verbs that apply to ALL the resources specified by this
+  rule. '*' represents all verbs.
+  """
   verbs: [String!]!
+
+  """
+  APIGroups is the name of the APIGroup that contains the resources. If multiple
+  API groups are specified, any action requested against one of the enumerated
+  resources in any API group will be allowed.
+  """
   apiGroups: [String!]
+
+  """
+	Resources is a list of resources this rule applies to. '*' represents all
+  resources.
+  """
   resources: [String!]
+
+  """
+	ResourceNames is a list of names that the rule applies to. An empty set means
+  that everything is allowed.
+  """
   resourceNames: [String!]
+
+  """
+	NonResourceURLs is a set of partial urls that a user should have access to.
+  '*' is allowed, but only as the full, final step in the path. Rules can either
+  apply to API resources (such as "pods" or "secrets") or non-resource URL paths
+  (such as "/api"),  but not both.
+  """
   nonResourceURLs: [String!]
 }
 
+"""
+A LabelSelector matches a Kubernetes resource by labels.
+"""
 type LabelSelector {
+  "The labels to match on."
   matchLabels: Map
 }
 
@@ -101,86 +307,239 @@ type LabelSelector {
 # event does not have events. We might consider creating a distinct
 # InvolvedObject interface (or something like that) for the events field.
 
+"""
+An event pertaining to a Kubernetes resource.
+"""
 type Event implements Node {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The Kubernetes resource this event pertains to."
   involvedObject: KubernetesResource! @goField(forceResolver: true)
+
+  "The type of event."
   type: EventType
+
+  "The reason the event was emitted."
   reason: String
+
+  "Details about the event, if any."
   message: String
+
+  "The source of the event - e.g. a controller."
   source: EventSource
-  totalCount: Int
+
+  "The number of times this event has occurred."
+  count: Int
+
+  "The time at which this event was first recorded."
   firstTime: Time
+
+  "The time at which this event was most recently recorded."
   lastTime: Time
 
+  "A raw JSON representation of the event."
   raw: JSONObject!
 }
 
+"""
+An EventSource is the source of an event. Note that in this context 'source'
+indicates the software or system that emitted the event, not the Kubernetes
+resource it pertains to.
+"""
 type EventSource {
+  "The software component that emitted the event."
   component: String
 }
 
+"""
+An EventType indicates the type of an event.
+"""
 enum EventType {
+  "A normal, informational event."
   NORMAL
+
+  "A warning that something suboptimal has occurred."
   WARNING
 }
 
+"""
+A Secret holds secret data.
+"""
 type Secret implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
-  kind: String!
-  metadata: ObjectMeta!
-  data: JSONObject
 
+  "The underlying Kubernetes API kind of this resource."
+  kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
+  metadata: ObjectMeta!
+
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"""
+A CustomResourceDefinition defines a type of custom resource that extends the
+set of resources supported by the Kubernetes API.
+"""
 type CustomResourceDefinition implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: CustomResourceDefinitionSpec!
+
+  "The observed state of this resource."
   status: CustomResourceDefinitionStatus
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
-  definedResources(version: String): KubernetesResourceConnection! @goField(forceResolver: true)
+
+  "Custom resources defined by this CRD"
+  definedResources(
+    "Return resources of this version."
+    version: String
+  ): KubernetesResourceConnection! @goField(forceResolver: true)
 }
 
+"""
+A CustomResourceDefinitionSpec represents the desired state of a custom resource
+definition.
+"""
 type CustomResourceDefinitionSpec {
+  """
+  Group specifies the API group of the defined custom resource. Custom resources
+  are served under `/apis/<group>/...`. Must match the name of the CRD (in the
+  form `<names.plural>.<group>`).
+  """
   group: String!
+
+  """
+	Names specifies the resource and kind names of the defined custom resource.
+  """
   names: CustomResourceDefinitionNames!
+
+  """
+	Versions is the list of all API versions of the defined custom resource.
+  Version names are used to compute the order in which served versions are
+  listed in API discovery. If the version string is "kube-like", it will sort
+  above non "kube-like" version strings, which are ordered lexicographically.
+  "Kube-like" versions start with a "v", then are followed by a number (the
+  major version), then optionally the string "alpha" or "beta" and another
+  number (the minor version). These are sorted first by GA > beta > alpha (where
+  GA is a version with no suffix such as beta or alpha), and then by comparing
+  major version, then minor version. An example sorted list of versions: v10,
+  v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10.
+  """
   versions: [CustomResourceDefinitionVersion!]
 }
 
+"""
+CustomResourceDefinitionNames specifies the resource and kind names of the
+defined custom resource.
+"""
 type CustomResourceDefinitionNames {
+
+  """
+	The plural name of the resource to serve. Custom resources are served by
+  the Kuberntes API under `/apis/<group>/<version>/.../<plural>`.
+  """
   plural: String!
+
+  """
+	The singular name of the resource.
+  """
   singular: String
+
+  """
+  Short names for the resource, exposed in API discovery documents, and used by
+  clients to support invocations like `kubectl get <shortname>`.
+  """
   shortNames: [String!]
+
+  """
+  The Kubernetes API kind of the defined resource.
+  """
   kind: String!
+
+  """
+  The Kubernetes API kind of a list of the defined resource.
+  """
   listKind: String
+
+  """
+	A list of grouped resources this custom resource belongs to (e.g. 'all'). This
+  is published in API discovery documents, and used by clients to support
+  invocations like `kubectl get all`.
+  """
   categories: [String!]
 }
 
+"""
+A CustomResourceDefinitionVersion describes a version of a custom resource.
+"""
 type CustomResourceDefinitionVersion {
+  """
+	Name of this version, e.g. “v1”, “v2beta1”, etc. Custom resources are served
+  under this version at `/apis/<group>/<version>/...` if `served` istrue.
+  """
   name: String!
+
+  """
+	Served specifies that this version should be served via Kubernetes REST APIs.
+  """
   served: Boolean!
+
+  """
+	Schema describes the schema used for validation, pruning, and defaulting of
+  this version of the defined custom resource.
+  """
   schema: CustomResourceValidation
 }
 
+"""
+A CustomResourceValidation is a list of validation methods for a custom
+resource.
+"""
 type CustomResourceValidation {
+	"OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
   openAPIV3Schema: JSONObject
 }
 
+"""
+A CustomResourceDefinitionStatus represents the observed state of a custom
+resource definition.
+"""
 type CustomResourceDefinitionStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
 }

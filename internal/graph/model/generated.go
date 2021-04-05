@@ -9,493 +9,904 @@ import (
 	"time"
 )
 
+// A ComposedResource is either a managed or a composite resource.
 type ComposedResource interface {
 	IsComposedResource()
 }
 
+// A ConditionedStatus represents the observed state of a Kubernetes resource that
+// exposes status conditions.
 type ConditionedStatus interface {
 	IsConditionedStatus()
 }
 
+// An object that corresponds to a Kubernetes API resource.
 type KubernetesResource interface {
 	IsKubernetesResource()
 }
 
+// An object with an ID.
 type Node interface {
 	IsNode()
 }
 
+// A ComposedResourceConnection represents a connection to composed resources.
 type ComposedResourceConnection struct {
-	Nodes      []ComposedResource `json:"nodes"`
-	TotalCount int                `json:"totalCount"`
+	// Connected nodes.
+	Nodes []ComposedResource `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
 }
 
+// A CompositeResource is a resource this is reconciled by composing other
+// composite or managed resources. Composite resources use a Composition to
+// determine which resources to compose, and how.
 type CompositeResource struct {
-	ID         ReferenceID              `json:"id"`
-	APIVersion string                   `json:"apiVersion"`
-	Kind       string                   `json:"kind"`
-	Metadata   *ObjectMeta              `json:"metadata"`
-	Spec       *CompositeResourceSpec   `json:"spec"`
-	Status     *CompositeResourceStatus `json:"status"`
-	Raw        string                   `json:"raw"`
-	Events     *EventConnection         `json:"events"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// The desired state of this resource.
+	Spec *CompositeResourceSpec `json:"spec"`
+	// The observed state of this resource.
+	Status *CompositeResourceStatus `json:"status"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
 }
 
 func (CompositeResource) IsNode()               {}
 func (CompositeResource) IsKubernetesResource() {}
 func (CompositeResource) IsComposedResource()   {}
 
+// A CompositeResourceClaim is a namespaced proxy for a composite resource.
 type CompositeResourceClaim struct {
-	ID         ReferenceID                   `json:"id"`
-	APIVersion string                        `json:"apiVersion"`
-	Kind       string                        `json:"kind"`
-	Metadata   *ObjectMeta                   `json:"metadata"`
-	Spec       *CompositeResourceClaimSpec   `json:"spec"`
-	Status     *CompositeResourceClaimStatus `json:"status"`
-	Raw        string                        `json:"raw"`
-	Events     *EventConnection              `json:"events"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// The desired state of this resource.
+	Spec *CompositeResourceClaimSpec `json:"spec"`
+	// The observed state of this resource.
+	Status *CompositeResourceClaimStatus `json:"status"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
 }
 
 func (CompositeResourceClaim) IsNode()               {}
 func (CompositeResourceClaim) IsKubernetesResource() {}
 
+// A CompositeResourceConnection represents a connection to composite resource
+// claims.
 type CompositeResourceClaimConnection struct {
-	Nodes      []CompositeResourceClaim `json:"nodes"`
-	TotalCount int                      `json:"totalCount"`
+	// Connected nodes.
+	Nodes []CompositeResourceClaim `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
 }
 
+// CompositeResourceConnectionDetails represents the observed status of a composite
+// resource claim's connection details.
 type CompositeResourceClaimConnectionDetails struct {
+	// The time at which the composite resource claim's connection details were last
+	// published.
 	LastPublishedTime *time.Time `json:"lastPublishedTime"`
 }
 
+// A CompositeResourceClaimSpec represents the desired state of a composite
+// resource claim.
 type CompositeResourceClaimSpec struct {
-	Composition              *Composition       `json:"composition"`
-	CompositionSelector      *LabelSelector     `json:"compositionSelector"`
-	Resource                 *CompositeResource `json:"resource"`
-	WritesConnectionSecretTo *Secret            `json:"writesConnectionSecretTo"`
+	// The composition this composite resource uses to compose resources.
+	Composition *Composition `json:"composition"`
+	// A composition selector is used to select this composite resource claims's
+	// (composite resource's) composition by matching on labels.
+	CompositionSelector *LabelSelector `json:"compositionSelector"`
+	// The composite resource to which this composite resource claim is bound.
+	Resource *CompositeResource `json:"resource"`
+	// The secret this composite resource claim writes its connection details to.
+	ConnectionSecret *Secret `json:"connectionSecret"`
 }
 
+// A CompositeResourceClaimStatus represents the observed status of a composite
+// resource claim.
 type CompositeResourceClaimStatus struct {
-	Conditions        []Condition                              `json:"conditions"`
+	// The observed condition of this resource.
+	Conditions []Condition `json:"conditions"`
+	// The status of this composite resource's connection details.
 	ConnectionDetails *CompositeResourceClaimConnectionDetails `json:"connectionDetails"`
 }
 
 func (CompositeResourceClaimStatus) IsConditionedStatus() {}
 
+// A CompositeResourceConnection represents a connection to composite resources.
 type CompositeResourceConnection struct {
-	Nodes      []CompositeResource `json:"nodes"`
-	TotalCount int                 `json:"totalCount"`
+	// Connected nodes.
+	Nodes []CompositeResource `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
 }
 
+// CompositeResourceConnectionDetails represents the observed status of a composite
+// resource's connection details.
 type CompositeResourceConnectionDetails struct {
+	// The time at which the composite resource's connection details were last
+	// published.
 	LastPublishedTime *time.Time `json:"lastPublishedTime"`
 }
 
+// A CompositeResourceDefinition (or XRD) defines a new kind of resource. The new
+// resource is composed of other composite or managed resources.
 type CompositeResourceDefinition struct {
-	ID                             ReferenceID                        `json:"id"`
-	APIVersion                     string                             `json:"apiVersion"`
-	Kind                           string                             `json:"kind"`
-	Metadata                       *ObjectMeta                        `json:"metadata"`
-	Spec                           *CompositeResourceDefinitionSpec   `json:"spec"`
-	Status                         *CompositeResourceDefinitionStatus `json:"status"`
-	Raw                            string                             `json:"raw"`
-	Events                         *EventConnection                   `json:"events"`
-	DefinedCompositeResources      *CompositeResourceConnection       `json:"definedCompositeResources"`
-	DefinedCompositeResourceClaims *CompositeResourceClaimConnection  `json:"definedCompositeResourceClaims"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// The desired state of this resource.
+	Spec *CompositeResourceDefinitionSpec `json:"spec"`
+	// The observed state of this resource.
+	Status *CompositeResourceDefinitionStatus `json:"status"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
+	// Composite resources (XRs) defined by this XRD.
+	DefinedCompositeResources *CompositeResourceConnection `json:"definedCompositeResources"`
+	// Composite resource claims (XRCs) defined by this XRD.
+	DefinedCompositeResourceClaims *CompositeResourceClaimConnection `json:"definedCompositeResourceClaims"`
 }
 
 func (CompositeResourceDefinition) IsNode()               {}
 func (CompositeResourceDefinition) IsKubernetesResource() {}
 
+// A CompositeResourceDefinitionConnection represents a connection to composite
+// resource definitions (XRDs).
 type CompositeResourceDefinitionConnection struct {
-	Nodes      []CompositeResourceDefinition `json:"nodes"`
-	TotalCount int                           `json:"totalCount"`
+	// Connected nodes.
+	Nodes []CompositeResourceDefinition `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
 }
 
+// A CompositeResourceDefinitionControllerStatus shows the observed state of the
+// controllers that power the definition.
 type CompositeResourceDefinitionControllerStatus struct {
-	CompositeResourceType      *TypeReference `json:"compositeResourceType"`
+	// The CompositeResourceTypeRef is the type of composite resource that Crossplane
+	//  is currently reconciling for this definition. Its version will eventually
+	//  become consistent with the definition's referenceable version. Note that
+	//  clients may interact with any served type; this is simply the type that
+	//  Crossplane interacts with.
+	CompositeResourceType *TypeReference `json:"compositeResourceType"`
+	// The CompositeResourceClaimTypeRef is the type of composite resource claim
+	// that Crossplane is currently reconciling for this definition. Its version
+	// will eventually become consistent with the definition's referenceable version.
+	//  Note that clients may interact with any served type; this is simply the type
+	//  that Crossplane interacts with.
 	CompositeResourceClaimType *TypeReference `json:"compositeResourceClaimType"`
 }
 
+// CompositeResourceDefinitionNames specifies the resource and kind names of the
+// defined composite resource or claim.
 type CompositeResourceDefinitionNames struct {
-	Plural     string   `json:"plural"`
-	Singular   *string  `json:"singular"`
+	// The plural name of the resource to serve. Composite resources are served by
+	//  the Kuberntes API under `/apis/<group>/<version>/.../<plural>`.
+	Plural string `json:"plural"`
+	// The singular name of the resource.
+	Singular *string `json:"singular"`
+	// Short names for the resource, exposed in API discovery documents, and used by
+	// clients to support invocations like `kubectl get <shortname>`.
 	ShortNames []string `json:"shortNames"`
-	Kind       string   `json:"kind"`
-	ListKind   *string  `json:"listKind"`
+	// The Kubernetes API kind of the defined resource.
+	Kind string `json:"kind"`
+	// The Kubernetes API kind of a list of the defined resource.
+	ListKind *string `json:"listKind"`
+	// A list of grouped resources this custom resource belongs to (e.g. 'all'). This
+	//  is published in API discovery documents, and used by clients to support
+	//  invocations like `kubectl get all`.
 	Categories []string `json:"categories"`
 }
 
+// A CompositeResourceDefinitionStatus represents the observed state of a composite
+// resource definition.
 type CompositeResourceDefinitionStatus struct {
-	Conditions  []Condition                                  `json:"conditions"`
+	// The observed condition of this resource.
+	Conditions []Condition `json:"conditions"`
+	// Controllers represents the status of the controllers that power this
+	//  composite resource definition.
 	Controllers *CompositeResourceDefinitionControllerStatus `json:"controllers"`
 }
 
 func (CompositeResourceDefinitionStatus) IsConditionedStatus() {}
 
+// A CompositeResourceDefinitionVersion describes a version of a composite
+// resource.
 type CompositeResourceDefinitionVersion struct {
-	Name          string                       `json:"name"`
-	Referenceable bool                         `json:"referenceable"`
-	Served        bool                         `json:"served"`
-	Schema        *CompositeResourceValidation `json:"schema"`
+	// Name of this version, e.g. “v1”, “v2beta1”, etc. Composite resources are
+	// served under this version at `/apis/<group>/<version>/...` if `served` is
+	// true.
+	Name string `json:"name"`
+	// Referenceable specifies that this version may be referenced by a Composition
+	//  in order to configure which resources an XR may be composed of. Exactly one
+	//  version must be marked as referenceable; all Compositions must target only the
+	//  referenceable version. The referenceable version must be served.
+	Referenceable bool `json:"referenceable"`
+	// Served specifies that this version should be served via Kubernetes REST APIs.
+	Served bool `json:"served"`
+	// Schema describes the schema used for validation, pruning, and defaulting of
+	//  this version of the defined composite resource. Fields required by all
+	//  composite resources are injected into this schema automatically, and override
+	//  equivalently named fields in this schema.
+	Schema *CompositeResourceValidation `json:"schema"`
 }
 
+// A CompositeResourceClaimStatus represents the observed state of a composite
+// resource.
 type CompositeResourceStatus struct {
-	Conditions        []Condition                         `json:"conditions"`
+	// The observed condition of this resource.
+	Conditions []Condition `json:"conditions"`
+	// The status of this composite resource's connection details.
 	ConnectionDetails *CompositeResourceConnectionDetails `json:"connectionDetails"`
 }
 
 func (CompositeResourceStatus) IsConditionedStatus() {}
 
+// A CompositeResourceValidation is a list of validation methods for a composite
+// resource.
 type CompositeResourceValidation struct {
+	// OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning.
 	OpenAPIV3Schema *string `json:"openAPIV3Schema"`
 }
 
+// A Composition defines the group of resources to be created when a compatible
+// type of composite resource is created with reference to the composition.
 type Composition struct {
-	ID         ReferenceID        `json:"id"`
-	APIVersion string             `json:"apiVersion"`
-	Kind       string             `json:"kind"`
-	Metadata   *ObjectMeta        `json:"metadata"`
-	Spec       *CompositionSpec   `json:"spec"`
-	Status     *CompositionStatus `json:"status"`
-	Raw        string             `json:"raw"`
-	Events     *EventConnection   `json:"events"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// The desired state of this resource.
+	Spec *CompositionSpec `json:"spec"`
+	// The observed state of this resource.
+	Status *CompositionStatus `json:"status"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
 }
 
 func (Composition) IsNode()               {}
 func (Composition) IsKubernetesResource() {}
 
+// A CompositionConnection represents a connection to compositions.
 type CompositionConnection struct {
-	Nodes      []Composition `json:"nodes"`
-	TotalCount int           `json:"totalCount"`
+	// Connected nodes.
+	Nodes []Composition `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
 }
 
+// A CompositionSpec represents the desired state of a composition.
 type CompositionSpec struct {
-	CompositeTypeRef                  *TypeReference `json:"compositeTypeRef"`
-	WriteConnectionSecretsToNamespace *string        `json:"writeConnectionSecretsToNamespace"`
+	// CompositeTypeRef specifies the type of composite resource that this
+	//  composition is compatible with.
+	CompositeTypeRef *TypeReference `json:"compositeTypeRef"`
+	// WriteConnectionSecretsToNamespace specifies the namespace in which the
+	// connection secrets of composite resource dynamically provisioned using this
+	//  composition will be created.
+	WriteConnectionSecretsToNamespace *string `json:"writeConnectionSecretsToNamespace"`
 }
 
+// A CompositionStatus represents the observed state of a composition.
 type CompositionStatus struct {
+	// The observed condition of this resource.
 	Conditions []Condition `json:"conditions"`
 }
 
 func (CompositionStatus) IsConditionedStatus() {}
 
+// A condition that may apply to a resource.
+//
+// Note that type and reason are intentionally not enums; Crossplane does not limit
+// the allowed values at the API level.
 type Condition struct {
-	Type               string          `json:"type"`
-	Status             ConditionStatus `json:"status"`
-	LastTransitionTime time.Time       `json:"lastTransitionTime"`
-	Reason             string          `json:"reason"`
-	Message            *string         `json:"message"`
+	// Type of this condition. At most one of each condition type may apply to a
+	//  resource at any point in time.
+	Type string `json:"type"`
+	// Status of this condition; is it currently True, False, or Unknown?
+	Status ConditionStatus `json:"status"`
+	// LastTransitionTime is the last time this condition transitioned from one
+	//  status to another.
+	LastTransitionTime time.Time `json:"lastTransitionTime"`
+	// A Reason for this condition's last transition from one status to another.
+	Reason string `json:"reason"`
+	// A Message containing details about this condition's last transition from one
+	//  status to another, if any.
+	Message *string `json:"message"`
 }
 
+// A Configuration extends Crossplane with support for new composite resources.
 type Configuration struct {
-	ID         ReferenceID                      `json:"id"`
-	APIVersion string                           `json:"apiVersion"`
-	Kind       string                           `json:"kind"`
-	Metadata   *ObjectMeta                      `json:"metadata"`
-	Spec       *ConfigurationSpec               `json:"spec"`
-	Status     *ConfigurationStatus             `json:"status"`
-	Raw        string                           `json:"raw"`
-	Events     *EventConnection                 `json:"events"`
-	Revisions  *ConfigurationRevisionConnection `json:"revisions"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// The desired state of this resource.
+	Spec *ConfigurationSpec `json:"spec"`
+	// The observed state of this resource.
+	Status *ConfigurationStatus `json:"status"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
+	// Revisions of this configuration.
+	Revisions *ConfigurationRevisionConnection `json:"revisions"`
 }
 
 func (Configuration) IsNode()               {}
 func (Configuration) IsKubernetesResource() {}
 
+// A ConfigurationConnection represents a connection to configurations.
 type ConfigurationConnection struct {
-	Nodes      []Configuration `json:"nodes"`
-	TotalCount int             `json:"totalCount"`
+	// Connected nodes.
+	Nodes []Configuration `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
 }
 
+// A ConfigurationRevision represents a revision or 'version' of a configuration.
 type ConfigurationRevision struct {
-	ID         ReferenceID                  `json:"id"`
-	APIVersion string                       `json:"apiVersion"`
-	Kind       string                       `json:"kind"`
-	Metadata   *ObjectMeta                  `json:"metadata"`
-	Spec       *ConfigurationRevisionSpec   `json:"spec"`
-	Status     *ConfigurationRevisionStatus `json:"status"`
-	Raw        string                       `json:"raw"`
-	Events     *EventConnection             `json:"events"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// The desired state of this resource.
+	Spec *ConfigurationRevisionSpec `json:"spec"`
+	// The observed state of this resource.
+	Status *ConfigurationRevisionStatus `json:"status"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
 }
 
 func (ConfigurationRevision) IsNode()               {}
 func (ConfigurationRevision) IsKubernetesResource() {}
 
+// A ConfigurationRevisionConnection represents a connection to configuration
+// revisions.
 type ConfigurationRevisionConnection struct {
-	Nodes      []ConfigurationRevision `json:"nodes"`
-	TotalCount int                     `json:"totalCount"`
+	// Connected nodes.
+	Nodes []ConfigurationRevision `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
 }
 
+// A ConfigurationRevisionSpec represents the desired state of a configuration
+// revision.
 type ConfigurationRevisionSpec struct {
-	DesiredState                PackageRevisionDesiredState `json:"desiredState"`
-	Package                     string                      `json:"package"`
-	PackagePullPolicy           *PackagePullPolicy          `json:"packagePullPolicy"`
-	Revision                    int                         `json:"revision"`
-	IgnoreCrossplaneConstraints *bool                       `json:"ignoreCrossplaneConstraints"`
-	SkipDependencyResolution    *bool                       `json:"skipDependencyResolution"`
+	// Desired state of the configuration revision.
+	DesiredState PackageRevisionDesiredState `json:"desiredState"`
+	// Package image used by the install pod to extract package contents.
+	Package string `json:"package"`
+	// PackagePullPolicy defines the pull policy for the package..
+	PackagePullPolicy *PackagePullPolicy `json:"packagePullPolicy"`
+	// Revision number. Indicates when the revision will be garbage collected based
+	// on the configuration's RevisionHistoryLimit.
+	Revision int `json:"revision"`
+	// IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+	// Crossplane version constrains specified by the package.
+	IgnoreCrossplaneConstraints *bool `json:"ignoreCrossplaneConstraints"`
+	// SkipDependencyResolution indicates to the package manager whether to skip
+	// resolving dependencies for a package.
+	SkipDependencyResolution *bool `json:"skipDependencyResolution"`
 }
 
+// A ConfigurationSpec represents the desired state of a configuration.
 type ConfigurationSpec struct {
-	Package                     string                    `json:"package"`
-	RevisionActivationPolicy    *RevisionActivationPolicy `json:"revisionActivationPolicy"`
-	RevisionHistoryLimit        *int                      `json:"revisionHistoryLimit"`
-	PackagePullPolicy           *PackagePullPolicy        `json:"packagePullPolicy"`
-	IgnoreCrossplaneConstraints *bool                     `json:"ignoreCrossplaneConstraints"`
-	SkipDependencyResolution    *bool                     `json:"skipDependencyResolution"`
+	// The name of the configuration package to pull from an OCI registry.
+	Package string `json:"package"`
+	// RevisionActivationPolicy specifies how the package controller should update
+	//  from one revision to the next.
+	RevisionActivationPolicy *RevisionActivationPolicy `json:"revisionActivationPolicy"`
+	// RevisionHistoryLimit dictates how the package controller cleans up old
+	//  inactive package revisions. Defaults to 1. Can be disabled by explicitly
+	//  setting to 0.
+	RevisionHistoryLimit *int `json:"revisionHistoryLimit"`
+	// PackagePullPolicy defines the pull policy for the package.
+	PackagePullPolicy *PackagePullPolicy `json:"packagePullPolicy"`
+	// IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+	//  Crossplane version constraints specified by the package.
+	IgnoreCrossplaneConstraints *bool `json:"ignoreCrossplaneConstraints"`
+	// SkipDependencyResolution indicates to the package manager whether to skip
+	// resolving dependencies for a package.
+	SkipDependencyResolution *bool `json:"skipDependencyResolution"`
 }
 
+// A ConfigurationRevisionStatus represents the observed state of a configuration.
 type ConfigurationStatus struct {
-	Conditions        []Condition `json:"conditions"`
-	CurrentRevision   *string     `json:"currentRevision"`
-	CurrentIdentifier *string     `json:"currentIdentifier"`
+	// The observed condition of this resource.
+	Conditions []Condition `json:"conditions"`
+	// CurrentRevision is the name of the current package revision. It will reflect
+	//  the most up to date revision, whether it has been activated or not.
+	CurrentRevision *string `json:"currentRevision"`
+	// CurrentIdentifier is the most recent package source that was used to produce a
+	//  revision. The package manager uses this field to determine whether to check
+	//  for package updates for a given source when packagePullPolicy is set to
+	//  IfNotPresent.
+	CurrentIdentifier *string `json:"currentIdentifier"`
 }
 
 func (ConfigurationStatus) IsConditionedStatus() {}
 
+// A CustomResourceDefinition defines a type of custom resource that extends the
+// set of resources supported by the Kubernetes API.
 type CustomResourceDefinition struct {
-	ID               ReferenceID                     `json:"id"`
-	APIVersion       string                          `json:"apiVersion"`
-	Kind             string                          `json:"kind"`
-	Metadata         *ObjectMeta                     `json:"metadata"`
-	Spec             *CustomResourceDefinitionSpec   `json:"spec"`
-	Status           *CustomResourceDefinitionStatus `json:"status"`
-	Raw              string                          `json:"raw"`
-	Events           *EventConnection                `json:"events"`
-	DefinedResources *KubernetesResourceConnection   `json:"definedResources"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// The desired state of this resource.
+	Spec *CustomResourceDefinitionSpec `json:"spec"`
+	// The observed state of this resource.
+	Status *CustomResourceDefinitionStatus `json:"status"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
+	// Custom resources defined by this CRD
+	DefinedResources *KubernetesResourceConnection `json:"definedResources"`
 }
 
 func (CustomResourceDefinition) IsNode()               {}
 func (CustomResourceDefinition) IsKubernetesResource() {}
 
+// CustomResourceDefinitionNames specifies the resource and kind names of the
+// defined custom resource.
 type CustomResourceDefinitionNames struct {
-	Plural     string   `json:"plural"`
-	Singular   *string  `json:"singular"`
+	// The plural name of the resource to serve. Custom resources are served by
+	//  the Kuberntes API under `/apis/<group>/<version>/.../<plural>`.
+	Plural string `json:"plural"`
+	// The singular name of the resource.
+	Singular *string `json:"singular"`
+	// Short names for the resource, exposed in API discovery documents, and used by
+	// clients to support invocations like `kubectl get <shortname>`.
 	ShortNames []string `json:"shortNames"`
-	Kind       string   `json:"kind"`
-	ListKind   *string  `json:"listKind"`
+	// The Kubernetes API kind of the defined resource.
+	Kind string `json:"kind"`
+	// The Kubernetes API kind of a list of the defined resource.
+	ListKind *string `json:"listKind"`
+	// A list of grouped resources this custom resource belongs to (e.g. 'all'). This
+	//  is published in API discovery documents, and used by clients to support
+	//  invocations like `kubectl get all`.
 	Categories []string `json:"categories"`
 }
 
+// A CustomResourceDefinitionSpec represents the desired state of a custom resource
+// definition.
 type CustomResourceDefinitionSpec struct {
-	Group    string                            `json:"group"`
-	Names    *CustomResourceDefinitionNames    `json:"names"`
+	// Group specifies the API group of the defined custom resource. Custom resources
+	// are served under `/apis/<group>/...`. Must match the name of the CRD (in the
+	// form `<names.plural>.<group>`).
+	Group string `json:"group"`
+	// Names specifies the resource and kind names of the defined custom resource.
+	Names *CustomResourceDefinitionNames `json:"names"`
+	// Versions is the list of all API versions of the defined custom resource.
+	//  Version names are used to compute the order in which served versions are
+	//  listed in API discovery. If the version string is "kube-like", it will sort
+	//  above non "kube-like" version strings, which are ordered lexicographically.
+	//  "Kube-like" versions start with a "v", then are followed by a number (the
+	//  major version), then optionally the string "alpha" or "beta" and another
+	//  number (the minor version). These are sorted first by GA > beta > alpha (where
+	//  GA is a version with no suffix such as beta or alpha), and then by comparing
+	//  major version, then minor version. An example sorted list of versions: v10,
+	//  v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10.
 	Versions []CustomResourceDefinitionVersion `json:"versions"`
 }
 
+// A CustomResourceDefinitionStatus represents the observed state of a custom
+// resource definition.
 type CustomResourceDefinitionStatus struct {
+	// The observed condition of this resource.
 	Conditions []Condition `json:"conditions"`
 }
 
 func (CustomResourceDefinitionStatus) IsConditionedStatus() {}
 
+// A CustomResourceDefinitionVersion describes a version of a custom resource.
 type CustomResourceDefinitionVersion struct {
-	Name   string                    `json:"name"`
-	Served bool                      `json:"served"`
+	// Name of this version, e.g. “v1”, “v2beta1”, etc. Custom resources are served
+	//  under this version at `/apis/<group>/<version>/...` if `served` istrue.
+	Name string `json:"name"`
+	// Served specifies that this version should be served via Kubernetes REST APIs.
+	Served bool `json:"served"`
+	// Schema describes the schema used for validation, pruning, and defaulting of
+	//  this version of the defined custom resource.
 	Schema *CustomResourceValidation `json:"schema"`
 }
 
+// A CustomResourceValidation is a list of validation methods for a custom
+// resource.
 type CustomResourceValidation struct {
+	// OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning.
 	OpenAPIV3Schema *string `json:"openAPIV3Schema"`
 }
 
+// An event pertaining to a Kubernetes resource.
 type Event struct {
-	ID             ReferenceID        `json:"id"`
-	APIVersion     string             `json:"apiVersion"`
-	Kind           string             `json:"kind"`
-	Metadata       *ObjectMeta        `json:"metadata"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// The Kubernetes resource this event pertains to.
 	InvolvedObject KubernetesResource `json:"involvedObject"`
-	Type           *EventType         `json:"type"`
-	Reason         *string            `json:"reason"`
-	Message        *string            `json:"message"`
-	Source         *EventSource       `json:"source"`
-	TotalCount     *int               `json:"totalCount"`
-	FirstTime      *time.Time         `json:"firstTime"`
-	LastTime       *time.Time         `json:"lastTime"`
-	Raw            string             `json:"raw"`
+	// The type of event.
+	Type *EventType `json:"type"`
+	// The reason the event was emitted.
+	Reason *string `json:"reason"`
+	// Details about the event, if any.
+	Message *string `json:"message"`
+	// The source of the event - e.g. a controller.
+	Source *EventSource `json:"source"`
+	// The number of times this event has occurred.
+	Count *int `json:"count"`
+	// The time at which this event was first recorded.
+	FirstTime *time.Time `json:"firstTime"`
+	// The time at which this event was most recently recorded.
+	LastTime *time.Time `json:"lastTime"`
+	// A raw JSON representation of the event.
+	Raw string `json:"raw"`
 }
 
 func (Event) IsNode() {}
 
+// An EventConnection represents a connection to events.
 type EventConnection struct {
-	Nodes      []Event `json:"nodes"`
-	TotalCount int     `json:"totalCount"`
+	// Connected nodes.
+	Nodes []Event `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
 }
 
+// An EventSource is the source of an event. Note that in this context 'source'
+// indicates the software or system that emitted the event, not the Kubernetes
+// resource it pertains to.
 type EventSource struct {
+	// The software component that emitted the event.
 	Component *string `json:"component"`
 }
 
+// A GenericResource represents a kind of Kubernetes resource that does not
+// correspond to a kind or class of resources that is more specifically modelled
+// by xgql.
 type GenericResource struct {
-	ID         ReferenceID      `json:"id"`
-	APIVersion string           `json:"apiVersion"`
-	Kind       string           `json:"kind"`
-	Metadata   *ObjectMeta      `json:"metadata"`
-	Raw        string           `json:"raw"`
-	Events     *EventConnection `json:"events"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
 }
 
 func (GenericResource) IsNode()               {}
 func (GenericResource) IsKubernetesResource() {}
 
+// A KubernetesResourceConnection represents a connection to Kubernetes resources.
 type KubernetesResourceConnection struct {
-	Nodes      []KubernetesResource `json:"nodes"`
-	TotalCount int                  `json:"totalCount"`
+	// Connected nodes.
+	Nodes []KubernetesResource `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
 }
 
+// A LabelSelector matches a Kubernetes resource by labels.
 type LabelSelector struct {
+	// The labels to match on.
 	MatchLabels map[string]interface{} `json:"matchLabels"`
 }
 
+// A ManagedResource is a Kubernetes API representation of a resource in an
+// external system, such as a cloud provider's API. Crossplane providers add
+// support for new kinds of managed resource.
 type ManagedResource struct {
-	ID         ReferenceID            `json:"id"`
-	APIVersion string                 `json:"apiVersion"`
-	Kind       string                 `json:"kind"`
-	Metadata   *ObjectMeta            `json:"metadata"`
-	Spec       *ManagedResourceSpec   `json:"spec"`
-	Status     *ManagedResourceStatus `json:"status"`
-	Raw        string                 `json:"raw"`
-	Events     *EventConnection       `json:"events"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// The desired state of this resource.
+	Spec *ManagedResourceSpec `json:"spec"`
+	// The observed state of this resource.
+	Status *ManagedResourceStatus `json:"status"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
 }
 
 func (ManagedResource) IsComposedResource()   {}
 func (ManagedResource) IsNode()               {}
 func (ManagedResource) IsKubernetesResource() {}
 
+// A ManagedResourceStatus represents the observed state of a managed resource.
 type ManagedResourceStatus struct {
+	// The observed condition of this resource.
 	Conditions []Condition `json:"conditions"`
 }
 
 func (ManagedResourceStatus) IsConditionedStatus() {}
 
+// An owner of a Kubernetes resource.
 type Owner struct {
-	Resource   KubernetesResource `json:"resource"`
-	Controller *bool              `json:"controller"`
+	// The owner.
+	Resource KubernetesResource `json:"resource"`
+	// Whether the owner is the controller of the owned Kubernetes resource.
+	Controller *bool `json:"controller"`
 }
 
+// An OwnerConnection represents a connection to an owner.
 type OwnerConnection struct {
-	Nodes      []Owner `json:"nodes"`
-	TotalCount int     `json:"totalCount"`
+	// Connected nodes.
+	Nodes []Owner `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
 }
 
+// A PolicyRule holds information that describes a KubernetesRBAC policy rule.
 type PolicyRule struct {
-	Verbs           []string `json:"verbs"`
-	APIGroups       []string `json:"apiGroups"`
-	Resources       []string `json:"resources"`
-	ResourceNames   []string `json:"resourceNames"`
+	// Verbs is a list of verbs that apply to ALL the resources specified by this
+	//  rule. '*' represents all verbs.
+	Verbs []string `json:"verbs"`
+	// APIGroups is the name of the APIGroup that contains the resources. If multiple
+	// API groups are specified, any action requested against one of the enumerated
+	// resources in any API group will be allowed.
+	APIGroups []string `json:"apiGroups"`
+	// Resources is a list of resources this rule applies to. '*' represents all
+	//  resources.
+	Resources []string `json:"resources"`
+	// ResourceNames is a list of names that the rule applies to. An empty set means
+	//  that everything is allowed.
+	ResourceNames []string `json:"resourceNames"`
+	// NonResourceURLs is a set of partial urls that a user should have access to.
+	//  '*' is allowed, but only as the full, final step in the path. Rules can either
+	//  apply to API resources (such as "pods" or "secrets") or non-resource URL paths
+	//  (such as "/api"),  but not both.
 	NonResourceURLs []string `json:"nonResourceURLs"`
 }
 
+// A Provider extends Crossplane with support for new managed resources.
 type Provider struct {
-	ID         ReferenceID                 `json:"id"`
-	APIVersion string                      `json:"apiVersion"`
-	Kind       string                      `json:"kind"`
-	Metadata   *ObjectMeta                 `json:"metadata"`
-	Spec       *ProviderSpec               `json:"spec"`
-	Status     *ProviderStatus             `json:"status"`
-	Raw        string                      `json:"raw"`
-	Events     *EventConnection            `json:"events"`
-	Revisions  *ProviderRevisionConnection `json:"revisions"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// The desired state of this resource.
+	Spec *ProviderSpec `json:"spec"`
+	// The observed state of this resource.
+	Status *ProviderStatus `json:"status"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
+	// Revisions of this provider.
+	Revisions *ProviderRevisionConnection `json:"revisions"`
 }
 
 func (Provider) IsNode()               {}
 func (Provider) IsKubernetesResource() {}
 
+// A ProviderConfig configures a provider, in that it provides configuration that
+// is relevant to all managed resources installed by a provider.
 type ProviderConfig struct {
-	ID         ReferenceID           `json:"id"`
-	APIVersion string                `json:"apiVersion"`
-	Kind       string                `json:"kind"`
-	Metadata   *ObjectMeta           `json:"metadata"`
-	Status     *ProviderConfigStatus `json:"status"`
-	Events     *EventConnection      `json:"events"`
-	Raw        string                `json:"raw"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// The observed state of this resource.
+	Status *ProviderConfigStatus `json:"status"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
 }
 
 func (ProviderConfig) IsNode()               {}
 func (ProviderConfig) IsKubernetesResource() {}
 
+// A ProviderConfigStatus represents the observed state of a provider config.
 type ProviderConfigStatus struct {
+	// The observed condition of this resource.
 	Conditions []Condition `json:"conditions"`
-	Users      *int        `json:"users"`
+	// The number of managed resources currently using this provider config.
+	Users *int `json:"users"`
 }
 
 func (ProviderConfigStatus) IsConditionedStatus() {}
 
+// A ProviderConnection represents a connection to providers.
 type ProviderConnection struct {
-	Nodes      []Provider `json:"nodes"`
-	TotalCount int        `json:"totalCount"`
+	// Connected nodes.
+	Nodes []Provider `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
 }
 
+// A ProviderRevision represents a revision or 'version' of a provider.
 type ProviderRevision struct {
-	ID         ReferenceID             `json:"id"`
-	APIVersion string                  `json:"apiVersion"`
-	Kind       string                  `json:"kind"`
-	Metadata   *ObjectMeta             `json:"metadata"`
-	Spec       *ProviderRevisionSpec   `json:"spec"`
-	Status     *ProviderRevisionStatus `json:"status"`
-	Raw        string                  `json:"raw"`
-	Events     *EventConnection        `json:"events"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// The desired state of this resource.
+	Spec *ProviderRevisionSpec `json:"spec"`
+	// The observed state of this resource.
+	Status *ProviderRevisionStatus `json:"status"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
 }
 
 func (ProviderRevision) IsNode()               {}
 func (ProviderRevision) IsKubernetesResource() {}
 
+// A ProviderRevisionConnection represents a connection to provider revisions.
 type ProviderRevisionConnection struct {
-	Nodes      []ProviderRevision `json:"nodes"`
-	TotalCount int                `json:"totalCount"`
+	// Connected nodes.
+	Nodes []ProviderRevision `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
 }
 
+// A ProviderRevisionSpec represents the desired state of a provider revision.
 type ProviderRevisionSpec struct {
-	DesiredState                PackageRevisionDesiredState `json:"desiredState"`
-	Package                     string                      `json:"package"`
-	PackagePullPolicy           *PackagePullPolicy          `json:"packagePullPolicy"`
-	Revision                    int                         `json:"revision"`
-	IgnoreCrossplaneConstraints *bool                       `json:"ignoreCrossplaneConstraints"`
-	SkipDependencyResolution    *bool                       `json:"skipDependencyResolution"`
+	// Desired state of the provider revision.
+	DesiredState PackageRevisionDesiredState `json:"desiredState"`
+	// Package image used by the install pod to extract package contents.
+	Package string `json:"package"`
+	// PackagePullPolicy defines the pull policy for the package. It is also applied
+	//  to any images pulled for the package, such as a provider's controller image.
+	PackagePullPolicy *PackagePullPolicy `json:"packagePullPolicy"`
+	// Revision number. Indicates when the revision will be garbage collected based
+	// on the configuration's RevisionHistoryLimit.
+	Revision int `json:"revision"`
+	// IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+	// Crossplane version constrains specified by the package.
+	IgnoreCrossplaneConstraints *bool `json:"ignoreCrossplaneConstraints"`
+	// SkipDependencyResolution indicates to the package manager whether to skip
+	// resolving dependencies for a package.
+	SkipDependencyResolution *bool `json:"skipDependencyResolution"`
 }
 
+// A ProviderSpec represents the desired state of a provider.
 type ProviderSpec struct {
-	Package                     string                    `json:"package"`
-	RevisionActivationPolicy    *RevisionActivationPolicy `json:"revisionActivationPolicy"`
-	RevisionHistoryLimit        *int                      `json:"revisionHistoryLimit"`
-	PackagePullPolicy           *PackagePullPolicy        `json:"packagePullPolicy"`
-	IgnoreCrossplaneConstraints *bool                     `json:"ignoreCrossplaneConstraints"`
-	SkipDependencyResolution    *bool                     `json:"skipDependencyResolution"`
+	// The name of the provider package to pull from an OCI registry.
+	Package string `json:"package"`
+	// RevisionActivationPolicy specifies how the package controller should update
+	//  from one revision to the next.
+	RevisionActivationPolicy *RevisionActivationPolicy `json:"revisionActivationPolicy"`
+	// RevisionHistoryLimit dictates how the package controller cleans up old
+	//  inactive package revisions. Defaults to 1. Can be disabled by explicitly
+	//  setting to 0.
+	RevisionHistoryLimit *int `json:"revisionHistoryLimit"`
+	// PackagePullPolicy defines the pull policy for the package.
+	PackagePullPolicy *PackagePullPolicy `json:"packagePullPolicy"`
+	// IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+	//  Crossplane version constraints specified by the package.
+	IgnoreCrossplaneConstraints *bool `json:"ignoreCrossplaneConstraints"`
+	// SkipDependencyResolution indicates to the package manager whether to skip
+	// resolving dependencies for a package.
+	SkipDependencyResolution *bool `json:"skipDependencyResolution"`
 }
 
+// A ProviderStatus represents the observed state of a provider.
 type ProviderStatus struct {
-	Conditions        []Condition `json:"conditions"`
-	CurrentRevision   *string     `json:"currentRevision"`
-	CurrentIdentifier *string     `json:"currentIdentifier"`
+	// The observed condition of this resource.
+	Conditions []Condition `json:"conditions"`
+	// CurrentRevision is the name of the current package revision. It will reflect
+	//  the most up to date revision, whether it has been activated or not.
+	CurrentRevision *string `json:"currentRevision"`
+	// CurrentIdentifier is the most recent package source that was used to produce a
+	//  revision. The package manager uses this field to determine whether to check
+	//  for package updates for a given source when packagePullPolicy is set to
+	//  IfNotPresent.
+	CurrentIdentifier *string `json:"currentIdentifier"`
 }
 
 func (ProviderStatus) IsConditionedStatus() {}
 
+// A Secret holds secret data.
 type Secret struct {
-	ID         ReferenceID      `json:"id"`
-	APIVersion string           `json:"apiVersion"`
-	Kind       string           `json:"kind"`
-	Metadata   *ObjectMeta      `json:"metadata"`
-	Data       *string          `json:"data"`
-	Raw        string           `json:"raw"`
-	Events     *EventConnection `json:"events"`
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
 }
 
 func (Secret) IsNode()               {}
 func (Secret) IsKubernetesResource() {}
 
+// A TypeReference references a type of Kubernetes resource by API version and
+// kind.
 type TypeReference struct {
+	// The Kubernetes API version of the referenced resource.
 	APIVersion string `json:"apiVersion"`
-	Kind       string `json:"kind"`
+	// The Kubernetes API kind of the referenced resource.
+	Kind string `json:"kind"`
 }
 
+// A ConditionStatus represensts the status of a condition.
 type ConditionStatus string
 
 const (
+	// The status of the condition is unknown.
 	ConditionStatusUnknown ConditionStatus = "UNKNOWN"
-	ConditionStatusFalse   ConditionStatus = "FALSE"
-	ConditionStatusTrue    ConditionStatus = "TRUE"
+	// The condition is false.
+	ConditionStatusFalse ConditionStatus = "FALSE"
+	// The condition is true.
+	ConditionStatusTrue ConditionStatus = "TRUE"
 )
 
 var AllConditionStatus = []ConditionStatus{
@@ -533,10 +944,17 @@ func (e ConditionStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+// A DeletionPolicy specifies what will happen to the underlying external resource
+// when this managed resource is deleted - either "Delete" or "Orphan" the external
+// resource.
 type DeletionPolicy string
 
 const (
+	// Delete the resource from the external system when the managed resource is
+	// deleted.
 	DeletionPolicyDelete DeletionPolicy = "DELETE"
+	// Leave the resource in the external system when the managed resource is
+	// deleted.
 	DeletionPolicyOrphan DeletionPolicy = "ORPHAN"
 )
 
@@ -574,10 +992,13 @@ func (e DeletionPolicy) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+// An EventType indicates the type of an event.
 type EventType string
 
 const (
-	EventTypeNormal  EventType = "NORMAL"
+	// A normal, informational event.
+	EventTypeNormal EventType = "NORMAL"
+	// A warning that something suboptimal has occurred.
 	EventTypeWarning EventType = "WARNING"
 )
 
@@ -615,11 +1036,15 @@ func (e EventType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+// A PackagePullPolicy represents when to pull a package OCI image from a registry.
 type PackagePullPolicy string
 
 const (
-	PackagePullPolicyAlways       PackagePullPolicy = "ALWAYS"
-	PackagePullPolicyNever        PackagePullPolicy = "NEVER"
+	// Always pull the package image, even if it is already present.
+	PackagePullPolicyAlways PackagePullPolicy = "ALWAYS"
+	// Never pull the package image.
+	PackagePullPolicyNever PackagePullPolicy = "NEVER"
+	// Only pull the package image if it is not present.
 	PackagePullPolicyIfNotPresent PackagePullPolicy = "IF_NOT_PRESENT"
 )
 
@@ -658,11 +1083,15 @@ func (e PackagePullPolicy) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+// A PackageRevisionDesiredState represents the desired state of a provider or
+// configuration revision.
 type PackageRevisionDesiredState string
 
 const (
+	// The revision should be inactive.
 	PackageRevisionDesiredStateInactive PackageRevisionDesiredState = "INACTIVE"
-	PackageRevisionDesiredStateActive   PackageRevisionDesiredState = "ACTIVE"
+	// The revision should be active.
+	PackageRevisionDesiredStateActive PackageRevisionDesiredState = "ACTIVE"
 )
 
 var AllPackageRevisionDesiredState = []PackageRevisionDesiredState{
@@ -699,11 +1128,15 @@ func (e PackageRevisionDesiredState) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+// A RevisionActivationPolicy indicates how a provider or configuration package
+// should activate its revisions.
 type RevisionActivationPolicy string
 
 const (
+	// Automatically activate package revisions.
 	RevisionActivationPolicyAutomatic RevisionActivationPolicy = "AUTOMATIC"
-	RevisionActivationPolicyManual    RevisionActivationPolicy = "MANUAL"
+	// Require a user to manually activate revisions.
+	RevisionActivationPolicyManual RevisionActivationPolicy = "MANUAL"
 )
 
 var AllRevisionActivationPolicy = []RevisionActivationPolicy{
