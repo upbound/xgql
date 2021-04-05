@@ -1,26 +1,75 @@
+"""
+Query is the root type for GraphQL queries.
+"""
 type Query {
+    """
+    Providers that are currently installed.
+    """
     providers: ProviderConnection!
+
+    """
+    Configurations that are currently installed.
+    """
     configurations: ConfigurationConnection!
-    compositeResourceDefinitions(dangling: Boolean = false): CompositeResourceDefinitionConnection!
-    compositions(dangling: Boolean = false): CompositionConnection!
+
+    """
+    Composite Resource Definitions (XRDs) that currently exist.
+    """
+    compositeResourceDefinitions(
+      "Only return XRDs that aren't owned by a configuration revision."
+      dangling: Boolean = false
+    ): CompositeResourceDefinitionConnection!
+
+    """
+    Compositions that currently exist.
+    """
+    compositions(
+      "Only return Compositions that aren't owned by a configuration revision."
+      dangling: Boolean = false
+    ): CompositionConnection!
 }
 
+"""
+A ProviderConnection represents a connection to providers.
+"""
 type ProviderConnection {
-    items: [Provider!]
-    count: Int!
+  "Connected nodes."
+  nodes: [Provider!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+A ConfigurationConnection represents a connection to configurations.
+"""
 type ConfigurationConnection {
-    items: [Configuration!]
-    count: Int!
+  "Connected nodes."
+  nodes: [Configuration!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+A CompositeResourceDefinitionConnection represents a connection to composite
+resource definitions (XRDs).
+"""
 type CompositeResourceDefinitionConnection {
-    items: [CompositeResourceDefinition!]
-    count: Int!
+  "Connected nodes."
+  nodes: [CompositeResourceDefinition!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+A CompositionConnection represents a connection to compositions.
+"""
 type CompositionConnection {
-    items: [Composition!]
-    count: Int!
+  "Connected nodes."
+  nodes: [Composition!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }

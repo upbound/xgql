@@ -17,6 +17,10 @@ GO_SUBDIRS += cmd internal
 GO111MODULE = on
 -include build/makelib/golang.mk
 
+# Setup Node (for linting the schema)
+YARN_DIR = lint-schema
+-include build/makelib/yarnjs.mk
+
 # Setup Helm
 HELM_VERSION=v2.17.0
 HELM_BASE_URL = https://charts.upbound.io 
@@ -35,6 +39,10 @@ OSBASEIMAGE = gcr.io/distroless/static:nonroot
 fallthrough: submodules
 	@echo Initial setup complete. Running make again . . .
 	@make
+
+yarn.lint: yarn.install
+	@echo === yarn lint
+	@cd $(YARN_DIR); $(YARN) lint
 
 # Ensure a PR is ready for review.
 reviewable: generate lint

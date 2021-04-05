@@ -1,28 +1,79 @@
+"""
+A ManagedResource is a Kubernetes API representation of a resource in an
+external system, such as a cloud provider's API. Crossplane providers add
+support for new kinds of managed resource.
+"""
 type ManagedResource implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: ManagedResourceSpec!
+
+  "The observed state of this resource."
   status: ManagedResourceStatus!
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"""
+A ManagedResourceSpec represents the desired state of a managed resource.
+"""
 type ManagedResourceSpec {
+  """
+  The secret this managed resource writes its connection details to.
+  """
   connectionSecret: Secret @goField(forceResolver: true)
+
+  """
+  The provider configuration configures how this managed resource interacts
+  with an external system.
+  """
   providerConfig: ProviderConfig @goField(forceResolver: true)
+
+  """
+  The deletion policy specifies what will happen to the underlying external
+  resource when this managed resource is deleted.
+  """
   deletionPolicy: DeletionPolicy
 }
 
+"""
+A DeletionPolicy specifies what will happen to the underlying external resource
+when this managed resource is deleted - either "Delete" or "Orphan" the external
+resource.
+"""
 enum DeletionPolicy {
-  Delete
-  Orphan
+  """
+  Delete the resource from the external system when the managed resource is
+  deleted.
+  """
+  DELETE
+
+  """
+  Leave the resource in the external system when the managed resource is
+  deleted.
+  """
+  ORPHAN
 }
 
+"""
+A ManagedResourceStatus represents the observed state of a managed resource.
+"""
 type ManagedResourceStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
 }

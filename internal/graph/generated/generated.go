@@ -66,8 +66,8 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	ComposedResourceConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	CompositeResource struct {
@@ -93,8 +93,8 @@ type ComplexityRoot struct {
 	}
 
 	CompositeResourceClaimConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	CompositeResourceClaimConnectionDetails struct {
@@ -102,10 +102,10 @@ type ComplexityRoot struct {
 	}
 
 	CompositeResourceClaimSpec struct {
-		Composition              func(childComplexity int) int
-		CompositionSelector      func(childComplexity int) int
-		Resource                 func(childComplexity int) int
-		WritesConnectionSecretTo func(childComplexity int) int
+		Composition         func(childComplexity int) int
+		CompositionSelector func(childComplexity int) int
+		ConnectionSecret    func(childComplexity int) int
+		Resource            func(childComplexity int) int
 	}
 
 	CompositeResourceClaimStatus struct {
@@ -114,8 +114,8 @@ type ComplexityRoot struct {
 	}
 
 	CompositeResourceConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	CompositeResourceConnectionDetails struct {
@@ -136,8 +136,8 @@ type ComplexityRoot struct {
 	}
 
 	CompositeResourceDefinitionConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	CompositeResourceDefinitionControllerStatus struct {
@@ -177,11 +177,11 @@ type ComplexityRoot struct {
 	}
 
 	CompositeResourceSpec struct {
-		Claim                    func(childComplexity int) int
-		Composition              func(childComplexity int) int
-		CompositionSelector      func(childComplexity int) int
-		Resources                func(childComplexity int) int
-		WritesConnectionSecretTo func(childComplexity int) int
+		Claim               func(childComplexity int) int
+		Composition         func(childComplexity int) int
+		CompositionSelector func(childComplexity int) int
+		ConnectionSecret    func(childComplexity int) int
+		Resources           func(childComplexity int) int
 	}
 
 	CompositeResourceStatus struct {
@@ -205,8 +205,8 @@ type ComplexityRoot struct {
 	}
 
 	CompositionConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	CompositionSpec struct {
@@ -239,8 +239,8 @@ type ComplexityRoot struct {
 	}
 
 	ConfigurationConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	ConfigurationRevision struct {
@@ -255,8 +255,8 @@ type ComplexityRoot struct {
 	}
 
 	ConfigurationRevisionConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	ConfigurationRevisionSpec struct {
@@ -350,8 +350,8 @@ type ComplexityRoot struct {
 	}
 
 	EventConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	EventSource struct {
@@ -368,8 +368,8 @@ type ComplexityRoot struct {
 	}
 
 	KubernetesResourceConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	LabelSelector struct {
@@ -417,8 +417,8 @@ type ComplexityRoot struct {
 	}
 
 	OwnerConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	PolicyRule struct {
@@ -457,8 +457,8 @@ type ComplexityRoot struct {
 	}
 
 	ProviderConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	ProviderRevision struct {
@@ -473,8 +473,8 @@ type ComplexityRoot struct {
 	}
 
 	ProviderRevisionConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	ProviderRevisionSpec struct {
@@ -519,17 +519,11 @@ type ComplexityRoot struct {
 
 	Secret struct {
 		APIVersion func(childComplexity int) int
-		Data       func(childComplexity int) int
 		Events     func(childComplexity int) int
 		ID         func(childComplexity int) int
 		Kind       func(childComplexity int) int
 		Metadata   func(childComplexity int) int
 		Raw        func(childComplexity int) int
-	}
-
-	SecretConnection struct {
-		Count func(childComplexity int) int
-		Items func(childComplexity int) int
 	}
 
 	TypeReference struct {
@@ -548,7 +542,7 @@ type CompositeResourceClaimSpecResolver interface {
 	Composition(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.Composition, error)
 
 	Resource(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.CompositeResource, error)
-	WritesConnectionSecretTo(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.Secret, error)
+	ConnectionSecret(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.Secret, error)
 }
 type CompositeResourceDefinitionResolver interface {
 	Events(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.EventConnection, error)
@@ -563,7 +557,7 @@ type CompositeResourceSpecResolver interface {
 	Composition(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Composition, error)
 
 	Claim(ctx context.Context, obj *model.CompositeResourceSpec) (*model.CompositeResourceClaim, error)
-	WritesConnectionSecretTo(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error)
+	ConnectionSecret(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error)
 	Resources(ctx context.Context, obj *model.CompositeResourceSpec) (*model.ComposedResourceConnection, error)
 }
 type CompositionResolver interface {
@@ -637,19 +631,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "ComposedResourceConnection.count":
-		if e.complexity.ComposedResourceConnection.Count == nil {
+	case "ComposedResourceConnection.nodes":
+		if e.complexity.ComposedResourceConnection.Nodes == nil {
 			break
 		}
 
-		return e.complexity.ComposedResourceConnection.Count(childComplexity), true
+		return e.complexity.ComposedResourceConnection.Nodes(childComplexity), true
 
-	case "ComposedResourceConnection.items":
-		if e.complexity.ComposedResourceConnection.Items == nil {
+	case "ComposedResourceConnection.totalCount":
+		if e.complexity.ComposedResourceConnection.TotalCount == nil {
 			break
 		}
 
-		return e.complexity.ComposedResourceConnection.Items(childComplexity), true
+		return e.complexity.ComposedResourceConnection.TotalCount(childComplexity), true
 
 	case "CompositeResource.apiVersion":
 		if e.complexity.CompositeResource.APIVersion == nil {
@@ -763,19 +757,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResourceClaim.Status(childComplexity), true
 
-	case "CompositeResourceClaimConnection.count":
-		if e.complexity.CompositeResourceClaimConnection.Count == nil {
+	case "CompositeResourceClaimConnection.nodes":
+		if e.complexity.CompositeResourceClaimConnection.Nodes == nil {
 			break
 		}
 
-		return e.complexity.CompositeResourceClaimConnection.Count(childComplexity), true
+		return e.complexity.CompositeResourceClaimConnection.Nodes(childComplexity), true
 
-	case "CompositeResourceClaimConnection.items":
-		if e.complexity.CompositeResourceClaimConnection.Items == nil {
+	case "CompositeResourceClaimConnection.totalCount":
+		if e.complexity.CompositeResourceClaimConnection.TotalCount == nil {
 			break
 		}
 
-		return e.complexity.CompositeResourceClaimConnection.Items(childComplexity), true
+		return e.complexity.CompositeResourceClaimConnection.TotalCount(childComplexity), true
 
 	case "CompositeResourceClaimConnectionDetails.lastPublishedTime":
 		if e.complexity.CompositeResourceClaimConnectionDetails.LastPublishedTime == nil {
@@ -798,19 +792,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResourceClaimSpec.CompositionSelector(childComplexity), true
 
+	case "CompositeResourceClaimSpec.connectionSecret":
+		if e.complexity.CompositeResourceClaimSpec.ConnectionSecret == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceClaimSpec.ConnectionSecret(childComplexity), true
+
 	case "CompositeResourceClaimSpec.resource":
 		if e.complexity.CompositeResourceClaimSpec.Resource == nil {
 			break
 		}
 
 		return e.complexity.CompositeResourceClaimSpec.Resource(childComplexity), true
-
-	case "CompositeResourceClaimSpec.writesConnectionSecretTo":
-		if e.complexity.CompositeResourceClaimSpec.WritesConnectionSecretTo == nil {
-			break
-		}
-
-		return e.complexity.CompositeResourceClaimSpec.WritesConnectionSecretTo(childComplexity), true
 
 	case "CompositeResourceClaimStatus.conditions":
 		if e.complexity.CompositeResourceClaimStatus.Conditions == nil {
@@ -826,19 +820,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResourceClaimStatus.ConnectionDetails(childComplexity), true
 
-	case "CompositeResourceConnection.count":
-		if e.complexity.CompositeResourceConnection.Count == nil {
+	case "CompositeResourceConnection.nodes":
+		if e.complexity.CompositeResourceConnection.Nodes == nil {
 			break
 		}
 
-		return e.complexity.CompositeResourceConnection.Count(childComplexity), true
+		return e.complexity.CompositeResourceConnection.Nodes(childComplexity), true
 
-	case "CompositeResourceConnection.items":
-		if e.complexity.CompositeResourceConnection.Items == nil {
+	case "CompositeResourceConnection.totalCount":
+		if e.complexity.CompositeResourceConnection.TotalCount == nil {
 			break
 		}
 
-		return e.complexity.CompositeResourceConnection.Items(childComplexity), true
+		return e.complexity.CompositeResourceConnection.TotalCount(childComplexity), true
 
 	case "CompositeResourceConnectionDetails.lastPublishedTime":
 		if e.complexity.CompositeResourceConnectionDetails.LastPublishedTime == nil {
@@ -927,19 +921,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResourceDefinition.Status(childComplexity), true
 
-	case "CompositeResourceDefinitionConnection.count":
-		if e.complexity.CompositeResourceDefinitionConnection.Count == nil {
+	case "CompositeResourceDefinitionConnection.nodes":
+		if e.complexity.CompositeResourceDefinitionConnection.Nodes == nil {
 			break
 		}
 
-		return e.complexity.CompositeResourceDefinitionConnection.Count(childComplexity), true
+		return e.complexity.CompositeResourceDefinitionConnection.Nodes(childComplexity), true
 
-	case "CompositeResourceDefinitionConnection.items":
-		if e.complexity.CompositeResourceDefinitionConnection.Items == nil {
+	case "CompositeResourceDefinitionConnection.totalCount":
+		if e.complexity.CompositeResourceDefinitionConnection.TotalCount == nil {
 			break
 		}
 
-		return e.complexity.CompositeResourceDefinitionConnection.Items(childComplexity), true
+		return e.complexity.CompositeResourceDefinitionConnection.TotalCount(childComplexity), true
 
 	case "CompositeResourceDefinitionControllerStatus.compositeResourceClaimType":
 		if e.complexity.CompositeResourceDefinitionControllerStatus.CompositeResourceClaimType == nil {
@@ -1109,19 +1103,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResourceSpec.CompositionSelector(childComplexity), true
 
+	case "CompositeResourceSpec.connectionSecret":
+		if e.complexity.CompositeResourceSpec.ConnectionSecret == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceSpec.ConnectionSecret(childComplexity), true
+
 	case "CompositeResourceSpec.resources":
 		if e.complexity.CompositeResourceSpec.Resources == nil {
 			break
 		}
 
 		return e.complexity.CompositeResourceSpec.Resources(childComplexity), true
-
-	case "CompositeResourceSpec.writesConnectionSecretTo":
-		if e.complexity.CompositeResourceSpec.WritesConnectionSecretTo == nil {
-			break
-		}
-
-		return e.complexity.CompositeResourceSpec.WritesConnectionSecretTo(childComplexity), true
 
 	case "CompositeResourceStatus.conditions":
 		if e.complexity.CompositeResourceStatus.Conditions == nil {
@@ -1200,19 +1194,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Composition.Status(childComplexity), true
 
-	case "CompositionConnection.count":
-		if e.complexity.CompositionConnection.Count == nil {
+	case "CompositionConnection.nodes":
+		if e.complexity.CompositionConnection.Nodes == nil {
 			break
 		}
 
-		return e.complexity.CompositionConnection.Count(childComplexity), true
+		return e.complexity.CompositionConnection.Nodes(childComplexity), true
 
-	case "CompositionConnection.items":
-		if e.complexity.CompositionConnection.Items == nil {
+	case "CompositionConnection.totalCount":
+		if e.complexity.CompositionConnection.TotalCount == nil {
 			break
 		}
 
-		return e.complexity.CompositionConnection.Items(childComplexity), true
+		return e.complexity.CompositionConnection.TotalCount(childComplexity), true
 
 	case "CompositionSpec.compositeTypeRef":
 		if e.complexity.CompositionSpec.CompositeTypeRef == nil {
@@ -1338,19 +1332,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Configuration.Status(childComplexity), true
 
-	case "ConfigurationConnection.count":
-		if e.complexity.ConfigurationConnection.Count == nil {
+	case "ConfigurationConnection.nodes":
+		if e.complexity.ConfigurationConnection.Nodes == nil {
 			break
 		}
 
-		return e.complexity.ConfigurationConnection.Count(childComplexity), true
+		return e.complexity.ConfigurationConnection.Nodes(childComplexity), true
 
-	case "ConfigurationConnection.items":
-		if e.complexity.ConfigurationConnection.Items == nil {
+	case "ConfigurationConnection.totalCount":
+		if e.complexity.ConfigurationConnection.TotalCount == nil {
 			break
 		}
 
-		return e.complexity.ConfigurationConnection.Items(childComplexity), true
+		return e.complexity.ConfigurationConnection.TotalCount(childComplexity), true
 
 	case "ConfigurationRevision.apiVersion":
 		if e.complexity.ConfigurationRevision.APIVersion == nil {
@@ -1408,19 +1402,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ConfigurationRevision.Status(childComplexity), true
 
-	case "ConfigurationRevisionConnection.count":
-		if e.complexity.ConfigurationRevisionConnection.Count == nil {
+	case "ConfigurationRevisionConnection.nodes":
+		if e.complexity.ConfigurationRevisionConnection.Nodes == nil {
 			break
 		}
 
-		return e.complexity.ConfigurationRevisionConnection.Count(childComplexity), true
+		return e.complexity.ConfigurationRevisionConnection.Nodes(childComplexity), true
 
-	case "ConfigurationRevisionConnection.items":
-		if e.complexity.ConfigurationRevisionConnection.Items == nil {
+	case "ConfigurationRevisionConnection.totalCount":
+		if e.complexity.ConfigurationRevisionConnection.TotalCount == nil {
 			break
 		}
 
-		return e.complexity.ConfigurationRevisionConnection.Items(childComplexity), true
+		return e.complexity.ConfigurationRevisionConnection.TotalCount(childComplexity), true
 
 	case "ConfigurationRevisionSpec.desiredState":
 		if e.complexity.ConfigurationRevisionSpec.DesiredState == nil {
@@ -1826,19 +1820,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Event.Type(childComplexity), true
 
-	case "EventConnection.count":
-		if e.complexity.EventConnection.Count == nil {
+	case "EventConnection.nodes":
+		if e.complexity.EventConnection.Nodes == nil {
 			break
 		}
 
-		return e.complexity.EventConnection.Count(childComplexity), true
+		return e.complexity.EventConnection.Nodes(childComplexity), true
 
-	case "EventConnection.items":
-		if e.complexity.EventConnection.Items == nil {
+	case "EventConnection.totalCount":
+		if e.complexity.EventConnection.TotalCount == nil {
 			break
 		}
 
-		return e.complexity.EventConnection.Items(childComplexity), true
+		return e.complexity.EventConnection.TotalCount(childComplexity), true
 
 	case "EventSource.component":
 		if e.complexity.EventSource.Component == nil {
@@ -1889,19 +1883,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GenericResource.Raw(childComplexity), true
 
-	case "KubernetesResourceConnection.count":
-		if e.complexity.KubernetesResourceConnection.Count == nil {
+	case "KubernetesResourceConnection.nodes":
+		if e.complexity.KubernetesResourceConnection.Nodes == nil {
 			break
 		}
 
-		return e.complexity.KubernetesResourceConnection.Count(childComplexity), true
+		return e.complexity.KubernetesResourceConnection.Nodes(childComplexity), true
 
-	case "KubernetesResourceConnection.items":
-		if e.complexity.KubernetesResourceConnection.Items == nil {
+	case "KubernetesResourceConnection.totalCount":
+		if e.complexity.KubernetesResourceConnection.TotalCount == nil {
 			break
 		}
 
-		return e.complexity.KubernetesResourceConnection.Items(childComplexity), true
+		return e.complexity.KubernetesResourceConnection.TotalCount(childComplexity), true
 
 	case "LabelSelector.matchLabels":
 		if e.complexity.LabelSelector.MatchLabels == nil {
@@ -2090,19 +2084,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Owner.Resource(childComplexity), true
 
-	case "OwnerConnection.count":
-		if e.complexity.OwnerConnection.Count == nil {
+	case "OwnerConnection.nodes":
+		if e.complexity.OwnerConnection.Nodes == nil {
 			break
 		}
 
-		return e.complexity.OwnerConnection.Count(childComplexity), true
+		return e.complexity.OwnerConnection.Nodes(childComplexity), true
 
-	case "OwnerConnection.items":
-		if e.complexity.OwnerConnection.Items == nil {
+	case "OwnerConnection.totalCount":
+		if e.complexity.OwnerConnection.TotalCount == nil {
 			break
 		}
 
-		return e.complexity.OwnerConnection.Items(childComplexity), true
+		return e.complexity.OwnerConnection.TotalCount(childComplexity), true
 
 	case "PolicyRule.apiGroups":
 		if e.complexity.PolicyRule.APIGroups == nil {
@@ -2270,19 +2264,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProviderConfigStatus.Users(childComplexity), true
 
-	case "ProviderConnection.count":
-		if e.complexity.ProviderConnection.Count == nil {
+	case "ProviderConnection.nodes":
+		if e.complexity.ProviderConnection.Nodes == nil {
 			break
 		}
 
-		return e.complexity.ProviderConnection.Count(childComplexity), true
+		return e.complexity.ProviderConnection.Nodes(childComplexity), true
 
-	case "ProviderConnection.items":
-		if e.complexity.ProviderConnection.Items == nil {
+	case "ProviderConnection.totalCount":
+		if e.complexity.ProviderConnection.TotalCount == nil {
 			break
 		}
 
-		return e.complexity.ProviderConnection.Items(childComplexity), true
+		return e.complexity.ProviderConnection.TotalCount(childComplexity), true
 
 	case "ProviderRevision.apiVersion":
 		if e.complexity.ProviderRevision.APIVersion == nil {
@@ -2340,19 +2334,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProviderRevision.Status(childComplexity), true
 
-	case "ProviderRevisionConnection.count":
-		if e.complexity.ProviderRevisionConnection.Count == nil {
+	case "ProviderRevisionConnection.nodes":
+		if e.complexity.ProviderRevisionConnection.Nodes == nil {
 			break
 		}
 
-		return e.complexity.ProviderRevisionConnection.Count(childComplexity), true
+		return e.complexity.ProviderRevisionConnection.Nodes(childComplexity), true
 
-	case "ProviderRevisionConnection.items":
-		if e.complexity.ProviderRevisionConnection.Items == nil {
+	case "ProviderRevisionConnection.totalCount":
+		if e.complexity.ProviderRevisionConnection.TotalCount == nil {
 			break
 		}
 
-		return e.complexity.ProviderRevisionConnection.Items(childComplexity), true
+		return e.complexity.ProviderRevisionConnection.TotalCount(childComplexity), true
 
 	case "ProviderRevisionSpec.desiredState":
 		if e.complexity.ProviderRevisionSpec.DesiredState == nil {
@@ -2546,13 +2540,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Secret.APIVersion(childComplexity), true
 
-	case "Secret.data":
-		if e.complexity.Secret.Data == nil {
-			break
-		}
-
-		return e.complexity.Secret.Data(childComplexity), true
-
 	case "Secret.events":
 		if e.complexity.Secret.Events == nil {
 			break
@@ -2587,20 +2574,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Secret.Raw(childComplexity), true
-
-	case "SecretConnection.count":
-		if e.complexity.SecretConnection.Count == nil {
-			break
-		}
-
-		return e.complexity.SecretConnection.Count(childComplexity), true
-
-	case "SecretConnection.items":
-		if e.complexity.SecretConnection.Items == nil {
-			break
-		}
-
-		return e.complexity.SecretConnection.Items(childComplexity), true
 
 	case "TypeReference.apiVersion":
 		if e.complexity.TypeReference.APIVersion == nil {
@@ -2666,199 +2639,637 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "schema/apiextensions.gql", Input: `type CompositeResourceDefinition implements Node & KubernetesResource {
+	{Name: "schema/apiextensions.gql", Input: `"""
+A CompositeResourceDefinition (or XRD) defines a new kind of resource. The new
+resource is composed of other composite or managed resources.
+"""
+type CompositeResourceDefinition implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: CompositeResourceDefinitionSpec!
+
+  "The observed state of this resource."
   status: CompositeResourceDefinitionStatus
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
-  definedCompositeResources(version: String): CompositeResourceConnection! @goField(forceResolver: true)
-  definedCompositeResourceClaims(version: String, namespace: String): CompositeResourceClaimConnection! @goField(forceResolver: true)
+
+  "Composite resources (XRs) defined by this XRD."
+  definedCompositeResources(
+    "Return resources of this version."
+    version: String
+  ): CompositeResourceConnection! @goField(forceResolver: true)
+
+  "Composite resource claims (XRCs) defined by this XRD."
+  definedCompositeResourceClaims(
+    "Return resources of this version."
+    version: String,
+
+    "Return resources in this namespace."
+    namespace: String
+  ): CompositeResourceClaimConnection! @goField(forceResolver: true)
 }
 
+"""
+A CompositeResourceConnection represents a connection to composite resources.
+"""
 type CompositeResourceConnection {
-  items: [CompositeResource!]
-  count: Int!
+  "Connected nodes."
+  nodes: [CompositeResource!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+A CompositeResourceConnection represents a connection to composite resource
+claims.
+"""
 type CompositeResourceClaimConnection {
-  items: [CompositeResourceClaim!]
-  count: Int!
+  "Connected nodes."
+  nodes: [CompositeResourceClaim!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+A CompositeResourceDefinitionSpec represents the desired state of a composite
+resource definition.
+"""
 type CompositeResourceDefinitionSpec {
+  """
+  Group specifies the API group of the defined composite resource. Composite
+  resources are served under ` + "`" + `/apis/<group>/...` + "`" + `. Must match the name of the XRD
+  (in the form ` + "`" + `<names.plural>.<group>` + "`" + `).
+  """
   group: String!
+
+  """
+	Names specifies the resource and kind names of the defined composite resource.
+  """
   names: CompositeResourceDefinitionNames!
+
+  """
+	ClaimNames specifies the names of an optional composite resource claim. When
+  claim names are specified Crossplane will create a namespaced 'composite
+  resource claim' CRD that corresponds to the defined composite resource. This
+  composite resource claim acts as a namespaced proxy for the composite
+  resource; creating, updating, or deleting the claim will create, update, or
+  delete a corresponding composite resource. You may add claim names to an
+  existing CompositeResourceDefinition, but they cannot be changed or removed
+  once they have been set.
+  """
   claimNames: CompositeResourceDefinitionNames
+
+  """
+	ConnectionSecretKeys is the list of keys that will be exposed to the end user
+  of the defined kind.
+  """
   connectionSecretKeys: [String!]
+
+  """
+	DefaultComposition is the Composition resource that will be used in case no
+  composition selector is given.
+  """
   defaultComposition: Composition @goField(forceResolver: true)
+
+  """
+	EnforcedComposition is the Composition resource that will be used by all
+  composite instances whose schema is defined by this definition.
+  """
   enforcedComposition: Composition @goField(forceResolver: true)
+
+  """
+	Versions is the list of all API versions of the defined composite resource.
+  Version names are used to compute the order in which served versions are
+  listed in API discovery. If the version string is "kube-like", it will sort
+  above non "kube-like" version strings, which are ordered lexicographically.
+  "Kube-like" versions start with a "v", then are followed by a number (the
+  major version), then optionally the string "alpha" or "beta" and another
+  number (the minor version). These are sorted first by GA > beta > alpha (where
+  GA is a version with no suffix such as beta or alpha), and then by comparing
+  major version, then minor version. An example sorted list of versions: v10,
+  v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10. Note
+  that all versions must have identical schemas; Crossplane does not currently
+	support conversion between different version schemas.
+  """
   versions: [CompositeResourceDefinitionVersion!]
 }
 
+
+"""
+CompositeResourceDefinitionNames specifies the resource and kind names of the
+defined composite resource or claim.
+"""
 type CompositeResourceDefinitionNames {
+
+  """
+	The plural name of the resource to serve. Composite resources are served by
+  the Kuberntes API under ` + "`" + `/apis/<group>/<version>/.../<plural>` + "`" + `.
+  """
   plural: String!
+
+  """
+	The singular name of the resource.
+  """
   singular: String
+
+  """
+  Short names for the resource, exposed in API discovery documents, and used by
+  clients to support invocations like ` + "`" + `kubectl get <shortname>` + "`" + `.
+  """
   shortNames: [String!]
+
+  """
+  The Kubernetes API kind of the defined resource.
+  """
   kind: String!
+
+  """
+  The Kubernetes API kind of a list of the defined resource.
+  """
   listKind: String
+
+  """
+	A list of grouped resources this custom resource belongs to (e.g. 'all'). This
+  is published in API discovery documents, and used by clients to support
+  invocations like ` + "`" + `kubectl get all` + "`" + `.
+  """
   categories: [String!]
 }
 
+"""
+A CompositeResourceDefinitionVersion describes a version of a composite
+resource.
+"""
 type CompositeResourceDefinitionVersion {
+  """
+	Name of this version, e.g. “v1”, “v2beta1”, etc. Composite resources are
+	served under this version at ` + "`" + `/apis/<group>/<version>/...` + "`" + ` if ` + "`" + `served` + "`" + ` is
+	true.
+  """
   name: String!
+
+  """
+	Referenceable specifies that this version may be referenced by a Composition
+  in order to configure which resources an XR may be composed of. Exactly one
+  version must be marked as referenceable; all Compositions must target only the
+  referenceable version. The referenceable version must be served.
+  """
   referenceable: Boolean!
+
+  """
+	Served specifies that this version should be served via Kubernetes REST APIs.
+  """
   served: Boolean!
+
+  """
+	Schema describes the schema used for validation, pruning, and defaulting of
+  this version of the defined composite resource. Fields required by all
+  composite resources are injected into this schema automatically, and override
+  equivalently named fields in this schema.
+  """
   schema: CompositeResourceValidation
 }
 
+"""
+A CompositeResourceValidation is a list of validation methods for a composite
+resource.
+"""
 type CompositeResourceValidation {
+	"OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
   openAPIV3Schema: JSONObject
 }
 
+"""
+A CompositeResourceDefinitionStatus represents the observed state of a composite
+resource definition.
+"""
 type CompositeResourceDefinitionStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
+
+  """
+	Controllers represents the status of the controllers that power this
+  composite resource definition.
+  """
   controllers: CompositeResourceDefinitionControllerStatus
 }
 
+"""
+A CompositeResourceDefinitionControllerStatus shows the observed state of the
+controllers that power the definition.
+"""
 type CompositeResourceDefinitionControllerStatus {
+
+  """
+	The CompositeResourceTypeRef is the type of composite resource that Crossplane
+  is currently reconciling for this definition. Its version will eventually
+  become consistent with the definition's referenceable version. Note that
+  clients may interact with any served type; this is simply the type that
+  Crossplane interacts with.
+  """
   compositeResourceType: TypeReference
+
+  """
+	The CompositeResourceClaimTypeRef is the type of composite resource claim
+	that Crossplane is currently reconciling for this definition. Its version
+	will eventually become consistent with the definition's referenceable version.
+  Note that clients may interact with any served type; this is simply the type
+  that Crossplane interacts with.
+  """
   compositeResourceClaimType: TypeReference
 }
 
+
+"""
+A TypeReference references a type of Kubernetes resource by API version and
+kind.
+"""
 type TypeReference {
+  "The Kubernetes API version of the referenced resource."
   apiVersion: String!
+
+  "The Kubernetes API kind of the referenced resource."
   kind: String!
 }
 
+"""
+A Composition defines the group of resources to be created when a compatible
+type of composite resource is created with reference to the composition.
+"""
 type Composition implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: CompositionSpec!
+
+  "The observed state of this resource."
   status: CompositionStatus
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"""
+A CompositionSpec represents the desired state of a composition.
+"""
 type CompositionSpec {
+  """
+	CompositeTypeRef specifies the type of composite resource that this
+  composition is compatible with.
+  """
   compositeTypeRef: TypeReference!
+
+  """
+	WriteConnectionSecretsToNamespace specifies the namespace in which the
+	connection secrets of composite resource dynamically provisioned using this
+  composition will be created.
+  """
   writeConnectionSecretsToNamespace: String
 
   # TODO(negz): Model patch sets and resource templates.
 }
 
+"""
+A CompositionStatus represents the observed state of a composition.
+"""
 type CompositionStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
 }
 
 `, BuiltIn: false},
-	{Name: "schema/common.gql", Input: `scalar Time
+	{Name: "schema/common.gql", Input: `"""
+Time is a timestamp.
+"""
+scalar Time
+
+"""
+A Map of string to arbitrary values.
+"""
 scalar Map
+
+"""
+A JSONObject contains a JSON object encoded as a string.
+"""
 scalar JSONObject
 
+"""
+An object with an ID.
+"""
 interface Node {
+  "An opaque identifier that is unique across all types."
   id: ID!
 }
 
+"""
+An object that corresponds to a Kubernetes API resource.
+"""
 interface KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! 
 }
 
+"""
+An EventConnection represents a connection to events.
+"""
 type EventConnection {
-  items: [Event!]
-  count: Int!
+  "Connected nodes."
+  nodes: [Event!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+A KubernetesResourceConnection represents a connection to Kubernetes resources.
+"""
 type KubernetesResourceConnection {
-  items: [KubernetesResource!]
-  count: Int!
+  "Connected nodes."
+  nodes: [KubernetesResource!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+A GenericResource represents a kind of Kubernetes resource that does not
+correspond to a kind or class of resources that is more specifically modelled 
+by xgql.
+"""
 type GenericResource implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
-# Corresponds to v1 object metadata
-# https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#objectmeta-v1-meta
+
+"""
+ObjectMeta is metadata that is common to all Kubernetes API resources.
+https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#objectmeta-v1-meta
+"""
 type ObjectMeta {
+  """
+  The name of this resource. Unique within its API group and version for
+  cluster scoped resources, and also within its namespace for namespaced
+  resources.
+  """
   name: String!
+
+  """
+  An optional prefix used by the Kubernetes API server to generate a unique
+  name at creation time if a name was not provided.
+  """
   generateName: String
+
+  """
+  The space within each name must be unique, for namespaced resources. An empty
+  namespace is equivalent to the 'default' namespace.
+  """
   namespace: String
+
+  """
+  An opaque identifier of this resource that is unique across time.
+  """
   uid: String!
+
+  """
+  An opaque version that changes whenever the underlying resource changes in the
+  API server. Used for change detection and optimistic concurrency.
+  """
   resourceVersion: String!
+
+  """
+  A sequence number representing the specific generation of the desired state.
+  """
   generation: Int!
+
+  """
+  The time the underlying Kubernetes resource was created in the API server.
+  """
   creationTime: Time!
+
+  """
+  The time at which the underlying Kubernetes resource will be (or was) deleted.
+  Resources may exist past their deletion time while their controllers handle
+  any required cleanup.
+  """
   deletionTime: Time
+
+  """
+	Map of string keys and values that can be used to organize and categorize
+	(scope and select) objects. May match selectors of replication controllers
+	and services.
+	
+  More info: http://kubernetes.io/docs/user-guide/labels
+  """
   labels: Map
+
+  """
+	Map of string keys and values that may be set by external tools to store and
+  retrieve arbitrary metadata.
+
+	More info: http://kubernetes.io/docs/user-guide/annotations
+  """
   annotations: Map
 
-  owners(controller: Boolean): OwnerConnection! @goField(forceResolver: true)
+
+  """
+	Resources depended by this resource. If ALL resources in the list have been
+  deleted, this resource will be garbage collected. If this resource is managed
+  by a controller, then an entry in this list will point to this controller,
+  with the controller field set to true. There cannot be more than one managing
+  controller.
+  """
+  owners(
+    "Return only the owner that represents the controller of this resource."
+    controller: Boolean
+  ): OwnerConnection! @goField(forceResolver: true)
 }
 
+"""
+An OwnerConnection represents a connection to an owner.
+"""
 type OwnerConnection {
-  items: [Owner!]
-  count: Int!
+  "Connected nodes."
+  nodes: [Owner!]
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+An owner of a Kubernetes resource.
+"""
 type Owner {
+  "The owner."
   resource: KubernetesResource!
+
+  "Whether the owner is the controller of the owned Kubernetes resource."
   controller: Boolean,
 }
 
+"""
+A ConditionedStatus represents the observed state of a Kubernetes resource that
+exposes status conditions.
+"""
 interface ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
 }
 
-# Note that type and reason are intentionally not enums; Crossplane does not
-# limit the allowed values at the API level.
+
+"""
+A condition that may apply to a resource.
+
+Note that type and reason are intentionally not enums; Crossplane does not limit
+the allowed values at the API level.
+"""
 type Condition {
+  """
+	Type of this condition. At most one of each condition type may apply to a
+  resource at any point in time.
+  """
   type: String!
+
+  """
+	Status of this condition; is it currently True, False, or Unknown?
+  """
   status: ConditionStatus!
+
+  """
+	LastTransitionTime is the last time this condition transitioned from one
+  status to another.
+  """
   lastTransitionTime: Time!
+
+  """
+	A Reason for this condition's last transition from one status to another.
+  """
   reason: String!
+
+  """
+	A Message containing details about this condition's last transition from one
+  status to another, if any.
+  """
   message: String
 }
 
+
+"""
+A ConditionStatus represensts the status of a condition.
+"""
 enum ConditionStatus {
-  Unknown
-  False
-  True
+  "The status of the condition is unknown."
+  UNKNOWN
+
+  "The condition is false."
+  FALSE
+
+  "The condition is true."
+  TRUE
 }
 
+"""
+A PolicyRule holds information that describes a KubernetesRBAC policy rule.
+"""
 type PolicyRule {
+  """
+	Verbs is a list of verbs that apply to ALL the resources specified by this
+  rule. '*' represents all verbs.
+  """
   verbs: [String!]!
+
+  """
+  APIGroups is the name of the APIGroup that contains the resources. If multiple
+  API groups are specified, any action requested against one of the enumerated
+  resources in any API group will be allowed.
+  """
   apiGroups: [String!]
+
+  """
+	Resources is a list of resources this rule applies to. '*' represents all
+  resources.
+  """
   resources: [String!]
+
+  """
+	ResourceNames is a list of names that the rule applies to. An empty set means
+  that everything is allowed.
+  """
   resourceNames: [String!]
+
+  """
+	NonResourceURLs is a set of partial urls that a user should have access to.
+  '*' is allowed, but only as the full, final step in the path. Rules can either
+  apply to API resources (such as "pods" or "secrets") or non-resource URL paths
+  (such as "/api"),  but not both.
+  """
   nonResourceURLs: [String!]
 }
 
+"""
+A LabelSelector matches a Kubernetes resource by labels.
+"""
 type LabelSelector {
+  "The labels to match on."
   matchLabels: Map
 }
 
@@ -2866,184 +3277,474 @@ type LabelSelector {
 # event does not have events. We might consider creating a distinct
 # InvolvedObject interface (or something like that) for the events field.
 
+"""
+An event pertaining to a Kubernetes resource.
+"""
 type Event implements Node {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The Kubernetes resource this event pertains to."
   involvedObject: KubernetesResource! @goField(forceResolver: true)
+
+  "The type of event."
   type: EventType
+
+  "The reason the event was emitted."
   reason: String
+
+  "Details about the event, if any."
   message: String
+
+  "The source of the event - e.g. a controller."
   source: EventSource
+
+  "The number of times this event has occurred."
   count: Int
+
+  "The time at which this event was first recorded."
   firstTime: Time
+
+  "The time at which this event was most recently recorded."
   lastTime: Time
 
+  "A raw JSON representation of the event."
   raw: JSONObject!
 }
 
+"""
+An EventSource is the source of an event. Note that in this context 'source'
+indicates the software or system that emitted the event, not the Kubernetes
+resource it pertains to.
+"""
 type EventSource {
+  "The software component that emitted the event."
   component: String
 }
 
+"""
+An EventType indicates the type of an event.
+"""
 enum EventType {
-  Normal
-  Warning
+  "A normal, informational event."
+  NORMAL
+
+  "A warning that something suboptimal has occurred."
+  WARNING
 }
 
+"""
+A Secret holds secret data.
+"""
 type Secret implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
-  kind: String!
-  metadata: ObjectMeta!
-  data: JSONObject
 
+  "The underlying Kubernetes API kind of this resource."
+  kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
+  metadata: ObjectMeta!
+
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
-type SecretConnection {
-  items: [Secret!]
-  count: Int!
-}
-
+"""
+A CustomResourceDefinition defines a type of custom resource that extends the
+set of resources supported by the Kubernetes API.
+"""
 type CustomResourceDefinition implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: CustomResourceDefinitionSpec!
+
+  "The observed state of this resource."
   status: CustomResourceDefinitionStatus
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
-  definedResources(version: String): KubernetesResourceConnection! @goField(forceResolver: true)
+
+  "Custom resources defined by this CRD"
+  definedResources(
+    "Return resources of this version."
+    version: String
+  ): KubernetesResourceConnection! @goField(forceResolver: true)
 }
 
+"""
+A CustomResourceDefinitionSpec represents the desired state of a custom resource
+definition.
+"""
 type CustomResourceDefinitionSpec {
+  """
+  Group specifies the API group of the defined custom resource. Custom resources
+  are served under ` + "`" + `/apis/<group>/...` + "`" + `. Must match the name of the CRD (in the
+  form ` + "`" + `<names.plural>.<group>` + "`" + `).
+  """
   group: String!
+
+  """
+	Names specifies the resource and kind names of the defined custom resource.
+  """
   names: CustomResourceDefinitionNames!
+
+  """
+	Versions is the list of all API versions of the defined custom resource.
+  Version names are used to compute the order in which served versions are
+  listed in API discovery. If the version string is "kube-like", it will sort
+  above non "kube-like" version strings, which are ordered lexicographically.
+  "Kube-like" versions start with a "v", then are followed by a number (the
+  major version), then optionally the string "alpha" or "beta" and another
+  number (the minor version). These are sorted first by GA > beta > alpha (where
+  GA is a version with no suffix such as beta or alpha), and then by comparing
+  major version, then minor version. An example sorted list of versions: v10,
+  v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10.
+  """
   versions: [CustomResourceDefinitionVersion!]
 }
 
+"""
+CustomResourceDefinitionNames specifies the resource and kind names of the
+defined custom resource.
+"""
 type CustomResourceDefinitionNames {
+
+  """
+	The plural name of the resource to serve. Custom resources are served by
+  the Kuberntes API under ` + "`" + `/apis/<group>/<version>/.../<plural>` + "`" + `.
+  """
   plural: String!
+
+  """
+	The singular name of the resource.
+  """
   singular: String
+
+  """
+  Short names for the resource, exposed in API discovery documents, and used by
+  clients to support invocations like ` + "`" + `kubectl get <shortname>` + "`" + `.
+  """
   shortNames: [String!]
+
+  """
+  The Kubernetes API kind of the defined resource.
+  """
   kind: String!
+
+  """
+  The Kubernetes API kind of a list of the defined resource.
+  """
   listKind: String
+
+  """
+	A list of grouped resources this custom resource belongs to (e.g. 'all'). This
+  is published in API discovery documents, and used by clients to support
+  invocations like ` + "`" + `kubectl get all` + "`" + `.
+  """
   categories: [String!]
 }
 
+"""
+A CustomResourceDefinitionVersion describes a version of a custom resource.
+"""
 type CustomResourceDefinitionVersion {
+  """
+	Name of this version, e.g. “v1”, “v2beta1”, etc. Custom resources are served
+  under this version at ` + "`" + `/apis/<group>/<version>/...` + "`" + ` if ` + "`" + `served` + "`" + ` istrue.
+  """
   name: String!
+
+  """
+	Served specifies that this version should be served via Kubernetes REST APIs.
+  """
   served: Boolean!
+
+  """
+	Schema describes the schema used for validation, pruning, and defaulting of
+  this version of the defined custom resource.
+  """
   schema: CustomResourceValidation
 }
 
+"""
+A CustomResourceValidation is a list of validation methods for a custom
+resource.
+"""
 type CustomResourceValidation {
+	"OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
   openAPIV3Schema: JSONObject
 }
 
+"""
+A CustomResourceDefinitionStatus represents the observed state of a custom
+resource definition.
+"""
 type CustomResourceDefinitionStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
 }`, BuiltIn: false},
-	{Name: "schema/composite.gql", Input: `type CompositeResource implements Node & KubernetesResource {
+	{Name: "schema/composite.gql", Input: `"""
+A CompositeResource is a resource this is reconciled by composing other
+composite or managed resources. Composite resources use a Composition to
+determine which resources to compose, and how.
+"""
+type CompositeResource implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: CompositeResourceSpec!
+
+  "The observed state of this resource."
   status: CompositeResourceStatus!
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"""
+A CompositeResourceSpec represents the desired state of a composite resource.
+"""
 type CompositeResourceSpec {
+  """
+  The composition this composite resource uses to compose resources.
+  """
   composition: Composition @goField(forceResolver: true)
-  compositionSelector: LabelSelector
-  claim: CompositeResourceClaim @goField(forceResolver: true)
-  writesConnectionSecretTo: Secret @goField(forceResolver: true)
 
+  """
+  A composition selector is used to select this composite resource's composition
+  by matching on labels.
+  """
+  compositionSelector: LabelSelector
+
+  """
+  The composite resource claim that claims this composite resource.
+  """
+  claim: CompositeResourceClaim @goField(forceResolver: true)
+
+  """
+  The secret this composite resource writes its connection details to.
+  """
+  connectionSecret: Secret @goField(forceResolver: true)
+
+  """
+  The resources of which this composite resource is composed.
+  """
   resources: ComposedResourceConnection @goField(forceResolver: true)
 }
 
+"""
+A ComposedResourceConnection represents a connection to composed resources.
+"""
 type ComposedResourceConnection {
-  items: [ComposedResource!]
-  count: Int!
+  "Connected nodes."
+  nodes: [ComposedResource!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
 # TODO(negz): Do we need to support GenericResource here, just in case? We only
 # support managed an composite resources officially, but in practice some folks
 # use arbitrary resources.
+
+"""
+A ComposedResource is either a managed or a composite resource.
+"""
 union ComposedResource = ManagedResource | CompositeResource
 
+"""
+A CompositeResourceClaimStatus represents the observed state of a composite
+resource.
+"""
 type CompositeResourceStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
+
+  "The status of this composite resource's connection details."
   connectionDetails: CompositeResourceConnectionDetails
 }
 
+"""
+CompositeResourceConnectionDetails represents the observed status of a composite
+resource's connection details.
+"""
 type CompositeResourceConnectionDetails {
+  """
+  The time at which the composite resource's connection details were last
+  published.
+  """
   lastPublishedTime: Time
 }
 
+"""
+A CompositeResourceClaim is a namespaced proxy for a composite resource.
+"""
 type CompositeResourceClaim implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: CompositeResourceClaimSpec!
+
+  "The observed state of this resource."
   status: CompositeResourceClaimStatus!
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"""
+A CompositeResourceClaimSpec represents the desired state of a composite
+resource claim.
+"""
 type CompositeResourceClaimSpec {
+  """
+  The composition this composite resource uses to compose resources.
+  """
   composition: Composition @goField(forceResolver: true)
+
+  """
+  A composition selector is used to select this composite resource claims's
+  (composite resource's) composition by matching on labels.
+  """
   compositionSelector: LabelSelector
+
+  """
+  The composite resource to which this composite resource claim is bound.
+  """
   resource: CompositeResource @goField(forceResolver: true)
-  writesConnectionSecretTo: Secret @goField(forceResolver: true)
+
+
+  """
+  The secret this composite resource claim writes its connection details to.
+  """
+  connectionSecret: Secret @goField(forceResolver: true)
 }
 
+"""
+A CompositeResourceClaimStatus represents the observed status of a composite
+resource claim.
+"""
 type CompositeResourceClaimStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
+
+  "The status of this composite resource's connection details."
   connectionDetails: CompositeResourceClaimConnectionDetails
 }
 
+"""
+CompositeResourceConnectionDetails represents the observed status of a composite
+resource claim's connection details.
+"""
 type CompositeResourceClaimConnectionDetails {
+  """
+  The time at which the composite resource claim's connection details were last
+  published.
+  """
   lastPublishedTime: Time
 }
 `, BuiltIn: false},
-	{Name: "schema/configuration.gql", Input: `type Configuration implements Node & KubernetesResource {
+	{Name: "schema/configuration.gql", Input: `"""
+A Configuration extends Crossplane with support for new composite resources.
+"""
+type Configuration implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: ConfigurationSpec!
+
+  "The observed state of this resource."
   status: ConfigurationStatus
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
-  revisions(active: Boolean): ConfigurationRevisionConnection! @goField(forceResolver: true)
+
+  "Revisions of this configuration."
+  revisions(
+    "Return only the active revision."
+    active: Boolean
+  ): ConfigurationRevisionConnection! @goField(forceResolver: true)
 }
 
+"""
+A ConfigurationRevisionConnection represents a connection to configuration
+revisions.
+"""
 type ConfigurationRevisionConnection {
-  items: [ConfigurationRevision!]
-  count: Int!
+  "Connected nodes."
+  nodes: [ConfigurationRevision!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
 # TODO(negz): Include packagePullSecrets? It seems idiomatic to resolve an array
@@ -3053,57 +3754,179 @@ type ConfigurationRevisionConnection {
 # The Secrets are presumed to be read from the namespace in which Crossplane is
 # running, which we do not know.
 
+"""
+A ConfigurationSpec represents the desired state of a configuration.
+"""
 type ConfigurationSpec {
+  """
+  The name of the configuration package to pull from an OCI registry.
+  """
   package: String!
+
+  """
+	RevisionActivationPolicy specifies how the package controller should update
+  from one revision to the next.
+  """
   revisionActivationPolicy: RevisionActivationPolicy
+
+  """
+	RevisionHistoryLimit dictates how the package controller cleans up old
+  inactive package revisions. Defaults to 1. Can be disabled by explicitly
+  setting to 0.
+  """
   revisionHistoryLimit: Int
+
+  """
+	PackagePullPolicy defines the pull policy for the package.
+  """
   packagePullPolicy: PackagePullPolicy
+
+  """
+	IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+  Crossplane version constraints specified by the package.
+  """
   ignoreCrossplaneConstraints: Boolean
+
+  """
+	SkipDependencyResolution indicates to the package manager whether to skip
+	resolving dependencies for a package.
+  """
   skipDependencyResolution: Boolean
 }
 
+"""
+A ConfigurationRevisionStatus represents the observed state of a configuration.
+"""
 type ConfigurationStatus implements ConditionedStatus {
+  """
+  The observed condition of this resource.
+  """
   conditions: [Condition!]
+
+  """
+	CurrentRevision is the name of the current package revision. It will reflect
+  the most up to date revision, whether it has been activated or not.
+  """
   currentRevision: String
+
+  """
+	CurrentIdentifier is the most recent package source that was used to produce a
+  revision. The package manager uses this field to determine whether to check
+  for package updates for a given source when packagePullPolicy is set to
+  IfNotPresent.
+  """
   currentIdentifier: String
 }
 
+"""
+A ConfigurationRevision represents a revision or 'version' of a configuration.
+"""
 type ConfigurationRevision implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: ConfigurationRevisionSpec!
+
+  "The observed state of this resource."
   status: ConfigurationRevisionStatus
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"""
+A ConfigurationRevisionSpec represents the desired state of a configuration
+revision.
+"""
 type ConfigurationRevisionSpec {
+  """
+  Desired state of the configuration revision.
+  """
   desiredState: PackageRevisionDesiredState!
+
+  """
+  Package image used by the install pod to extract package contents.
+  """
   package: String!
+
+  """
+	PackagePullPolicy defines the pull policy for the package..
+  """
   packagePullPolicy: PackagePullPolicy
+
+  """
+  Revision number. Indicates when the revision will be garbage collected based
+  on the configuration's RevisionHistoryLimit.
+  """
   revision: Int!
+
+  """
+  IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+  Crossplane version constrains specified by the package.
+  """
   ignoreCrossplaneConstraints: Boolean
+
+  """
+  SkipDependencyResolution indicates to the package manager whether to skip
+  resolving dependencies for a package.
+  """
   skipDependencyResolution: Boolean
 }
 
+"""
+A ConfigurationRevisionStatus represents the observed state of a configuration
+revision.
+"""
 type ConfigurationRevisionStatus implements ConditionedStatus {
+  """
+  The observed condition of this resource.
+  """
   conditions: [Condition!]
+
+  """
+  The number of known dependencies.
+  """
   foundDependencies: Int
+
+  """
+  The number of installed dependencies.
+  """
   installedDependencies: Int
+
+  """
+  The number of invalid dependencies.
+  """
   invalidDependencies: Int
+
+  """
+  Permissions requested by this configuration revision.
+  """
   permissionRequests: [PolicyRule!]
 
-  # In practice these objects are currently always a CompositeResourceDefinition
-  # or a Composition. Crossplane lints the content of configuration packages to
-  # enforce this, but it's not enforced at the API level. We return an array of
-  # KubernetesResource here because doing so allows us to package different
-  # types in future without a breaking GraphQL schema change.
+  """
+  Objects owned by this configuration revision - i.e. objects that were created
+  by this configuration revision or that would have been created if they did
+  not already exist.
 
+  In practice these objects are currently always a CompositeResourceDefinition
+  or a Composition. Crossplane lints the content of configuration packages to
+  enforce this, but it's not enforced at the Kubernetes API level. We return an
+  array of KubernetesResource here because doing so allows us to package
+  different types in future without a breaking GraphQL schema change.
+  """
   objects: KubernetesResourceConnection! @goField(forceResolver: true)
 }
 `, BuiltIn: false},
@@ -3116,70 +3939,169 @@ type ConfigurationRevisionStatus implements ConditionedStatus {
 
 directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION
     | FIELD_DEFINITION`, BuiltIn: false},
-	{Name: "schema/managed.gql", Input: `type ManagedResource implements Node & KubernetesResource {
+	{Name: "schema/managed.gql", Input: `"""
+A ManagedResource is a Kubernetes API representation of a resource in an
+external system, such as a cloud provider's API. Crossplane providers add
+support for new kinds of managed resource.
+"""
+type ManagedResource implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: ManagedResourceSpec!
+
+  "The observed state of this resource."
   status: ManagedResourceStatus!
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"""
+A ManagedResourceSpec represents the desired state of a managed resource.
+"""
 type ManagedResourceSpec {
+  """
+  The secret this managed resource writes its connection details to.
+  """
   connectionSecret: Secret @goField(forceResolver: true)
+
+  """
+  The provider configuration configures how this managed resource interacts
+  with an external system.
+  """
   providerConfig: ProviderConfig @goField(forceResolver: true)
+
+  """
+  The deletion policy specifies what will happen to the underlying external
+  resource when this managed resource is deleted.
+  """
   deletionPolicy: DeletionPolicy
 }
 
+"""
+A DeletionPolicy specifies what will happen to the underlying external resource
+when this managed resource is deleted - either "Delete" or "Orphan" the external
+resource.
+"""
 enum DeletionPolicy {
-  Delete
-  Orphan
+  """
+  Delete the resource from the external system when the managed resource is
+  deleted.
+  """
+  DELETE
+
+  """
+  Leave the resource in the external system when the managed resource is
+  deleted.
+  """
+  ORPHAN
 }
 
+"""
+A ManagedResourceStatus represents the observed state of a managed resource.
+"""
 type ManagedResourceStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
 }
 `, BuiltIn: false},
-	{Name: "schema/package.gql", Input: `enum RevisionActivationPolicy {
-  Automatic
-  Manual
+	{Name: "schema/package.gql", Input: `"""
+A RevisionActivationPolicy indicates how a provider or configuration package
+should activate its revisions.
+"""
+enum RevisionActivationPolicy {
+  "Automatically activate package revisions."
+  AUTOMATIC
+
+  "Require a user to manually activate revisions."
+  MANUAL
 }
 
+"""
+A PackagePullPolicy represents when to pull a package OCI image from a registry.
+"""
 enum PackagePullPolicy {
-  Always
-  Never
-  IfNotPresent
+  "Always pull the package image, even if it is already present."
+  ALWAYS
+
+  "Never pull the package image."
+  NEVER
+
+  "Only pull the package image if it is not present."
+  IF_NOT_PRESENT
 }
 
+"""
+A PackageRevisionDesiredState represents the desired state of a provider or
+configuration revision.
+"""
 enum PackageRevisionDesiredState {
-  Inactive
-  Active
+  "The revision should be inactive."
+  INACTIVE
+
+  "The revision should be active."
+  ACTIVE
 }
 
 `, BuiltIn: false},
-	{Name: "schema/provider.gql", Input: `type Provider implements Node & KubernetesResource {
+	{Name: "schema/provider.gql", Input: `"""
+A Provider extends Crossplane with support for new managed resources.
+"""
+type Provider implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: ProviderSpec!
+
+  "The observed state of this resource."
   status: ProviderStatus
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
-  revisions(active: Boolean): ProviderRevisionConnection! @goField(forceResolver: true)
+
+  "Revisions of this provider."
+  revisions(
+    "Return only the active revision."
+    active: Boolean
+  ): ProviderRevisionConnection! @goField(forceResolver: true)
 }
 
+"""
+A ProviderRevisionConnection represents a connection to provider revisions.
+"""
 type ProviderRevisionConnection {
-  items: [ProviderRevision!]
-  count: Int!
+  "Connected nodes."
+  nodes: [ProviderRevision!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
 # TODO(negz): Include packagePullSecrets? It seems idiomatic to resolve an array
@@ -3189,103 +4111,293 @@ type ProviderRevisionConnection {
 # The Secrets are presumed to be read from the namespace in which Crossplane is
 # running, which we do not know.
 
+"""
+A ProviderSpec represents the desired state of a provider.
+"""
 type ProviderSpec {
+  """
+  The name of the provider package to pull from an OCI registry.
+  """
   package: String!
+
+  """
+	RevisionActivationPolicy specifies how the package controller should update
+  from one revision to the next.
+  """
   revisionActivationPolicy: RevisionActivationPolicy
+
+  """
+	RevisionHistoryLimit dictates how the package controller cleans up old
+  inactive package revisions. Defaults to 1. Can be disabled by explicitly
+  setting to 0.
+  """
   revisionHistoryLimit: Int
+
+  """
+	PackagePullPolicy defines the pull policy for the package.
+  """
   packagePullPolicy: PackagePullPolicy
+
+  """
+	IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+  Crossplane version constraints specified by the package.
+  """
   ignoreCrossplaneConstraints: Boolean
+
+  """
+	SkipDependencyResolution indicates to the package manager whether to skip
+	resolving dependencies for a package.
+  """
   skipDependencyResolution: Boolean
 }
 
+"""
+A ProviderStatus represents the observed state of a provider.
+"""
 type ProviderStatus implements ConditionedStatus {
+  """
+  The observed condition of this resource.
+  """
   conditions: [Condition!]
+
+  """
+	CurrentRevision is the name of the current package revision. It will reflect
+  the most up to date revision, whether it has been activated or not.
+  """
   currentRevision: String
+
+  """
+	CurrentIdentifier is the most recent package source that was used to produce a
+  revision. The package manager uses this field to determine whether to check
+  for package updates for a given source when packagePullPolicy is set to
+  IfNotPresent.
+  """
   currentIdentifier: String
 }
 
+"""
+A ProviderRevision represents a revision or 'version' of a provider.
+"""
 type ProviderRevision implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: ProviderRevisionSpec!
+
+  "The observed state of this resource."
   status: ProviderRevisionStatus
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"""
+A ProviderRevisionSpec represents the desired state of a provider revision.
+"""
 type ProviderRevisionSpec {
+  """
+  Desired state of the provider revision.
+  """
   desiredState: PackageRevisionDesiredState!
+
+  """
+  Package image used by the install pod to extract package contents.
+  """
   package: String!
+
+  """
+	PackagePullPolicy defines the pull policy for the package. It is also applied
+  to any images pulled for the package, such as a provider's controller image.
+  """
   packagePullPolicy: PackagePullPolicy
+
+  """
+  Revision number. Indicates when the revision will be garbage collected based
+  on the configuration's RevisionHistoryLimit.
+  """
   revision: Int!
+
+  """
+  IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+  Crossplane version constrains specified by the package.
+  """
   ignoreCrossplaneConstraints: Boolean
+
+  """
+  SkipDependencyResolution indicates to the package manager whether to skip
+  resolving dependencies for a package.
+  """
   skipDependencyResolution: Boolean
 
 }
 
+"""
+A ProviderRevisionStatus represents the observed state of a provider revision.
+"""
 type ProviderRevisionStatus implements ConditionedStatus {
+  """
+  The observed condition of this resource.
+  """
   conditions: [Condition!]
+
+  """
+  The number of known dependencies.
+  """
   foundDependencies: Int
+
+  """
+  The number of installed dependencies.
+  """
   installedDependencies: Int
+
+  """
+  The number of invalid dependencies.
+  """
   invalidDependencies: Int
+
+  """
+  Permissions requested by this configuration revision.
+  """
   permissionRequests: [PolicyRule!]
 
-  # In practice these objects are currently always a CustomResourceDefinition.
-  # Crossplane lints the content of provider packages to enforce this, but it's
-  # not enforced at the API level. We return an array of KubernetesResource here
-  # because doing so allows us to package different types in future without a
-  # breaking GraphQL schema change.
+  """
+  Objects owned by this provider revision - i.e. objects that were created by
+  this provider revision or that would have been created if they did not already
+  exist.
 
+  In practice these objects are currently always a CustomResourceDefinition.
+  Crossplane lints the content of provider packages to enforce this, but it's
+  not enforced at the Kubernetes API level. We return an array of
+  KubernetesResource here because doing so allows us to package different types
+  in future without a breaking GraphQL schema change.
+  """
   objects: KubernetesResourceConnection! @goField(forceResolver: true)
 }
 `, BuiltIn: false},
-	{Name: "schema/providerconfig.gql", Input: `type ProviderConfig implements Node & KubernetesResource {
+	{Name: "schema/providerconfig.gql", Input: `"""
+A ProviderConfig configures a provider, in that it provides configuration that
+is relevant to all managed resources installed by a provider.
+"""
+type ProviderConfig implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The observed state of this resource."
   status: ProviderConfigStatus
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 }
 
+"""
+A ProviderConfigStatus represents the observed state of a provider config.
+"""
 type ProviderConfigStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
+
+  "The number of managed resources currently using this provider config."
   users: Int
 }`, BuiltIn: false},
-	{Name: "schema/queries.gql", Input: `type Query {
+	{Name: "schema/queries.gql", Input: `"""
+Query is the root type for GraphQL queries.
+"""
+type Query {
+    """
+    Providers that are currently installed.
+    """
     providers: ProviderConnection!
+
+    """
+    Configurations that are currently installed.
+    """
     configurations: ConfigurationConnection!
-    compositeResourceDefinitions(dangling: Boolean = false): CompositeResourceDefinitionConnection!
-    compositions(dangling: Boolean = false): CompositionConnection!
+
+    """
+    Composite Resource Definitions (XRDs) that currently exist.
+    """
+    compositeResourceDefinitions(
+      "Only return XRDs that aren't owned by a configuration revision."
+      dangling: Boolean = false
+    ): CompositeResourceDefinitionConnection!
+
+    """
+    Compositions that currently exist.
+    """
+    compositions(
+      "Only return Compositions that aren't owned by a configuration revision."
+      dangling: Boolean = false
+    ): CompositionConnection!
 }
 
+"""
+A ProviderConnection represents a connection to providers.
+"""
 type ProviderConnection {
-    items: [Provider!]
-    count: Int!
+  "Connected nodes."
+  nodes: [Provider!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+A ConfigurationConnection represents a connection to configurations.
+"""
 type ConfigurationConnection {
-    items: [Configuration!]
-    count: Int!
+  "Connected nodes."
+  nodes: [Configuration!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+A CompositeResourceDefinitionConnection represents a connection to composite
+resource definitions (XRDs).
+"""
 type CompositeResourceDefinitionConnection {
-    items: [CompositeResourceDefinition!]
-    count: Int!
+  "Connected nodes."
+  nodes: [CompositeResourceDefinition!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+A CompositionConnection represents a connection to compositions.
+"""
 type CompositionConnection {
-    items: [Composition!]
-    count: Int!
+  "Connected nodes."
+  nodes: [Composition!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -3476,7 +4588,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _ComposedResourceConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.ComposedResourceConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _ComposedResourceConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.ComposedResourceConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3494,7 +4606,7 @@ func (ec *executionContext) _ComposedResourceConnection_items(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Nodes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3508,7 +4620,7 @@ func (ec *executionContext) _ComposedResourceConnection_items(ctx context.Contex
 	return ec.marshalOComposedResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ComposedResourceConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.ComposedResourceConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _ComposedResourceConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.ComposedResourceConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3526,7 +4638,7 @@ func (ec *executionContext) _ComposedResourceConnection_count(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4103,7 +5215,7 @@ func (ec *executionContext) _CompositeResourceClaim_events(ctx context.Context, 
 	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResourceClaimConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResourceClaimConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4121,7 +5233,7 @@ func (ec *executionContext) _CompositeResourceClaimConnection_items(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Nodes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4135,7 +5247,7 @@ func (ec *executionContext) _CompositeResourceClaimConnection_items(ctx context.
 	return ec.marshalOCompositeResourceClaim2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResourceClaimConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResourceClaimConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4153,7 +5265,7 @@ func (ec *executionContext) _CompositeResourceClaimConnection_count(ctx context.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4298,7 +5410,7 @@ func (ec *executionContext) _CompositeResourceClaimSpec_resource(ctx context.Con
 	return ec.marshalOCompositeResource2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResourceClaimSpec_writesConnectionSecretTo(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimSpec) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResourceClaimSpec_connectionSecret(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimSpec) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4316,7 +5428,7 @@ func (ec *executionContext) _CompositeResourceClaimSpec_writesConnectionSecretTo
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.CompositeResourceClaimSpec().WritesConnectionSecretTo(rctx, obj)
+		return ec.resolvers.CompositeResourceClaimSpec().ConnectionSecret(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4394,7 +5506,7 @@ func (ec *executionContext) _CompositeResourceClaimStatus_connectionDetails(ctx 
 	return ec.marshalOCompositeResourceClaimConnectionDetails2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnectionDetails(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResourceConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResourceConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4412,7 +5524,7 @@ func (ec *executionContext) _CompositeResourceConnection_items(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Nodes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4426,7 +5538,7 @@ func (ec *executionContext) _CompositeResourceConnection_items(ctx context.Conte
 	return ec.marshalOCompositeResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResourceConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResourceConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4444,7 +5556,7 @@ func (ec *executionContext) _CompositeResourceConnection_count(ctx context.Conte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4854,7 +5966,7 @@ func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResourc
 	return ec.marshalNCompositeResourceClaimConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResourceDefinitionConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResourceDefinitionConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4872,7 +5984,7 @@ func (ec *executionContext) _CompositeResourceDefinitionConnection_items(ctx con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Nodes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4886,7 +5998,7 @@ func (ec *executionContext) _CompositeResourceDefinitionConnection_items(ctx con
 	return ec.marshalOCompositeResourceDefinition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResourceDefinitionConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResourceDefinitionConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinitionConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4904,7 +6016,7 @@ func (ec *executionContext) _CompositeResourceDefinitionConnection_count(ctx con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5710,7 +6822,7 @@ func (ec *executionContext) _CompositeResourceSpec_claim(ctx context.Context, fi
 	return ec.marshalOCompositeResourceClaim2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaim(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResourceSpec_writesConnectionSecretTo(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceSpec) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResourceSpec_connectionSecret(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceSpec) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -5728,7 +6840,7 @@ func (ec *executionContext) _CompositeResourceSpec_writesConnectionSecretTo(ctx 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.CompositeResourceSpec().WritesConnectionSecretTo(rctx, obj)
+		return ec.resolvers.CompositeResourceSpec().ConnectionSecret(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6147,7 +7259,7 @@ func (ec *executionContext) _Composition_events(ctx context.Context, field graph
 	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositionConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.CompositionConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositionConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.CompositionConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6165,7 +7277,7 @@ func (ec *executionContext) _CompositionConnection_items(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Nodes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6179,7 +7291,7 @@ func (ec *executionContext) _CompositionConnection_items(ctx context.Context, fi
 	return ec.marshalOComposition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositionConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.CompositionConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositionConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.CompositionConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6197,7 +7309,7 @@ func (ec *executionContext) _CompositionConnection_count(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6804,7 +7916,7 @@ func (ec *executionContext) _Configuration_revisions(ctx context.Context, field 
 	return ec.marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ConfigurationConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _ConfigurationConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6822,7 +7934,7 @@ func (ec *executionContext) _ConfigurationConnection_items(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Nodes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6836,7 +7948,7 @@ func (ec *executionContext) _ConfigurationConnection_items(ctx context.Context, 
 	return ec.marshalOConfiguration2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ConfigurationConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _ConfigurationConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6854,7 +7966,7 @@ func (ec *executionContext) _ConfigurationConnection_count(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7148,7 +8260,7 @@ func (ec *executionContext) _ConfigurationRevision_events(ctx context.Context, f
 	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ConfigurationRevisionConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevisionConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _ConfigurationRevisionConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevisionConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -7166,7 +8278,7 @@ func (ec *executionContext) _ConfigurationRevisionConnection_items(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Nodes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7180,7 +8292,7 @@ func (ec *executionContext) _ConfigurationRevisionConnection_items(ctx context.C
 	return ec.marshalOConfigurationRevision2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ConfigurationRevisionConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevisionConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _ConfigurationRevisionConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevisionConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -7198,7 +8310,7 @@ func (ec *executionContext) _ConfigurationRevisionConnection_count(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9121,7 +10233,7 @@ func (ec *executionContext) _Event_raw(ctx context.Context, field graphql.Collec
 	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _EventConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.EventConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _EventConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.EventConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -9139,7 +10251,7 @@ func (ec *executionContext) _EventConnection_items(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Nodes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9153,7 +10265,7 @@ func (ec *executionContext) _EventConnection_items(ctx context.Context, field gr
 	return ec.marshalOEvent2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _EventConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.EventConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _EventConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.EventConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -9171,7 +10283,7 @@ func (ec *executionContext) _EventConnection_count(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9430,7 +10542,7 @@ func (ec *executionContext) _GenericResource_events(ctx context.Context, field g
 	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KubernetesResourceConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.KubernetesResourceConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _KubernetesResourceConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.KubernetesResourceConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -9448,7 +10560,7 @@ func (ec *executionContext) _KubernetesResourceConnection_items(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Nodes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9462,7 +10574,7 @@ func (ec *executionContext) _KubernetesResourceConnection_items(ctx context.Cont
 	return ec.marshalOKubernetesResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KubernetesResourceConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.KubernetesResourceConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _KubernetesResourceConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.KubernetesResourceConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -9480,7 +10592,7 @@ func (ec *executionContext) _KubernetesResourceConnection_count(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10381,7 +11493,7 @@ func (ec *executionContext) _Owner_controller(ctx context.Context, field graphql
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _OwnerConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.OwnerConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _OwnerConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.OwnerConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10399,7 +11511,7 @@ func (ec *executionContext) _OwnerConnection_items(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Nodes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10413,7 +11525,7 @@ func (ec *executionContext) _OwnerConnection_items(ctx context.Context, field gr
 	return ec.marshalOOwner2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _OwnerConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.OwnerConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _OwnerConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.OwnerConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10431,7 +11543,7 @@ func (ec *executionContext) _OwnerConnection_count(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11236,7 +12348,7 @@ func (ec *executionContext) _ProviderConfigStatus_users(ctx context.Context, fie
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProviderConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _ProviderConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11254,7 +12366,7 @@ func (ec *executionContext) _ProviderConnection_items(ctx context.Context, field
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Nodes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11268,7 +12380,7 @@ func (ec *executionContext) _ProviderConnection_items(ctx context.Context, field
 	return ec.marshalOProvider2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProviderConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _ProviderConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11286,7 +12398,7 @@ func (ec *executionContext) _ProviderConnection_count(ctx context.Context, field
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11580,7 +12692,7 @@ func (ec *executionContext) _ProviderRevision_events(ctx context.Context, field 
 	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProviderRevisionConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevisionConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _ProviderRevisionConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevisionConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11598,7 +12710,7 @@ func (ec *executionContext) _ProviderRevisionConnection_items(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Nodes, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11612,7 +12724,7 @@ func (ec *executionContext) _ProviderRevisionConnection_items(ctx context.Contex
 	return ec.marshalOProviderRevision2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProviderRevisionConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevisionConnection) (ret graphql.Marshaler) {
+func (ec *executionContext) _ProviderRevisionConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevisionConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11630,7 +12742,7 @@ func (ec *executionContext) _ProviderRevisionConnection_count(ctx context.Contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12699,38 +13811,6 @@ func (ec *executionContext) _Secret_metadata(ctx context.Context, field graphql.
 	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Secret_data(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Secret",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Data, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOJSONObject2ᚖstring(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Secret_raw(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12799,73 +13879,6 @@ func (ec *executionContext) _Secret_events(ctx context.Context, field graphql.Co
 	res := resTmp.(*model.EventConnection)
 	fc.Result = res
 	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SecretConnection_items(ctx context.Context, field graphql.CollectedField, obj *model.SecretConnection) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SecretConnection",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]model.Secret)
-	fc.Result = res
-	return ec.marshalOSecret2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _SecretConnection_count(ctx context.Context, field graphql.CollectedField, obj *model.SecretConnection) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "SecretConnection",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Count, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TypeReference_apiVersion(ctx context.Context, field graphql.CollectedField, obj *model.TypeReference) (ret graphql.Marshaler) {
@@ -14360,10 +15373,10 @@ func (ec *executionContext) _ComposedResourceConnection(ctx context.Context, sel
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ComposedResourceConnection")
-		case "items":
-			out.Values[i] = ec._ComposedResourceConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._ComposedResourceConnection_count(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._ComposedResourceConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._ComposedResourceConnection_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -14531,10 +15544,10 @@ func (ec *executionContext) _CompositeResourceClaimConnection(ctx context.Contex
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceClaimConnection")
-		case "items":
-			out.Values[i] = ec._CompositeResourceClaimConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._CompositeResourceClaimConnection_count(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._CompositeResourceClaimConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._CompositeResourceClaimConnection_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -14608,7 +15621,7 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 				res = ec._CompositeResourceClaimSpec_resource(ctx, field, obj)
 				return res
 			})
-		case "writesConnectionSecretTo":
+		case "connectionSecret":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -14616,7 +15629,7 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._CompositeResourceClaimSpec_writesConnectionSecretTo(ctx, field, obj)
+				res = ec._CompositeResourceClaimSpec_connectionSecret(ctx, field, obj)
 				return res
 			})
 		default:
@@ -14667,10 +15680,10 @@ func (ec *executionContext) _CompositeResourceConnection(ctx context.Context, se
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceConnection")
-		case "items":
-			out.Values[i] = ec._CompositeResourceConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._CompositeResourceConnection_count(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._CompositeResourceConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._CompositeResourceConnection_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -14816,10 +15829,10 @@ func (ec *executionContext) _CompositeResourceDefinitionConnection(ctx context.C
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionConnection")
-		case "items":
-			out.Values[i] = ec._CompositeResourceDefinitionConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._CompositeResourceDefinitionConnection_count(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._CompositeResourceDefinitionConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._CompositeResourceDefinitionConnection_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -15060,7 +16073,7 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 				res = ec._CompositeResourceSpec_claim(ctx, field, obj)
 				return res
 			})
-		case "writesConnectionSecretTo":
+		case "connectionSecret":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -15068,7 +16081,7 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._CompositeResourceSpec_writesConnectionSecretTo(ctx, field, obj)
+				res = ec._CompositeResourceSpec_connectionSecret(ctx, field, obj)
 				return res
 			})
 		case "resources":
@@ -15222,10 +16235,10 @@ func (ec *executionContext) _CompositionConnection(ctx context.Context, sel ast.
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositionConnection")
-		case "items":
-			out.Values[i] = ec._CompositionConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._CompositionConnection_count(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._CompositionConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._CompositionConnection_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -15430,10 +16443,10 @@ func (ec *executionContext) _ConfigurationConnection(ctx context.Context, sel as
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationConnection")
-		case "items":
-			out.Values[i] = ec._ConfigurationConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._ConfigurationConnection_count(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._ConfigurationConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._ConfigurationConnection_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -15527,10 +16540,10 @@ func (ec *executionContext) _ConfigurationRevisionConnection(ctx context.Context
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationRevisionConnection")
-		case "items":
-			out.Values[i] = ec._ConfigurationRevisionConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._ConfigurationRevisionConnection_count(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._ConfigurationRevisionConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._ConfigurationRevisionConnection_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -16023,10 +17036,10 @@ func (ec *executionContext) _EventConnection(ctx context.Context, sel ast.Select
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventConnection")
-		case "items":
-			out.Values[i] = ec._EventConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._EventConnection_count(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._EventConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._EventConnection_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -16137,10 +17150,10 @@ func (ec *executionContext) _KubernetesResourceConnection(ctx context.Context, s
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("KubernetesResourceConnection")
-		case "items":
-			out.Values[i] = ec._KubernetesResourceConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._KubernetesResourceConnection_count(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._KubernetesResourceConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._KubernetesResourceConnection_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -16431,10 +17444,10 @@ func (ec *executionContext) _OwnerConnection(ctx context.Context, sel ast.Select
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("OwnerConnection")
-		case "items":
-			out.Values[i] = ec._OwnerConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._OwnerConnection_count(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._OwnerConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._OwnerConnection_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -16666,10 +17679,10 @@ func (ec *executionContext) _ProviderConnection(ctx context.Context, sel ast.Sel
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderConnection")
-		case "items":
-			out.Values[i] = ec._ProviderConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._ProviderConnection_count(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._ProviderConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._ProviderConnection_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -16763,10 +17776,10 @@ func (ec *executionContext) _ProviderRevisionConnection(ctx context.Context, sel
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderRevisionConnection")
-		case "items":
-			out.Values[i] = ec._ProviderRevisionConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._ProviderRevisionConnection_count(ctx, field, obj)
+		case "nodes":
+			out.Values[i] = ec._ProviderRevisionConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._ProviderRevisionConnection_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -17052,8 +18065,6 @@ func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "data":
-			out.Values[i] = ec._Secret_data(ctx, field, obj)
 		case "raw":
 			out.Values[i] = ec._Secret_raw(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -17073,35 +18084,6 @@ func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, o
 				}
 				return res
 			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var secretConnectionImplementors = []string{"SecretConnection"}
-
-func (ec *executionContext) _SecretConnection(ctx context.Context, sel ast.SelectionSet, obj *model.SecretConnection) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, secretConnectionImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("SecretConnection")
-		case "items":
-			out.Values[i] = ec._SecretConnection_items(ctx, field, obj)
-		case "count":
-			out.Values[i] = ec._SecretConnection_count(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -17853,10 +18835,6 @@ func (ec *executionContext) marshalNProviderSpec2ᚖgithubᚗcomᚋupboundᚋxgq
 		return graphql.Null
 	}
 	return ec._ProviderSpec(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNSecret2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx context.Context, sel ast.SelectionSet, v model.Secret) graphql.Marshaler {
-	return ec._Secret(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -19076,46 +20054,6 @@ func (ec *executionContext) marshalORevisionActivationPolicy2ᚖgithubᚗcomᚋu
 		return graphql.Null
 	}
 	return v
-}
-
-func (ec *executionContext) marshalOSecret2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Secret) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNSecret2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
 }
 
 func (ec *executionContext) marshalOSecret2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx context.Context, sel ast.SelectionSet, v *model.Secret) graphql.Marshaler {

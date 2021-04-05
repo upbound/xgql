@@ -100,8 +100,8 @@ func TestObjectMetaOwners(t *testing.T) {
 			},
 			want: want{
 				oc: &model.OwnerConnection{
-					Items: []model.Owner{{Resource: gown}},
-					Count: 1,
+					Nodes:      []model.Owner{{Resource: gown}},
+					TotalCount: 1,
 				},
 				errs: gqlerror.List{
 					gqlerror.Errorf(errors.Wrap(errBoom, errGetOwner).Error()),
@@ -134,13 +134,13 @@ func TestObjectMetaOwners(t *testing.T) {
 			},
 			want: want{
 				oc: &model.OwnerConnection{
-					Items: []model.Owner{
+					Nodes: []model.Owner{
 						{
 							Resource:   gctrl,
 							Controller: pointer.BoolPtr(true),
 						},
 					},
-					Count: 1,
+					TotalCount: 1,
 				},
 			},
 		},

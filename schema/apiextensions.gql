@@ -1,96 +1,328 @@
+"""
+A CompositeResourceDefinition (or XRD) defines a new kind of resource. The new
+resource is composed of other composite or managed resources.
+"""
 type CompositeResourceDefinition implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: CompositeResourceDefinitionSpec!
+
+  "The observed state of this resource."
   status: CompositeResourceDefinitionStatus
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
-  definedCompositeResources(version: String): CompositeResourceConnection! @goField(forceResolver: true)
-  definedCompositeResourceClaims(version: String, namespace: String): CompositeResourceClaimConnection! @goField(forceResolver: true)
+
+  "Composite resources (XRs) defined by this XRD."
+  definedCompositeResources(
+    "Return resources of this version."
+    version: String
+  ): CompositeResourceConnection! @goField(forceResolver: true)
+
+  "Composite resource claims (XRCs) defined by this XRD."
+  definedCompositeResourceClaims(
+    "Return resources of this version."
+    version: String,
+
+    "Return resources in this namespace."
+    namespace: String
+  ): CompositeResourceClaimConnection! @goField(forceResolver: true)
 }
 
+"""
+A CompositeResourceConnection represents a connection to composite resources.
+"""
 type CompositeResourceConnection {
-  items: [CompositeResource!]
-  count: Int!
+  "Connected nodes."
+  nodes: [CompositeResource!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+A CompositeResourceConnection represents a connection to composite resource
+claims.
+"""
 type CompositeResourceClaimConnection {
-  items: [CompositeResourceClaim!]
-  count: Int!
+  "Connected nodes."
+  nodes: [CompositeResourceClaim!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
+"""
+A CompositeResourceDefinitionSpec represents the desired state of a composite
+resource definition.
+"""
 type CompositeResourceDefinitionSpec {
+  """
+  Group specifies the API group of the defined composite resource. Composite
+  resources are served under `/apis/<group>/...`. Must match the name of the XRD
+  (in the form `<names.plural>.<group>`).
+  """
   group: String!
+
+  """
+	Names specifies the resource and kind names of the defined composite resource.
+  """
   names: CompositeResourceDefinitionNames!
+
+  """
+	ClaimNames specifies the names of an optional composite resource claim. When
+  claim names are specified Crossplane will create a namespaced 'composite
+  resource claim' CRD that corresponds to the defined composite resource. This
+  composite resource claim acts as a namespaced proxy for the composite
+  resource; creating, updating, or deleting the claim will create, update, or
+  delete a corresponding composite resource. You may add claim names to an
+  existing CompositeResourceDefinition, but they cannot be changed or removed
+  once they have been set.
+  """
   claimNames: CompositeResourceDefinitionNames
+
+  """
+	ConnectionSecretKeys is the list of keys that will be exposed to the end user
+  of the defined kind.
+  """
   connectionSecretKeys: [String!]
+
+  """
+	DefaultComposition is the Composition resource that will be used in case no
+  composition selector is given.
+  """
   defaultComposition: Composition @goField(forceResolver: true)
+
+  """
+	EnforcedComposition is the Composition resource that will be used by all
+  composite instances whose schema is defined by this definition.
+  """
   enforcedComposition: Composition @goField(forceResolver: true)
+
+  """
+	Versions is the list of all API versions of the defined composite resource.
+  Version names are used to compute the order in which served versions are
+  listed in API discovery. If the version string is "kube-like", it will sort
+  above non "kube-like" version strings, which are ordered lexicographically.
+  "Kube-like" versions start with a "v", then are followed by a number (the
+  major version), then optionally the string "alpha" or "beta" and another
+  number (the minor version). These are sorted first by GA > beta > alpha (where
+  GA is a version with no suffix such as beta or alpha), and then by comparing
+  major version, then minor version. An example sorted list of versions: v10,
+  v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10. Note
+  that all versions must have identical schemas; Crossplane does not currently
+	support conversion between different version schemas.
+  """
   versions: [CompositeResourceDefinitionVersion!]
 }
 
+
+"""
+CompositeResourceDefinitionNames specifies the resource and kind names of the
+defined composite resource or claim.
+"""
 type CompositeResourceDefinitionNames {
+
+  """
+	The plural name of the resource to serve. Composite resources are served by
+  the Kuberntes API under `/apis/<group>/<version>/.../<plural>`.
+  """
   plural: String!
+
+  """
+	The singular name of the resource.
+  """
   singular: String
+
+  """
+  Short names for the resource, exposed in API discovery documents, and used by
+  clients to support invocations like `kubectl get <shortname>`.
+  """
   shortNames: [String!]
+
+  """
+  The Kubernetes API kind of the defined resource.
+  """
   kind: String!
+
+  """
+  The Kubernetes API kind of a list of the defined resource.
+  """
   listKind: String
+
+  """
+	A list of grouped resources this custom resource belongs to (e.g. 'all'). This
+  is published in API discovery documents, and used by clients to support
+  invocations like `kubectl get all`.
+  """
   categories: [String!]
 }
 
+"""
+A CompositeResourceDefinitionVersion describes a version of a composite
+resource.
+"""
 type CompositeResourceDefinitionVersion {
+  """
+	Name of this version, e.g. “v1”, “v2beta1”, etc. Composite resources are
+	served under this version at `/apis/<group>/<version>/...` if `served` is
+	true.
+  """
   name: String!
+
+  """
+	Referenceable specifies that this version may be referenced by a Composition
+  in order to configure which resources an XR may be composed of. Exactly one
+  version must be marked as referenceable; all Compositions must target only the
+  referenceable version. The referenceable version must be served.
+  """
   referenceable: Boolean!
+
+  """
+	Served specifies that this version should be served via Kubernetes REST APIs.
+  """
   served: Boolean!
+
+  """
+	Schema describes the schema used for validation, pruning, and defaulting of
+  this version of the defined composite resource. Fields required by all
+  composite resources are injected into this schema automatically, and override
+  equivalently named fields in this schema.
+  """
   schema: CompositeResourceValidation
 }
 
+"""
+A CompositeResourceValidation is a list of validation methods for a composite
+resource.
+"""
 type CompositeResourceValidation {
+	"OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
   openAPIV3Schema: JSONObject
 }
 
+"""
+A CompositeResourceDefinitionStatus represents the observed state of a composite
+resource definition.
+"""
 type CompositeResourceDefinitionStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
+
+  """
+	Controllers represents the status of the controllers that power this
+  composite resource definition.
+  """
   controllers: CompositeResourceDefinitionControllerStatus
 }
 
+"""
+A CompositeResourceDefinitionControllerStatus shows the observed state of the
+controllers that power the definition.
+"""
 type CompositeResourceDefinitionControllerStatus {
+
+  """
+	The CompositeResourceTypeRef is the type of composite resource that Crossplane
+  is currently reconciling for this definition. Its version will eventually
+  become consistent with the definition's referenceable version. Note that
+  clients may interact with any served type; this is simply the type that
+  Crossplane interacts with.
+  """
   compositeResourceType: TypeReference
+
+  """
+	The CompositeResourceClaimTypeRef is the type of composite resource claim
+	that Crossplane is currently reconciling for this definition. Its version
+	will eventually become consistent with the definition's referenceable version.
+  Note that clients may interact with any served type; this is simply the type
+  that Crossplane interacts with.
+  """
   compositeResourceClaimType: TypeReference
 }
 
+
+"""
+A TypeReference references a type of Kubernetes resource by API version and
+kind.
+"""
 type TypeReference {
+  "The Kubernetes API version of the referenced resource."
   apiVersion: String!
+
+  "The Kubernetes API kind of the referenced resource."
   kind: String!
 }
 
+"""
+A Composition defines the group of resources to be created when a compatible
+type of composite resource is created with reference to the composition.
+"""
 type Composition implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: CompositionSpec!
+
+  "The observed state of this resource."
   status: CompositionStatus
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"""
+A CompositionSpec represents the desired state of a composition.
+"""
 type CompositionSpec {
+  """
+	CompositeTypeRef specifies the type of composite resource that this
+  composition is compatible with.
+  """
   compositeTypeRef: TypeReference!
+
+  """
+	WriteConnectionSecretsToNamespace specifies the namespace in which the
+	connection secrets of composite resource dynamically provisioned using this
+  composition will be created.
+  """
   writeConnectionSecretsToNamespace: String
 
   # TODO(negz): Model patch sets and resource templates.
 }
 
+"""
+A CompositionStatus represents the observed state of a composition.
+"""
 type CompositionStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
 }
 

@@ -60,5 +60,5 @@ func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta, controll
 		owners = append(owners, model.Owner{Controller: ref.Controller, Resource: kr})
 	}
 
-	return &model.OwnerConnection{Items: owners, Count: len(owners)}, nil
+	return &model.OwnerConnection{Nodes: owners, TotalCount: len(owners)}, nil
 }

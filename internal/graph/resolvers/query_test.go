@@ -88,8 +88,8 @@ func TestQueryProviders(t *testing.T) {
 			},
 			want: want{
 				pc: &model.ProviderConnection{
-					Items: []model.Provider{gp},
-					Count: 1,
+					Nodes:      []model.Provider{gp},
+					TotalCount: 1,
 				},
 			},
 		},
@@ -183,8 +183,8 @@ func TestQueryConfigurations(t *testing.T) {
 			},
 			want: want{
 				cc: &model.ConfigurationConnection{
-					Items: []model.Configuration{gc},
-					Count: 1,
+					Nodes:      []model.Configuration{gc},
+					TotalCount: 1,
 				},
 			},
 		},

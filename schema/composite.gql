@@ -1,71 +1,186 @@
+"""
+A CompositeResource is a resource this is reconciled by composing other
+composite or managed resources. Composite resources use a Composition to
+determine which resources to compose, and how.
+"""
 type CompositeResource implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: CompositeResourceSpec!
+
+  "The observed state of this resource."
   status: CompositeResourceStatus!
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"""
+A CompositeResourceSpec represents the desired state of a composite resource.
+"""
 type CompositeResourceSpec {
+  """
+  The composition this composite resource uses to compose resources.
+  """
   composition: Composition @goField(forceResolver: true)
-  compositionSelector: LabelSelector
-  claim: CompositeResourceClaim @goField(forceResolver: true)
-  writesConnectionSecretTo: Secret @goField(forceResolver: true)
 
+  """
+  A composition selector is used to select this composite resource's composition
+  by matching on labels.
+  """
+  compositionSelector: LabelSelector
+
+  """
+  The composite resource claim that claims this composite resource.
+  """
+  claim: CompositeResourceClaim @goField(forceResolver: true)
+
+  """
+  The secret this composite resource writes its connection details to.
+  """
+  connectionSecret: Secret @goField(forceResolver: true)
+
+  """
+  The resources of which this composite resource is composed.
+  """
   resources: ComposedResourceConnection @goField(forceResolver: true)
 }
 
+"""
+A ComposedResourceConnection represents a connection to composed resources.
+"""
 type ComposedResourceConnection {
-  items: [ComposedResource!]
-  count: Int!
+  "Connected nodes."
+  nodes: [ComposedResource!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
 }
 
 # TODO(negz): Do we need to support GenericResource here, just in case? We only
 # support managed an composite resources officially, but in practice some folks
 # use arbitrary resources.
+
+"""
+A ComposedResource is either a managed or a composite resource.
+"""
 union ComposedResource = ManagedResource | CompositeResource
 
+"""
+A CompositeResourceClaimStatus represents the observed state of a composite
+resource.
+"""
 type CompositeResourceStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
+
+  "The status of this composite resource's connection details."
   connectionDetails: CompositeResourceConnectionDetails
 }
 
+"""
+CompositeResourceConnectionDetails represents the observed status of a composite
+resource's connection details.
+"""
 type CompositeResourceConnectionDetails {
+  """
+  The time at which the composite resource's connection details were last
+  published.
+  """
   lastPublishedTime: Time
 }
 
+"""
+A CompositeResourceClaim is a namespaced proxy for a composite resource.
+"""
 type CompositeResourceClaim implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The desired state of this resource."
   spec: CompositeResourceClaimSpec!
+
+  "The observed state of this resource."
   status: CompositeResourceClaimStatus!
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"""
+A CompositeResourceClaimSpec represents the desired state of a composite
+resource claim.
+"""
 type CompositeResourceClaimSpec {
+  """
+  The composition this composite resource uses to compose resources.
+  """
   composition: Composition @goField(forceResolver: true)
+
+  """
+  A composition selector is used to select this composite resource claims's
+  (composite resource's) composition by matching on labels.
+  """
   compositionSelector: LabelSelector
+
+  """
+  The composite resource to which this composite resource claim is bound.
+  """
   resource: CompositeResource @goField(forceResolver: true)
-  writesConnectionSecretTo: Secret @goField(forceResolver: true)
+
+
+  """
+  The secret this composite resource claim writes its connection details to.
+  """
+  connectionSecret: Secret @goField(forceResolver: true)
 }
 
+"""
+A CompositeResourceClaimStatus represents the observed status of a composite
+resource claim.
+"""
 type CompositeResourceClaimStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
+
+  "The status of this composite resource's connection details."
   connectionDetails: CompositeResourceClaimConnectionDetails
 }
 
+"""
+CompositeResourceConnectionDetails represents the observed status of a composite
+resource claim's connection details.
+"""
 type CompositeResourceClaimConnectionDetails {
+  """
+  The time at which the composite resource claim's connection details were last
+  published.
+  """
   lastPublishedTime: Time
 }

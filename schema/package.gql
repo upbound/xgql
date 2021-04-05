@@ -1,16 +1,38 @@
+"""
+A RevisionActivationPolicy indicates how a provider or configuration package
+should activate its revisions.
+"""
 enum RevisionActivationPolicy {
-  Automatic
-  Manual
+  "Automatically activate package revisions."
+  AUTOMATIC
+
+  "Require a user to manually activate revisions."
+  MANUAL
 }
 
+"""
+A PackagePullPolicy represents when to pull a package OCI image from a registry.
+"""
 enum PackagePullPolicy {
-  Always
-  Never
-  IfNotPresent
+  "Always pull the package image, even if it is already present."
+  ALWAYS
+
+  "Never pull the package image."
+  NEVER
+
+  "Only pull the package image if it is not present."
+  IF_NOT_PRESENT
 }
 
+"""
+A PackageRevisionDesiredState represents the desired state of a provider or
+configuration revision.
+"""
 enum PackageRevisionDesiredState {
-  Inactive
-  Active
+  "The revision should be inactive."
+  INACTIVE
+
+  "The revision should be active."
+  ACTIVE
 }
 

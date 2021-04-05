@@ -1,0 +1,11 @@
+{
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "graphql-schema-linter": "^2.0.1"
+  },
+  "scripts": {
+    "lint": "yarn run graphql-schema-linter",
+    "build": "true",
+    "test-ci": "true"
+  }
+}

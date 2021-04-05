@@ -47,7 +47,7 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration,
 	}
 
 	out := &model.ConfigurationRevisionConnection{
-		Items: make([]model.ConfigurationRevision, 0),
+		Nodes: make([]model.ConfigurationRevision, 0),
 	}
 
 	for i := range in.Items {
@@ -65,8 +65,8 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration,
 			continue
 		}
 
-		out.Items = append(out.Items, model.GetConfigurationRevision(&cr))
-		out.Count++
+		out.Nodes = append(out.Nodes, model.GetConfigurationRevision(&cr))
+		out.TotalCount++
 	}
 
 	return out, nil
@@ -94,7 +94,7 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 	}
 
 	out := &model.KubernetesResourceConnection{
-		Items: make([]model.KubernetesResource, 0, len(obj.ObjectRefs)),
+		Nodes: make([]model.KubernetesResource, 0, len(obj.ObjectRefs)),
 	}
 
 	for _, ref := range obj.ObjectRefs {
@@ -113,8 +113,8 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 				continue
 			}
 
-			out.Items = append(out.Items, model.GetCompositeResourceDefinition(xrd))
-			out.Count++
+			out.Nodes = append(out.Nodes, model.GetCompositeResourceDefinition(xrd))
+			out.TotalCount++
 		case extv1.CompositionKind:
 			cmp := &extv1.Composition{}
 			if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, cmp); err != nil {
@@ -122,8 +122,8 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 				continue
 			}
 
-			out.Items = append(out.Items, model.GetComposition(cmp))
-			out.Count++
+			out.Nodes = append(out.Nodes, model.GetComposition(cmp))
+			out.TotalCount++
 		}
 	}
 

@@ -1,17 +1,37 @@
+"""
+A ProviderConfig configures a provider, in that it provides configuration that
+is relevant to all managed resources installed by a provider.
+"""
 type ProviderConfig implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
   id: ID!
 
+  "The underlying Kubernetes API version of this resource."
   apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
   kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
+
+  "The observed state of this resource."
   status: ProviderConfigStatus
 
+  "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 
+  "A raw JSON representation of the underlying Kubernetes resource."
   raw: JSONObject!
 }
 
+"""
+A ProviderConfigStatus represents the observed state of a provider config.
+"""
 type ProviderConfigStatus implements ConditionedStatus {
+  "The observed condition of this resource."
   conditions: [Condition!]
+
+  "The number of managed resources currently using this provider config."
   users: Int
 }
