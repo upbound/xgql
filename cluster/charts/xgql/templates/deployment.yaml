@@ -53,6 +53,12 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+        {{- if .Values.tlsSecret }}
+        volumeMounts:
+        - mountPath: /tls
+          name: tls
+          readOnly: true
+        {{- end}}
       {{- if .Values.nodeSelector }}
       nodeSelector: {{ toYaml .Values.nodeSelector | nindent 8 }}
       {{- end }}
@@ -62,3 +68,10 @@ spec:
       {{- if .Values.affinity }}
       affinity: {{ toYaml .Values.affinity | nindent 8 }}
       {{- end }}
+      {{- if .Values.tlsSecret }}
+      volumes:
+      - name: tls
+        secret:
+          defaultMode: 420
+          secretName: {{ .Values.tlsSecret }}
+      {{- end}}

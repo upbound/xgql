@@ -1,6 +1,8 @@
 package main
 
 import (
+	"io/ioutil"
+	stdlog "log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -69,12 +71,15 @@ var noCache = []client.Object{
 
 func main() {
 	var (
-		app    = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
-		debug  = app.Flag("debug", "Enable debug logging.").Short('d').Bool()
-		listen = app.Flag("listen", "Address to listen at.").Default(":8080").String()
-		play   = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
-		agent  = app.Flag("trace-agent", "Address of the Jaeger trace agent. Leave unset to disable tracing.").String()
-		ratio  = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
+		app      = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
+		debug    = app.Flag("debug", "Enable debug logging.").Short('d').Bool()
+		listen   = app.Flag("listen", "Address at which to listen for TLS connections. Requires TLS cert and key.").Default(":8443").String()
+		tlsCert  = app.Flag("tls-cert", "Path to the TLS certificate file used to serve TLS connections.").ExistingFile()
+		tlsKey   = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
+		insecure = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
+		play     = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
+		agent    = app.Flag("trace-agent", "Address of the Jaeger trace agent. Leave unset to disable tracing.").String()
+		ratio    = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
 	)
 	app.Version(version.Version)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
@@ -151,7 +156,17 @@ func main() {
 		rt.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	}
 
-	kingpin.FatalIfError(http.ListenAndServe(*listen, rt), "cannot listen for HTTP")
+	if *tlsCert != "" && *tlsKey != "" {
+		go func() {
+			log.Debug("Listening for TLS connections", "address", *listen)
+			h := http.Server{Handler: rt, Addr: *listen, ErrorLog: stdlog.New(ioutil.Discard, "", 0)}
+			kingpin.FatalIfError(h.ListenAndServeTLS(*tlsCert, *tlsKey), "cannot serve TLS HTTP")
+		}()
+	}
+
+	log.Debug("Listening for insecure connections", "address", *insecure)
+	h := http.Server{Handler: rt, Addr: *insecure, ErrorLog: stdlog.New(ioutil.Discard, "", 0)}
+	kingpin.FatalIfError(h.ListenAndServe(), "cannot serve insecure HTTP")
 }
 
 type formatter struct{ log logging.Logger }
