@@ -32,6 +32,9 @@ func (r *configuration) Events(ctx context.Context, obj *model.Configuration) (*
 }
 
 func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration, active *bool) (*model.ConfigurationRevisionConnection, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
 	t, _ := token.FromContext(ctx)
 
 	c, err := r.clients.Get(t)
@@ -85,8 +88,10 @@ type configurationRevisionStatus struct {
 }
 
 func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (*model.KubernetesResourceConnection, error) {
-	t, _ := token.FromContext(ctx)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
 
+	t, _ := token.FromContext(ctx)
 	c, err := r.clients.Get(t)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))

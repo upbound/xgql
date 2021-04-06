@@ -23,8 +23,10 @@ type objectMeta struct {
 }
 
 func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta, controller *bool) (*model.OwnerConnection, error) {
-	t, _ := token.FromContext(ctx)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
 
+	t, _ := token.FromContext(ctx)
 	c, err := r.clients.Get(t)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))

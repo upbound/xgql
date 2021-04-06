@@ -1,11 +1,16 @@
 package resolvers
 
 import (
+	"time"
+
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 )
+
+// Default resolver timeout.
+const timeout = 5 * time.Second
 
 // A ClientCache can produce a client for a given token.
 type ClientCache interface {

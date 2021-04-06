@@ -23,8 +23,10 @@ type query struct {
 }
 
 func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error) {
-	t, _ := token.FromContext(ctx)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
 
+	t, _ := token.FromContext(ctx)
 	c, err := r.clients.Get(t)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
@@ -50,8 +52,10 @@ func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error
 }
 
 func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnection, error) {
-	t, _ := token.FromContext(ctx)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
 
+	t, _ := token.FromContext(ctx)
 	c, err := r.clients.Get(t)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
