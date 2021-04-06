@@ -25,8 +25,10 @@ func (r *crd) Events(ctx context.Context, obj *model.CustomResourceDefinition) (
 }
 
 func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error) {
-	t, _ := token.FromContext(ctx)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
 
+	t, _ := token.FromContext(ctx)
 	c, err := r.clients.Get(t)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))

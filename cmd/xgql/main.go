@@ -38,6 +38,7 @@ import (
 
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
+	"github.com/upbound/xgql/internal/graph/present"
 	"github.com/upbound/xgql/internal/graph/resolvers"
 	"github.com/upbound/xgql/internal/opentelemetry"
 	"github.com/upbound/xgql/internal/token"
@@ -145,6 +146,7 @@ func main() {
 		clients.WithLogger(log),
 	)
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
+	srv.SetErrorPresenter(present.Error)
 	srv.Use(opentelemetry.MetricEmitter{})
 	srv.Use(opentelemetry.Tracer{})
 	srv.Use(apollotracing.Tracer{})
@@ -156,16 +158,23 @@ func main() {
 		rt.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	}
 
+	h := http.Server{
+		Handler:      rt,
+		WriteTimeout: 10 * time.Second,
+		ReadTimeout:  5 * time.Second,
+		ErrorLog:     stdlog.New(ioutil.Discard, "", 0),
+	}
+
 	if *tlsCert != "" && *tlsKey != "" {
 		go func() {
 			log.Debug("Listening for TLS connections", "address", *listen)
-			h := http.Server{Handler: rt, Addr: *listen, ErrorLog: stdlog.New(ioutil.Discard, "", 0)}
+			h.Addr = *listen
 			kingpin.FatalIfError(h.ListenAndServeTLS(*tlsCert, *tlsKey), "cannot serve TLS HTTP")
 		}()
 	}
 
 	log.Debug("Listening for insecure connections", "address", *insecure)
-	h := http.Server{Handler: rt, Addr: *insecure, ErrorLog: stdlog.New(ioutil.Discard, "", 0)}
+	h.Addr = *insecure
 	kingpin.FatalIfError(h.ListenAndServe(), "cannot serve insecure HTTP")
 }
 
