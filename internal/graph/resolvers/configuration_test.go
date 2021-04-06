@@ -20,6 +20,7 @@ import (
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
+	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/model"
@@ -78,7 +79,7 @@ func TestConfigurationRevisions(t *testing.T) {
 	}{
 		"GetClientError": {
 			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{}, errBoom
 			}),
 			args: args{
@@ -92,7 +93,7 @@ func TestConfigurationRevisions(t *testing.T) {
 		},
 		"ListRevisionsError": {
 			reason: "If we can't list revisions we should add the error to the GraphQL context and return early.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(errBoom),
 				}, nil
@@ -108,7 +109,7 @@ func TestConfigurationRevisions(t *testing.T) {
 		},
 		"AllRevisions": {
 			reason: "We should successfully return any revisions we own that we can list and model.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
 						*obj.(*pkgv1.ConfigurationRevisionList) = pkgv1.ConfigurationRevisionList{
@@ -133,7 +134,7 @@ func TestConfigurationRevisions(t *testing.T) {
 		},
 		"ActiveRevisions": {
 			reason: "We should successfully return any active revisions we own that we can list and model.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
 						*obj.(*pkgv1.ConfigurationRevisionList) = pkgv1.ConfigurationRevisionList{
@@ -205,7 +206,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 	}{
 		"GetClientError": {
 			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{}, errBoom
 			}),
 			args: args{
@@ -219,7 +220,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 		},
 		"UnknownObject": {
 			reason: "We should not attempt to get an object that doesn't seem to be part of the API extensions group.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{}, nil
 			}),
 			args: args{
@@ -241,7 +242,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 		},
 		"GetXRDError": {
 			reason: "If we can't get an XRD we should add the error to the GraphQL context and continue.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockGet: test.NewMockGetFn(nil, func(obj client.Object) error {
 						if _, ok := obj.(*extv1.CompositeResourceDefinition); ok {
@@ -280,7 +281,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 		},
 		"GetCompositionError": {
 			reason: "If we can't get a Composition we should add the error to the GraphQL context and continue.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockGet: test.NewMockGetFn(nil, func(obj client.Object) error {
 						if _, ok := obj.(*extv1.Composition); ok {

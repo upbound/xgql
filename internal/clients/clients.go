@@ -1,10 +1,9 @@
 package clients
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
-	"crypto/sha256"
-	"fmt"
 	"io"
 	"sync"
 	"time"
@@ -18,6 +17,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
+
+	"github.com/upbound/xgql/internal/auth"
+	"github.com/upbound/xgql/internal/version"
 )
 
 const (
@@ -52,17 +54,15 @@ func Config() (*rest.Config, error) {
 	cfg.QPS = 5
 	cfg.Burst = 10
 
+	cfg.UserAgent = "xgql/" + version.Version
+
 	return cfg, nil
 }
 
-// WithoutBearerToken returns a copy of the supplied REST config wihout its own
-// bearer token. This allows a bearer token to be injected into the config at
-// client creation time.
-func WithoutBearerToken(cfg *rest.Config) *rest.Config {
-	out := rest.CopyConfig(cfg)
-	out.BearerToken = ""
-	out.BearerTokenFile = ""
-	return out
+// Anonymize the supplied config by returning a copy with all authentication
+// details and credentials removed.
+func Anonymize(cfg *rest.Config) *rest.Config {
+	return rest.AnonymousClientConfig(cfg)
 }
 
 // TODO(negz): There are a few gotchas with watch based caches. The chief issue
@@ -181,18 +181,16 @@ func ForNamespace(n string) GetOption {
 }
 
 // Get a client that uses the specified bearer token.
-func (c *Cache) Get(token string, o ...GetOption) (client.Client, error) {
+func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) {
 	opts := &getOptions{}
 	for _, fn := range o {
 		fn(opts)
 	}
 
-	// TODO(negz): Is this sufficient to anonymize our bearer token?
-	h := sha256.New()
-	_, _ = h.Write(c.salt)
-	_, _ = h.Write([]byte(token))
-	_, _ = h.Write([]byte(opts.Namespace))
-	id := fmt.Sprintf("%x", h.Sum(nil))
+	extra := bytes.Buffer{}
+	extra.Write(c.salt)
+	extra.WriteString(opts.Namespace)
+	id := cr.Hash(extra.Bytes())
 
 	log := c.log.WithValues("client-id", id)
 	if opts.Namespace != "" {
@@ -209,10 +207,7 @@ func (c *Cache) Get(token string, o ...GetOption) (client.Client, error) {
 	}
 
 	started := time.Now()
-
-	cfg := rest.CopyConfig(c.cfg)
-	cfg.BearerToken = token
-	cfg.BearerTokenFile = ""
+	cfg := cr.Inject(c.cfg)
 
 	wc, err := c.newClient(cfg, client.Options{Scheme: c.scheme, Mapper: c.mapper})
 	if err != nil {

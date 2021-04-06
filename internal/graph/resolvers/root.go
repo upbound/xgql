@@ -5,6 +5,7 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 )
@@ -15,15 +16,15 @@ const timeout = 5 * time.Second
 // A ClientCache can produce a client for a given token.
 type ClientCache interface {
 	// Get a client for the given token.
-	Get(token string, o ...clients.GetOption) (client.Client, error)
+	Get(cr auth.Credentials, o ...clients.GetOption) (client.Client, error)
 }
 
 // A ClientCacheFn is a function that can produce a client for a given token.
-type ClientCacheFn func(token string, o ...clients.GetOption) (client.Client, error)
+type ClientCacheFn func(cr auth.Credentials, o ...clients.GetOption) (client.Client, error)
 
 // Get a client for the given token.
-func (fn ClientCacheFn) Get(token string, o ...clients.GetOption) (client.Client, error) {
-	return fn(token, o...)
+func (fn ClientCacheFn) Get(cr auth.Credentials, o ...clients.GetOption) (client.Client, error) {
+	return fn(cr, o...)
 }
 
 // The Root resolver.

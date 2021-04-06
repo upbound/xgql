@@ -1,0 +1,257 @@
+package auth
+
+import (
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
+	"k8s.io/client-go/rest"
+)
+
+func TestCredentialsInject(t *testing.T) {
+	token := "toke-one"
+
+	basicUser := "so"
+	basicPass := "basic"
+
+	impUser := "imp"
+	impGroup := "impish"
+	impExtraKey := "Coolness"
+	impExtraVal := "very"
+
+	cases := map[string]struct {
+		creds Credentials
+		cfg   *rest.Config
+		want  *rest.Config
+	}{
+		"EmptyConfig": {
+			creds: Credentials{
+				BearerToken:   token,
+				BasicUsername: basicUser,
+				BasicPassword: basicPass,
+				Impersonate: Impersonation{
+					Username: impUser,
+					Groups:   []string{impGroup},
+					Extra:    map[string][]string{impExtraKey: {impExtraVal}},
+				},
+			},
+			cfg: &rest.Config{},
+			want: &rest.Config{
+				BearerToken: token,
+				Username:    basicUser,
+				Password:    basicPass,
+				Impersonate: rest.ImpersonationConfig{
+					UserName: impUser,
+					Groups:   []string{impGroup},
+					Extra:    map[string][]string{impExtraKey: {impExtraVal}},
+				},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			got := tc.creds.Inject(tc.cfg)
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("\nc.Inject(...): -want, +got\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestCredentialsHash(t *testing.T) {
+	cases := map[string]struct {
+		creds Credentials
+		extra []byte
+		want  string
+	}{
+		"CredsOnly": {
+			creds: Credentials{
+				BearerToken:   "toke-one",
+				BasicUsername: "so",
+				BasicPassword: "basic",
+				Impersonate: Impersonation{
+					Username: "imp",
+					Groups:   []string{"imps"},
+					Extra:    map[string][]string{"coolness": {"very"}},
+				},
+			},
+			want: "3a891076971c12916e6e52149563cba9b165017460c3fb7164f07f5bb5d94f18",
+		},
+		"Extra": {
+			creds: Credentials{
+				BearerToken: "toke-one",
+			},
+			extra: []byte("coolness"),
+			want:  "3a9957abe9a6091449e9a1facbde080fe01a291f62e88f9276a4d39d18be8393",
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			got := tc.creds.Hash(tc.extra)
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("c.Hash(...): -want, +got:\n%s", diff)
+			}
+		})
+	}
+
+}
+
+func TestMiddleware(t *testing.T) {
+	token := "toke-one"
+
+	basicUser := "so"
+	basicPass := "basic"
+
+	impUser := "imp"
+	impGroup := "impish"
+	impExtraKey := "Coolness"
+	impExtraVal := "very"
+
+	type want struct {
+		c  Credentials
+		ok bool
+	}
+
+	tests := map[string]struct {
+		r    *http.Request
+		want want
+	}{
+		"WithWellFormedBearerHeader": {
+			r: func() *http.Request {
+				r := httptest.NewRequest("GET", "/", nil)
+				r.Header.Add("Authorization", "Bearer "+token)
+				return r
+			}(),
+			want: want{
+				c: Credentials{
+					BearerToken: token,
+				},
+				ok: true,
+			},
+		},
+		"WithWellFormedBasicHeader": {
+			r: func() *http.Request {
+				r := httptest.NewRequest("GET", "/", nil)
+				r.SetBasicAuth(basicUser, basicPass)
+				return r
+			}(),
+			want: want{
+				c: Credentials{
+					BasicUsername: basicUser,
+					BasicPassword: basicPass,
+				},
+				ok: true,
+			},
+		},
+		"WithWellFormedImpersonationHeaders": {
+			r: func() *http.Request {
+				r := httptest.NewRequest("GET", "/", nil)
+				r.Header.Add(headerImpersonateUser, impUser)
+				r.Header.Add(headerImpersonateGroup, impGroup)
+				r.Header.Add(headerPrefixImpersonateExtra+impExtraKey, impExtraVal)
+				return r
+			}(),
+			want: want{
+				c: Credentials{
+					Impersonate: Impersonation{
+						Username: impUser,
+						Groups:   []string{impGroup},
+						Extra:    map[string][]string{impExtraKey: {impExtraVal}},
+					},
+				},
+				ok: true,
+			},
+		},
+		"WithMalformedAuthzHeaders": {
+			r: func() *http.Request {
+				r := httptest.NewRequest("GET", "/", nil)
+				r.Header.Add("Authorization", "wat")
+				return r
+			}(),
+			want: want{
+				c:  Credentials{},
+				ok: true,
+			},
+		},
+		"WithoutHeaders": {
+			r: httptest.NewRequest("GET", "/", nil),
+			want: want{
+				c:  Credentials{},
+				ok: true,
+			},
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			h := Middleware(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+				c, ok := FromContext(r.Context())
+				if diff := cmp.Diff(tc.want.c, c); diff != "" {
+					t.Errorf("FromContext(...): -want, +got:\n%s", diff)
+				}
+				if diff := cmp.Diff(tc.want.ok, ok); diff != "" {
+					t.Errorf("FromContext(...): -want, +got:\n%s", diff)
+				}
+			}))
+
+			h.ServeHTTP(httptest.NewRecorder(), tc.r)
+		})
+	}
+}
+
+func TestFromContext(t *testing.T) {
+	creds := Credentials{BearerToken: "toke-one"}
+
+	type want struct {
+		c  Credentials
+		ok bool
+	}
+
+	tests := map[string]struct {
+		ctx  context.Context
+		want want
+	}{
+		"WithCredentialsValue": {
+			ctx: context.WithValue(context.Background(), key, creds),
+			want: want{
+				c:  creds,
+				ok: true,
+			},
+		},
+		"WithStringValue": {
+			ctx: context.WithValue(context.Background(), key, "toke-one"),
+			want: want{
+				c:  Credentials{},
+				ok: false,
+			},
+		},
+		"WithIntValue": {
+			ctx: context.WithValue(context.Background(), key, 42),
+			want: want{
+				c:  Credentials{},
+				ok: false,
+			},
+		},
+		"WithNoValue": {
+			ctx: context.Background(),
+			want: want{
+				c:  Credentials{},
+				ok: false,
+			},
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			c, ok := FromContext(tc.ctx)
+			if diff := cmp.Diff(tc.want.c, c); diff != "" {
+				t.Errorf("FromContext(...): -want, +got:\n%s", diff)
+			}
+			if diff := cmp.Diff(tc.want.ok, ok); diff != "" {
+				t.Errorf("FromContext(...): -want, +got:\n%s", diff)
+			}
+		})
+	}
+}

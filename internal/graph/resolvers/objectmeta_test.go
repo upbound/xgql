@@ -15,6 +15,7 @@ import (
 
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 
+	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/model"
@@ -56,7 +57,7 @@ func TestObjectMetaOwners(t *testing.T) {
 	}{
 		"GetClientError": {
 			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{}, errBoom
 			}),
 			args: args{
@@ -70,7 +71,7 @@ func TestObjectMetaOwners(t *testing.T) {
 		},
 		"GetOwnerError": {
 			reason: "If we can't get an owner we should add the error to the GraphQL context and continue.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockGet: test.NewMockGetFn(nil, func(obj client.Object) error {
 						if k, ok := obj.(interface {
@@ -110,7 +111,7 @@ func TestObjectMetaOwners(t *testing.T) {
 		},
 		"ControllerOnly": {
 			reason: "If we get an owner that isn't a controller reference we should continue.",
-			clients: ClientCacheFn(func(_ string, _ ...clients.GetOption) (client.Client, error) {
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockGet: test.NewMockGetFn(nil),
 				}, nil

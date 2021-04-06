@@ -8,8 +8,8 @@ import (
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
+	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/graph/model"
-	"github.com/upbound/xgql/internal/token"
 )
 
 const (
@@ -28,8 +28,8 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	t, _ := token.FromContext(ctx)
-	c, err := r.clients.Get(t)
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil

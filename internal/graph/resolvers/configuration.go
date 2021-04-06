@@ -13,8 +13,8 @@ import (
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
+	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/graph/model"
-	"github.com/upbound/xgql/internal/token"
 )
 
 const (
@@ -35,9 +35,8 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration,
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	t, _ := token.FromContext(ctx)
-
-	c, err := r.clients.Get(t)
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil
@@ -91,8 +90,8 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	t, _ := token.FromContext(ctx)
-	c, err := r.clients.Get(t)
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return nil, nil

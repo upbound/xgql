@@ -36,12 +36,12 @@ import (
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
+	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/present"
 	"github.com/upbound/xgql/internal/graph/resolvers"
 	"github.com/upbound/xgql/internal/opentelemetry"
-	"github.com/upbound/xgql/internal/token"
 	"github.com/upbound/xgql/internal/version"
 )
 
@@ -116,7 +116,7 @@ func main() {
 
 	rt := chi.NewRouter()
 	rt.Use(middleware.RequestLogger(&formatter{log}))
-	rt.Use(token.Middleware)
+	rt.Use(auth.Middleware)
 	rt.Use(version.Middleware)
 
 	s := runtime.NewScheme()
@@ -140,7 +140,7 @@ func main() {
 	log.Debug("Created REST mapper", "duration", time.Since(t))
 
 	ca := clients.NewCache(s,
-		clients.WithoutBearerToken(cfg),
+		clients.Anonymize(cfg),
 		clients.WithRESTMapper(rm),
 		clients.DoNotCache(noCache),
 		clients.WithLogger(log),
