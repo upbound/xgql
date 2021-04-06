@@ -11,13 +11,11 @@ nodeSelector: {}
 tolerations: {}
 affinity: {}
 
+# Uncomment to serve via TLS.
+# tlsSecret: xgql-certs
+# args: {"--tls-key=/tls/tls.key", "--tls-cert=/tls/tls.crt"}
+
 args: {}
-
-provider:
-  packages: []
-
-configuration:
-  packages: []
 
 imagePullSecrets:
 - dockerhub
