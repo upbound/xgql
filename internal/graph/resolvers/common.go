@@ -5,8 +5,11 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
+	corev1 "k8s.io/api/core/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/utils/pointer"
 
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/graph/model"
@@ -16,12 +19,48 @@ const (
 	errModelDefined = "cannot model defined resource"
 )
 
+type genericResource struct {
+	clients ClientCache
+}
+
+func (r *genericResource) Events(ctx context.Context, obj *model.GenericResource) (*model.EventConnection, error) {
+	e := &events{clients: r.clients}
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: obj.APIVersion,
+		Kind:       obj.Kind,
+		Name:       obj.Metadata.Name,
+		Namespace:  pointer.StringPtrDerefOr(obj.Metadata.Namespace, ""),
+		UID:        types.UID(obj.Metadata.UID),
+	})
+}
+
+type secret struct {
+	clients ClientCache
+}
+
+func (r *secret) Events(ctx context.Context, obj *model.Secret) (*model.EventConnection, error) {
+	e := &events{clients: r.clients}
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: obj.APIVersion,
+		Kind:       obj.Kind,
+		Name:       obj.Metadata.Name,
+		Namespace:  pointer.StringPtrDerefOr(obj.Metadata.Namespace, ""),
+		UID:        types.UID(obj.Metadata.UID),
+	})
+}
+
 type crd struct {
 	clients ClientCache
 }
 
 func (r *crd) Events(ctx context.Context, obj *model.CustomResourceDefinition) (*model.EventConnection, error) {
-	return nil, nil
+	e := &events{clients: r.clients}
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: obj.APIVersion,
+		Kind:       obj.Kind,
+		Name:       obj.Metadata.Name,
+		UID:        types.UID(obj.Metadata.UID),
+	})
 }
 
 func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error) {

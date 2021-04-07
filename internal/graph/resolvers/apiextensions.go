@@ -5,8 +5,10 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
+	corev1 "k8s.io/api/core/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/graph/model"
@@ -21,7 +23,13 @@ type xrd struct {
 }
 
 func (r *xrd) Events(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.EventConnection, error) {
-	return nil, nil
+	e := &events{clients: r.clients}
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: obj.APIVersion,
+		Kind:       obj.Kind,
+		Name:       obj.Metadata.Name,
+		UID:        types.UID(obj.Metadata.UID),
+	})
 }
 
 func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string) (*model.CompositeResourceConnection, error) {

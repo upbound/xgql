@@ -5,6 +5,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
+	corev1 "k8s.io/api/core/v1"
 
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
@@ -86,4 +87,20 @@ func (r *query) CompositeResourceDefinitions(ctx context.Context, dangling *bool
 
 func (r *query) Compositions(ctx context.Context, dangling *bool) (*model.CompositionConnection, error) {
 	return nil, nil
+}
+
+func (r *query) Events(ctx context.Context, involvedID *model.ReferenceID) (*model.EventConnection, error) {
+	e := events{clients: r.clients}
+	if involvedID == nil {
+		// Resolve all events.
+		return e.Resolve(ctx, nil)
+	}
+
+	// Resolve events pertaining to the supplied ID.
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: involvedID.APIVersion,
+		Kind:       involvedID.Kind,
+		Namespace:  involvedID.Namespace,
+		Name:       involvedID.Name,
+	})
 }
