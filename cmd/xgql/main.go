@@ -56,6 +56,8 @@ var noCache = []client.Object{
 	// they could end up as the owner reference of a resource we're concerned
 	// with, and we don't want to try to watch (e.g.) all pods in the cluster
 	// just because a pod somehow became the owner reference of an XR.
+	&corev1.Node{},
+	&corev1.Namespace{},
 	&corev1.Pod{},
 	&corev1.ConfigMap{},
 	&corev1.Service{},

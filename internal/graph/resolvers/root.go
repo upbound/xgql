@@ -49,7 +49,7 @@ func (r *Root) ObjectMeta() generated.ObjectMetaResolver {
 
 // Secret resolves properties of the Secret GraphQL type.
 func (r *Root) Secret() generated.SecretResolver {
-	return nil
+	return &secret{clients: r.clients}
 }
 
 // CompositeResource resolves properties of the CompositeResource GraphQL type.
@@ -117,12 +117,12 @@ func (r *Root) CustomResourceDefinition() generated.CustomResourceDefinitionReso
 
 // Event resolves properties of the Event GraphQL type.
 func (r *Root) Event() generated.EventResolver {
-	return nil
+	return &event{clients: r.clients}
 }
 
 // GenericResource resolves properties of the GenericResource GraphQL type.
 func (r *Root) GenericResource() generated.GenericResourceResolver {
-	return nil
+	return &genericResource{clients: r.clients}
 }
 
 // ManagedResource resolves properties of the CustomResourceDefinition GraphQL

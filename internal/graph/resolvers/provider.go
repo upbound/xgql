@@ -6,6 +6,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
+	corev1 "k8s.io/api/core/v1"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -27,7 +28,13 @@ type provider struct {
 }
 
 func (r *provider) Events(ctx context.Context, obj *model.Provider) (*model.EventConnection, error) {
-	return nil, nil
+	e := &events{clients: r.clients}
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: obj.APIVersion,
+		Kind:       obj.Kind,
+		Name:       obj.Metadata.Name,
+		UID:        types.UID(obj.Metadata.UID),
+	})
 }
 
 func (r *provider) Revisions(ctx context.Context, obj *model.Provider, active *bool) (*model.ProviderRevisionConnection, error) {
@@ -78,7 +85,13 @@ type providerRevision struct {
 }
 
 func (r *providerRevision) Events(ctx context.Context, obj *model.ProviderRevision) (*model.EventConnection, error) {
-	return nil, nil
+	e := &events{clients: r.clients}
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: obj.APIVersion,
+		Kind:       obj.Kind,
+		Name:       obj.Metadata.Name,
+		UID:        types.UID(obj.Metadata.UID),
+	})
 }
 
 type providerRevisionStatus struct {

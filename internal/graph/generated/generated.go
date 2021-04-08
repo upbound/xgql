@@ -514,6 +514,7 @@ type ComplexityRoot struct {
 		CompositeResourceDefinitions func(childComplexity int, dangling *bool) int
 		Compositions                 func(childComplexity int, dangling *bool) int
 		Configurations               func(childComplexity int) int
+		Events                       func(childComplexity int, involvedID *model.ReferenceID) int
 		Providers                    func(childComplexity int) int
 	}
 
@@ -611,6 +612,7 @@ type QueryResolver interface {
 	Configurations(ctx context.Context) (*model.ConfigurationConnection, error)
 	CompositeResourceDefinitions(ctx context.Context, dangling *bool) (*model.CompositeResourceDefinitionConnection, error)
 	Compositions(ctx context.Context, dangling *bool) (*model.CompositionConnection, error)
+	Events(ctx context.Context, involvedID *model.ReferenceID) (*model.EventConnection, error)
 }
 type SecretResolver interface {
 	Events(ctx context.Context, obj *model.Secret) (*model.EventConnection, error)
@@ -2526,6 +2528,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Configurations(childComplexity), true
 
+	case "Query.events":
+		if e.complexity.Query.Events == nil {
+			break
+		}
+
+		args, err := ec.field_Query_events_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Events(childComplexity, args["involvedID"].(*model.ReferenceID)), true
+
 	case "Query.providers":
 		if e.complexity.Query.Providers == nil {
 			break
@@ -4353,6 +4367,14 @@ type Query {
       "Only return Compositions that aren't owned by a configuration revision."
       dangling: Boolean = false
     ): CompositionConnection!
+
+    """
+    Kubernetes events.
+    """
+    events(
+      "Only return events associated with the supplied ID."
+      involvedID: ID
+    ): EventConnection!
 }
 
 """
@@ -4547,6 +4569,21 @@ func (ec *executionContext) field_Query_compositions_args(ctx context.Context, r
 		}
 	}
 	args["dangling"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_events_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReferenceID
+	if tmp, ok := rawArgs["involvedID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("involvedID"))
+		arg0, err = ec.unmarshalOID2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["involvedID"] = arg0
 	return args, nil
 }
 
@@ -13600,6 +13637,48 @@ func (ec *executionContext) _Query_compositions(ctx context.Context, field graph
 	return ec.marshalNCompositionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_events(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_events_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Events(rctx, args["involvedID"].(*model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.EventConnection)
+	fc.Result = res
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -18019,6 +18098,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "events":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_events(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -19738,6 +19831,22 @@ func (ec *executionContext) unmarshalOEventType2ᚖgithubᚗcomᚋupboundᚋxgql
 }
 
 func (ec *executionContext) marshalOEventType2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventType(ctx context.Context, sel ast.SelectionSet, v *model.EventType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOID2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx context.Context, v interface{}) (*model.ReferenceID, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ReferenceID)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx context.Context, sel ast.SelectionSet, v *model.ReferenceID) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

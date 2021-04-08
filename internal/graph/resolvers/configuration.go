@@ -6,6 +6,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/pointer"
@@ -28,7 +29,13 @@ type configuration struct {
 }
 
 func (r *configuration) Events(ctx context.Context, obj *model.Configuration) (*model.EventConnection, error) {
-	return nil, nil
+	e := &events{clients: r.clients}
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: obj.APIVersion,
+		Kind:       obj.Kind,
+		Name:       obj.Metadata.Name,
+		UID:        types.UID(obj.Metadata.UID),
+	})
 }
 
 func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration, active *bool) (*model.ConfigurationRevisionConnection, error) {
@@ -79,7 +86,13 @@ type configurationRevision struct {
 }
 
 func (r *configurationRevision) Events(ctx context.Context, obj *model.ConfigurationRevision) (*model.EventConnection, error) {
-	return nil, nil
+	e := &events{clients: r.clients}
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: obj.APIVersion,
+		Kind:       obj.Kind,
+		Name:       obj.Metadata.Name,
+		UID:        types.UID(obj.Metadata.UID),
+	})
 }
 
 type configurationRevisionStatus struct {

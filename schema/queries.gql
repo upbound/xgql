@@ -27,6 +27,14 @@ type Query {
       "Only return Compositions that aren't owned by a configuration revision."
       dangling: Boolean = false
     ): CompositionConnection!
+
+    """
+    Kubernetes events.
+    """
+    events(
+      "Only return events associated with the supplied ID."
+      involvedID: ID
+    ): EventConnection!
 }
 
 """
