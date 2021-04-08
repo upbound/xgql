@@ -9,8 +9,10 @@ import (
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/upbound/xgql/internal/auth"
+	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/model"
 )
 
@@ -76,7 +78,58 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 }
 
 func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version, namespace *string) (*model.CompositeResourceClaimConnection, error) {
-	return nil, nil
+	// Return early if this XRD doesn't offer a claim.
+	if obj.Spec.ClaimNames == nil {
+		return &model.CompositeResourceClaimConnection{}, nil
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	gopts := []clients.GetOption{}
+	lopts := []client.ListOption{}
+	if namespace != nil {
+		gopts = []clients.GetOption{clients.ForNamespace(*namespace)}
+		lopts = []client.ListOption{client.InNamespace(*namespace)}
+	}
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds, gopts...)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	gv := schema.GroupVersion{Group: obj.Spec.Group}
+	switch {
+	case version != nil:
+		gv.Version = *version
+	default:
+		gv.Version = pickXRDVersion(obj.Spec.Versions)
+	}
+
+	in := &kunstructured.UnstructuredList{}
+	in.SetAPIVersion(gv.String())
+	in.SetKind(obj.Spec.ClaimNames.Kind + "List")
+	if lk := obj.Spec.ClaimNames.ListKind; lk != nil && *lk != "" {
+		in.SetKind(*lk)
+	}
+
+	if err := c.List(ctx, in, lopts...); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errListResources))
+		return nil, nil
+	}
+
+	out := &model.CompositeResourceClaimConnection{
+		Nodes:      make([]model.CompositeResourceClaim, 0, len(in.Items)),
+		TotalCount: len(in.Items),
+	}
+
+	for i := range in.Items {
+		out.Nodes = append(out.Nodes, model.GetCompositeResourceClaim(&in.Items[i]))
+	}
+
+	return out, nil
 }
 
 // TODO(negz): Try to pick the 'highest' version (e.g. v2 > v1 > v1beta1),

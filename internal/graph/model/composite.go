@@ -64,3 +64,57 @@ func GetCompositeResource(u *kunstructured.Unstructured) CompositeResource {
 		Raw:    raw(xr),
 	}
 }
+
+// A CompositeResourceClaimSpec represents the desired state of a composite
+// resource claim.
+type CompositeResourceClaimSpec struct {
+	CompositionSelector *LabelSelector `json:"compositionSelector"`
+
+	CompositionReference              *corev1.ObjectReference
+	ResourceReference                 *corev1.ObjectReference
+	WritesConnectionSecretToReference *xpv1.LocalSecretReference
+}
+
+// GetCompositeResourceClaimStatus from the supplied Crossplane claim.
+func GetCompositeResourceClaimStatus(xrc *unstructured.Claim) *CompositeResourceClaimStatus {
+	c := xrc.GetConditions()
+	t := xrc.GetConnectionDetailsLastPublishedTime()
+
+	out := &CompositeResourceClaimStatus{}
+	if len(c) > 0 {
+		out.Conditions = GetConditions(c)
+	}
+	if t != nil {
+		out.ConnectionDetails = &CompositeResourceClaimConnectionDetails{LastPublishedTime: &t.Time}
+	}
+
+	if cmp.Equal(out, &CompositeResourceClaimStatus{}) {
+		return nil
+	}
+
+	return out
+}
+
+// GetCompositeResourceClaim from the supplied Crossplane claim.
+func GetCompositeResourceClaim(u *kunstructured.Unstructured) CompositeResourceClaim {
+	xrc := &unstructured.Claim{Unstructured: *u}
+	return CompositeResourceClaim{
+		ID: ReferenceID{
+			APIVersion: xrc.GetAPIVersion(),
+			Kind:       xrc.GetKind(),
+			Name:       xrc.GetName(),
+		},
+
+		APIVersion: xrc.GetAPIVersion(),
+		Kind:       xrc.GetKind(),
+		Metadata:   GetObjectMeta(xrc),
+		Spec: &CompositeResourceClaimSpec{
+			CompositionSelector:               GetLabelSelector(xrc.GetCompositionSelector()),
+			CompositionReference:              xrc.GetCompositionReference(),
+			ResourceReference:                 xrc.GetResourceReference(),
+			WritesConnectionSecretToReference: xrc.GetWriteConnectionSecretToReference(),
+		},
+		Status: GetCompositeResourceClaimStatus(xrc),
+		Raw:    raw(xrc),
+	}
+}

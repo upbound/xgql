@@ -104,20 +104,6 @@ type CompositeResourceClaimConnectionDetails struct {
 	LastPublishedTime *time.Time `json:"lastPublishedTime"`
 }
 
-// A CompositeResourceClaimSpec represents the desired state of a composite
-// resource claim.
-type CompositeResourceClaimSpec struct {
-	// The composition this composite resource uses to compose resources.
-	Composition *Composition `json:"composition"`
-	// A composition selector is used to select this composite resource claims's
-	// (composite resource's) composition by matching on labels.
-	CompositionSelector *LabelSelector `json:"compositionSelector"`
-	// The composite resource to which this composite resource claim is bound.
-	Resource *CompositeResource `json:"resource"`
-	// The secret this composite resource claim writes its connection details to.
-	ConnectionSecret *Secret `json:"connectionSecret"`
-}
-
 // A CompositeResourceClaimStatus represents the observed status of a composite
 // resource claim.
 type CompositeResourceClaimStatus struct {

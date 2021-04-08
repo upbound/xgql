@@ -17,12 +17,12 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 )
 
-var _ resource.Composite = &Composite{}
+var _ resource.CompositeClaim = &Claim{}
 
-func emptyXR() *Composite {
-	return &Composite{Unstructured: unstructured.Unstructured{Object: map[string]interface{}{}}}
+func emptyXRC() *Claim {
+	return &Claim{Unstructured: unstructured.Unstructured{Object: map[string]interface{}{}}}
 }
-func TestProbablyComposite(t *testing.T) {
+func TestProbablyClaim(t *testing.T) {
 	cases := map[string]struct {
 		u    *unstructured.Unstructured
 		want bool
@@ -33,11 +33,11 @@ func TestProbablyComposite(t *testing.T) {
 				fieldpath.Pave(o).SetValue("spec.compositionRef", &corev1.ObjectReference{
 					Name: "coolcomposition",
 				})
-				fieldpath.Pave(o).SetValue("spec.resourceRefs", []corev1.ObjectReference{{
+				fieldpath.Pave(o).SetValue("spec.resourceRef", &corev1.ObjectReference{
 					APIVersion: "example.org/v1",
 					Kind:       "Example",
 					Name:       "coolexample",
-				}})
+				})
 				return &unstructured.Unstructured{Object: o}
 			}(),
 			want: true,
@@ -54,43 +54,39 @@ func TestProbablyComposite(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := ProbablyComposite(tc.u)
+			got := ProbablyClaim(tc.u)
 			if diff := cmp.Diff(tc.want, got); diff != "" {
-				t.Errorf("\nProbablyComposite(...): -want, +got:\n%s", diff)
+				t.Errorf("\nProbablyClaim(...): -want, +got:\n%s", diff)
 			}
 		})
 	}
 }
 
-func TestCompositeCondition(t *testing.T) {
+func TestClaimCondition(t *testing.T) {
 	cases := map[string]struct {
 		reason string
-		u      *Composite
+		u      *Claim
 		set    []xpv1.Condition
 		get    xpv1.ConditionType
 		want   xpv1.Condition
 	}{
 		"NewCondition": {
-			reason: "It should be possible to set a condition of an emptyXR Unstructured.",
-			u:      emptyXR(),
+			reason: "It should be possible to set a condition of an empty Claim.",
+			u:      emptyXRC(),
 			set:    []xpv1.Condition{xpv1.Available(), xpv1.ReconcileSuccess()},
 			get:    xpv1.TypeReady,
 			want:   xpv1.Available(),
 		},
 		"ExistingCondition": {
 			reason: "It should be possible to overwrite a condition that is already set.",
-			u: func() *Composite {
-				c := emptyXR()
-				c.SetConditions(xpv1.Creating())
-				return c
-			}(),
-			set:  []xpv1.Condition{xpv1.Available()},
-			get:  xpv1.TypeReady,
-			want: xpv1.Available(),
+			u:      emptyXRC(),
+			set:    []xpv1.Condition{xpv1.Available()},
+			get:    xpv1.TypeReady,
+			want:   xpv1.Available(),
 		},
 		"WeirdStatus": {
 			reason: "It should not be possible to set a condition when status is not an object.",
-			u: &Composite{unstructured.Unstructured{Object: map[string]interface{}{
+			u: &Claim{unstructured.Unstructured{Object: map[string]interface{}{
 				"status": "wat",
 			}}},
 			set:  []xpv1.Condition{xpv1.Available()},
@@ -99,7 +95,7 @@ func TestCompositeCondition(t *testing.T) {
 		},
 		"WeirdStatusConditions": {
 			reason: "Conditions should be overwritten if they are not an object.",
-			u: &Composite{unstructured.Unstructured{Object: map[string]interface{}{
+			u: &Claim{unstructured.Unstructured{Object: map[string]interface{}{
 				"status": map[string]interface{}{
 					"conditions": "wat",
 				},
@@ -121,16 +117,16 @@ func TestCompositeCondition(t *testing.T) {
 	}
 }
 
-func TestCompositeConditions(t *testing.T) {
+func TestClaimConditions(t *testing.T) {
 	cases := map[string]struct {
 		reason string
-		u      *Composite
+		u      *Claim
 		want   []xpv1.Condition
 	}{
 		"NewCondition": {
 			reason: "It should be possible to get conditions.",
-			u: func() *Composite {
-				c := emptyXR()
+			u: func() *Claim {
+				c := emptyXRC()
 				c.SetConditions(xpv1.Available(), xpv1.ReconcileSuccess())
 				return c
 			}(),
@@ -138,14 +134,14 @@ func TestCompositeConditions(t *testing.T) {
 		},
 		"WeirdStatus": {
 			reason: "It should not be possible to get conditions when status is not an object.",
-			u: &Composite{unstructured.Unstructured{Object: map[string]interface{}{
+			u: &Claim{unstructured.Unstructured{Object: map[string]interface{}{
 				"status": "wat",
 			}}},
 			want: nil,
 		},
 		"WeirdStatusConditions": {
 			reason: "It should notbe possible to get conditions when they are not an array.",
-			u: &Composite{unstructured.Unstructured{Object: map[string]interface{}{
+			u: &Claim{unstructured.Unstructured{Object: map[string]interface{}{
 				"status": map[string]interface{}{
 					"conditions": "wat",
 				},
@@ -164,15 +160,15 @@ func TestCompositeConditions(t *testing.T) {
 	}
 }
 
-func TestCompositeCompositionSelector(t *testing.T) {
+func TestCompositionSelector(t *testing.T) {
 	sel := &metav1.LabelSelector{MatchLabels: map[string]string{"cool": "very"}}
 	cases := map[string]struct {
-		u    *Composite
+		u    *Claim
 		set  *metav1.LabelSelector
 		want *metav1.LabelSelector
 	}{
 		"NewSel": {
-			u:    emptyXR(),
+			u:    emptyXRC(),
 			set:  sel,
 			want: sel,
 		},
@@ -188,16 +184,15 @@ func TestCompositeCompositionSelector(t *testing.T) {
 		})
 	}
 }
-
-func TestCompositeCompositionReference(t *testing.T) {
+func TestCompositionReference(t *testing.T) {
 	ref := &corev1.ObjectReference{Namespace: "ns", Name: "cool"}
 	cases := map[string]struct {
-		u    *Composite
+		u    *Claim
 		set  *corev1.ObjectReference
 		want *corev1.ObjectReference
 	}{
 		"NewRef": {
-			u:    emptyXR(),
+			u:    emptyXRC(),
 			set:  ref,
 			want: ref,
 		},
@@ -214,15 +209,15 @@ func TestCompositeCompositionReference(t *testing.T) {
 	}
 }
 
-func TestCompositeClaimReference(t *testing.T) {
+func TestResourceReference(t *testing.T) {
 	ref := &corev1.ObjectReference{Namespace: "ns", Name: "cool"}
 	cases := map[string]struct {
-		u    *Composite
+		u    *Claim
 		set  *corev1.ObjectReference
 		want *corev1.ObjectReference
 	}{
 		"NewRef": {
-			u:    emptyXR(),
+			u:    emptyXRC(),
 			set:  ref,
 			want: ref,
 		},
@@ -230,49 +225,24 @@ func TestCompositeClaimReference(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			tc.u.SetClaimReference(tc.set)
-			got := tc.u.GetClaimReference()
+			tc.u.SetResourceReference(tc.set)
+			got := tc.u.GetResourceReference()
 			if diff := cmp.Diff(tc.want, got); diff != "" {
-				t.Errorf("\nu.GetClaimReference(): -want, +got:\n%s", diff)
+				t.Errorf("\nu.GetResourceReference(): -want, +got:\n%s", diff)
 			}
 		})
 	}
 }
 
-func TestCompositeResourceReferences(t *testing.T) {
-	ref := corev1.ObjectReference{Namespace: "ns", Name: "cool"}
+func TestWriteConnectionSecretToReference(t *testing.T) {
+	ref := &xpv1.LocalSecretReference{Name: "cool"}
 	cases := map[string]struct {
-		u    *Composite
-		set  []corev1.ObjectReference
-		want []corev1.ObjectReference
+		u    *Claim
+		set  *xpv1.LocalSecretReference
+		want *xpv1.LocalSecretReference
 	}{
 		"NewRef": {
-			u:    emptyXR(),
-			set:  []corev1.ObjectReference{ref},
-			want: []corev1.ObjectReference{ref},
-		},
-	}
-
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			tc.u.SetResourceReferences(tc.set)
-			got := tc.u.GetResourceReferences()
-			if diff := cmp.Diff(tc.want, got); diff != "" {
-				t.Errorf("\nu.GetResourceReferences(): -want, +got:\n%s", diff)
-			}
-		})
-	}
-}
-
-func TestCompositeWriteConnectionSecretToReference(t *testing.T) {
-	ref := &xpv1.SecretReference{Namespace: "ns", Name: "cool"}
-	cases := map[string]struct {
-		u    *Composite
-		set  *xpv1.SecretReference
-		want *xpv1.SecretReference
-	}{
-		"NewRef": {
-			u:    emptyXR(),
+			u:    emptyXRC(),
 			set:  ref,
 			want: ref,
 		},
@@ -289,7 +259,7 @@ func TestCompositeWriteConnectionSecretToReference(t *testing.T) {
 	}
 }
 
-func TestCompositeConnectionDetailsLastPublishedTime(t *testing.T) {
+func TestConnectionDetailsLastPublishedTime(t *testing.T) {
 	now := &metav1.Time{Time: time.Now()}
 
 	// The timestamp loses a little resolution when round-tripped through JSON
@@ -302,12 +272,12 @@ func TestCompositeConnectionDetailsLastPublishedTime(t *testing.T) {
 	}
 
 	cases := map[string]struct {
-		u    *Composite
+		u    *Claim
 		set  *metav1.Time
 		want *metav1.Time
 	}{
 		"NewTime": {
-			u:    emptyXR(),
+			u:    emptyXRC(),
 			set:  now,
 			want: lores(now),
 		},

@@ -287,6 +287,9 @@ func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, e
 	case unstructured.ProbablyComposite(u):
 		return GetCompositeResource(u), nil
 
+	case unstructured.ProbablyClaim(u):
+		return GetCompositeResourceClaim(u), nil
+
 	case u.GroupVersionKind() == pkgv1.ProviderGroupVersionKind:
 		p := &pkgv1.Provider{}
 		if err := convert(u, p); err != nil {
