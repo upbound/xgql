@@ -62,32 +62,32 @@ type ConfigurationSpec {
   package: String!
 
   """
-	RevisionActivationPolicy specifies how the package controller should update
+  RevisionActivationPolicy specifies how the package controller should update
   from one revision to the next.
   """
   revisionActivationPolicy: RevisionActivationPolicy
 
   """
-	RevisionHistoryLimit dictates how the package controller cleans up old
+  RevisionHistoryLimit dictates how the package controller cleans up old
   inactive package revisions. Defaults to 1. Can be disabled by explicitly
   setting to 0.
   """
   revisionHistoryLimit: Int
 
   """
-	PackagePullPolicy defines the pull policy for the package.
+  PackagePullPolicy defines the pull policy for the package.
   """
   packagePullPolicy: PackagePullPolicy
 
   """
-	IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+  IgnoreCrossplaneConstraints indicates to the package manager whether to honor
   Crossplane version constraints specified by the package.
   """
   ignoreCrossplaneConstraints: Boolean
 
   """
-	SkipDependencyResolution indicates to the package manager whether to skip
-	resolving dependencies for a package.
+  SkipDependencyResolution indicates to the package manager whether to skip
+  resolving dependencies for a package.
   """
   skipDependencyResolution: Boolean
 }
@@ -102,13 +102,13 @@ type ConfigurationStatus implements ConditionedStatus {
   conditions: [Condition!]
 
   """
-	CurrentRevision is the name of the current package revision. It will reflect
+  CurrentRevision is the name of the current package revision. It will reflect
   the most up to date revision, whether it has been activated or not.
   """
   currentRevision: String
 
   """
-	CurrentIdentifier is the most recent package source that was used to produce a
+  CurrentIdentifier is the most recent package source that was used to produce a
   revision. The package manager uses this field to determine whether to check
   for package updates for a given source when packagePullPolicy is set to
   IfNotPresent.
@@ -161,7 +161,7 @@ type ConfigurationRevisionSpec {
   package: String!
 
   """
-	PackagePullPolicy defines the pull policy for the package..
+  PackagePullPolicy defines the pull policy for the package..
   """
   packagePullPolicy: PackagePullPolicy
 

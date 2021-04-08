@@ -154,7 +154,6 @@ type CompositeResourceClaimSpec {
   """
   resource: CompositeResource @goField(forceResolver: true)
 
-
   """
   The secret this composite resource claim writes its connection details to.
   """

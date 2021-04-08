@@ -35,4 +35,3 @@ enum PackageRevisionDesiredState {
   "The revision should be active."
   ACTIVE
 }
-

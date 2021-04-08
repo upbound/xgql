@@ -2691,7 +2691,7 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
   "Composite resource claims (XRCs) defined by this XRD."
   definedCompositeResourceClaims(
     "Return resources of this version."
-    version: String,
+    version: String
 
     "Return resources in this namespace."
     namespace: String
@@ -2734,12 +2734,12 @@ type CompositeResourceDefinitionSpec {
   group: String!
 
   """
-	Names specifies the resource and kind names of the defined composite resource.
+  Names specifies the resource and kind names of the defined composite resource.
   """
   names: CompositeResourceDefinitionNames!
 
   """
-	ClaimNames specifies the names of an optional composite resource claim. When
+  ClaimNames specifies the names of an optional composite resource claim. When
   claim names are specified Crossplane will create a namespaced 'composite
   resource claim' CRD that corresponds to the defined composite resource. This
   composite resource claim acts as a namespaced proxy for the composite
@@ -2751,25 +2751,25 @@ type CompositeResourceDefinitionSpec {
   claimNames: CompositeResourceDefinitionNames
 
   """
-	ConnectionSecretKeys is the list of keys that will be exposed to the end user
-  of the defined kind.
+  ConnectionSecretKeys is the list of keys that will be exposed to the end user
+   of the defined kind.
   """
   connectionSecretKeys: [String!]
 
   """
-	DefaultComposition is the Composition resource that will be used in case no
-  composition selector is given.
+  DefaultComposition is the Composition resource that will be used in case no
+   composition selector is given.
   """
   defaultComposition: Composition @goField(forceResolver: true)
 
   """
-	EnforcedComposition is the Composition resource that will be used by all
-  composite instances whose schema is defined by this definition.
+  EnforcedComposition is the Composition resource that will be used by all
+   composite instances whose schema is defined by this definition.
   """
   enforcedComposition: Composition @goField(forceResolver: true)
 
   """
-	Versions is the list of all API versions of the defined composite resource.
+  Versions is the list of all API versions of the defined composite resource.
   Version names are used to compute the order in which served versions are
   listed in API discovery. If the version string is "kube-like", it will sort
   above non "kube-like" version strings, which are ordered lexicographically.
@@ -2780,26 +2780,24 @@ type CompositeResourceDefinitionSpec {
   major version, then minor version. An example sorted list of versions: v10,
   v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10. Note
   that all versions must have identical schemas; Crossplane does not currently
-	support conversion between different version schemas.
+  support conversion between different version schemas.
   """
   versions: [CompositeResourceDefinitionVersion!]
 }
-
 
 """
 CompositeResourceDefinitionNames specifies the resource and kind names of the
 defined composite resource or claim.
 """
 type CompositeResourceDefinitionNames {
-
   """
-	The plural name of the resource to serve. Composite resources are served by
+  The plural name of the resource to serve. Composite resources are served by
   the Kuberntes API under ` + "`" + `/apis/<group>/<version>/.../<plural>` + "`" + `.
   """
   plural: String!
 
   """
-	The singular name of the resource.
+  The singular name of the resource.
   """
   singular: String
 
@@ -2820,7 +2818,7 @@ type CompositeResourceDefinitionNames {
   listKind: String
 
   """
-	A list of grouped resources this custom resource belongs to (e.g. 'all'). This
+  A list of grouped resources this custom resource belongs to (e.g. 'all'). This
   is published in API discovery documents, and used by clients to support
   invocations like ` + "`" + `kubectl get all` + "`" + `.
   """
@@ -2833,14 +2831,14 @@ resource.
 """
 type CompositeResourceDefinitionVersion {
   """
-	Name of this version, e.g. “v1”, “v2beta1”, etc. Composite resources are
-	served under this version at ` + "`" + `/apis/<group>/<version>/...` + "`" + ` if ` + "`" + `served` + "`" + ` is
-	true.
+  Name of this version, e.g. “v1”, “v2beta1”, etc. Composite resources are
+  served under this version at ` + "`" + `/apis/<group>/<version>/...` + "`" + ` if ` + "`" + `served` + "`" + ` is
+  true.
   """
   name: String!
 
   """
-	Referenceable specifies that this version may be referenced by a Composition
+  Referenceable specifies that this version may be referenced by a Composition
   in order to configure which resources an XR may be composed of. Exactly one
   version must be marked as referenceable; all Compositions must target only the
   referenceable version. The referenceable version must be served.
@@ -2848,12 +2846,12 @@ type CompositeResourceDefinitionVersion {
   referenceable: Boolean!
 
   """
-	Served specifies that this version should be served via Kubernetes REST APIs.
+  Served specifies that this version should be served via Kubernetes REST APIs.
   """
   served: Boolean!
 
   """
-	Schema describes the schema used for validation, pruning, and defaulting of
+  Schema describes the schema used for validation, pruning, and defaulting of
   this version of the defined composite resource. Fields required by all
   composite resources are injected into this schema automatically, and override
   equivalently named fields in this schema.
@@ -2866,7 +2864,7 @@ A CompositeResourceValidation is a list of validation methods for a composite
 resource.
 """
 type CompositeResourceValidation {
-	"OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
+  "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
   openAPIV3Schema: JSONObject
 }
 
@@ -2879,7 +2877,7 @@ type CompositeResourceDefinitionStatus implements ConditionedStatus {
   conditions: [Condition!]
 
   """
-	Controllers represents the status of the controllers that power this
+  Controllers represents the status of the controllers that power this
   composite resource definition.
   """
   controllers: CompositeResourceDefinitionControllerStatus
@@ -2890,9 +2888,8 @@ A CompositeResourceDefinitionControllerStatus shows the observed state of the
 controllers that power the definition.
 """
 type CompositeResourceDefinitionControllerStatus {
-
   """
-	The CompositeResourceTypeRef is the type of composite resource that Crossplane
+  The CompositeResourceTypeRef is the type of composite resource that Crossplane
   is currently reconciling for this definition. Its version will eventually
   become consistent with the definition's referenceable version. Note that
   clients may interact with any served type; this is simply the type that
@@ -2901,15 +2898,14 @@ type CompositeResourceDefinitionControllerStatus {
   compositeResourceType: TypeReference
 
   """
-	The CompositeResourceClaimTypeRef is the type of composite resource claim
-	that Crossplane is currently reconciling for this definition. Its version
-	will eventually become consistent with the definition's referenceable version.
+  The CompositeResourceClaimTypeRef is the type of composite resource claim
+  that Crossplane is currently reconciling for this definition. Its version
+  will eventually become consistent with the definition's referenceable version.
   Note that clients may interact with any served type; this is simply the type
   that Crossplane interacts with.
   """
   compositeResourceClaimType: TypeReference
 }
-
 
 """
 A TypeReference references a type of Kubernetes resource by API version and
@@ -2958,14 +2954,14 @@ A CompositionSpec represents the desired state of a composition.
 """
 type CompositionSpec {
   """
-	CompositeTypeRef specifies the type of composite resource that this
+  CompositeTypeRef specifies the type of composite resource that this
   composition is compatible with.
   """
   compositeTypeRef: TypeReference!
 
   """
-	WriteConnectionSecretsToNamespace specifies the namespace in which the
-	connection secrets of composite resource dynamically provisioned using this
+  WriteConnectionSecretsToNamespace specifies the namespace in which the
+  connection secrets of composite resource dynamically provisioned using this
   composition will be created.
   """
   writeConnectionSecretsToNamespace: String
@@ -2980,7 +2976,6 @@ type CompositionStatus implements ConditionedStatus {
   "The observed condition of this resource."
   conditions: [Condition!]
 }
-
 `, BuiltIn: false},
 	{Name: "schema/common.gql", Input: `"""
 Time is a timestamp.
@@ -3025,7 +3020,7 @@ interface KubernetesResource {
   raw: JSONObject!
 
   "Events pertaining to this resource."
-  events: EventConnection! 
+  events: EventConnection!
 }
 
 """
@@ -3052,7 +3047,7 @@ type KubernetesResourceConnection {
 
 """
 A GenericResource represents a kind of Kubernetes resource that does not
-correspond to a kind or class of resources that is more specifically modelled 
+correspond to a kind or class of resources that is more specifically modelled
 by xgql.
 """
 type GenericResource implements Node & KubernetesResource {
@@ -3074,7 +3069,6 @@ type GenericResource implements Node & KubernetesResource {
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
-
 
 """
 ObjectMeta is metadata that is common to all Kubernetes API resources.
@@ -3129,25 +3123,24 @@ type ObjectMeta {
   deletionTime: Time
 
   """
-	Map of string keys and values that can be used to organize and categorize
-	(scope and select) objects. May match selectors of replication controllers
-	and services.
-	
-  More info: http://kubernetes.io/docs/user-guide/labels
+  Map of string keys and values that can be used to organize and categorize
+  (scope and select) objects. May match selectors of replication controllers
+  and services.
+
+   More info: http://kubernetes.io/docs/user-guide/labels
   """
   labels: Map
 
   """
-	Map of string keys and values that may be set by external tools to store and
+  Map of string keys and values that may be set by external tools to store and
   retrieve arbitrary metadata.
 
-	More info: http://kubernetes.io/docs/user-guide/annotations
+  More info: http://kubernetes.io/docs/user-guide/annotations
   """
   annotations: Map
 
-
   """
-	Resources depended by this resource. If ALL resources in the list have been
+  Resources depended by this resource. If ALL resources in the list have been
   deleted, this resource will be garbage collected. If this resource is managed
   by a controller, then an entry in this list will point to this controller,
   with the controller field set to true. There cannot be more than one managing
@@ -3177,7 +3170,7 @@ type Owner {
   resource: KubernetesResource!
 
   "Whether the owner is the controller of the owned Kubernetes resource."
-  controller: Boolean,
+  controller: Boolean
 }
 
 """
@@ -3189,7 +3182,6 @@ interface ConditionedStatus {
   conditions: [Condition!]
 }
 
-
 """
 A condition that may apply to a resource.
 
@@ -3198,34 +3190,33 @@ the allowed values at the API level.
 """
 type Condition {
   """
-	Type of this condition. At most one of each condition type may apply to a
+  Type of this condition. At most one of each condition type may apply to a
   resource at any point in time.
   """
   type: String!
 
   """
-	Status of this condition; is it currently True, False, or Unknown?
+  Status of this condition; is it currently True, False, or Unknown?
   """
   status: ConditionStatus!
 
   """
-	LastTransitionTime is the last time this condition transitioned from one
+  LastTransitionTime is the last time this condition transitioned from one
   status to another.
   """
   lastTransitionTime: Time!
 
   """
-	A Reason for this condition's last transition from one status to another.
+  A Reason for this condition's last transition from one status to another.
   """
   reason: String!
 
   """
-	A Message containing details about this condition's last transition from one
+  A Message containing details about this condition's last transition from one
   status to another, if any.
   """
   message: String
 }
-
 
 """
 A ConditionStatus represensts the status of a condition.
@@ -3246,7 +3237,7 @@ A PolicyRule holds information that describes a KubernetesRBAC policy rule.
 """
 type PolicyRule {
   """
-	Verbs is a list of verbs that apply to ALL the resources specified by this
+  Verbs is a list of verbs that apply to ALL the resources specified by this
   rule. '*' represents all verbs.
   """
   verbs: [String!]!
@@ -3259,19 +3250,19 @@ type PolicyRule {
   apiGroups: [String!]
 
   """
-	Resources is a list of resources this rule applies to. '*' represents all
+  Resources is a list of resources this rule applies to. '*' represents all
   resources.
   """
   resources: [String!]
 
   """
-	ResourceNames is a list of names that the rule applies to. An empty set means
+  ResourceNames is a list of names that the rule applies to. An empty set means
   that everything is allowed.
   """
   resourceNames: [String!]
 
   """
-	NonResourceURLs is a set of partial urls that a user should have access to.
+  NonResourceURLs is a set of partial urls that a user should have access to.
   '*' is allowed, but only as the full, final step in the path. Rules can either
   apply to API resources (such as "pods" or "secrets") or non-resource URL paths
   (such as "/api"),  but not both.
@@ -3428,12 +3419,12 @@ type CustomResourceDefinitionSpec {
   group: String!
 
   """
-	Names specifies the resource and kind names of the defined custom resource.
+  Names specifies the resource and kind names of the defined custom resource.
   """
   names: CustomResourceDefinitionNames!
 
   """
-	Versions is the list of all API versions of the defined custom resource.
+  Versions is the list of all API versions of the defined custom resource.
   Version names are used to compute the order in which served versions are
   listed in API discovery. If the version string is "kube-like", it will sort
   above non "kube-like" version strings, which are ordered lexicographically.
@@ -3452,15 +3443,14 @@ CustomResourceDefinitionNames specifies the resource and kind names of the
 defined custom resource.
 """
 type CustomResourceDefinitionNames {
-
   """
-	The plural name of the resource to serve. Custom resources are served by
-  the Kuberntes API under ` + "`" + `/apis/<group>/<version>/.../<plural>` + "`" + `.
+  The plural name of the resource to serve. Custom resources are served by
+   the Kuberntes API under ` + "`" + `/apis/<group>/<version>/.../<plural>` + "`" + `.
   """
   plural: String!
 
   """
-	The singular name of the resource.
+  The singular name of the resource.
   """
   singular: String
 
@@ -3481,7 +3471,7 @@ type CustomResourceDefinitionNames {
   listKind: String
 
   """
-	A list of grouped resources this custom resource belongs to (e.g. 'all'). This
+  A list of grouped resources this custom resource belongs to (e.g. 'all'). This
   is published in API discovery documents, and used by clients to support
   invocations like ` + "`" + `kubectl get all` + "`" + `.
   """
@@ -3493,18 +3483,18 @@ A CustomResourceDefinitionVersion describes a version of a custom resource.
 """
 type CustomResourceDefinitionVersion {
   """
-	Name of this version, e.g. “v1”, “v2beta1”, etc. Custom resources are served
+  Name of this version, e.g. “v1”, “v2beta1”, etc. Custom resources are served
   under this version at ` + "`" + `/apis/<group>/<version>/...` + "`" + ` if ` + "`" + `served` + "`" + ` istrue.
   """
   name: String!
 
   """
-	Served specifies that this version should be served via Kubernetes REST APIs.
+  Served specifies that this version should be served via Kubernetes REST APIs.
   """
   served: Boolean!
 
   """
-	Schema describes the schema used for validation, pruning, and defaulting of
+  Schema describes the schema used for validation, pruning, and defaulting of
   this version of the defined custom resource.
   """
   schema: CustomResourceValidation
@@ -3515,7 +3505,7 @@ A CustomResourceValidation is a list of validation methods for a custom
 resource.
 """
 type CustomResourceValidation {
-	"OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
+  "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
   openAPIV3Schema: JSONObject
 }
 
@@ -3526,7 +3516,8 @@ resource definition.
 type CustomResourceDefinitionStatus implements ConditionedStatus {
   "The observed condition of this resource."
   conditions: [Condition!]
-}`, BuiltIn: false},
+}
+`, BuiltIn: false},
 	{Name: "schema/composite.gql", Input: `"""
 A CompositeResource is a resource this is reconciled by composing other
 composite or managed resources. Composite resources use a Composition to
@@ -3683,7 +3674,6 @@ type CompositeResourceClaimSpec {
   """
   resource: CompositeResource @goField(forceResolver: true)
 
-
   """
   The secret this composite resource claim writes its connection details to.
   """
@@ -3778,32 +3768,32 @@ type ConfigurationSpec {
   package: String!
 
   """
-	RevisionActivationPolicy specifies how the package controller should update
+  RevisionActivationPolicy specifies how the package controller should update
   from one revision to the next.
   """
   revisionActivationPolicy: RevisionActivationPolicy
 
   """
-	RevisionHistoryLimit dictates how the package controller cleans up old
+  RevisionHistoryLimit dictates how the package controller cleans up old
   inactive package revisions. Defaults to 1. Can be disabled by explicitly
   setting to 0.
   """
   revisionHistoryLimit: Int
 
   """
-	PackagePullPolicy defines the pull policy for the package.
+  PackagePullPolicy defines the pull policy for the package.
   """
   packagePullPolicy: PackagePullPolicy
 
   """
-	IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+  IgnoreCrossplaneConstraints indicates to the package manager whether to honor
   Crossplane version constraints specified by the package.
   """
   ignoreCrossplaneConstraints: Boolean
 
   """
-	SkipDependencyResolution indicates to the package manager whether to skip
-	resolving dependencies for a package.
+  SkipDependencyResolution indicates to the package manager whether to skip
+  resolving dependencies for a package.
   """
   skipDependencyResolution: Boolean
 }
@@ -3818,13 +3808,13 @@ type ConfigurationStatus implements ConditionedStatus {
   conditions: [Condition!]
 
   """
-	CurrentRevision is the name of the current package revision. It will reflect
+  CurrentRevision is the name of the current package revision. It will reflect
   the most up to date revision, whether it has been activated or not.
   """
   currentRevision: String
 
   """
-	CurrentIdentifier is the most recent package source that was used to produce a
+  CurrentIdentifier is the most recent package source that was used to produce a
   revision. The package manager uses this field to determine whether to check
   for package updates for a given source when packagePullPolicy is set to
   IfNotPresent.
@@ -3877,7 +3867,7 @@ type ConfigurationRevisionSpec {
   package: String!
 
   """
-	PackagePullPolicy defines the pull policy for the package..
+  PackagePullPolicy defines the pull policy for the package..
   """
   packagePullPolicy: PackagePullPolicy
 
@@ -3944,15 +3934,16 @@ type ConfigurationRevisionStatus implements ConditionedStatus {
   objects: KubernetesResourceConnection! @goField(forceResolver: true)
 }
 `, BuiltIn: false},
-	{Name: "schema/directives.gql", Input: `directive @goModel(model: String, models: [String!]) on OBJECT
-    | INPUT_OBJECT
-    | SCALAR
-    | ENUM
-    | INTERFACE
-    | UNION
+	{Name: "schema/directives.gql", Input: `directive @goModel(
+  model: String
+  models: [String!]
+) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
 
-directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION
-    | FIELD_DEFINITION`, BuiltIn: false},
+directive @goField(
+  forceResolver: Boolean
+  name: String
+) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+`, BuiltIn: false},
 	{Name: "schema/managed.gql", Input: `"""
 A ManagedResource is a Kubernetes API representation of a resource in an
 external system, such as a cloud provider's API. Crossplane providers add
@@ -4070,7 +4061,6 @@ enum PackageRevisionDesiredState {
   "The revision should be active."
   ACTIVE
 }
-
 `, BuiltIn: false},
 	{Name: "schema/provider.gql", Input: `"""
 A Provider extends Crossplane with support for new managed resources.
@@ -4135,32 +4125,32 @@ type ProviderSpec {
   package: String!
 
   """
-	RevisionActivationPolicy specifies how the package controller should update
+  RevisionActivationPolicy specifies how the package controller should update
   from one revision to the next.
   """
   revisionActivationPolicy: RevisionActivationPolicy
 
   """
-	RevisionHistoryLimit dictates how the package controller cleans up old
+  RevisionHistoryLimit dictates how the package controller cleans up old
   inactive package revisions. Defaults to 1. Can be disabled by explicitly
   setting to 0.
   """
   revisionHistoryLimit: Int
 
   """
-	PackagePullPolicy defines the pull policy for the package.
+  PackagePullPolicy defines the pull policy for the package.
   """
   packagePullPolicy: PackagePullPolicy
 
   """
-	IgnoreCrossplaneConstraints indicates to the package manager whether to honor
+  IgnoreCrossplaneConstraints indicates to the package manager whether to honor
   Crossplane version constraints specified by the package.
   """
   ignoreCrossplaneConstraints: Boolean
 
   """
-	SkipDependencyResolution indicates to the package manager whether to skip
-	resolving dependencies for a package.
+  SkipDependencyResolution indicates to the package manager whether to skip
+  resolving dependencies for a package.
   """
   skipDependencyResolution: Boolean
 }
@@ -4175,13 +4165,13 @@ type ProviderStatus implements ConditionedStatus {
   conditions: [Condition!]
 
   """
-	CurrentRevision is the name of the current package revision. It will reflect
+  CurrentRevision is the name of the current package revision. It will reflect
   the most up to date revision, whether it has been activated or not.
   """
   currentRevision: String
 
   """
-	CurrentIdentifier is the most recent package source that was used to produce a
+  CurrentIdentifier is the most recent package source that was used to produce a
   revision. The package manager uses this field to determine whether to check
   for package updates for a given source when packagePullPolicy is set to
   IfNotPresent.
@@ -4233,7 +4223,7 @@ type ProviderRevisionSpec {
   package: String!
 
   """
-	PackagePullPolicy defines the pull policy for the package. It is also applied
+  PackagePullPolicy defines the pull policy for the package. It is also applied
   to any images pulled for the package, such as a provider's controller image.
   """
   packagePullPolicy: PackagePullPolicy
@@ -4255,7 +4245,6 @@ type ProviderRevisionSpec {
   resolving dependencies for a package.
   """
   skipDependencyResolution: Boolean
-
 }
 
 """
@@ -4337,44 +4326,45 @@ type ProviderConfigStatus implements ConditionedStatus {
 
   "The number of managed resources currently using this provider config."
   users: Int
-}`, BuiltIn: false},
+}
+`, BuiltIn: false},
 	{Name: "schema/queries.gql", Input: `"""
 Query is the root type for GraphQL queries.
 """
 type Query {
-    """
-    Providers that are currently installed.
-    """
-    providers: ProviderConnection!
+  """
+  Providers that are currently installed.
+  """
+  providers: ProviderConnection!
 
-    """
-    Configurations that are currently installed.
-    """
-    configurations: ConfigurationConnection!
+  """
+  Configurations that are currently installed.
+  """
+  configurations: ConfigurationConnection!
 
-    """
-    Composite Resource Definitions (XRDs) that currently exist.
-    """
-    compositeResourceDefinitions(
-      "Only return XRDs that aren't owned by a configuration revision."
-      dangling: Boolean = false
-    ): CompositeResourceDefinitionConnection!
+  """
+  Composite Resource Definitions (XRDs) that currently exist.
+  """
+  compositeResourceDefinitions(
+    "Only return XRDs that aren't owned by a configuration revision."
+    dangling: Boolean = false
+  ): CompositeResourceDefinitionConnection!
 
-    """
-    Compositions that currently exist.
-    """
-    compositions(
-      "Only return Compositions that aren't owned by a configuration revision."
-      dangling: Boolean = false
-    ): CompositionConnection!
+  """
+  Compositions that currently exist.
+  """
+  compositions(
+    "Only return Compositions that aren't owned by a configuration revision."
+    dangling: Boolean = false
+  ): CompositionConnection!
 
-    """
-    Kubernetes events.
-    """
-    events(
-      "Only return events associated with the supplied ID."
-      involvedID: ID
-    ): EventConnection!
+  """
+  Kubernetes events.
+  """
+  events(
+    "Only return events associated with the supplied ID."
+    involvedID: ID
+  ): EventConnection!
 }
 
 """
@@ -4420,7 +4410,8 @@ type CompositionConnection {
 
   "The total number of connected nodes."
   totalCount: Int!
-}`, BuiltIn: false},
+}
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
