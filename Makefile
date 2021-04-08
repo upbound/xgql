@@ -41,7 +41,7 @@ fallthrough: submodules
 	@make
 
 yarn.lint: yarn.install
-	@echo === yarn lint
+	@cd $(YARN_DIR); $(YARN) format
 	@cd $(YARN_DIR); $(YARN) lint
 
 # Ensure a PR is ready for review.

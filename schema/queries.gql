@@ -2,39 +2,39 @@
 Query is the root type for GraphQL queries.
 """
 type Query {
-    """
-    Providers that are currently installed.
-    """
-    providers: ProviderConnection!
+  """
+  Providers that are currently installed.
+  """
+  providers: ProviderConnection!
 
-    """
-    Configurations that are currently installed.
-    """
-    configurations: ConfigurationConnection!
+  """
+  Configurations that are currently installed.
+  """
+  configurations: ConfigurationConnection!
 
-    """
-    Composite Resource Definitions (XRDs) that currently exist.
-    """
-    compositeResourceDefinitions(
-      "Only return XRDs that aren't owned by a configuration revision."
-      dangling: Boolean = false
-    ): CompositeResourceDefinitionConnection!
+  """
+  Composite Resource Definitions (XRDs) that currently exist.
+  """
+  compositeResourceDefinitions(
+    "Only return XRDs that aren't owned by a configuration revision."
+    dangling: Boolean = false
+  ): CompositeResourceDefinitionConnection!
 
-    """
-    Compositions that currently exist.
-    """
-    compositions(
-      "Only return Compositions that aren't owned by a configuration revision."
-      dangling: Boolean = false
-    ): CompositionConnection!
+  """
+  Compositions that currently exist.
+  """
+  compositions(
+    "Only return Compositions that aren't owned by a configuration revision."
+    dangling: Boolean = false
+  ): CompositionConnection!
 
-    """
-    Kubernetes events.
-    """
-    events(
-      "Only return events associated with the supplied ID."
-      involvedID: ID
-    ): EventConnection!
+  """
+  Kubernetes events.
+  """
+  events(
+    "Only return events associated with the supplied ID."
+    involvedID: ID
+  ): EventConnection!
 }
 
 """

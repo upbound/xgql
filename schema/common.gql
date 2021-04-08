@@ -41,7 +41,7 @@ interface KubernetesResource {
   raw: JSONObject!
 
   "Events pertaining to this resource."
-  events: EventConnection! 
+  events: EventConnection!
 }
 
 """
@@ -68,7 +68,7 @@ type KubernetesResourceConnection {
 
 """
 A GenericResource represents a kind of Kubernetes resource that does not
-correspond to a kind or class of resources that is more specifically modelled 
+correspond to a kind or class of resources that is more specifically modelled
 by xgql.
 """
 type GenericResource implements Node & KubernetesResource {
@@ -90,7 +90,6 @@ type GenericResource implements Node & KubernetesResource {
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 }
-
 
 """
 ObjectMeta is metadata that is common to all Kubernetes API resources.
@@ -145,25 +144,24 @@ type ObjectMeta {
   deletionTime: Time
 
   """
-	Map of string keys and values that can be used to organize and categorize
-	(scope and select) objects. May match selectors of replication controllers
-	and services.
-	
-  More info: http://kubernetes.io/docs/user-guide/labels
+  Map of string keys and values that can be used to organize and categorize
+  (scope and select) objects. May match selectors of replication controllers
+  and services.
+
+   More info: http://kubernetes.io/docs/user-guide/labels
   """
   labels: Map
 
   """
-	Map of string keys and values that may be set by external tools to store and
+  Map of string keys and values that may be set by external tools to store and
   retrieve arbitrary metadata.
 
-	More info: http://kubernetes.io/docs/user-guide/annotations
+  More info: http://kubernetes.io/docs/user-guide/annotations
   """
   annotations: Map
 
-
   """
-	Resources depended by this resource. If ALL resources in the list have been
+  Resources depended by this resource. If ALL resources in the list have been
   deleted, this resource will be garbage collected. If this resource is managed
   by a controller, then an entry in this list will point to this controller,
   with the controller field set to true. There cannot be more than one managing
@@ -193,7 +191,7 @@ type Owner {
   resource: KubernetesResource!
 
   "Whether the owner is the controller of the owned Kubernetes resource."
-  controller: Boolean,
+  controller: Boolean
 }
 
 """
@@ -205,7 +203,6 @@ interface ConditionedStatus {
   conditions: [Condition!]
 }
 
-
 """
 A condition that may apply to a resource.
 
@@ -214,34 +211,33 @@ the allowed values at the API level.
 """
 type Condition {
   """
-	Type of this condition. At most one of each condition type may apply to a
+  Type of this condition. At most one of each condition type may apply to a
   resource at any point in time.
   """
   type: String!
 
   """
-	Status of this condition; is it currently True, False, or Unknown?
+  Status of this condition; is it currently True, False, or Unknown?
   """
   status: ConditionStatus!
 
   """
-	LastTransitionTime is the last time this condition transitioned from one
+  LastTransitionTime is the last time this condition transitioned from one
   status to another.
   """
   lastTransitionTime: Time!
 
   """
-	A Reason for this condition's last transition from one status to another.
+  A Reason for this condition's last transition from one status to another.
   """
   reason: String!
 
   """
-	A Message containing details about this condition's last transition from one
+  A Message containing details about this condition's last transition from one
   status to another, if any.
   """
   message: String
 }
-
 
 """
 A ConditionStatus represensts the status of a condition.
@@ -262,7 +258,7 @@ A PolicyRule holds information that describes a KubernetesRBAC policy rule.
 """
 type PolicyRule {
   """
-	Verbs is a list of verbs that apply to ALL the resources specified by this
+  Verbs is a list of verbs that apply to ALL the resources specified by this
   rule. '*' represents all verbs.
   """
   verbs: [String!]!
@@ -275,19 +271,19 @@ type PolicyRule {
   apiGroups: [String!]
 
   """
-	Resources is a list of resources this rule applies to. '*' represents all
+  Resources is a list of resources this rule applies to. '*' represents all
   resources.
   """
   resources: [String!]
 
   """
-	ResourceNames is a list of names that the rule applies to. An empty set means
+  ResourceNames is a list of names that the rule applies to. An empty set means
   that everything is allowed.
   """
   resourceNames: [String!]
 
   """
-	NonResourceURLs is a set of partial urls that a user should have access to.
+  NonResourceURLs is a set of partial urls that a user should have access to.
   '*' is allowed, but only as the full, final step in the path. Rules can either
   apply to API resources (such as "pods" or "secrets") or non-resource URL paths
   (such as "/api"),  but not both.
@@ -444,12 +440,12 @@ type CustomResourceDefinitionSpec {
   group: String!
 
   """
-	Names specifies the resource and kind names of the defined custom resource.
+  Names specifies the resource and kind names of the defined custom resource.
   """
   names: CustomResourceDefinitionNames!
 
   """
-	Versions is the list of all API versions of the defined custom resource.
+  Versions is the list of all API versions of the defined custom resource.
   Version names are used to compute the order in which served versions are
   listed in API discovery. If the version string is "kube-like", it will sort
   above non "kube-like" version strings, which are ordered lexicographically.
@@ -468,15 +464,14 @@ CustomResourceDefinitionNames specifies the resource and kind names of the
 defined custom resource.
 """
 type CustomResourceDefinitionNames {
-
   """
-	The plural name of the resource to serve. Custom resources are served by
-  the Kuberntes API under `/apis/<group>/<version>/.../<plural>`.
+  The plural name of the resource to serve. Custom resources are served by
+   the Kuberntes API under `/apis/<group>/<version>/.../<plural>`.
   """
   plural: String!
 
   """
-	The singular name of the resource.
+  The singular name of the resource.
   """
   singular: String
 
@@ -497,7 +492,7 @@ type CustomResourceDefinitionNames {
   listKind: String
 
   """
-	A list of grouped resources this custom resource belongs to (e.g. 'all'). This
+  A list of grouped resources this custom resource belongs to (e.g. 'all'). This
   is published in API discovery documents, and used by clients to support
   invocations like `kubectl get all`.
   """
@@ -509,18 +504,18 @@ A CustomResourceDefinitionVersion describes a version of a custom resource.
 """
 type CustomResourceDefinitionVersion {
   """
-	Name of this version, e.g. “v1”, “v2beta1”, etc. Custom resources are served
+  Name of this version, e.g. “v1”, “v2beta1”, etc. Custom resources are served
   under this version at `/apis/<group>/<version>/...` if `served` istrue.
   """
   name: String!
 
   """
-	Served specifies that this version should be served via Kubernetes REST APIs.
+  Served specifies that this version should be served via Kubernetes REST APIs.
   """
   served: Boolean!
 
   """
-	Schema describes the schema used for validation, pruning, and defaulting of
+  Schema describes the schema used for validation, pruning, and defaulting of
   this version of the defined custom resource.
   """
   schema: CustomResourceValidation
@@ -531,7 +526,7 @@ A CustomResourceValidation is a list of validation methods for a custom
 resource.
 """
 type CustomResourceValidation {
-	"OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
+  "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
   openAPIV3Schema: JSONObject
 }
 

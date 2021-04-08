@@ -36,7 +36,7 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
   "Composite resource claims (XRCs) defined by this XRD."
   definedCompositeResourceClaims(
     "Return resources of this version."
-    version: String,
+    version: String
 
     "Return resources in this namespace."
     namespace: String
@@ -79,12 +79,12 @@ type CompositeResourceDefinitionSpec {
   group: String!
 
   """
-	Names specifies the resource and kind names of the defined composite resource.
+  Names specifies the resource and kind names of the defined composite resource.
   """
   names: CompositeResourceDefinitionNames!
 
   """
-	ClaimNames specifies the names of an optional composite resource claim. When
+  ClaimNames specifies the names of an optional composite resource claim. When
   claim names are specified Crossplane will create a namespaced 'composite
   resource claim' CRD that corresponds to the defined composite resource. This
   composite resource claim acts as a namespaced proxy for the composite
@@ -96,25 +96,25 @@ type CompositeResourceDefinitionSpec {
   claimNames: CompositeResourceDefinitionNames
 
   """
-	ConnectionSecretKeys is the list of keys that will be exposed to the end user
-  of the defined kind.
+  ConnectionSecretKeys is the list of keys that will be exposed to the end user
+   of the defined kind.
   """
   connectionSecretKeys: [String!]
 
   """
-	DefaultComposition is the Composition resource that will be used in case no
-  composition selector is given.
+  DefaultComposition is the Composition resource that will be used in case no
+   composition selector is given.
   """
   defaultComposition: Composition @goField(forceResolver: true)
 
   """
-	EnforcedComposition is the Composition resource that will be used by all
-  composite instances whose schema is defined by this definition.
+  EnforcedComposition is the Composition resource that will be used by all
+   composite instances whose schema is defined by this definition.
   """
   enforcedComposition: Composition @goField(forceResolver: true)
 
   """
-	Versions is the list of all API versions of the defined composite resource.
+  Versions is the list of all API versions of the defined composite resource.
   Version names are used to compute the order in which served versions are
   listed in API discovery. If the version string is "kube-like", it will sort
   above non "kube-like" version strings, which are ordered lexicographically.
@@ -125,26 +125,24 @@ type CompositeResourceDefinitionSpec {
   major version, then minor version. An example sorted list of versions: v10,
   v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10. Note
   that all versions must have identical schemas; Crossplane does not currently
-	support conversion between different version schemas.
+  support conversion between different version schemas.
   """
   versions: [CompositeResourceDefinitionVersion!]
 }
-
 
 """
 CompositeResourceDefinitionNames specifies the resource and kind names of the
 defined composite resource or claim.
 """
 type CompositeResourceDefinitionNames {
-
   """
-	The plural name of the resource to serve. Composite resources are served by
+  The plural name of the resource to serve. Composite resources are served by
   the Kuberntes API under `/apis/<group>/<version>/.../<plural>`.
   """
   plural: String!
 
   """
-	The singular name of the resource.
+  The singular name of the resource.
   """
   singular: String
 
@@ -165,7 +163,7 @@ type CompositeResourceDefinitionNames {
   listKind: String
 
   """
-	A list of grouped resources this custom resource belongs to (e.g. 'all'). This
+  A list of grouped resources this custom resource belongs to (e.g. 'all'). This
   is published in API discovery documents, and used by clients to support
   invocations like `kubectl get all`.
   """
@@ -178,14 +176,14 @@ resource.
 """
 type CompositeResourceDefinitionVersion {
   """
-	Name of this version, e.g. “v1”, “v2beta1”, etc. Composite resources are
-	served under this version at `/apis/<group>/<version>/...` if `served` is
-	true.
+  Name of this version, e.g. “v1”, “v2beta1”, etc. Composite resources are
+  served under this version at `/apis/<group>/<version>/...` if `served` is
+  true.
   """
   name: String!
 
   """
-	Referenceable specifies that this version may be referenced by a Composition
+  Referenceable specifies that this version may be referenced by a Composition
   in order to configure which resources an XR may be composed of. Exactly one
   version must be marked as referenceable; all Compositions must target only the
   referenceable version. The referenceable version must be served.
@@ -193,12 +191,12 @@ type CompositeResourceDefinitionVersion {
   referenceable: Boolean!
 
   """
-	Served specifies that this version should be served via Kubernetes REST APIs.
+  Served specifies that this version should be served via Kubernetes REST APIs.
   """
   served: Boolean!
 
   """
-	Schema describes the schema used for validation, pruning, and defaulting of
+  Schema describes the schema used for validation, pruning, and defaulting of
   this version of the defined composite resource. Fields required by all
   composite resources are injected into this schema automatically, and override
   equivalently named fields in this schema.
@@ -211,7 +209,7 @@ A CompositeResourceValidation is a list of validation methods for a composite
 resource.
 """
 type CompositeResourceValidation {
-	"OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
+  "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
   openAPIV3Schema: JSONObject
 }
 
@@ -224,7 +222,7 @@ type CompositeResourceDefinitionStatus implements ConditionedStatus {
   conditions: [Condition!]
 
   """
-	Controllers represents the status of the controllers that power this
+  Controllers represents the status of the controllers that power this
   composite resource definition.
   """
   controllers: CompositeResourceDefinitionControllerStatus
@@ -235,9 +233,8 @@ A CompositeResourceDefinitionControllerStatus shows the observed state of the
 controllers that power the definition.
 """
 type CompositeResourceDefinitionControllerStatus {
-
   """
-	The CompositeResourceTypeRef is the type of composite resource that Crossplane
+  The CompositeResourceTypeRef is the type of composite resource that Crossplane
   is currently reconciling for this definition. Its version will eventually
   become consistent with the definition's referenceable version. Note that
   clients may interact with any served type; this is simply the type that
@@ -246,15 +243,14 @@ type CompositeResourceDefinitionControllerStatus {
   compositeResourceType: TypeReference
 
   """
-	The CompositeResourceClaimTypeRef is the type of composite resource claim
-	that Crossplane is currently reconciling for this definition. Its version
-	will eventually become consistent with the definition's referenceable version.
+  The CompositeResourceClaimTypeRef is the type of composite resource claim
+  that Crossplane is currently reconciling for this definition. Its version
+  will eventually become consistent with the definition's referenceable version.
   Note that clients may interact with any served type; this is simply the type
   that Crossplane interacts with.
   """
   compositeResourceClaimType: TypeReference
 }
-
 
 """
 A TypeReference references a type of Kubernetes resource by API version and
@@ -303,14 +299,14 @@ A CompositionSpec represents the desired state of a composition.
 """
 type CompositionSpec {
   """
-	CompositeTypeRef specifies the type of composite resource that this
+  CompositeTypeRef specifies the type of composite resource that this
   composition is compatible with.
   """
   compositeTypeRef: TypeReference!
 
   """
-	WriteConnectionSecretsToNamespace specifies the namespace in which the
-	connection secrets of composite resource dynamically provisioned using this
+  WriteConnectionSecretsToNamespace specifies the namespace in which the
+  connection secrets of composite resource dynamically provisioned using this
   composition will be created.
   """
   writeConnectionSecretsToNamespace: String
@@ -325,4 +321,3 @@ type CompositionStatus implements ConditionedStatus {
   "The observed condition of this resource."
   conditions: [Condition!]
 }
-

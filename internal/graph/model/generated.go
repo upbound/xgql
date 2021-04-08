@@ -186,16 +186,16 @@ type CompositeResourceDefinitionConnection struct {
 // controllers that power the definition.
 type CompositeResourceDefinitionControllerStatus struct {
 	// The CompositeResourceTypeRef is the type of composite resource that Crossplane
-	//  is currently reconciling for this definition. Its version will eventually
-	//  become consistent with the definition's referenceable version. Note that
-	//  clients may interact with any served type; this is simply the type that
-	//  Crossplane interacts with.
+	// is currently reconciling for this definition. Its version will eventually
+	// become consistent with the definition's referenceable version. Note that
+	// clients may interact with any served type; this is simply the type that
+	// Crossplane interacts with.
 	CompositeResourceType *TypeReference `json:"compositeResourceType"`
 	// The CompositeResourceClaimTypeRef is the type of composite resource claim
 	// that Crossplane is currently reconciling for this definition. Its version
 	// will eventually become consistent with the definition's referenceable version.
-	//  Note that clients may interact with any served type; this is simply the type
-	//  that Crossplane interacts with.
+	// Note that clients may interact with any served type; this is simply the type
+	// that Crossplane interacts with.
 	CompositeResourceClaimType *TypeReference `json:"compositeResourceClaimType"`
 }
 
@@ -203,7 +203,7 @@ type CompositeResourceDefinitionControllerStatus struct {
 // defined composite resource or claim.
 type CompositeResourceDefinitionNames struct {
 	// The plural name of the resource to serve. Composite resources are served by
-	//  the Kuberntes API under `/apis/<group>/<version>/.../<plural>`.
+	// the Kuberntes API under `/apis/<group>/<version>/.../<plural>`.
 	Plural string `json:"plural"`
 	// The singular name of the resource.
 	Singular *string `json:"singular"`
@@ -215,8 +215,8 @@ type CompositeResourceDefinitionNames struct {
 	// The Kubernetes API kind of a list of the defined resource.
 	ListKind *string `json:"listKind"`
 	// A list of grouped resources this custom resource belongs to (e.g. 'all'). This
-	//  is published in API discovery documents, and used by clients to support
-	//  invocations like `kubectl get all`.
+	// is published in API discovery documents, and used by clients to support
+	// invocations like `kubectl get all`.
 	Categories []string `json:"categories"`
 }
 
@@ -226,7 +226,7 @@ type CompositeResourceDefinitionStatus struct {
 	// The observed condition of this resource.
 	Conditions []Condition `json:"conditions"`
 	// Controllers represents the status of the controllers that power this
-	//  composite resource definition.
+	// composite resource definition.
 	Controllers *CompositeResourceDefinitionControllerStatus `json:"controllers"`
 }
 
@@ -240,16 +240,16 @@ type CompositeResourceDefinitionVersion struct {
 	// true.
 	Name string `json:"name"`
 	// Referenceable specifies that this version may be referenced by a Composition
-	//  in order to configure which resources an XR may be composed of. Exactly one
-	//  version must be marked as referenceable; all Compositions must target only the
-	//  referenceable version. The referenceable version must be served.
+	// in order to configure which resources an XR may be composed of. Exactly one
+	// version must be marked as referenceable; all Compositions must target only the
+	// referenceable version. The referenceable version must be served.
 	Referenceable bool `json:"referenceable"`
 	// Served specifies that this version should be served via Kubernetes REST APIs.
 	Served bool `json:"served"`
 	// Schema describes the schema used for validation, pruning, and defaulting of
-	//  this version of the defined composite resource. Fields required by all
-	//  composite resources are injected into this schema automatically, and override
-	//  equivalently named fields in this schema.
+	// this version of the defined composite resource. Fields required by all
+	// composite resources are injected into this schema automatically, and override
+	// equivalently named fields in this schema.
 	Schema *CompositeResourceValidation `json:"schema"`
 }
 
@@ -306,11 +306,11 @@ type CompositionConnection struct {
 // A CompositionSpec represents the desired state of a composition.
 type CompositionSpec struct {
 	// CompositeTypeRef specifies the type of composite resource that this
-	//  composition is compatible with.
+	// composition is compatible with.
 	CompositeTypeRef *TypeReference `json:"compositeTypeRef"`
 	// WriteConnectionSecretsToNamespace specifies the namespace in which the
 	// connection secrets of composite resource dynamically provisioned using this
-	//  composition will be created.
+	// composition will be created.
 	WriteConnectionSecretsToNamespace *string `json:"writeConnectionSecretsToNamespace"`
 }
 
@@ -328,17 +328,17 @@ func (CompositionStatus) IsConditionedStatus() {}
 // the allowed values at the API level.
 type Condition struct {
 	// Type of this condition. At most one of each condition type may apply to a
-	//  resource at any point in time.
+	// resource at any point in time.
 	Type string `json:"type"`
 	// Status of this condition; is it currently True, False, or Unknown?
 	Status ConditionStatus `json:"status"`
 	// LastTransitionTime is the last time this condition transitioned from one
-	//  status to another.
+	// status to another.
 	LastTransitionTime time.Time `json:"lastTransitionTime"`
 	// A Reason for this condition's last transition from one status to another.
 	Reason string `json:"reason"`
 	// A Message containing details about this condition's last transition from one
-	//  status to another, if any.
+	// status to another, if any.
 	Message *string `json:"message"`
 }
 
@@ -432,16 +432,16 @@ type ConfigurationSpec struct {
 	// The name of the configuration package to pull from an OCI registry.
 	Package string `json:"package"`
 	// RevisionActivationPolicy specifies how the package controller should update
-	//  from one revision to the next.
+	// from one revision to the next.
 	RevisionActivationPolicy *RevisionActivationPolicy `json:"revisionActivationPolicy"`
 	// RevisionHistoryLimit dictates how the package controller cleans up old
-	//  inactive package revisions. Defaults to 1. Can be disabled by explicitly
-	//  setting to 0.
+	// inactive package revisions. Defaults to 1. Can be disabled by explicitly
+	// setting to 0.
 	RevisionHistoryLimit *int `json:"revisionHistoryLimit"`
 	// PackagePullPolicy defines the pull policy for the package.
 	PackagePullPolicy *PackagePullPolicy `json:"packagePullPolicy"`
 	// IgnoreCrossplaneConstraints indicates to the package manager whether to honor
-	//  Crossplane version constraints specified by the package.
+	// Crossplane version constraints specified by the package.
 	IgnoreCrossplaneConstraints *bool `json:"ignoreCrossplaneConstraints"`
 	// SkipDependencyResolution indicates to the package manager whether to skip
 	// resolving dependencies for a package.
@@ -453,12 +453,12 @@ type ConfigurationStatus struct {
 	// The observed condition of this resource.
 	Conditions []Condition `json:"conditions"`
 	// CurrentRevision is the name of the current package revision. It will reflect
-	//  the most up to date revision, whether it has been activated or not.
+	// the most up to date revision, whether it has been activated or not.
 	CurrentRevision *string `json:"currentRevision"`
 	// CurrentIdentifier is the most recent package source that was used to produce a
-	//  revision. The package manager uses this field to determine whether to check
-	//  for package updates for a given source when packagePullPolicy is set to
-	//  IfNotPresent.
+	// revision. The package manager uses this field to determine whether to check
+	// for package updates for a given source when packagePullPolicy is set to
+	// IfNotPresent.
 	CurrentIdentifier *string `json:"currentIdentifier"`
 }
 
@@ -506,8 +506,8 @@ type CustomResourceDefinitionNames struct {
 	// The Kubernetes API kind of a list of the defined resource.
 	ListKind *string `json:"listKind"`
 	// A list of grouped resources this custom resource belongs to (e.g. 'all'). This
-	//  is published in API discovery documents, and used by clients to support
-	//  invocations like `kubectl get all`.
+	// is published in API discovery documents, and used by clients to support
+	// invocations like `kubectl get all`.
 	Categories []string `json:"categories"`
 }
 
@@ -521,15 +521,15 @@ type CustomResourceDefinitionSpec struct {
 	// Names specifies the resource and kind names of the defined custom resource.
 	Names *CustomResourceDefinitionNames `json:"names"`
 	// Versions is the list of all API versions of the defined custom resource.
-	//  Version names are used to compute the order in which served versions are
-	//  listed in API discovery. If the version string is "kube-like", it will sort
-	//  above non "kube-like" version strings, which are ordered lexicographically.
-	//  "Kube-like" versions start with a "v", then are followed by a number (the
-	//  major version), then optionally the string "alpha" or "beta" and another
-	//  number (the minor version). These are sorted first by GA > beta > alpha (where
-	//  GA is a version with no suffix such as beta or alpha), and then by comparing
-	//  major version, then minor version. An example sorted list of versions: v10,
-	//  v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10.
+	// Version names are used to compute the order in which served versions are
+	// listed in API discovery. If the version string is "kube-like", it will sort
+	// above non "kube-like" version strings, which are ordered lexicographically.
+	// "Kube-like" versions start with a "v", then are followed by a number (the
+	// major version), then optionally the string "alpha" or "beta" and another
+	// number (the minor version). These are sorted first by GA > beta > alpha (where
+	// GA is a version with no suffix such as beta or alpha), and then by comparing
+	// major version, then minor version. An example sorted list of versions: v10,
+	// v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10.
 	Versions []CustomResourceDefinitionVersion `json:"versions"`
 }
 
@@ -545,12 +545,12 @@ func (CustomResourceDefinitionStatus) IsConditionedStatus() {}
 // A CustomResourceDefinitionVersion describes a version of a custom resource.
 type CustomResourceDefinitionVersion struct {
 	// Name of this version, e.g. “v1”, “v2beta1”, etc. Custom resources are served
-	//  under this version at `/apis/<group>/<version>/...` if `served` istrue.
+	// under this version at `/apis/<group>/<version>/...` if `served` istrue.
 	Name string `json:"name"`
 	// Served specifies that this version should be served via Kubernetes REST APIs.
 	Served bool `json:"served"`
 	// Schema describes the schema used for validation, pruning, and defaulting of
-	//  this version of the defined custom resource.
+	// this version of the defined custom resource.
 	Schema *CustomResourceValidation `json:"schema"`
 }
 
@@ -665,22 +665,22 @@ type OwnerConnection struct {
 // A PolicyRule holds information that describes a KubernetesRBAC policy rule.
 type PolicyRule struct {
 	// Verbs is a list of verbs that apply to ALL the resources specified by this
-	//  rule. '*' represents all verbs.
+	// rule. '*' represents all verbs.
 	Verbs []string `json:"verbs"`
 	// APIGroups is the name of the APIGroup that contains the resources. If multiple
 	// API groups are specified, any action requested against one of the enumerated
 	// resources in any API group will be allowed.
 	APIGroups []string `json:"apiGroups"`
 	// Resources is a list of resources this rule applies to. '*' represents all
-	//  resources.
+	// resources.
 	Resources []string `json:"resources"`
 	// ResourceNames is a list of names that the rule applies to. An empty set means
-	//  that everything is allowed.
+	// that everything is allowed.
 	ResourceNames []string `json:"resourceNames"`
 	// NonResourceURLs is a set of partial urls that a user should have access to.
-	//  '*' is allowed, but only as the full, final step in the path. Rules can either
-	//  apply to API resources (such as "pods" or "secrets") or non-resource URL paths
-	//  (such as "/api"),  but not both.
+	// '*' is allowed, but only as the full, final step in the path. Rules can either
+	// apply to API resources (such as "pods" or "secrets") or non-resource URL paths
+	// (such as "/api"),  but not both.
 	NonResourceURLs []string `json:"nonResourceURLs"`
 }
 
@@ -787,7 +787,7 @@ type ProviderRevisionSpec struct {
 	// Package image used by the install pod to extract package contents.
 	Package string `json:"package"`
 	// PackagePullPolicy defines the pull policy for the package. It is also applied
-	//  to any images pulled for the package, such as a provider's controller image.
+	// to any images pulled for the package, such as a provider's controller image.
 	PackagePullPolicy *PackagePullPolicy `json:"packagePullPolicy"`
 	// Revision number. Indicates when the revision will be garbage collected based
 	// on the configuration's RevisionHistoryLimit.
@@ -805,16 +805,16 @@ type ProviderSpec struct {
 	// The name of the provider package to pull from an OCI registry.
 	Package string `json:"package"`
 	// RevisionActivationPolicy specifies how the package controller should update
-	//  from one revision to the next.
+	// from one revision to the next.
 	RevisionActivationPolicy *RevisionActivationPolicy `json:"revisionActivationPolicy"`
 	// RevisionHistoryLimit dictates how the package controller cleans up old
-	//  inactive package revisions. Defaults to 1. Can be disabled by explicitly
-	//  setting to 0.
+	// inactive package revisions. Defaults to 1. Can be disabled by explicitly
+	// setting to 0.
 	RevisionHistoryLimit *int `json:"revisionHistoryLimit"`
 	// PackagePullPolicy defines the pull policy for the package.
 	PackagePullPolicy *PackagePullPolicy `json:"packagePullPolicy"`
 	// IgnoreCrossplaneConstraints indicates to the package manager whether to honor
-	//  Crossplane version constraints specified by the package.
+	// Crossplane version constraints specified by the package.
 	IgnoreCrossplaneConstraints *bool `json:"ignoreCrossplaneConstraints"`
 	// SkipDependencyResolution indicates to the package manager whether to skip
 	// resolving dependencies for a package.
@@ -826,12 +826,12 @@ type ProviderStatus struct {
 	// The observed condition of this resource.
 	Conditions []Condition `json:"conditions"`
 	// CurrentRevision is the name of the current package revision. It will reflect
-	//  the most up to date revision, whether it has been activated or not.
+	// the most up to date revision, whether it has been activated or not.
 	CurrentRevision *string `json:"currentRevision"`
 	// CurrentIdentifier is the most recent package source that was used to produce a
-	//  revision. The package manager uses this field to determine whether to check
-	//  for package updates for a given source when packagePullPolicy is set to
-	//  IfNotPresent.
+	// revision. The package manager uses this field to determine whether to check
+	// for package updates for a given source when packagePullPolicy is set to
+	// IfNotPresent.
 	CurrentIdentifier *string `json:"currentIdentifier"`
 }
 
