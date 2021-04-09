@@ -54,19 +54,25 @@ func (r *Root) Secret() generated.SecretResolver {
 
 // CompositeResource resolves properties of the CompositeResource GraphQL type.
 func (r *Root) CompositeResource() generated.CompositeResourceResolver {
-	return nil
+	return &compositeResource{clients: r.clients}
+}
+
+// CompositeResourceSpec resolves properties of the CompositeResourceSpec
+// GraphQL type.
+func (r *Root) CompositeResourceSpec() generated.CompositeResourceSpecResolver {
+	return &compositeResourceSpec{clients: r.clients}
 }
 
 // CompositeResourceClaim resolves properties of the CompositeResourceClaim
 // GraphQL type.
 func (r *Root) CompositeResourceClaim() generated.CompositeResourceClaimResolver {
-	return nil
+	return &compositeResourceClaim{clients: r.clients}
 }
 
 // CompositeResourceClaimSpec resolves properties of the CompositeResourceClaimSpec
 // GraphQL type.
 func (r *Root) CompositeResourceClaimSpec() generated.CompositeResourceClaimSpecResolver {
-	return nil
+	return &compositeResourceClaimSpec{clients: r.clients}
 }
 
 // CompositeResourceDefinition resolves properties of the
@@ -78,18 +84,12 @@ func (r *Root) CompositeResourceDefinition() generated.CompositeResourceDefiniti
 // CompositeResourceDefinitionSpec resolves properties of the
 // CompositeResourceDefinitionSpec GraphQL type.
 func (r *Root) CompositeResourceDefinitionSpec() generated.CompositeResourceDefinitionSpecResolver {
-	return nil
-}
-
-// CompositeResourceSpec resolves properties of the CompositeResourceSpec
-// GraphQL type.
-func (r *Root) CompositeResourceSpec() generated.CompositeResourceSpecResolver {
-	return nil
+	return &xrdSpec{clients: r.clients}
 }
 
 // Composition resolves properties of the Composition GraphQL type.
 func (r *Root) Composition() generated.CompositionResolver {
-	return nil
+	return &composition{clients: r.clients}
 }
 
 // Configuration resolves properties of the Configuration GraphQL type.
@@ -128,7 +128,7 @@ func (r *Root) GenericResource() generated.GenericResourceResolver {
 // ManagedResource resolves properties of the CustomResourceDefinition GraphQL
 // type.
 func (r *Root) ManagedResource() generated.ManagedResourceResolver {
-	return nil
+	return &managedResource{clients: r.clients}
 }
 
 // ManagedResourceSpec resolves properties of the CustomResourceDefinition GraphQL
@@ -155,5 +155,5 @@ func (r *Root) ProviderRevisionStatus() generated.ProviderRevisionStatusResolver
 
 // ProviderConfig resolves properties of the ProviderConfig GraphQL type.
 func (r *Root) ProviderConfig() generated.ProviderConfigResolver {
-	return nil
+	return &providerConfig{clients: r.clients}
 }

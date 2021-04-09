@@ -57,28 +57,12 @@ type CompositeResourceSpec {
   """
   The resources of which this composite resource is composed.
   """
-  resources: ComposedResourceConnection @goField(forceResolver: true)
-}
-
-"""
-A ComposedResourceConnection represents a connection to composed resources.
-"""
-type ComposedResourceConnection {
-  "Connected nodes."
-  nodes: [ComposedResource!]
-
-  "The total number of connected nodes."
-  totalCount: Int!
+  resources: KubernetesResourceConnection @goField(forceResolver: true)
 }
 
 # TODO(negz): Do we need to support GenericResource here, just in case? We only
 # support managed an composite resources officially, but in practice some folks
 # use arbitrary resources.
-
-"""
-A ComposedResource is either a managed or a composite resource.
-"""
-union ComposedResource = ManagedResource | CompositeResource
 
 """
 A CompositeResourceClaimStatus represents the observed state of a composite

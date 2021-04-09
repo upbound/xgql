@@ -371,8 +371,8 @@ func TestGetKubernetesResource(t *testing.T) {
 					ID:       ReferenceID{Name: "cool"},
 					Metadata: &ObjectMeta{Name: "cool"},
 					Spec: &ManagedResourceSpec{
-						ProviderConfigRef: &xpv1.Reference{Name: "pr"},
-						DeletionPolicy:    &dp,
+						ProviderConfigReference: &xpv1.Reference{Name: "pr"},
+						DeletionPolicy:          &dp,
 					},
 				},
 			},

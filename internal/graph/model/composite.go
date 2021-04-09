@@ -65,14 +65,25 @@ func GetCompositeResource(u *kunstructured.Unstructured) CompositeResource {
 	}
 }
 
+func delocalize(ref *xpv1.LocalSecretReference, namespace string) *xpv1.SecretReference {
+	if ref == nil {
+		return nil
+	}
+	return &xpv1.SecretReference{Namespace: namespace, Name: ref.Name}
+}
+
 // A CompositeResourceClaimSpec represents the desired state of a composite
 // resource claim.
 type CompositeResourceClaimSpec struct {
 	CompositionSelector *LabelSelector `json:"compositionSelector"`
 
-	CompositionReference              *corev1.ObjectReference
-	ResourceReference                 *corev1.ObjectReference
-	WritesConnectionSecretToReference *xpv1.LocalSecretReference
+	CompositionReference *corev1.ObjectReference
+	ResourceReference    *corev1.ObjectReference
+
+	// We use a non-local secret reference because we need to know what
+	// namespace the secret is in when we're resolving it, when we only have
+	// access to the spec.
+	WritesConnectionSecretToReference *xpv1.SecretReference
 }
 
 // GetCompositeResourceClaimStatus from the supplied Crossplane claim.
@@ -112,7 +123,7 @@ func GetCompositeResourceClaim(u *kunstructured.Unstructured) CompositeResourceC
 			CompositionSelector:               GetLabelSelector(xrc.GetCompositionSelector()),
 			CompositionReference:              xrc.GetCompositionReference(),
 			ResourceReference:                 xrc.GetResourceReference(),
-			WritesConnectionSecretToReference: xrc.GetWriteConnectionSecretToReference(),
+			WritesConnectionSecretToReference: delocalize(xrc.GetWriteConnectionSecretToReference(), xrc.GetNamespace()),
 		},
 		Status: GetCompositeResourceClaimStatus(xrc),
 		Raw:    raw(xrc),

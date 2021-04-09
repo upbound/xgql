@@ -11,6 +11,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
+
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/model"
@@ -153,4 +155,72 @@ func pickXRDVersion(vs []model.CompositeResourceDefinitionVersion) string {
 
 	// We shouldn't get here, unless the XRD is serving no versions?
 	return ""
+}
+
+type xrdSpec struct {
+	clients ClientCache
+}
+
+func (r *xrdSpec) DefaultComposition(ctx context.Context, obj *model.CompositeResourceDefinitionSpec) (*model.Composition, error) {
+	if obj.DefaultCompositionReference == nil {
+		return nil, nil
+	}
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	cmp := &extv1.Composition{}
+	nn := types.NamespacedName{Name: obj.DefaultCompositionReference.Name}
+	if err := c.Get(ctx, nn, cmp); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetComposition))
+		return nil, nil
+	}
+
+	out := model.GetComposition(cmp)
+	return &out, nil
+}
+
+func (r *xrdSpec) EnforcedComposition(ctx context.Context, obj *model.CompositeResourceDefinitionSpec) (*model.Composition, error) {
+	if obj.EnforcedCompositionReference == nil {
+		return nil, nil
+	}
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	cmp := &extv1.Composition{}
+	nn := types.NamespacedName{Name: obj.EnforcedCompositionReference.Name}
+	if err := c.Get(ctx, nn, cmp); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetComposition))
+		return nil, nil
+	}
+
+	out := model.GetComposition(cmp)
+	return &out, nil
+}
+
+type composition struct {
+	clients ClientCache
+}
+
+func (r *composition) Events(ctx context.Context, obj *model.Composition) (*model.EventConnection, error) {
+	e := &events{clients: r.clients}
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: obj.APIVersion,
+		Kind:       obj.Kind,
+		Name:       obj.Metadata.Name,
+		UID:        types.UID(obj.Metadata.UID),
+	})
 }

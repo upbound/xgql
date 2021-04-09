@@ -10,6 +10,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/utils/pointer"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 
@@ -115,6 +116,7 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 
 				xrc.SetAPIVersion("example.org/v1")
 				xrc.SetKind("CompositeResource")
+				xrc.SetNamespace("default")
 				xrc.SetName("cool")
 				xrc.SetCompositionSelector(&metav1.LabelSelector{MatchLabels: map[string]string{"cool": "very"}})
 				xrc.SetCompositionReference(&corev1.ObjectReference{Name: "coolcmp"})
@@ -134,13 +136,14 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 				APIVersion: "example.org/v1",
 				Kind:       "CompositeResource",
 				Metadata: &ObjectMeta{
-					Name: "cool",
+					Namespace: pointer.StringPtr("default"),
+					Name:      "cool",
 				},
 				Spec: &CompositeResourceClaimSpec{
 					CompositionSelector:               &LabelSelector{MatchLabels: map[string]interface{}{"cool": "very"}},
 					CompositionReference:              &corev1.ObjectReference{Name: "coolcmp"},
 					ResourceReference:                 &corev1.ObjectReference{Name: "coolxr"},
-					WritesConnectionSecretToReference: &xpv1.LocalSecretReference{Name: "coolsecret"},
+					WritesConnectionSecretToReference: &xpv1.SecretReference{Namespace: "default", Name: "coolsecret"},
 				},
 				Status: &CompositeResourceClaimStatus{
 					Conditions: []Condition{{}},

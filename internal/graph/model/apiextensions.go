@@ -19,8 +19,8 @@ type CompositeResourceDefinitionSpec struct {
 	ConnectionSecretKeys []string                             `json:"connectionSecretKeys"`
 	Versions             []CompositeResourceDefinitionVersion `json:"versions"`
 
-	DefaultCompositionRef  *xpv1.Reference
-	EnforcedCompositionRef *xpv1.Reference
+	DefaultCompositionReference  *xpv1.Reference
+	EnforcedCompositionReference *xpv1.Reference
 }
 
 // GetCompositeResourceDefinitionNames from the supplied Kubernetes names.
@@ -117,12 +117,12 @@ func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) Comp
 		Kind:       xrd.Kind,
 		Metadata:   GetObjectMeta(xrd),
 		Spec: &CompositeResourceDefinitionSpec{
-			Group:                  xrd.Spec.Group,
-			Names:                  GetCompositeResourceDefinitionNames(&xrd.Spec.Names),
-			ClaimNames:             GetCompositeResourceDefinitionNames(xrd.Spec.ClaimNames),
-			Versions:               GetCompositeResourceDefinitionVersions(xrd.Spec.Versions),
-			DefaultCompositionRef:  xrd.Spec.DefaultCompositionRef,
-			EnforcedCompositionRef: xrd.Spec.EnforcedCompositionRef,
+			Group:                        xrd.Spec.Group,
+			Names:                        GetCompositeResourceDefinitionNames(&xrd.Spec.Names),
+			ClaimNames:                   GetCompositeResourceDefinitionNames(xrd.Spec.ClaimNames),
+			Versions:                     GetCompositeResourceDefinitionVersions(xrd.Spec.Versions),
+			DefaultCompositionReference:  xrd.Spec.DefaultCompositionRef,
+			EnforcedCompositionReference: xrd.Spec.EnforcedCompositionRef,
 		},
 		Status: GetCompositeResourceDefinitionStatus(xrd.Status),
 		Raw:    raw(xrd),
