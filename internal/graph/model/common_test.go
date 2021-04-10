@@ -184,7 +184,7 @@ func TestGetSecret(t *testing.T) {
 			reason: "All supported fields should be converted to our model",
 			s: &corev1.Secret{
 				TypeMeta: metav1.TypeMeta{
-					APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					APIVersion: corev1.SchemeGroupVersion.String(),
 					Kind:       "Secret",
 				},
 				ObjectMeta: metav1.ObjectMeta{
@@ -195,11 +195,11 @@ func TestGetSecret(t *testing.T) {
 			},
 			want: Secret{
 				ID: ReferenceID{
-					APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					APIVersion: corev1.SchemeGroupVersion.String(),
 					Kind:       "Secret",
 					Name:       "cool",
 				},
-				APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+				APIVersion: corev1.SchemeGroupVersion.String(),
 				Kind:       "Secret",
 				Metadata: &ObjectMeta{
 					Name: "cool",
@@ -212,7 +212,13 @@ func TestGetSecret(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			s:      &corev1.Secret{},
 			want: Secret{
-				Metadata: &ObjectMeta{},
+				ID: ReferenceID{
+					APIVersion: corev1.SchemeGroupVersion.String(),
+					Kind:       "Secret",
+				},
+				APIVersion: corev1.SchemeGroupVersion.String(),
+				Kind:       "Secret",
+				Metadata:   &ObjectMeta{},
 			},
 		},
 	}
@@ -237,7 +243,7 @@ func TestGetConfigMap(t *testing.T) {
 			reason: "All supported fields should be converted to our model",
 			cm: &corev1.ConfigMap{
 				TypeMeta: metav1.TypeMeta{
-					APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					APIVersion: corev1.SchemeGroupVersion.String(),
 					Kind:       "ConfigMap",
 				},
 				ObjectMeta: metav1.ObjectMeta{
@@ -247,11 +253,11 @@ func TestGetConfigMap(t *testing.T) {
 			},
 			want: ConfigMap{
 				ID: ReferenceID{
-					APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					APIVersion: corev1.SchemeGroupVersion.String(),
 					Kind:       "ConfigMap",
 					Name:       "cool",
 				},
-				APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+				APIVersion: corev1.SchemeGroupVersion.String(),
 				Kind:       "ConfigMap",
 				Metadata: &ObjectMeta{
 					Name: "cool",
@@ -263,7 +269,13 @@ func TestGetConfigMap(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			cm:     &corev1.ConfigMap{},
 			want: ConfigMap{
-				Metadata: &ObjectMeta{},
+				ID: ReferenceID{
+					APIVersion: corev1.SchemeGroupVersion.String(),
+					Kind:       "ConfigMap",
+				},
+				APIVersion: corev1.SchemeGroupVersion.String(),
+				Kind:       "ConfigMap",
+				Metadata:   &ObjectMeta{},
 			},
 		},
 	}
@@ -642,10 +654,10 @@ func TestGetKubernetesResource(t *testing.T) {
 			want: want{
 				kr: Secret{
 					ID: ReferenceID{
-						APIVersion: schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+						APIVersion: corev1.SchemeGroupVersion.String(),
 						Kind:       "Secret",
 					},
-					APIVersion: schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					APIVersion: corev1.SchemeGroupVersion.String(),
 					Kind:       "Secret",
 					Metadata:   &ObjectMeta{},
 				},
@@ -661,10 +673,10 @@ func TestGetKubernetesResource(t *testing.T) {
 			want: want{
 				kr: ConfigMap{
 					ID: ReferenceID{
-						APIVersion: schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+						APIVersion: corev1.SchemeGroupVersion.String(),
 						Kind:       "ConfigMap",
 					},
-					APIVersion: schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					APIVersion: corev1.SchemeGroupVersion.String(),
 					Kind:       "ConfigMap",
 					Metadata:   &ObjectMeta{},
 				},

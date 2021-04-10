@@ -189,14 +189,13 @@ func (Secret) IsKubernetesResource() {}
 func GetSecret(s *corev1.Secret) Secret {
 	out := Secret{
 		ID: ReferenceID{
-			APIVersion: s.APIVersion,
-			Kind:       s.Kind,
+			APIVersion: corev1.SchemeGroupVersion.String(),
+			Kind:       "Secret",
 			Namespace:  s.GetNamespace(),
 			Name:       s.GetName(),
 		},
-
-		APIVersion: s.APIVersion,
-		Kind:       s.Kind,
+		APIVersion: corev1.SchemeGroupVersion.String(),
+		Kind:       "Secret",
 		Metadata:   GetObjectMeta(s),
 		Data:       s.Data,
 		Raw:        raw(s),
@@ -240,14 +239,13 @@ func (ConfigMap) IsKubernetesResource() {}
 func GetConfigMap(cm *corev1.ConfigMap) ConfigMap {
 	return ConfigMap{
 		ID: ReferenceID{
-			APIVersion: cm.APIVersion,
-			Kind:       cm.Kind,
+			APIVersion: corev1.SchemeGroupVersion.String(),
+			Kind:       "ConfigMap",
 			Namespace:  cm.GetNamespace(),
 			Name:       cm.GetName(),
 		},
-
-		APIVersion: cm.APIVersion,
-		Kind:       cm.Kind,
+		APIVersion: corev1.SchemeGroupVersion.String(),
+		Kind:       "ConfigMap",
 		Metadata:   GetObjectMeta(cm),
 		Data:       cm.Data,
 		Raw:        raw(cm),
