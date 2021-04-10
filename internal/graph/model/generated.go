@@ -9,11 +9,6 @@ import (
 	"time"
 )
 
-// A ComposedResource is either a managed or a composite resource.
-type ComposedResource interface {
-	IsComposedResource()
-}
-
 // A ConditionedStatus represents the observed state of a Kubernetes resource that
 // exposes status conditions.
 type ConditionedStatus interface {
@@ -28,14 +23,6 @@ type KubernetesResource interface {
 // An object with an ID.
 type Node interface {
 	IsNode()
-}
-
-// A ComposedResourceConnection represents a connection to composed resources.
-type ComposedResourceConnection struct {
-	// Connected nodes.
-	Nodes []ComposedResource `json:"nodes"`
-	// The total number of connected nodes.
-	TotalCount int `json:"totalCount"`
 }
 
 // A CompositeResource is a resource this is reconciled by composing other
@@ -62,7 +49,6 @@ type CompositeResource struct {
 
 func (CompositeResource) IsNode()               {}
 func (CompositeResource) IsKubernetesResource() {}
-func (CompositeResource) IsComposedResource()   {}
 
 // A CompositeResourceClaim is a namespaced proxy for a composite resource.
 type CompositeResourceClaim struct {
@@ -102,20 +88,6 @@ type CompositeResourceClaimConnectionDetails struct {
 	// The time at which the composite resource claim's connection details were last
 	// published.
 	LastPublishedTime *time.Time `json:"lastPublishedTime"`
-}
-
-// A CompositeResourceClaimSpec represents the desired state of a composite
-// resource claim.
-type CompositeResourceClaimSpec struct {
-	// The composition this composite resource uses to compose resources.
-	Composition *Composition `json:"composition"`
-	// A composition selector is used to select this composite resource claims's
-	// (composite resource's) composition by matching on labels.
-	CompositionSelector *LabelSelector `json:"compositionSelector"`
-	// The composite resource to which this composite resource claim is bound.
-	Resource *CompositeResource `json:"resource"`
-	// The secret this composite resource claim writes its connection details to.
-	ConnectionSecret *Secret `json:"connectionSecret"`
 }
 
 // A CompositeResourceClaimStatus represents the observed status of a composite
@@ -634,7 +606,6 @@ type ManagedResource struct {
 	Events *EventConnection `json:"events"`
 }
 
-func (ManagedResource) IsComposedResource()   {}
 func (ManagedResource) IsNode()               {}
 func (ManagedResource) IsKubernetesResource() {}
 

@@ -10,9 +10,9 @@ import (
 
 // A ManagedResourceSpec specifies the desired state of a managed resource.
 type ManagedResourceSpec struct {
-	WritesConnectionSecretToRef *xpv1.SecretReference
-	ProviderConfigRef           *xpv1.Reference
-	DeletionPolicy              *DeletionPolicy `json:"deletionPolicy"`
+	WritesConnectionSecretToReference *xpv1.SecretReference
+	ProviderConfigReference           *xpv1.Reference
+	DeletionPolicy                    *DeletionPolicy `json:"deletionPolicy"`
 }
 
 // GetDeletionPolicy from the supplied Crossplane policy.
@@ -52,9 +52,9 @@ func GetManagedResource(u *kunstructured.Unstructured) ManagedResource {
 		Kind:       mg.GetKind(),
 		Metadata:   GetObjectMeta(mg),
 		Spec: &ManagedResourceSpec{
-			WritesConnectionSecretToRef: mg.GetWriteConnectionSecretToReference(),
-			ProviderConfigRef:           mg.GetProviderConfigReference(),
-			DeletionPolicy:              GetDeletionPolicy(mg.GetDeletionPolicy()),
+			WritesConnectionSecretToReference: mg.GetWriteConnectionSecretToReference(),
+			ProviderConfigReference:           mg.GetProviderConfigReference(),
+			DeletionPolicy:                    GetDeletionPolicy(mg.GetDeletionPolicy()),
 		},
 		Status: GetManagedResourceStatus(mg),
 		Raw:    raw(mg),

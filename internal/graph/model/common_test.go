@@ -335,6 +335,7 @@ func TestGetKubernetesResource(t *testing.T) {
 		cmpopts.IgnoreFields(ManagedResource{}, "Raw"),
 		cmpopts.IgnoreFields(ProviderConfig{}, "Raw"),
 		cmpopts.IgnoreFields(CompositeResource{}, "Raw"),
+		cmpopts.IgnoreFields(CompositeResourceClaim{}, "Raw"),
 		cmpopts.IgnoreFields(Provider{}, "Raw"),
 		cmpopts.IgnoreFields(ProviderRevision{}, "Raw"),
 		cmpopts.IgnoreFields(Configuration{}, "Raw"),
@@ -370,8 +371,8 @@ func TestGetKubernetesResource(t *testing.T) {
 					ID:       ReferenceID{Name: "cool"},
 					Metadata: &ObjectMeta{Name: "cool"},
 					Spec: &ManagedResourceSpec{
-						ProviderConfigRef: &xpv1.Reference{Name: "pr"},
-						DeletionPolicy:    &dp,
+						ProviderConfigReference: &xpv1.Reference{Name: "pr"},
+						DeletionPolicy:          &dp,
 					},
 				},
 			},
@@ -393,16 +394,40 @@ func TestGetKubernetesResource(t *testing.T) {
 		"Composite": {
 			u: func() *kunstructured.Unstructured {
 				// Set resource refs to convince unstructured.ProbablyComposite
-				xp := &unstructured.Composite{}
-				xp.SetName("cool")
-				xp.SetResourceReferences([]corev1.ObjectReference{{Name: "cool"}})
-				return xp.GetUnstructured()
+				xr := &unstructured.Composite{}
+				xr.SetName("cool")
+				xr.SetCompositionReference(&corev1.ObjectReference{Name: "cmp"})
+				xr.SetResourceReferences([]corev1.ObjectReference{{Name: "cool"}})
+				return xr.GetUnstructured()
 			}(),
 			want: want{
 				kr: CompositeResource{
 					ID:       ReferenceID{Name: "cool"},
 					Metadata: &ObjectMeta{Name: "cool"},
-					Spec:     &CompositeResourceSpec{ResourceReferences: []corev1.ObjectReference{{Name: "cool"}}},
+					Spec: &CompositeResourceSpec{
+						CompositionReference: &corev1.ObjectReference{Name: "cmp"},
+						ResourceReferences:   []corev1.ObjectReference{{Name: "cool"}},
+					},
+				},
+			},
+		},
+		"Claim": {
+			u: func() *kunstructured.Unstructured {
+				// Set resource refs to convince unstructured.ProbablyClaim
+				xrc := &unstructured.Claim{}
+				xrc.SetName("cool")
+				xrc.SetCompositionReference(&corev1.ObjectReference{Name: "cmp"})
+				xrc.SetResourceReference(&corev1.ObjectReference{Name: "xr"})
+				return xrc.GetUnstructured()
+			}(),
+			want: want{
+				kr: CompositeResourceClaim{
+					ID:       ReferenceID{Name: "cool"},
+					Metadata: &ObjectMeta{Name: "cool"},
+					Spec: &CompositeResourceClaimSpec{
+						CompositionReference: &corev1.ObjectReference{Name: "cmp"},
+						ResourceReference:    &corev1.ObjectReference{Name: "xr"},
+					},
 				},
 			},
 		},

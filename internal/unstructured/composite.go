@@ -29,12 +29,14 @@ import (
 // github.com/crossplane-runtime/pkg/resource/unstructured/composite.
 
 // ProbablyComposite returns true if the supplied *Unstructured is probably a
-// composite resource. It considers any resource with an array of object refs at
-// spec.resourceRefs to probably be a composite resource.
+// composite resource. It considers any resource with an object reference at
+// spec.compositionRef and an array of object refs at spec.resourceRefs to
+// probably be a composite resource.
 func ProbablyComposite(u *unstructured.Unstructured) bool {
+	cerr := fieldpath.Pave(u.Object).GetValueInto("spec.compositionRef", &corev1.ObjectReference{})
 	r := []corev1.ObjectReference{}
-	err := fieldpath.Pave(u.Object).GetValueInto("spec.resourceRefs", &r)
-	return err == nil
+	rerr := fieldpath.Pave(u.Object).GetValueInto("spec.resourceRefs", &r)
+	return cerr == nil && rerr == nil
 }
 
 // A Composite resource.
@@ -161,7 +163,7 @@ func (c *Composite) SetConnectionDetailsLastPublishedTime(t *metav1.Time) {
 // NOTE(negz): The below method isn't part of the resource.Composite interface;
 // it exists to allow us to extract conditions to convert to our GraphQL model.
 
-// GetConditions of this managed resource.
+// GetConditions of this Composite resource.
 func (c *Composite) GetConditions() []xpv1.Condition {
 	conditioned := xpv1.ConditionedStatus{}
 	// The path is directly `status` because conditions are inline.

@@ -65,11 +65,6 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	ComposedResourceConnection struct {
-		Nodes      func(childComplexity int) int
-		TotalCount func(childComplexity int) int
-	}
-
 	CompositeResource struct {
 		APIVersion func(childComplexity int) int
 		Events     func(childComplexity int) int
@@ -511,10 +506,10 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		CompositeResourceDefinitions func(childComplexity int, dangling *bool) int
-		Compositions                 func(childComplexity int, dangling *bool) int
+		CompositeResourceDefinitions func(childComplexity int, revision *model.ReferenceID, dangling *bool) int
+		Compositions                 func(childComplexity int, revision *model.ReferenceID, dangling *bool) int
 		Configurations               func(childComplexity int) int
-		Events                       func(childComplexity int, involvedID *model.ReferenceID) int
+		Events                       func(childComplexity int, involved *model.ReferenceID) int
 		Providers                    func(childComplexity int) int
 	}
 
@@ -559,7 +554,7 @@ type CompositeResourceSpecResolver interface {
 
 	Claim(ctx context.Context, obj *model.CompositeResourceSpec) (*model.CompositeResourceClaim, error)
 	ConnectionSecret(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error)
-	Resources(ctx context.Context, obj *model.CompositeResourceSpec) (*model.ComposedResourceConnection, error)
+	Resources(ctx context.Context, obj *model.CompositeResourceSpec) (*model.KubernetesResourceConnection, error)
 }
 type CompositionResolver interface {
 	Events(ctx context.Context, obj *model.Composition) (*model.EventConnection, error)
@@ -610,9 +605,9 @@ type ProviderRevisionStatusResolver interface {
 type QueryResolver interface {
 	Providers(ctx context.Context) (*model.ProviderConnection, error)
 	Configurations(ctx context.Context) (*model.ConfigurationConnection, error)
-	CompositeResourceDefinitions(ctx context.Context, dangling *bool) (*model.CompositeResourceDefinitionConnection, error)
-	Compositions(ctx context.Context, dangling *bool) (*model.CompositionConnection, error)
-	Events(ctx context.Context, involvedID *model.ReferenceID) (*model.EventConnection, error)
+	CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositeResourceDefinitionConnection, error)
+	Compositions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositionConnection, error)
+	Events(ctx context.Context, involved *model.ReferenceID) (*model.EventConnection, error)
 }
 type SecretResolver interface {
 	Events(ctx context.Context, obj *model.Secret) (*model.EventConnection, error)
@@ -632,20 +627,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
-
-	case "ComposedResourceConnection.nodes":
-		if e.complexity.ComposedResourceConnection.Nodes == nil {
-			break
-		}
-
-		return e.complexity.ComposedResourceConnection.Nodes(childComplexity), true
-
-	case "ComposedResourceConnection.totalCount":
-		if e.complexity.ComposedResourceConnection.TotalCount == nil {
-			break
-		}
-
-		return e.complexity.ComposedResourceConnection.TotalCount(childComplexity), true
 
 	case "CompositeResource.apiVersion":
 		if e.complexity.CompositeResource.APIVersion == nil {
@@ -2507,7 +2488,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.CompositeResourceDefinitions(childComplexity, args["dangling"].(*bool)), true
+		return e.complexity.Query.CompositeResourceDefinitions(childComplexity, args["revision"].(*model.ReferenceID), args["dangling"].(*bool)), true
 
 	case "Query.compositions":
 		if e.complexity.Query.Compositions == nil {
@@ -2519,7 +2500,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Compositions(childComplexity, args["dangling"].(*bool)), true
+		return e.complexity.Query.Compositions(childComplexity, args["revision"].(*model.ReferenceID), args["dangling"].(*bool)), true
 
 	case "Query.configurations":
 		if e.complexity.Query.Configurations == nil {
@@ -2538,7 +2519,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Events(childComplexity, args["involvedID"].(*model.ReferenceID)), true
+		return e.complexity.Query.Events(childComplexity, args["involved"].(*model.ReferenceID)), true
 
 	case "Query.providers":
 		if e.complexity.Query.Providers == nil {
@@ -3577,28 +3558,12 @@ type CompositeResourceSpec {
   """
   The resources of which this composite resource is composed.
   """
-  resources: ComposedResourceConnection @goField(forceResolver: true)
-}
-
-"""
-A ComposedResourceConnection represents a connection to composed resources.
-"""
-type ComposedResourceConnection {
-  "Connected nodes."
-  nodes: [ComposedResource!]
-
-  "The total number of connected nodes."
-  totalCount: Int!
+  resources: KubernetesResourceConnection @goField(forceResolver: true)
 }
 
 # TODO(negz): Do we need to support GenericResource here, just in case? We only
 # support managed an composite resources officially, but in practice some folks
 # use arbitrary resources.
-
-"""
-A ComposedResource is either a managed or a composite resource.
-"""
-union ComposedResource = ManagedResource | CompositeResource
 
 """
 A CompositeResourceClaimStatus represents the observed state of a composite
@@ -4346,7 +4311,15 @@ type Query {
   Composite Resource Definitions (XRDs) that currently exist.
   """
   compositeResourceDefinitions(
-    "Only return XRDs that aren't owned by a configuration revision."
+    """
+    Only return XRDs that are owned by the supplied configuration revision ID.
+    """
+    revision: ID
+
+    """
+    Only return XRDs that aren't owned by a configuration revision. Takes
+    precedence over revision when both are set.
+    """
     dangling: Boolean = false
   ): CompositeResourceDefinitionConnection!
 
@@ -4354,7 +4327,16 @@ type Query {
   Compositions that currently exist.
   """
   compositions(
-    "Only return Compositions that aren't owned by a configuration revision."
+    """
+    Only return Compositions that are owned by the supplied configuration
+    revision ID.
+    """
+    revision: ID
+
+    """
+    Only return Compositions that aren't owned by a configuration revision.
+    Takes precedence over revision when both are set.
+    """
     dangling: Boolean = false
   ): CompositionConnection!
 
@@ -4363,7 +4345,7 @@ type Query {
   """
   events(
     "Only return events associated with the supplied ID."
-    involvedID: ID
+    involved: ID
   ): EventConnection!
 }
 
@@ -4536,30 +4518,48 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_compositeResourceDefinitions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *bool
-	if tmp, ok := rawArgs["dangling"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dangling"))
-		arg0, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+	var arg0 *model.ReferenceID
+	if tmp, ok := rawArgs["revision"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("revision"))
+		arg0, err = ec.unmarshalOID2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["dangling"] = arg0
+	args["revision"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["dangling"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dangling"))
+		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["dangling"] = arg1
 	return args, nil
 }
 
 func (ec *executionContext) field_Query_compositions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *bool
-	if tmp, ok := rawArgs["dangling"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dangling"))
-		arg0, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+	var arg0 *model.ReferenceID
+	if tmp, ok := rawArgs["revision"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("revision"))
+		arg0, err = ec.unmarshalOID2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["dangling"] = arg0
+	args["revision"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["dangling"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dangling"))
+		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["dangling"] = arg1
 	return args, nil
 }
 
@@ -4567,14 +4567,14 @@ func (ec *executionContext) field_Query_events_args(ctx context.Context, rawArgs
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.ReferenceID
-	if tmp, ok := rawArgs["involvedID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("involvedID"))
+	if tmp, ok := rawArgs["involved"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("involved"))
 		arg0, err = ec.unmarshalOID2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["involvedID"] = arg0
+	args["involved"] = arg0
 	return args, nil
 }
 
@@ -4615,73 +4615,6 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
-
-func (ec *executionContext) _ComposedResourceConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.ComposedResourceConnection) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "ComposedResourceConnection",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Nodes, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]model.ComposedResource)
-	fc.Result = res
-	return ec.marshalOComposedResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _ComposedResourceConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.ComposedResourceConnection) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "ComposedResourceConnection",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TotalCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
 
 func (ec *executionContext) _CompositeResource_id(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
 	defer func() {
@@ -6909,9 +6842,9 @@ func (ec *executionContext) _CompositeResourceSpec_resources(ctx context.Context
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.ComposedResourceConnection)
+	res := resTmp.(*model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalOComposedResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceConnection(ctx, field.Selections, res)
+	return ec.marshalOKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceStatus_conditions(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceStatus) (ret graphql.Marshaler) {
@@ -13569,7 +13502,7 @@ func (ec *executionContext) _Query_compositeResourceDefinitions(ctx context.Cont
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().CompositeResourceDefinitions(rctx, args["dangling"].(*bool))
+		return ec.resolvers.Query().CompositeResourceDefinitions(rctx, args["revision"].(*model.ReferenceID), args["dangling"].(*bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13611,7 +13544,7 @@ func (ec *executionContext) _Query_compositions(ctx context.Context, field graph
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Compositions(rctx, args["dangling"].(*bool))
+		return ec.resolvers.Query().Compositions(rctx, args["revision"].(*model.ReferenceID), args["dangling"].(*bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13653,7 +13586,7 @@ func (ec *executionContext) _Query_events(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Events(rctx, args["involvedID"].(*model.ReferenceID))
+		return ec.resolvers.Query().Events(rctx, args["involved"].(*model.ReferenceID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15112,29 +15045,6 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    ************************** interface.gotpl ***************************
 
-func (ec *executionContext) _ComposedResource(ctx context.Context, sel ast.SelectionSet, obj model.ComposedResource) graphql.Marshaler {
-	switch obj := (obj).(type) {
-	case nil:
-		return graphql.Null
-	case model.ManagedResource:
-		return ec._ManagedResource(ctx, sel, &obj)
-	case *model.ManagedResource:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ManagedResource(ctx, sel, obj)
-	case model.CompositeResource:
-		return ec._CompositeResource(ctx, sel, &obj)
-	case *model.CompositeResource:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._CompositeResource(ctx, sel, obj)
-	default:
-		panic(fmt.Errorf("unexpected type %T", obj))
-	}
-}
-
 func (ec *executionContext) _ConditionedStatus(ctx context.Context, sel ast.SelectionSet, obj model.ConditionedStatus) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -15432,36 +15342,7 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 // region    **************************** object.gotpl ****************************
 
-var composedResourceConnectionImplementors = []string{"ComposedResourceConnection"}
-
-func (ec *executionContext) _ComposedResourceConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ComposedResourceConnection) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, composedResourceConnectionImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ComposedResourceConnection")
-		case "nodes":
-			out.Values[i] = ec._ComposedResourceConnection_nodes(ctx, field, obj)
-		case "totalCount":
-			out.Values[i] = ec._ComposedResourceConnection_totalCount(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var compositeResourceImplementors = []string{"CompositeResource", "Node", "KubernetesResource", "ComposedResource"}
+var compositeResourceImplementors = []string{"CompositeResource", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceImplementors)
@@ -17262,7 +17143,7 @@ func (ec *executionContext) _LabelSelector(ctx context.Context, sel ast.Selectio
 	return out
 }
 
-var managedResourceImplementors = []string{"ManagedResource", "ComposedResource", "Node", "KubernetesResource"}
+var managedResourceImplementors = []string{"ManagedResource", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.SelectionSet, obj *model.ManagedResource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, managedResourceImplementors)
@@ -18471,16 +18352,6 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNComposedResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResource(ctx context.Context, sel ast.SelectionSet, v model.ComposedResource) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._ComposedResource(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNCompositeResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx context.Context, sel ast.SelectionSet, v model.CompositeResource) graphql.Marshaler {
 	return ec._CompositeResource(ctx, sel, &v)
 }
@@ -19244,53 +19115,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
-func (ec *executionContext) marshalOComposedResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ComposedResource) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNComposedResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResource(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalOComposedResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposedResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.ComposedResourceConnection) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ComposedResourceConnection(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalOCompositeResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CompositeResource) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -19912,6 +19736,13 @@ func (ec *executionContext) marshalOKubernetesResource2ᚕgithubᚗcomᚋupbound
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) marshalOKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.KubernetesResourceConnection) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._KubernetesResourceConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOLabelSelector2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐLabelSelector(ctx context.Context, sel ast.SelectionSet, v *model.LabelSelector) graphql.Marshaler {

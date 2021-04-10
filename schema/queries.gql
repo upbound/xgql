@@ -16,7 +16,15 @@ type Query {
   Composite Resource Definitions (XRDs) that currently exist.
   """
   compositeResourceDefinitions(
-    "Only return XRDs that aren't owned by a configuration revision."
+    """
+    Only return XRDs that are owned by the supplied configuration revision ID.
+    """
+    revision: ID
+
+    """
+    Only return XRDs that aren't owned by a configuration revision. Takes
+    precedence over revision when both are set.
+    """
     dangling: Boolean = false
   ): CompositeResourceDefinitionConnection!
 
@@ -24,7 +32,16 @@ type Query {
   Compositions that currently exist.
   """
   compositions(
-    "Only return Compositions that aren't owned by a configuration revision."
+    """
+    Only return Compositions that are owned by the supplied configuration
+    revision ID.
+    """
+    revision: ID
+
+    """
+    Only return Compositions that aren't owned by a configuration revision.
+    Takes precedence over revision when both are set.
+    """
     dangling: Boolean = false
   ): CompositionConnection!
 
@@ -33,7 +50,7 @@ type Query {
   """
   events(
     "Only return events associated with the supplied ID."
-    involvedID: ID
+    involved: ID
   ): EventConnection!
 }
 

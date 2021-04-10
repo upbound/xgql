@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/upbound/xgql/internal/auth"
@@ -93,23 +92,10 @@ func involves(e *corev1.Event, ref *corev1.ObjectReference) bool {
 	// name from some time in the past.
 
 	got := ref
-	gotGV, err := schema.ParseGroupVersion(got.APIVersion)
-	if err != nil {
-		// This object has a malformed ID?
-		return false
-	}
-
 	want := e.InvolvedObject
-	wantGV, err := schema.ParseGroupVersion(want.APIVersion)
-	if err != nil {
-		// This event references a malformed APIVersion?
-		return false
-	}
 
 	switch {
-	// We match on group only because an event pertaining to one version of a
-	// resource pertains to all versions of a resource.
-	case gotGV.Group != wantGV.Group:
+	case got.APIVersion != want.APIVersion:
 		return false
 	case got.Kind != want.Kind:
 		return false

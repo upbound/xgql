@@ -16,12 +16,26 @@ const (
 	errGetSecret = "cannot get secret"
 )
 
+type managedResource struct {
+	clients ClientCache
+}
+
+func (r *managedResource) Events(ctx context.Context, obj *model.ManagedResource) (*model.EventConnection, error) {
+	e := &events{clients: r.clients}
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: obj.APIVersion,
+		Kind:       obj.Kind,
+		Name:       obj.Metadata.Name,
+		UID:        types.UID(obj.Metadata.UID),
+	})
+}
+
 type managedResourceSpec struct {
 	clients ClientCache
 }
 
 func (r *managedResourceSpec) ConnectionSecret(ctx context.Context, obj *model.ManagedResourceSpec) (*model.Secret, error) {
-	if obj.WritesConnectionSecretToRef == nil {
+	if obj.WritesConnectionSecretToReference == nil {
 		return nil, nil
 	}
 
@@ -37,8 +51,8 @@ func (r *managedResourceSpec) ConnectionSecret(ctx context.Context, obj *model.M
 
 	s := &corev1.Secret{}
 	nn := types.NamespacedName{
-		Namespace: obj.WritesConnectionSecretToRef.Namespace,
-		Name:      obj.WritesConnectionSecretToRef.Name,
+		Namespace: obj.WritesConnectionSecretToReference.Namespace,
+		Name:      obj.WritesConnectionSecretToReference.Name,
 	}
 	if err := c.Get(ctx, nn, s); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetSecret))

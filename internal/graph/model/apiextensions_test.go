@@ -116,8 +116,8 @@ func TestGetCompositeResourceDefinition(t *testing.T) {
 						Served:        true,
 						Schema:        &CompositeResourceValidation{OpenAPIV3Schema: pointer.StringPtr(schema)},
 					}},
-					DefaultCompositionRef:  &xpv1.Reference{Name: "default"},
-					EnforcedCompositionRef: &xpv1.Reference{Name: "enforced"},
+					DefaultCompositionReference:  &xpv1.Reference{Name: "default"},
+					EnforcedCompositionReference: &xpv1.Reference{Name: "enforced"},
 				},
 				Status: &CompositeResourceDefinitionStatus{
 					Conditions: []Condition{{}},

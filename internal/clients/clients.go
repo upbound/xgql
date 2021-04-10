@@ -214,7 +214,7 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 		return nil, errors.Wrap(err, errNewClient)
 	}
 
-	ca, err := c.newCache(cfg, cache.Options{Scheme: c.scheme, Mapper: c.mapper})
+	ca, err := c.newCache(cfg, cache.Options{Scheme: c.scheme, Mapper: c.mapper, Namespace: opts.Namespace})
 	if err != nil {
 		return nil, errors.Wrap(err, errNewCache)
 	}
