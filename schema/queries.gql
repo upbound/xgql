@@ -53,9 +53,14 @@ type Query {
   """
   providerRevisions(
     """
-    Only return revisions owned by the supplied provider..
+    Only return revisions owned by the supplied provider.
     """
     provider: ID
+
+    """
+    Only return active provider revisions.
+    """
+    active: Boolean
   ): ProviderRevisionConnection!
 
   """
@@ -102,6 +107,11 @@ type Query {
     Only return revisions owned by the supplied configuration.
     """
     configuration: ID
+
+    """
+    Only return active provider revisions.
+    """
+    active: Boolean
   ): ConfigurationRevisionConnection!
 
   """

@@ -149,8 +149,45 @@ func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error
 	return out, nil
 }
 
-func (r *query) ProviderRevisions(ctx context.Context, provider *model.ReferenceID) (*model.ProviderRevisionConnection, error) {
-	return nil, nil
+func (r *query) ProviderRevisions(ctx context.Context, provider *model.ReferenceID, active *bool) (*model.ProviderRevisionConnection, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	in := &pkgv1.ProviderRevisionList{}
+	if err := c.List(ctx, in); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errListProviderRevs))
+		return nil, nil
+	}
+
+	out := &model.ProviderRevisionConnection{
+		Nodes: make([]model.ProviderRevision, 0),
+	}
+
+	for i := range in.Items {
+		pr := in.Items[i] // So we don't take the address of a range variable.
+
+		// The supplied provider is not an owner of this PackageRevision.
+		if provider != nil && !containsID(pr.OwnerReferences, *provider) {
+			continue
+		}
+
+		// We only want the active PackageRevision, and this isn't it.
+		if pointer.BoolPtrDerefOr(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
+			continue
+		}
+
+		out.Nodes = append(out.Nodes, model.GetProviderRevision(&pr))
+		out.TotalCount++
+	}
+
+	return out, nil
 }
 
 func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.ReferenceID) (*model.CustomResourceDefinitionConnection, error) {
@@ -194,8 +231,45 @@ func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnect
 	return out, nil
 }
 
-func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID) (*model.ConfigurationRevisionConnection, error) {
-	return nil, nil
+func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID, active *bool) (*model.ConfigurationRevisionConnection, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	in := &pkgv1.ConfigurationRevisionList{}
+	if err := c.List(ctx, in); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errListConfigRevs))
+		return nil, nil
+	}
+
+	out := &model.ConfigurationRevisionConnection{
+		Nodes: make([]model.ConfigurationRevision, 0),
+	}
+
+	for i := range in.Items {
+		pr := in.Items[i] // So we don't take the address of a range variable.
+
+		// The supplied configuration is not an owner of this PackageRevision.
+		if configuration != nil && !containsID(pr.OwnerReferences, *configuration) {
+			continue
+		}
+
+		// We only want the active PackageRevision, and this isn't it.
+		if pointer.BoolPtrDerefOr(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
+			continue
+		}
+
+		out.Nodes = append(out.Nodes, model.GetConfigurationRevision(&pr))
+		out.TotalCount++
+	}
+
+	return out, nil
 }
 
 func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositeResourceDefinitionConnection, error) {
@@ -280,6 +354,22 @@ func (r *query) Compositions(ctx context.Context, revision *model.ReferenceID, d
 	return out, nil
 }
 
+func (r *query) CompositeResources(ctx context.Context, xrd model.ReferenceID) (*model.CompositeResourceConnection, error) {
+	return nil, nil
+}
+
+func (r *query) CompositeResource(ctx context.Context, xrc model.ReferenceID) (*model.CompositeResource, error) {
+	return nil, nil
+}
+
+func (r *query) CompositeResourceClaims(ctx context.Context, xrd model.ReferenceID) (*model.CompositeResourceClaimConnection, error) {
+	return nil, nil
+}
+
+func (r *query) CompositeResourceClaim(ctx context.Context, xr model.ReferenceID) (*model.CompositeResourceClaim, error) {
+	return nil, nil
+}
+
 func containsCR(in []metav1.OwnerReference) bool {
 	for _, ref := range in {
 		switch {
@@ -306,20 +396,4 @@ func containsID(in []metav1.OwnerReference, id model.ReferenceID) bool {
 		return true
 	}
 	return false
-}
-
-func (r *query) CompositeResources(ctx context.Context, xrd model.ReferenceID) (*model.CompositeResourceConnection, error) {
-	return nil, nil
-}
-
-func (r *query) CompositeResource(ctx context.Context, xrc model.ReferenceID) (*model.CompositeResource, error) {
-	return nil, nil
-}
-
-func (r *query) CompositeResourceClaims(ctx context.Context, xrd model.ReferenceID) (*model.CompositeResourceClaimConnection, error) {
-	return nil, nil
-}
-
-func (r *query) CompositeResourceClaim(ctx context.Context, xr model.ReferenceID) (*model.CompositeResourceClaim, error) {
-	return nil, nil
 }

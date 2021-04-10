@@ -392,6 +392,195 @@ func TestQueryProviders(t *testing.T) {
 	}
 }
 
+func TestQueryProviderRevisions(t *testing.T) {
+	errBoom := errors.New("boom")
+
+	id := model.ReferenceID{
+		APIVersion: pkgv1.ProviderGroupVersionKind.GroupVersion().String(),
+		Kind:       pkgv1.ProviderKind,
+		Name:       "coolprovider",
+	}
+
+	// The active ProviderRevision that we control.
+	active := pkgv1.ProviderRevision{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "coolrev",
+			OwnerReferences: []metav1.OwnerReference{{
+				APIVersion: id.APIVersion,
+				Kind:       id.Kind,
+				Name:       id.Name,
+			}},
+		},
+		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
+	}
+	gactive := model.GetProviderRevision(&active)
+
+	// A ProviderRevision we control, but that is inactive.
+	inactive := pkgv1.ProviderRevision{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "inactiverev",
+			OwnerReferences: []metav1.OwnerReference{{
+				APIVersion: id.APIVersion,
+				Kind:       id.Kind,
+				Name:       id.Name,
+			}},
+		},
+		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
+	}
+	ginactive := model.GetProviderRevision(&inactive)
+
+	// A ProviderRevision which we do not control.
+	other := pkgv1.ProviderRevision{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "not-ours",
+			OwnerReferences: []metav1.OwnerReference{{
+				APIVersion: id.APIVersion,
+				Kind:       id.Kind,
+				Name:       "other",
+			}},
+		},
+	}
+	gother := model.GetProviderRevision(&other)
+
+	type args struct {
+		ctx    context.Context
+		id     *model.ReferenceID
+		active *bool
+	}
+	type want struct {
+		pc   *model.ProviderRevisionConnection
+		err  error
+		errs gqlerror.List
+	}
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"GetClientError": {
+			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{}, errBoom
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+				},
+			},
+		},
+		"ListRevisionsError": {
+			reason: "If we can't list revisions we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(errBoom),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errListProviderRevs).Error()),
+				},
+			},
+		},
+		"AllRevisions": {
+			reason: "We should successfully return any revisions we own that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ProviderRevisionList) = pkgv1.ProviderRevisionList{
+							Items: []pkgv1.ProviderRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				pc: &model.ProviderRevisionConnection{
+					Nodes:      []model.ProviderRevision{gother, gactive, ginactive},
+					TotalCount: 3,
+				},
+			},
+		},
+		"ProvidersRevisions": {
+			reason: "We should successfully return any revisions the supplied provider id owns that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ProviderRevisionList) = pkgv1.ProviderRevisionList{
+							Items: []pkgv1.ProviderRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				id:  &id,
+			},
+			want: want{
+				pc: &model.ProviderRevisionConnection{
+					Nodes:      []model.ProviderRevision{gactive, ginactive},
+					TotalCount: 2,
+				},
+			},
+		},
+		"ActiveRevisions": {
+			reason: "We should successfully return any active revisions that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ProviderRevisionList) = pkgv1.ProviderRevisionList{
+							Items: []pkgv1.ProviderRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx:    graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				active: pointer.BoolPtr(true),
+			},
+			want: want{
+				pc: &model.ProviderRevisionConnection{
+					Nodes:      []model.ProviderRevision{gactive},
+					TotalCount: 1,
+				},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			q := &query{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := q.ProviderRevisions(tc.args.ctx, tc.args.id, tc.args.active)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\nq.Revisions(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\nq.Revisions(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.pc, got); diff != "" {
+				t.Errorf("\n%s\nq.Revisions(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
 func TestQueryConfigurations(t *testing.T) {
 	errBoom := errors.New("boom")
 
@@ -482,6 +671,195 @@ func TestQueryConfigurations(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.cc, got); diff != "" {
 				t.Errorf("\n%s\nq.Configurations(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestQueryConfigurationRevisions(t *testing.T) {
+	errBoom := errors.New("boom")
+
+	id := model.ReferenceID{
+		APIVersion: pkgv1.ConfigurationGroupVersionKind.GroupVersion().String(),
+		Kind:       pkgv1.ConfigurationKind,
+		Name:       "coolconfig",
+	}
+
+	// The active ConfigurationRevision that we control.
+	active := pkgv1.ConfigurationRevision{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "coolrev",
+			OwnerReferences: []metav1.OwnerReference{{
+				APIVersion: id.APIVersion,
+				Kind:       id.Kind,
+				Name:       id.Name,
+			}},
+		},
+		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
+	}
+	gactive := model.GetConfigurationRevision(&active)
+
+	// A ConfigurationRevision we control, but that is inactive.
+	inactive := pkgv1.ConfigurationRevision{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "inactiverev",
+			OwnerReferences: []metav1.OwnerReference{{
+				APIVersion: id.APIVersion,
+				Kind:       id.Kind,
+				Name:       id.Name,
+			}},
+		},
+		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
+	}
+	ginactive := model.GetConfigurationRevision(&inactive)
+
+	// A ConfigurationRevision which we do not control.
+	other := pkgv1.ConfigurationRevision{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "not-ours",
+			OwnerReferences: []metav1.OwnerReference{{
+				APIVersion: id.APIVersion,
+				Kind:       id.Kind,
+				Name:       "other",
+			}},
+		},
+	}
+	gother := model.GetConfigurationRevision(&other)
+
+	type args struct {
+		ctx    context.Context
+		id     *model.ReferenceID
+		active *bool
+	}
+	type want struct {
+		pc   *model.ConfigurationRevisionConnection
+		err  error
+		errs gqlerror.List
+	}
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"GetClientError": {
+			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{}, errBoom
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+				},
+			},
+		},
+		"ListRevisionsError": {
+			reason: "If we can't list revisions we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(errBoom),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errListConfigRevs).Error()),
+				},
+			},
+		},
+		"AllRevisions": {
+			reason: "We should successfully return any revisions we own that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ConfigurationRevisionList) = pkgv1.ConfigurationRevisionList{
+							Items: []pkgv1.ConfigurationRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				pc: &model.ConfigurationRevisionConnection{
+					Nodes:      []model.ConfigurationRevision{gother, gactive, ginactive},
+					TotalCount: 3,
+				},
+			},
+		},
+		"ConfigurationsRevisions": {
+			reason: "We should successfully return any revisions the supplied provider id owns that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ConfigurationRevisionList) = pkgv1.ConfigurationRevisionList{
+							Items: []pkgv1.ConfigurationRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				id:  &id,
+			},
+			want: want{
+				pc: &model.ConfigurationRevisionConnection{
+					Nodes:      []model.ConfigurationRevision{gactive, ginactive},
+					TotalCount: 2,
+				},
+			},
+		},
+		"ActiveRevisions": {
+			reason: "We should successfully return any active revisions that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ConfigurationRevisionList) = pkgv1.ConfigurationRevisionList{
+							Items: []pkgv1.ConfigurationRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx:    graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				active: pointer.BoolPtr(true),
+			},
+			want: want{
+				pc: &model.ConfigurationRevisionConnection{
+					Nodes:      []model.ConfigurationRevision{gactive},
+					TotalCount: 1,
+				},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			q := &query{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := q.ConfigurationRevisions(tc.args.ctx, tc.args.id, tc.args.active)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\nq.Revisions(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\nq.Revisions(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.pc, got); diff != "" {
+				t.Errorf("\n%s\nq.Revisions(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
 	}

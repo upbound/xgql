@@ -543,14 +543,14 @@ type ComplexityRoot struct {
 		CompositeResources           func(childComplexity int, xrd model.ReferenceID) int
 		Compositions                 func(childComplexity int, revision *model.ReferenceID, dangling *bool) int
 		ConfigMap                    func(childComplexity int, namespace string, name string) int
-		ConfigurationRevisions       func(childComplexity int, configuration *model.ReferenceID) int
+		ConfigurationRevisions       func(childComplexity int, configuration *model.ReferenceID, active *bool) int
 		Configurations               func(childComplexity int) int
 		CustomResourceDefinitions    func(childComplexity int, revision *model.ReferenceID) int
 		Events                       func(childComplexity int, involved *model.ReferenceID) int
 		KubernetesResource           func(childComplexity int, id model.ReferenceID) int
 		ManagedResources             func(childComplexity int, crd model.ReferenceID) int
 		ProviderConfigs              func(childComplexity int, crd model.ReferenceID) int
-		ProviderRevisions            func(childComplexity int, provider *model.ReferenceID) int
+		ProviderRevisions            func(childComplexity int, provider *model.ReferenceID, active *bool) int
 		Providers                    func(childComplexity int) int
 		Secret                       func(childComplexity int, namespace string, name string) int
 	}
@@ -655,12 +655,12 @@ type QueryResolver interface {
 	Secret(ctx context.Context, namespace string, name string) (*model.Secret, error)
 	ConfigMap(ctx context.Context, namespace string, name string) (*model.ConfigMap, error)
 	Providers(ctx context.Context) (*model.ProviderConnection, error)
-	ProviderRevisions(ctx context.Context, provider *model.ReferenceID) (*model.ProviderRevisionConnection, error)
+	ProviderRevisions(ctx context.Context, provider *model.ReferenceID, active *bool) (*model.ProviderRevisionConnection, error)
 	CustomResourceDefinitions(ctx context.Context, revision *model.ReferenceID) (*model.CustomResourceDefinitionConnection, error)
 	ManagedResources(ctx context.Context, crd model.ReferenceID) (*model.ManagedResourceConnection, error)
 	ProviderConfigs(ctx context.Context, crd model.ReferenceID) (*model.ProviderConfigConnection, error)
 	Configurations(ctx context.Context) (*model.ConfigurationConnection, error)
-	ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID) (*model.ConfigurationRevisionConnection, error)
+	ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID, active *bool) (*model.ConfigurationRevisionConnection, error)
 	CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositeResourceDefinitionConnection, error)
 	Compositions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositionConnection, error)
 	CompositeResources(ctx context.Context, xrd model.ReferenceID) (*model.CompositeResourceConnection, error)
@@ -2735,7 +2735,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.ConfigurationRevisions(childComplexity, args["configuration"].(*model.ReferenceID)), true
+		return e.complexity.Query.ConfigurationRevisions(childComplexity, args["configuration"].(*model.ReferenceID), args["active"].(*bool)), true
 
 	case "Query.configurations":
 		if e.complexity.Query.Configurations == nil {
@@ -2814,7 +2814,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.ProviderRevisions(childComplexity, args["provider"].(*model.ReferenceID)), true
+		return e.complexity.Query.ProviderRevisions(childComplexity, args["provider"].(*model.ReferenceID), args["active"].(*bool)), true
 
 	case "Query.providers":
 		if e.complexity.Query.Providers == nil {
@@ -4760,9 +4760,14 @@ type Query {
   """
   providerRevisions(
     """
-    Only return revisions owned by the supplied provider..
+    Only return revisions owned by the supplied provider.
     """
     provider: ID
+
+    """
+    Only return active provider revisions.
+    """
+    active: Boolean
   ): ProviderRevisionConnection!
 
   """
@@ -4809,6 +4814,11 @@ type Query {
     Only return revisions owned by the supplied configuration.
     """
     configuration: ID
+
+    """
+    Only return active provider revisions.
+    """
+    active: Boolean
   ): ConfigurationRevisionConnection!
 
   """
@@ -5246,6 +5256,15 @@ func (ec *executionContext) field_Query_configurationRevisions_args(ctx context.
 		}
 	}
 	args["configuration"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["active"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["active"] = arg1
 	return args, nil
 }
 
@@ -5336,6 +5355,15 @@ func (ec *executionContext) field_Query_providerRevisions_args(ctx context.Conte
 		}
 	}
 	args["provider"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["active"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["active"] = arg1
 	return args, nil
 }
 
@@ -14914,7 +14942,7 @@ func (ec *executionContext) _Query_providerRevisions(ctx context.Context, field 
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ProviderRevisions(rctx, args["provider"].(*model.ReferenceID))
+		return ec.resolvers.Query().ProviderRevisions(rctx, args["provider"].(*model.ReferenceID), args["active"].(*bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15117,7 +15145,7 @@ func (ec *executionContext) _Query_configurationRevisions(ctx context.Context, f
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ConfigurationRevisions(rctx, args["configuration"].(*model.ReferenceID))
+		return ec.resolvers.Query().ConfigurationRevisions(rctx, args["configuration"].(*model.ReferenceID), args["active"].(*bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
