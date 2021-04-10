@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/pointer"
 
@@ -18,6 +19,8 @@ import (
 )
 
 const (
+	errGetResource   = "cannot get Kubernetes resource"
+	errModelResource = "cannot model Kubernetes resource"
 	errGetClient     = "cannot get client"
 	errGetSecret     = "cannot get secret"
 	errGetConfigMap  = "cannot get config map"
@@ -30,7 +33,31 @@ type query struct {
 }
 
 func (r *query) KubernetesResource(ctx context.Context, id model.ReferenceID) (model.KubernetesResource, error) {
-	return nil, nil
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	u := &unstructured.Unstructured{}
+	u.SetAPIVersion(id.APIVersion)
+	u.SetKind(id.Kind)
+	nn := types.NamespacedName{Namespace: id.Namespace, Name: id.Name}
+	if err := c.Get(ctx, nn, u); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetResource))
+		return nil, nil
+	}
+
+	out, err := model.GetKubernetesResource(u)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errModelResource))
+		return nil, nil
+	}
+	return out, nil
 }
 
 func (r *query) Events(ctx context.Context, involved *model.ReferenceID) (*model.EventConnection, error) {

@@ -9,9 +9,11 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/utils/pointer"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/crossplane/crossplane-runtime/pkg/test"
@@ -25,6 +27,95 @@ import (
 )
 
 var _ generated.QueryResolver = &query{}
+
+func TestQueryKubernetesResource(t *testing.T) {
+	errBoom := errors.New("boom")
+
+	gkr, _ := model.GetKubernetesResource(&unstructured.Unstructured{})
+
+	type args struct {
+		ctx context.Context
+		id  model.ReferenceID
+	}
+	type want struct {
+		kr   model.KubernetesResource
+		err  error
+		errs gqlerror.List
+	}
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"GetClientError": {
+			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{}, errBoom
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+				},
+			},
+		},
+		"GetKubernetesResourceError": {
+			reason: "If we can't get the resource we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(errBoom),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetResource).Error()),
+				},
+			},
+		},
+		"Success": {
+			reason: "If we can get and model the resource  we should return it.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				kr: gkr,
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			q := &query{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := q.KubernetesResource(tc.args.ctx, tc.args.id)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.KubernetesResource(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.KubernetesResource(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreFields(model.GenericResource{}, "Raw")); diff != "" {
+				t.Errorf("\n%s\ns.KubernetesResource(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
 
 func TestQuerySecret(t *testing.T) {
 	errBoom := errors.New("boom")

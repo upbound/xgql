@@ -398,6 +398,7 @@ func TestGetKubernetesResource(t *testing.T) {
 		cmpopts.IgnoreFields(Composition{}, "Raw"),
 		cmpopts.IgnoreFields(CustomResourceDefinition{}, "Raw"),
 		cmpopts.IgnoreFields(Secret{}, "Raw"),
+		cmpopts.IgnoreFields(ConfigMap{}, "Raw"),
 		cmpopts.IgnoreFields(GenericResource{}, "Raw"),
 	}
 
@@ -646,6 +647,25 @@ func TestGetKubernetesResource(t *testing.T) {
 					},
 					APIVersion: schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
 					Kind:       "Secret",
+					Metadata:   &ObjectMeta{},
+				},
+			},
+		},
+		"ConfigMap": {
+			u: func() *kunstructured.Unstructured {
+				u := &kunstructured.Unstructured{}
+				u.SetAPIVersion(schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String())
+				u.SetKind("ConfigMap")
+				return u
+			}(),
+			want: want{
+				kr: ConfigMap{
+					ID: ReferenceID{
+						APIVersion: schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+						Kind:       "ConfigMap",
+					},
+					APIVersion: schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					Kind:       "ConfigMap",
 					Metadata:   &ObjectMeta{},
 				},
 			},

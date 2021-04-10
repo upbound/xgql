@@ -427,6 +427,13 @@ func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, e
 		}
 		return GetSecret(sec), nil
 
+	case u.GroupVersionKind() == schema.GroupVersionKind{Group: corev1.GroupName, Version: "v1", Kind: "ConfigMap"}:
+		cm := &corev1.ConfigMap{}
+		if err := convert(u, cm); err != nil {
+			return nil, errors.Wrap(err, "cannot convert config map")
+		}
+		return GetConfigMap(cm), nil
+
 	default:
 		return GetGenericResource(u), nil
 	}
