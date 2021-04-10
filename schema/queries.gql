@@ -3,9 +3,91 @@ Query is the root type for GraphQL queries.
 """
 type Query {
   """
+  An arbitrary Kubernetes resource. Types that are known to xgql will be
+  returned appropriately (e.g. a Crossplane provider will be of the GraphQL
+  Provider type). Types that are not known to xgql will be returned as a
+  GenericResource.
+  """
+  kubernetesResource(
+    "The ID of the desired resource."
+    id: ID!
+  ): KubernetesResource
+
+  """
+  Kubernetes events.
+  """
+  events(
+    "Only return events associated with the supplied ID."
+    involved: ID
+  ): EventConnection!
+
+  """
+  A Kubernetes secret.
+  """
+  secret(
+    "The secret's namespace"
+    namespace: String!
+
+    "The secret's name"
+    name: String!
+  ): Secret
+
+  """
+  A Kubernetes config map.
+  """
+  configMap(
+    "The config map's namespace"
+    namespace: String!
+
+    "The config map's name"
+    name: String!
+  ): ConfigMap
+
+  """
   Providers that are currently installed.
   """
   providers: ProviderConnection!
+
+  """
+  Provider revisions that currently exist.
+  """
+  providerRevisions(
+    """
+    Only return revisions owned by the supplied provider..
+    """
+    provider: ID
+  ): ProviderRevisionConnection!
+
+  """
+  Custom Resource Definitions (CRDs) that currently exist.
+  """
+  customResourceDefinitions(
+    """
+    Only return XRDs that are owned by the supplied provider revision.
+    """
+    revision: ID
+  ): CustomResourceDefinitionConnection!
+
+  """
+  Managed resources defined by a particular Custom Resource Definition (CRD).
+  """
+  managedResources(
+    """
+    Return managed resources defined by the supplied CRD.
+    """
+    crd: ID!
+  ): ManagedResourceConnection!
+
+  """
+  Provider configurations defined by a particular Custom Resource Definition
+  (CRD).
+  """
+  providerConfigs(
+    """
+    Return provider configs defined by the supplied CRD.
+    """
+    crd: ID!
+  ): ProviderConfigConnection!
 
   """
   Configurations that are currently installed.
@@ -13,11 +95,21 @@ type Query {
   configurations: ConfigurationConnection!
 
   """
+  Configuration revisions that currently exist.
+  """
+  configurationRevisions(
+    """
+    Only return revisions owned by the supplied configuration.
+    """
+    configuration: ID
+  ): ConfigurationRevisionConnection!
+
+  """
   Composite Resource Definitions (XRDs) that currently exist.
   """
   compositeResourceDefinitions(
     """
-    Only return XRDs that are owned by the supplied configuration revision ID.
+    Only return XRDs that are owned by the supplied configuration revision.
     """
     revision: ID
 
@@ -46,12 +138,46 @@ type Query {
   ): CompositionConnection!
 
   """
-  Kubernetes events.
+  Composite resources defined by a particular Composite Resource Definition
+  (XRD).
   """
-  events(
-    "Only return events associated with the supplied ID."
-    involved: ID
-  ): EventConnection!
+  compositeResources(
+    """
+    Return composite resources defined by the supplied XRD.
+    """
+    xrd: ID!
+  ): CompositeResourceConnection!
+
+  """
+  The composite resource associated with a particular claim.
+  """
+  compositeResource(
+    """
+    The composite resource claim bound to the desired composite resource.
+    """
+    xrc: ID!
+  ): CompositeResource
+
+  """
+  Composite resource claims defined by a particular Composite Resource
+  Definition (XRD).
+  """
+  compositeResourceClaims(
+    """
+    Return composite resources claims defined by the supplied XRD.
+    """
+    xrd: ID!
+  ): CompositeResourceClaimConnection!
+
+  """
+  The composite resource claim associated with a particular composite resource.
+  """
+  compositeResourceClaim(
+    """
+    The composite resource claim bound to the desired composite resource.
+    """
+    xr: ID!
+  ): CompositeResourceClaim
 }
 
 """
@@ -60,6 +186,40 @@ A ProviderConnection represents a connection to providers.
 type ProviderConnection {
   "Connected nodes."
   nodes: [Provider!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
+}
+
+"""
+A CustomResourceDefinitionConnection represents a connection to custom
+resource definitions (CRDs).
+"""
+type CustomResourceDefinitionConnection {
+  "Connected nodes."
+  nodes: [CustomResourceDefinition!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
+}
+
+"""
+A ManagedResourceConnection represents a connection to managed resources.
+"""
+type ManagedResourceConnection {
+  "Connected nodes."
+  nodes: [ManagedResource!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
+}
+
+"""
+A ProviderConfigConnection represents a connection to provider configs.
+"""
+type ProviderConfigConnection {
+  "Connected nodes."
+  nodes: [ProviderConfig!]
 
   "The total number of connected nodes."
   totalCount: Int!

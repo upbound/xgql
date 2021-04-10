@@ -26,6 +26,34 @@ type query struct {
 	clients ClientCache
 }
 
+func (r *query) KubernetesResource(ctx context.Context, id model.ReferenceID) (model.KubernetesResource, error) {
+	return nil, nil
+}
+
+func (r *query) Events(ctx context.Context, involved *model.ReferenceID) (*model.EventConnection, error) {
+	e := events{clients: r.clients}
+	if involved == nil {
+		// Resolve all events.
+		return e.Resolve(ctx, nil)
+	}
+
+	// Resolve events pertaining to the supplied ID.
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: involved.APIVersion,
+		Kind:       involved.Kind,
+		Namespace:  involved.Namespace,
+		Name:       involved.Name,
+	})
+}
+
+func (r *query) Secret(ctx context.Context, namespace string, name string) (*model.Secret, error) {
+	return nil, nil
+}
+
+func (r *query) ConfigMap(ctx context.Context, namespace string, name string) (*model.ConfigMap, error) {
+	return nil, nil
+}
+
 func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -55,6 +83,22 @@ func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error
 	return out, nil
 }
 
+func (r *query) ProviderRevisions(ctx context.Context, provider *model.ReferenceID) (*model.ProviderRevisionConnection, error) {
+	return nil, nil
+}
+
+func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.ReferenceID) (*model.CustomResourceDefinitionConnection, error) {
+	return nil, nil
+}
+
+func (r *query) ManagedResources(ctx context.Context, crd model.ReferenceID) (*model.ManagedResourceConnection, error) {
+	return nil, nil
+}
+
+func (r *query) ProviderConfigs(ctx context.Context, crd model.ReferenceID) (*model.ProviderConfigConnection, error) {
+	return nil, nil
+}
+
 func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -82,6 +126,10 @@ func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnect
 	}
 
 	return out, nil
+}
+
+func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID) (*model.ConfigurationRevisionConnection, error) {
+	return nil, nil
 }
 
 func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositeResourceDefinitionConnection, error) {
@@ -194,18 +242,18 @@ func containsID(in []metav1.OwnerReference, id model.ReferenceID) bool {
 	return false
 }
 
-func (r *query) Events(ctx context.Context, involved *model.ReferenceID) (*model.EventConnection, error) {
-	e := events{clients: r.clients}
-	if involved == nil {
-		// Resolve all events.
-		return e.Resolve(ctx, nil)
-	}
+func (r *query) CompositeResources(ctx context.Context, xrd model.ReferenceID) (*model.CompositeResourceConnection, error) {
+	return nil, nil
+}
 
-	// Resolve events pertaining to the supplied ID.
-	return e.Resolve(ctx, &corev1.ObjectReference{
-		APIVersion: involved.APIVersion,
-		Kind:       involved.Kind,
-		Namespace:  involved.Namespace,
-		Name:       involved.Name,
-	})
+func (r *query) CompositeResource(ctx context.Context, xrc model.ReferenceID) (*model.CompositeResource, error) {
+	return nil, nil
+}
+
+func (r *query) CompositeResourceClaims(ctx context.Context, xrd model.ReferenceID) (*model.CompositeResourceClaimConnection, error) {
+	return nil, nil
+}
+
+func (r *query) CompositeResourceClaim(ctx context.Context, xr model.ReferenceID) (*model.CompositeResourceClaim, error) {
+	return nil, nil
 }

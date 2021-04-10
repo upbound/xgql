@@ -314,6 +314,25 @@ type Condition struct {
 	Message *string `json:"message"`
 }
 
+// A ConfigMap holds configuration data.
+type ConfigMap struct {
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
+}
+
+func (ConfigMap) IsNode()               {}
+func (ConfigMap) IsKubernetesResource() {}
+
 // A Configuration extends Crossplane with support for new composite resources.
 type Configuration struct {
 	// An opaque identifier that is unique across all types.
@@ -462,6 +481,15 @@ type CustomResourceDefinition struct {
 func (CustomResourceDefinition) IsNode()               {}
 func (CustomResourceDefinition) IsKubernetesResource() {}
 
+// A CustomResourceDefinitionConnection represents a connection to custom
+// resource definitions (CRDs).
+type CustomResourceDefinitionConnection struct {
+	// Connected nodes.
+	Nodes []CustomResourceDefinition `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
+}
+
 // CustomResourceDefinitionNames specifies the resource and kind names of the
 // defined custom resource.
 type CustomResourceDefinitionNames struct {
@@ -609,6 +637,14 @@ type ManagedResource struct {
 func (ManagedResource) IsNode()               {}
 func (ManagedResource) IsKubernetesResource() {}
 
+// A ManagedResourceConnection represents a connection to managed resources.
+type ManagedResourceConnection struct {
+	// Connected nodes.
+	Nodes []ManagedResource `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
+}
+
 // A ManagedResourceStatus represents the observed state of a managed resource.
 type ManagedResourceStatus struct {
 	// The observed condition of this resource.
@@ -701,6 +737,14 @@ type ProviderConfig struct {
 
 func (ProviderConfig) IsNode()               {}
 func (ProviderConfig) IsKubernetesResource() {}
+
+// A ProviderConfigConnection represents a connection to provider configs.
+type ProviderConfigConnection struct {
+	// Connected nodes.
+	Nodes []ProviderConfig `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
+}
 
 // A reference to the ProviderConfig used by a particular managed resource.
 type ProviderConfigReference struct {

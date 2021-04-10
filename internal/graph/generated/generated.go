@@ -44,6 +44,7 @@ type ResolverRoot interface {
 	CompositeResourceDefinitionSpec() CompositeResourceDefinitionSpecResolver
 	CompositeResourceSpec() CompositeResourceSpecResolver
 	Composition() CompositionResolver
+	ConfigMap() ConfigMapResolver
 	Configuration() ConfigurationResolver
 	ConfigurationRevision() ConfigurationRevisionResolver
 	ConfigurationRevisionStatus() ConfigurationRevisionStatusResolver
@@ -221,6 +222,15 @@ type ComplexityRoot struct {
 		Type               func(childComplexity int) int
 	}
 
+	ConfigMap struct {
+		APIVersion func(childComplexity int) int
+		Events     func(childComplexity int) int
+		ID         func(childComplexity int) int
+		Kind       func(childComplexity int) int
+		Metadata   func(childComplexity int) int
+		Raw        func(childComplexity int) int
+	}
+
 	Configuration struct {
 		APIVersion func(childComplexity int) int
 		Events     func(childComplexity int) int
@@ -297,6 +307,11 @@ type ComplexityRoot struct {
 		Raw              func(childComplexity int) int
 		Spec             func(childComplexity int) int
 		Status           func(childComplexity int) int
+	}
+
+	CustomResourceDefinitionConnection struct {
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	CustomResourceDefinitionNames struct {
@@ -382,6 +397,11 @@ type ComplexityRoot struct {
 		Status     func(childComplexity int) int
 	}
 
+	ManagedResourceConnection struct {
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
 	ManagedResourceSpec struct {
 		ConnectionSecret  func(childComplexity int) int
 		DeletionPolicy    func(childComplexity int) int
@@ -444,6 +464,11 @@ type ComplexityRoot struct {
 		Metadata   func(childComplexity int) int
 		Raw        func(childComplexity int) int
 		Status     func(childComplexity int) int
+	}
+
+	ProviderConfigConnection struct {
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	ProviderConfigReference struct {
@@ -510,11 +535,23 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		CompositeResource            func(childComplexity int, xrc model.ReferenceID) int
+		CompositeResourceClaim       func(childComplexity int, xr model.ReferenceID) int
+		CompositeResourceClaims      func(childComplexity int, xrd model.ReferenceID) int
 		CompositeResourceDefinitions func(childComplexity int, revision *model.ReferenceID, dangling *bool) int
+		CompositeResources           func(childComplexity int, xrd model.ReferenceID) int
 		Compositions                 func(childComplexity int, revision *model.ReferenceID, dangling *bool) int
+		ConfigMap                    func(childComplexity int, namespace string, name string) int
+		ConfigurationRevisions       func(childComplexity int, configuration *model.ReferenceID) int
 		Configurations               func(childComplexity int) int
+		CustomResourceDefinitions    func(childComplexity int, revision *model.ReferenceID) int
 		Events                       func(childComplexity int, involved *model.ReferenceID) int
+		KubernetesResource           func(childComplexity int, id model.ReferenceID) int
+		ManagedResources             func(childComplexity int, crd model.ReferenceID) int
+		ProviderConfigs              func(childComplexity int, crd model.ReferenceID) int
+		ProviderRevisions            func(childComplexity int, provider *model.ReferenceID) int
 		Providers                    func(childComplexity int) int
+		Secret                       func(childComplexity int, namespace string, name string) int
 	}
 
 	Secret struct {
@@ -563,6 +600,9 @@ type CompositeResourceSpecResolver interface {
 type CompositionResolver interface {
 	Events(ctx context.Context, obj *model.Composition) (*model.EventConnection, error)
 }
+type ConfigMapResolver interface {
+	Events(ctx context.Context, obj *model.ConfigMap) (*model.EventConnection, error)
+}
 type ConfigurationResolver interface {
 	Events(ctx context.Context, obj *model.Configuration) (*model.EventConnection, error)
 	Revisions(ctx context.Context, obj *model.Configuration, active *bool) (*model.ConfigurationRevisionConnection, error)
@@ -606,11 +646,23 @@ type ProviderRevisionStatusResolver interface {
 	Objects(ctx context.Context, obj *model.ProviderRevisionStatus) (*model.KubernetesResourceConnection, error)
 }
 type QueryResolver interface {
+	KubernetesResource(ctx context.Context, id model.ReferenceID) (model.KubernetesResource, error)
+	Events(ctx context.Context, involved *model.ReferenceID) (*model.EventConnection, error)
+	Secret(ctx context.Context, namespace string, name string) (*model.Secret, error)
+	ConfigMap(ctx context.Context, namespace string, name string) (*model.ConfigMap, error)
 	Providers(ctx context.Context) (*model.ProviderConnection, error)
+	ProviderRevisions(ctx context.Context, provider *model.ReferenceID) (*model.ProviderRevisionConnection, error)
+	CustomResourceDefinitions(ctx context.Context, revision *model.ReferenceID) (*model.CustomResourceDefinitionConnection, error)
+	ManagedResources(ctx context.Context, crd model.ReferenceID) (*model.ManagedResourceConnection, error)
+	ProviderConfigs(ctx context.Context, crd model.ReferenceID) (*model.ProviderConfigConnection, error)
 	Configurations(ctx context.Context) (*model.ConfigurationConnection, error)
+	ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID) (*model.ConfigurationRevisionConnection, error)
 	CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositeResourceDefinitionConnection, error)
 	Compositions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositionConnection, error)
-	Events(ctx context.Context, involved *model.ReferenceID) (*model.EventConnection, error)
+	CompositeResources(ctx context.Context, xrd model.ReferenceID) (*model.CompositeResourceConnection, error)
+	CompositeResource(ctx context.Context, xrc model.ReferenceID) (*model.CompositeResource, error)
+	CompositeResourceClaims(ctx context.Context, xrd model.ReferenceID) (*model.CompositeResourceClaimConnection, error)
+	CompositeResourceClaim(ctx context.Context, xr model.ReferenceID) (*model.CompositeResourceClaim, error)
 }
 type SecretResolver interface {
 	Events(ctx context.Context, obj *model.Secret) (*model.EventConnection, error)
@@ -1250,6 +1302,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Condition.Type(childComplexity), true
 
+	case "ConfigMap.apiVersion":
+		if e.complexity.ConfigMap.APIVersion == nil {
+			break
+		}
+
+		return e.complexity.ConfigMap.APIVersion(childComplexity), true
+
+	case "ConfigMap.events":
+		if e.complexity.ConfigMap.Events == nil {
+			break
+		}
+
+		return e.complexity.ConfigMap.Events(childComplexity), true
+
+	case "ConfigMap.id":
+		if e.complexity.ConfigMap.ID == nil {
+			break
+		}
+
+		return e.complexity.ConfigMap.ID(childComplexity), true
+
+	case "ConfigMap.kind":
+		if e.complexity.ConfigMap.Kind == nil {
+			break
+		}
+
+		return e.complexity.ConfigMap.Kind(childComplexity), true
+
+	case "ConfigMap.metadata":
+		if e.complexity.ConfigMap.Metadata == nil {
+			break
+		}
+
+		return e.complexity.ConfigMap.Metadata(childComplexity), true
+
+	case "ConfigMap.raw":
+		if e.complexity.ConfigMap.Raw == nil {
+			break
+		}
+
+		return e.complexity.ConfigMap.Raw(childComplexity), true
+
 	case "Configuration.apiVersion":
 		if e.complexity.Configuration.APIVersion == nil {
 			break
@@ -1617,6 +1711,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CustomResourceDefinition.Status(childComplexity), true
 
+	case "CustomResourceDefinitionConnection.nodes":
+		if e.complexity.CustomResourceDefinitionConnection.Nodes == nil {
+			break
+		}
+
+		return e.complexity.CustomResourceDefinitionConnection.Nodes(childComplexity), true
+
+	case "CustomResourceDefinitionConnection.totalCount":
+		if e.complexity.CustomResourceDefinitionConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.CustomResourceDefinitionConnection.TotalCount(childComplexity), true
+
 	case "CustomResourceDefinitionNames.categories":
 		if e.complexity.CustomResourceDefinitionNames.Categories == nil {
 			break
@@ -1946,6 +2054,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ManagedResource.Status(childComplexity), true
 
+	case "ManagedResourceConnection.nodes":
+		if e.complexity.ManagedResourceConnection.Nodes == nil {
+			break
+		}
+
+		return e.complexity.ManagedResourceConnection.Nodes(childComplexity), true
+
+	case "ManagedResourceConnection.totalCount":
+		if e.complexity.ManagedResourceConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.ManagedResourceConnection.TotalCount(childComplexity), true
+
 	case "ManagedResourceSpec.connectionSecret":
 		if e.complexity.ManagedResourceSpec.ConnectionSecret == nil {
 			break
@@ -2236,6 +2358,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProviderConfig.Status(childComplexity), true
 
+	case "ProviderConfigConnection.nodes":
+		if e.complexity.ProviderConfigConnection.Nodes == nil {
+			break
+		}
+
+		return e.complexity.ProviderConfigConnection.Nodes(childComplexity), true
+
+	case "ProviderConfigConnection.totalCount":
+		if e.complexity.ProviderConfigConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.ProviderConfigConnection.TotalCount(childComplexity), true
+
 	case "ProviderConfigReference.name":
 		if e.complexity.ProviderConfigReference.Name == nil {
 			break
@@ -2488,6 +2624,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProviderStatus.CurrentRevision(childComplexity), true
 
+	case "Query.compositeResource":
+		if e.complexity.Query.CompositeResource == nil {
+			break
+		}
+
+		args, err := ec.field_Query_compositeResource_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CompositeResource(childComplexity, args["xrc"].(model.ReferenceID)), true
+
+	case "Query.compositeResourceClaim":
+		if e.complexity.Query.CompositeResourceClaim == nil {
+			break
+		}
+
+		args, err := ec.field_Query_compositeResourceClaim_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CompositeResourceClaim(childComplexity, args["xr"].(model.ReferenceID)), true
+
+	case "Query.compositeResourceClaims":
+		if e.complexity.Query.CompositeResourceClaims == nil {
+			break
+		}
+
+		args, err := ec.field_Query_compositeResourceClaims_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CompositeResourceClaims(childComplexity, args["xrd"].(model.ReferenceID)), true
+
 	case "Query.compositeResourceDefinitions":
 		if e.complexity.Query.CompositeResourceDefinitions == nil {
 			break
@@ -2499,6 +2671,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.CompositeResourceDefinitions(childComplexity, args["revision"].(*model.ReferenceID), args["dangling"].(*bool)), true
+
+	case "Query.compositeResources":
+		if e.complexity.Query.CompositeResources == nil {
+			break
+		}
+
+		args, err := ec.field_Query_compositeResources_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CompositeResources(childComplexity, args["xrd"].(model.ReferenceID)), true
 
 	case "Query.compositions":
 		if e.complexity.Query.Compositions == nil {
@@ -2512,12 +2696,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Compositions(childComplexity, args["revision"].(*model.ReferenceID), args["dangling"].(*bool)), true
 
+	case "Query.configMap":
+		if e.complexity.Query.ConfigMap == nil {
+			break
+		}
+
+		args, err := ec.field_Query_configMap_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ConfigMap(childComplexity, args["namespace"].(string), args["name"].(string)), true
+
+	case "Query.configurationRevisions":
+		if e.complexity.Query.ConfigurationRevisions == nil {
+			break
+		}
+
+		args, err := ec.field_Query_configurationRevisions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ConfigurationRevisions(childComplexity, args["configuration"].(*model.ReferenceID)), true
+
 	case "Query.configurations":
 		if e.complexity.Query.Configurations == nil {
 			break
 		}
 
 		return e.complexity.Query.Configurations(childComplexity), true
+
+	case "Query.customResourceDefinitions":
+		if e.complexity.Query.CustomResourceDefinitions == nil {
+			break
+		}
+
+		args, err := ec.field_Query_customResourceDefinitions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CustomResourceDefinitions(childComplexity, args["revision"].(*model.ReferenceID)), true
 
 	case "Query.events":
 		if e.complexity.Query.Events == nil {
@@ -2531,12 +2751,72 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Events(childComplexity, args["involved"].(*model.ReferenceID)), true
 
+	case "Query.kubernetesResource":
+		if e.complexity.Query.KubernetesResource == nil {
+			break
+		}
+
+		args, err := ec.field_Query_kubernetesResource_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.KubernetesResource(childComplexity, args["id"].(model.ReferenceID)), true
+
+	case "Query.managedResources":
+		if e.complexity.Query.ManagedResources == nil {
+			break
+		}
+
+		args, err := ec.field_Query_managedResources_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ManagedResources(childComplexity, args["crd"].(model.ReferenceID)), true
+
+	case "Query.providerConfigs":
+		if e.complexity.Query.ProviderConfigs == nil {
+			break
+		}
+
+		args, err := ec.field_Query_providerConfigs_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ProviderConfigs(childComplexity, args["crd"].(model.ReferenceID)), true
+
+	case "Query.providerRevisions":
+		if e.complexity.Query.ProviderRevisions == nil {
+			break
+		}
+
+		args, err := ec.field_Query_providerRevisions_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ProviderRevisions(childComplexity, args["provider"].(*model.ReferenceID)), true
+
 	case "Query.providers":
 		if e.complexity.Query.Providers == nil {
 			break
 		}
 
 		return e.complexity.Query.Providers(childComplexity), true
+
+	case "Query.secret":
+		if e.complexity.Query.Secret == nil {
+			break
+		}
+
+		args, err := ec.field_Query_secret_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Secret(childComplexity, args["namespace"].(string), args["name"].(string)), true
 
 	case "Secret.apiVersion":
 		if e.complexity.Secret.APIVersion == nil {
@@ -3338,10 +3618,38 @@ enum EventType {
   WARNING
 }
 
+# TODO(negz): Expose secret type.
+
+# TODO(negz): Expose a data(key: String!): String field for Secrets and
+# ConfigMaps.
+
 """
 A Secret holds secret data.
 """
 type Secret implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
+  id: ID!
+
+  "The underlying Kubernetes API version of this resource."
+  apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
+  kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
+  metadata: ObjectMeta!
+
+  "A raw JSON representation of the underlying Kubernetes resource."
+  raw: JSONObject!
+
+  "Events pertaining to this resource."
+  events: EventConnection! @goField(forceResolver: true)
+}
+
+"""
+A ConfigMap holds configuration data.
+"""
+type ConfigMap implements Node & KubernetesResource {
   "An opaque identifier that is unique across all types."
   id: ID!
 
@@ -4316,9 +4624,91 @@ Query is the root type for GraphQL queries.
 """
 type Query {
   """
+  An arbitrary Kubernetes resource. Types that are known to xgql will be
+  returned appropriately (e.g. a Crossplane provider will be of the GraphQL
+  Provider type). Types that are not known to xgql will be returned as a
+  GenericResource.
+  """
+  kubernetesResource(
+    "The ID of the desired resource."
+    id: ID!
+  ): KubernetesResource
+
+  """
+  Kubernetes events.
+  """
+  events(
+    "Only return events associated with the supplied ID."
+    involved: ID
+  ): EventConnection!
+
+  """
+  A Kubernetes secret.
+  """
+  secret(
+    "The secret's namespace"
+    namespace: String!
+
+    "The secret's name"
+    name: String!
+  ): Secret
+
+  """
+  A Kubernetes config map.
+  """
+  configMap(
+    "The config map's namespace"
+    namespace: String!
+
+    "The config map's name"
+    name: String!
+  ): ConfigMap
+
+  """
   Providers that are currently installed.
   """
   providers: ProviderConnection!
+
+  """
+  Provider revisions that currently exist.
+  """
+  providerRevisions(
+    """
+    Only return revisions owned by the supplied provider..
+    """
+    provider: ID
+  ): ProviderRevisionConnection!
+
+  """
+  Custom Resource Definitions (CRDs) that currently exist.
+  """
+  customResourceDefinitions(
+    """
+    Only return XRDs that are owned by the supplied provider revision.
+    """
+    revision: ID
+  ): CustomResourceDefinitionConnection!
+
+  """
+  Managed resources defined by a particular Custom Resource Definition (CRD).
+  """
+  managedResources(
+    """
+    Return managed resources defined by the supplied CRD.
+    """
+    crd: ID!
+  ): ManagedResourceConnection!
+
+  """
+  Provider configurations defined by a particular Custom Resource Definition
+  (CRD).
+  """
+  providerConfigs(
+    """
+    Return provider configs defined by the supplied CRD.
+    """
+    crd: ID!
+  ): ProviderConfigConnection!
 
   """
   Configurations that are currently installed.
@@ -4326,11 +4716,21 @@ type Query {
   configurations: ConfigurationConnection!
 
   """
+  Configuration revisions that currently exist.
+  """
+  configurationRevisions(
+    """
+    Only return revisions owned by the supplied configuration.
+    """
+    configuration: ID
+  ): ConfigurationRevisionConnection!
+
+  """
   Composite Resource Definitions (XRDs) that currently exist.
   """
   compositeResourceDefinitions(
     """
-    Only return XRDs that are owned by the supplied configuration revision ID.
+    Only return XRDs that are owned by the supplied configuration revision.
     """
     revision: ID
 
@@ -4359,12 +4759,46 @@ type Query {
   ): CompositionConnection!
 
   """
-  Kubernetes events.
+  Composite resources defined by a particular Composite Resource Definition
+  (XRD).
   """
-  events(
-    "Only return events associated with the supplied ID."
-    involved: ID
-  ): EventConnection!
+  compositeResources(
+    """
+    Return composite resources defined by the supplied XRD.
+    """
+    xrd: ID!
+  ): CompositeResourceConnection!
+
+  """
+  The composite resource associated with a particular claim.
+  """
+  compositeResource(
+    """
+    The composite resource claim bound to the desired composite resource.
+    """
+    xrc: ID!
+  ): CompositeResource
+
+  """
+  Composite resource claims defined by a particular Composite Resource
+  Definition (XRD).
+  """
+  compositeResourceClaims(
+    """
+    Return composite resources claims defined by the supplied XRD.
+    """
+    xrd: ID!
+  ): CompositeResourceClaimConnection!
+
+  """
+  The composite resource claim associated with a particular composite resource.
+  """
+  compositeResourceClaim(
+    """
+    The composite resource claim bound to the desired composite resource.
+    """
+    xr: ID!
+  ): CompositeResourceClaim
 }
 
 """
@@ -4373,6 +4807,40 @@ A ProviderConnection represents a connection to providers.
 type ProviderConnection {
   "Connected nodes."
   nodes: [Provider!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
+}
+
+"""
+A CustomResourceDefinitionConnection represents a connection to custom
+resource definitions (CRDs).
+"""
+type CustomResourceDefinitionConnection {
+  "Connected nodes."
+  nodes: [CustomResourceDefinition!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
+}
+
+"""
+A ManagedResourceConnection represents a connection to managed resources.
+"""
+type ManagedResourceConnection {
+  "Connected nodes."
+  nodes: [ManagedResource!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
+}
+
+"""
+A ProviderConfigConnection represents a connection to provider configs.
+"""
+type ProviderConfigConnection {
+  "Connected nodes."
+  nodes: [ProviderConfig!]
 
   "The total number of connected nodes."
   totalCount: Int!
@@ -4533,6 +5001,36 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_compositeResourceClaim_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["xr"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("xr"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["xr"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_compositeResourceClaims_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["xrd"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("xrd"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["xrd"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_compositeResourceDefinitions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4554,6 +5052,36 @@ func (ec *executionContext) field_Query_compositeResourceDefinitions_args(ctx co
 		}
 	}
 	args["dangling"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_compositeResource_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["xrc"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("xrc"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["xrc"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_compositeResources_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["xrd"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("xrd"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["xrd"] = arg0
 	return args, nil
 }
 
@@ -4581,6 +5109,60 @@ func (ec *executionContext) field_Query_compositions_args(ctx context.Context, r
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_configMap_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["name"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["name"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_configurationRevisions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReferenceID
+	if tmp, ok := rawArgs["configuration"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("configuration"))
+		arg0, err = ec.unmarshalOID2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["configuration"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_customResourceDefinitions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReferenceID
+	if tmp, ok := rawArgs["revision"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("revision"))
+		arg0, err = ec.unmarshalOID2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["revision"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_events_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4593,6 +5175,90 @@ func (ec *executionContext) field_Query_events_args(ctx context.Context, rawArgs
 		}
 	}
 	args["involved"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_kubernetesResource_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_managedResources_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["crd"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("crd"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["crd"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_providerConfigs_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["crd"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("crd"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["crd"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_providerRevisions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.ReferenceID
+	if tmp, ok := rawArgs["provider"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("provider"))
+		arg0, err = ec.unmarshalOID2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["provider"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_secret_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["name"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["name"] = arg1
 	return args, nil
 }
 
@@ -7576,6 +8242,216 @@ func (ec *executionContext) _Condition_message(ctx context.Context, field graphq
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _ConfigMap_id(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ConfigMap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.ReferenceID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ConfigMap_apiVersion(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ConfigMap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.APIVersion, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ConfigMap_kind(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ConfigMap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Kind, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ConfigMap_metadata(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ConfigMap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Metadata, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ObjectMeta)
+	fc.Result = res
+	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ConfigMap_raw(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ConfigMap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Raw, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ConfigMap_events(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ConfigMap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ConfigMap().Events(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.EventConnection)
+	fc.Result = res
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Configuration_id(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9312,6 +10188,73 @@ func (ec *executionContext) _CustomResourceDefinition_definedResources(ctx conte
 	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _CustomResourceDefinitionConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinitionConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CustomResourceDefinitionConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.CustomResourceDefinition)
+	fc.Result = res
+	return ec.marshalOCustomResourceDefinition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CustomResourceDefinitionConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinitionConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CustomResourceDefinitionConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _CustomResourceDefinitionNames_plural(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinitionNames) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -10900,6 +11843,73 @@ func (ec *executionContext) _ManagedResource_events(ctx context.Context, field g
 	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _ManagedResourceConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResourceConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ManagedResourceConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.ManagedResource)
+	fc.Result = res
+	return ec.marshalOManagedResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ManagedResourceConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResourceConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ManagedResourceConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _ManagedResourceSpec_connectionSecret(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResourceSpec) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12263,6 +13273,73 @@ func (ec *executionContext) _ProviderConfig_raw(ctx context.Context, field graph
 	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _ProviderConfigConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfigConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProviderConfigConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.ProviderConfig)
+	fc.Result = res
+	return ec.marshalOProviderConfig2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProviderConfigConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfigConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProviderConfigConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _ProviderConfigReference_name(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfigReference) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -13460,6 +14537,165 @@ func (ec *executionContext) _ProviderStatus_currentIdentifier(ctx context.Contex
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_kubernetesResource(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_kubernetesResource_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().KubernetesResource(rctx, args["id"].(model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.KubernetesResource)
+	fc.Result = res
+	return ec.marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_events(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_events_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Events(rctx, args["involved"].(*model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.EventConnection)
+	fc.Result = res
+	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_secret(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_secret_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Secret(rctx, args["namespace"].(string), args["name"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Secret)
+	fc.Result = res
+	return ec.marshalOSecret2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_configMap(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_configMap_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ConfigMap(rctx, args["namespace"].(string), args["name"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ConfigMap)
+	fc.Result = res
+	return ec.marshalOConfigMap2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigMap(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_providers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -13495,6 +14731,174 @@ func (ec *executionContext) _Query_providers(ctx context.Context, field graphql.
 	return ec.marshalNProviderConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_providerRevisions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_providerRevisions_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ProviderRevisions(rctx, args["provider"].(*model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProviderRevisionConnection)
+	fc.Result = res
+	return ec.marshalNProviderRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_customResourceDefinitions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_customResourceDefinitions_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CustomResourceDefinitions(rctx, args["revision"].(*model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.CustomResourceDefinitionConnection)
+	fc.Result = res
+	return ec.marshalNCustomResourceDefinitionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_managedResources(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_managedResources_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ManagedResources(rctx, args["crd"].(model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ManagedResourceConnection)
+	fc.Result = res
+	return ec.marshalNManagedResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_providerConfigs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_providerConfigs_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ProviderConfigs(rctx, args["crd"].(model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProviderConfigConnection)
+	fc.Result = res
+	return ec.marshalNProviderConfigConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigConnection(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_configurations(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -13528,6 +14932,48 @@ func (ec *executionContext) _Query_configurations(ctx context.Context, field gra
 	res := resTmp.(*model.ConfigurationConnection)
 	fc.Result = res
 	return ec.marshalNConfigurationConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_configurationRevisions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_configurationRevisions_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ConfigurationRevisions(rctx, args["configuration"].(*model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ConfigurationRevisionConnection)
+	fc.Result = res
+	return ec.marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_compositeResourceDefinitions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -13614,7 +15060,7 @@ func (ec *executionContext) _Query_compositions(ctx context.Context, field graph
 	return ec.marshalNCompositionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_events(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_compositeResources(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -13631,7 +15077,7 @@ func (ec *executionContext) _Query_events(ctx context.Context, field graphql.Col
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_events_args(ctx, rawArgs)
+	args, err := ec.field_Query_compositeResources_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -13639,7 +15085,7 @@ func (ec *executionContext) _Query_events(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Events(rctx, args["involved"].(*model.ReferenceID))
+		return ec.resolvers.Query().CompositeResources(rctx, args["xrd"].(model.ReferenceID))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13651,9 +15097,129 @@ func (ec *executionContext) _Query_events(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(*model.CompositeResourceConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_compositeResource(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_compositeResource_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CompositeResource(rctx, args["xrc"].(model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.CompositeResource)
+	fc.Result = res
+	return ec.marshalOCompositeResource2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResource(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_compositeResourceClaims(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_compositeResourceClaims_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CompositeResourceClaims(rctx, args["xrd"].(model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.CompositeResourceClaimConnection)
+	fc.Result = res
+	return ec.marshalNCompositeResourceClaimConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_compositeResourceClaim(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_compositeResourceClaim_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CompositeResourceClaim(rctx, args["xr"].(model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.CompositeResourceClaim)
+	fc.Result = res
+	return ec.marshalOCompositeResourceClaim2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaim(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -15216,6 +16782,13 @@ func (ec *executionContext) _KubernetesResource(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._Secret(ctx, sel, obj)
+	case model.ConfigMap:
+		return ec._ConfigMap(ctx, sel, &obj)
+	case *model.ConfigMap:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ConfigMap(ctx, sel, obj)
 	case model.CustomResourceDefinition:
 		return ec._CustomResourceDefinition(ctx, sel, &obj)
 	case *model.CustomResourceDefinition:
@@ -15323,6 +16896,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Secret(ctx, sel, obj)
+	case model.ConfigMap:
+		return ec._ConfigMap(ctx, sel, &obj)
+	case *model.ConfigMap:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ConfigMap(ctx, sel, obj)
 	case model.CustomResourceDefinition:
 		return ec._CustomResourceDefinition(ctx, sel, &obj)
 	case *model.CustomResourceDefinition:
@@ -16354,6 +17934,67 @@ func (ec *executionContext) _Condition(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
+var configMapImplementors = []string{"ConfigMap", "Node", "KubernetesResource"}
+
+func (ec *executionContext) _ConfigMap(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigMap) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, configMapImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ConfigMap")
+		case "id":
+			out.Values[i] = ec._ConfigMap_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "apiVersion":
+			out.Values[i] = ec._ConfigMap_apiVersion(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "kind":
+			out.Values[i] = ec._ConfigMap_kind(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "metadata":
+			out.Values[i] = ec._ConfigMap_metadata(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "raw":
+			out.Values[i] = ec._ConfigMap_raw(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "events":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ConfigMap_events(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var configurationImplementors = []string{"Configuration", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _Configuration(ctx context.Context, sel ast.SelectionSet, obj *model.Configuration) graphql.Marshaler {
@@ -16787,6 +18428,35 @@ func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel a
 				}
 				return res
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var customResourceDefinitionConnectionImplementors = []string{"CustomResourceDefinitionConnection"}
+
+func (ec *executionContext) _CustomResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinitionConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CustomResourceDefinitionConnection")
+		case "nodes":
+			out.Values[i] = ec._CustomResourceDefinitionConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._CustomResourceDefinitionConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -17267,6 +18937,35 @@ func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.Select
 	return out
 }
 
+var managedResourceConnectionImplementors = []string{"ManagedResourceConnection"}
+
+func (ec *executionContext) _ManagedResourceConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ManagedResourceConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, managedResourceConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ManagedResourceConnection")
+		case "nodes":
+			out.Values[i] = ec._ManagedResourceConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._ManagedResourceConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var managedResourceSpecImplementors = []string{"ManagedResourceSpec"}
 
 func (ec *executionContext) _ManagedResourceSpec(ctx context.Context, sel ast.SelectionSet, obj *model.ManagedResourceSpec) graphql.Marshaler {
@@ -17637,6 +19336,35 @@ func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var providerConfigConnectionImplementors = []string{"ProviderConfigConnection"}
+
+func (ec *executionContext) _ProviderConfigConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConfigConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, providerConfigConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProviderConfigConnection")
+		case "nodes":
+			out.Values[i] = ec._ProviderConfigConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._ProviderConfigConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var providerConfigReferenceImplementors = []string{"ProviderConfigReference"}
 
 func (ec *executionContext) _ProviderConfigReference(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConfigReference) graphql.Marshaler {
@@ -17985,6 +19713,53 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "kubernetesResource":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_kubernetesResource(ctx, field)
+				return res
+			})
+		case "events":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_events(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "secret":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_secret(ctx, field)
+				return res
+			})
+		case "configMap":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_configMap(ctx, field)
+				return res
+			})
 		case "providers":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -17999,6 +19774,62 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "providerRevisions":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_providerRevisions(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "customResourceDefinitions":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_customResourceDefinitions(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "managedResources":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_managedResources(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "providerConfigs":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_providerConfigs(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "configurations":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -18008,6 +19839,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_configurations(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "configurationRevisions":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_configurationRevisions(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -18041,7 +19886,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "events":
+		case "compositeResources":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -18049,10 +19894,46 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_events(ctx, field)
+				res = ec._Query_compositeResources(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			})
+		case "compositeResource":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_compositeResource(ctx, field)
+				return res
+			})
+		case "compositeResourceClaims":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_compositeResourceClaims(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "compositeResourceClaim":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_compositeResourceClaim(ctx, field)
 				return res
 			})
 		case "__type":
@@ -18639,6 +20520,24 @@ func (ec *executionContext) marshalNConfigurationSpec2ᚖgithubᚗcomᚋupbound�
 	return ec._ConfigurationSpec(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNCustomResourceDefinition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinition(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinition) graphql.Marshaler {
+	return ec._CustomResourceDefinition(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCustomResourceDefinitionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinitionConnection) graphql.Marshaler {
+	return ec._CustomResourceDefinitionConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCustomResourceDefinitionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._CustomResourceDefinitionConnection(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNCustomResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionNames) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -18745,6 +20644,24 @@ func (ec *executionContext) marshalNKubernetesResourceConnection2ᚖgithubᚗcom
 	return ec._KubernetesResourceConnection(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNManagedResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResource(ctx context.Context, sel ast.SelectionSet, v model.ManagedResource) graphql.Marshaler {
+	return ec._ManagedResource(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNManagedResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceConnection(ctx context.Context, sel ast.SelectionSet, v model.ManagedResourceConnection) graphql.Marshaler {
+	return ec._ManagedResourceConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNManagedResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.ManagedResourceConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ManagedResourceConnection(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNManagedResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx context.Context, sel ast.SelectionSet, v *model.ManagedResourceSpec) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -18809,6 +20726,24 @@ func (ec *executionContext) marshalNPolicyRule2githubᚗcomᚋupboundᚋxgqlᚋi
 
 func (ec *executionContext) marshalNProvider2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProvider(ctx context.Context, sel ast.SelectionSet, v model.Provider) graphql.Marshaler {
 	return ec._Provider(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProviderConfig2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfig(ctx context.Context, sel ast.SelectionSet, v model.ProviderConfig) graphql.Marshaler {
+	return ec._ProviderConfig(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProviderConfigConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigConnection(ctx context.Context, sel ast.SelectionSet, v model.ProviderConfigConnection) graphql.Marshaler {
+	return ec._ProviderConfigConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProviderConfigConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigConnection(ctx context.Context, sel ast.SelectionSet, v *model.ProviderConfigConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProviderConfigConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNProviderConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConnection(ctx context.Context, sel ast.SelectionSet, v model.ProviderConnection) graphql.Marshaler {
@@ -19496,6 +21431,13 @@ func (ec *executionContext) marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgql�
 	return ret
 }
 
+func (ec *executionContext) marshalOConfigMap2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigMap(ctx context.Context, sel ast.SelectionSet, v *model.ConfigMap) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ConfigMap(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOConfiguration2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Configuration) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -19588,6 +21530,46 @@ func (ec *executionContext) marshalOConfigurationStatus2ᚖgithubᚗcomᚋupboun
 		return graphql.Null
 	}
 	return ec._ConfigurationStatus(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOCustomResourceDefinition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CustomResourceDefinition) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCustomResourceDefinition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinition(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalOCustomResourceDefinitionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionStatus(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionStatus) graphql.Marshaler {
@@ -19769,6 +21751,13 @@ func (ec *executionContext) marshalOJSONObject2ᚖstring(ctx context.Context, se
 	return graphql.MarshalString(*v)
 }
 
+func (ec *executionContext) marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx context.Context, sel ast.SelectionSet, v model.KubernetesResource) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._KubernetesResource(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOKubernetesResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.KubernetesResource) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -19821,6 +21810,46 @@ func (ec *executionContext) marshalOLabelSelector2ᚖgithubᚗcomᚋupboundᚋxg
 		return graphql.Null
 	}
 	return ec._LabelSelector(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOManagedResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ManagedResource) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNManagedResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResource(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) unmarshalOMap2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
@@ -19962,6 +21991,46 @@ func (ec *executionContext) marshalOProvider2ᚕgithubᚗcomᚋupboundᚋxgqlᚋ
 				defer wg.Done()
 			}
 			ret[i] = ec.marshalNProvider2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProvider(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOProviderConfig2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigᚄ(ctx context.Context, sel ast.SelectionSet, v []model.ProviderConfig) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProviderConfig2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfig(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)

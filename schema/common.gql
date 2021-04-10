@@ -368,10 +368,38 @@ enum EventType {
   WARNING
 }
 
+# TODO(negz): Expose secret type.
+
+# TODO(negz): Expose a data(key: String!): String field for Secrets and
+# ConfigMaps.
+
 """
 A Secret holds secret data.
 """
 type Secret implements Node & KubernetesResource {
+  "An opaque identifier that is unique across all types."
+  id: ID!
+
+  "The underlying Kubernetes API version of this resource."
+  apiVersion: String!
+
+  "The underlying Kubernetes API kind of this resource."
+  kind: String!
+
+  "Metadata that is common to all Kubernetes API resources."
+  metadata: ObjectMeta!
+
+  "A raw JSON representation of the underlying Kubernetes resource."
+  raw: JSONObject!
+
+  "Events pertaining to this resource."
+  events: EventConnection! @goField(forceResolver: true)
+}
+
+"""
+A ConfigMap holds configuration data.
+"""
+type ConfigMap implements Node & KubernetesResource {
   "An opaque identifier that is unique across all types."
   id: ID!
 
