@@ -17,8 +17,128 @@ import (
 
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
+	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/model"
 )
+
+var (
+	_ generated.GenericResourceResolver          = &genericResource{}
+	_ generated.SecretResolver                   = &secret{}
+	_ generated.ConfigMapResolver                = &configMap{}
+	_ generated.CustomResourceDefinitionResolver = &crd{}
+)
+
+func TestSecretData(t *testing.T) {
+	type args struct {
+		ctx  context.Context
+		obj  *model.Secret
+		keys []string
+	}
+	type want struct {
+		vals []*string
+		err  error
+	}
+
+	cases := map[string]struct {
+		reason string
+		args   args
+		want   want
+	}{
+		"NoOp": {
+			reason: "If there is no secret data we should return early.",
+			args: args{
+				obj: &model.Secret{},
+			},
+			want: want{},
+		},
+		"Success": {
+			reason: "We should return values that exist at the same position in the array as the keys. Non-existent values should be nil.",
+			args: args{
+				obj: &model.Secret{
+					Data: map[string][]byte{
+						"cool": []byte("very"),
+						"lame": []byte("kinda"),
+						"wat":  []byte("value"),
+					},
+				},
+				keys: []string{"cool", "potato", "lame"},
+			},
+			want: want{
+				vals: []*string{pointer.StringPtr("very"), nil, pointer.StringPtr("kinda")},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			s := &secret{}
+
+			got, err := s.Data(tc.args.ctx, tc.args.obj, tc.args.keys)
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.Data(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.vals, got); diff != "" {
+				t.Errorf("\n%s\ns.Data(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestConfigMapData(t *testing.T) {
+	type args struct {
+		ctx  context.Context
+		obj  *model.ConfigMap
+		keys []string
+	}
+	type want struct {
+		vals []*string
+		err  error
+	}
+
+	cases := map[string]struct {
+		reason string
+		args   args
+		want   want
+	}{
+		"NoOp": {
+			reason: "If there is no config map data we should return early.",
+			args: args{
+				obj: &model.ConfigMap{},
+			},
+			want: want{},
+		},
+		"Success": {
+			reason: "We should return values that exist at the same position in the array as the keys. Non-existent values should be nil.",
+			args: args{
+				obj: &model.ConfigMap{
+					Data: map[string]string{
+						"cool": "very",
+						"lame": "kinda",
+						"wat":  "value",
+					},
+				},
+				keys: []string{"cool", "potato", "lame"},
+			},
+			want: want{
+				vals: []*string{pointer.StringPtr("very"), nil, pointer.StringPtr("kinda")},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			cm := &configMap{}
+
+			got, err := cm.Data(tc.args.ctx, tc.args.obj, tc.args.keys)
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.Data(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.vals, got); diff != "" {
+				t.Errorf("\n%s\ns.Data(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
 
 func TestCRDDefinedResources(t *testing.T) {
 	errBoom := errors.New("boom")

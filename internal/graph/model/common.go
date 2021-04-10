@@ -12,6 +12,7 @@ import (
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/json"
+	"k8s.io/utils/pointer"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
@@ -154,11 +155,39 @@ func GetGenericResource(u *kunstructured.Unstructured) GenericResource {
 	}
 }
 
-// TODO(negz): Does this need to exist? It's identical to GenericResource.
+// A Secret holds secret data.
+type Secret struct {
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+
+	// Type of this secret.
+	Type *string `json:"type"`
+
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+
+	Data map[string][]byte
+}
+
+// IsNode indicates that a Secret satisfies the GraphQL Node interface.
+func (Secret) IsNode() {}
+
+// IsKubernetesResource indicates that a Secret satisfies the GraphQL
+// IsKubernetesResource interface.
+func (Secret) IsKubernetesResource() {}
 
 // GetSecret from the suppled Kubernetes Secret
 func GetSecret(s *corev1.Secret) Secret {
-	return Secret{
+	out := Secret{
 		ID: ReferenceID{
 			APIVersion: s.APIVersion,
 			Kind:       s.Kind,
@@ -169,7 +198,59 @@ func GetSecret(s *corev1.Secret) Secret {
 		APIVersion: s.APIVersion,
 		Kind:       s.Kind,
 		Metadata:   GetObjectMeta(s),
+		Data:       s.Data,
 		Raw:        raw(s),
+	}
+
+	if s.Type != "" {
+		out.Type = pointer.StringPtr(string(s.Type))
+	}
+
+	return out
+}
+
+// A ConfigMap holds configuration data.
+type ConfigMap struct {
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+
+	Data map[string]string
+}
+
+// IsNode indicates that a ConfigMap satisfies the GraphQL Node interface.
+func (ConfigMap) IsNode() {}
+
+// IsKubernetesResource indicates that a ConfigMap satisfies the GraphQL
+// IsKubernetesResource interface.
+func (ConfigMap) IsKubernetesResource() {}
+
+// GetConfigMap from the supplied Kubernetes ConfigMap.
+func GetConfigMap(cm *corev1.ConfigMap) ConfigMap {
+	return ConfigMap{
+		ID: ReferenceID{
+			APIVersion: cm.APIVersion,
+			Kind:       cm.Kind,
+			Namespace:  cm.GetNamespace(),
+			Name:       cm.GetName(),
+		},
+
+		APIVersion: cm.APIVersion,
+		Kind:       cm.Kind,
+		Metadata:   GetObjectMeta(cm),
+		Data:       cm.Data,
+		Raw:        raw(cm),
 	}
 }
 

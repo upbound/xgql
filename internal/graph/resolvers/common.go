@@ -38,7 +38,53 @@ type secret struct {
 	clients ClientCache
 }
 
+func (r *secret) Data(_ context.Context, obj *model.Secret, keys []string) ([]*string, error) {
+	if obj.Data == nil {
+		return nil, nil
+	}
+	out := make([]*string, len(keys))
+	for i := range keys {
+		v, ok := obj.Data[keys[i]]
+		if !ok {
+			continue
+		}
+		s := string(v)
+		out[i] = &s
+	}
+	return out, nil
+}
+
 func (r *secret) Events(ctx context.Context, obj *model.Secret) (*model.EventConnection, error) {
+	e := &events{clients: r.clients}
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: obj.APIVersion,
+		Kind:       obj.Kind,
+		Name:       obj.Metadata.Name,
+		Namespace:  pointer.StringPtrDerefOr(obj.Metadata.Namespace, ""),
+		UID:        types.UID(obj.Metadata.UID),
+	})
+}
+
+type configMap struct {
+	clients ClientCache
+}
+
+func (r *configMap) Data(_ context.Context, obj *model.ConfigMap, keys []string) ([]*string, error) {
+	if obj.Data == nil {
+		return nil, nil
+	}
+	out := make([]*string, len(keys))
+	for i := range keys {
+		v, ok := obj.Data[keys[i]]
+		if !ok {
+			continue
+		}
+		out[i] = &v
+	}
+	return out, nil
+}
+
+func (r *configMap) Events(ctx context.Context, obj *model.ConfigMap) (*model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,

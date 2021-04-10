@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/pointer"
 
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
@@ -18,6 +19,8 @@ import (
 
 const (
 	errGetClient     = "cannot get client"
+	errGetSecret     = "cannot get secret"
+	errGetConfigMap  = "cannot get config map"
 	errListProviders = "cannot list providers"
 	errListConfigs   = "cannot list configurations"
 )
@@ -46,12 +49,48 @@ func (r *query) Events(ctx context.Context, involved *model.ReferenceID) (*model
 	})
 }
 
-func (r *query) Secret(ctx context.Context, namespace string, name string) (*model.Secret, error) {
-	return nil, nil
+func (r *query) Secret(ctx context.Context, namespace, name string) (*model.Secret, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	s := &corev1.Secret{}
+	nn := types.NamespacedName{Namespace: namespace, Name: name}
+	if err := c.Get(ctx, nn, s); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetSecret))
+		return nil, nil
+	}
+
+	out := model.GetSecret(s)
+	return &out, nil
 }
 
-func (r *query) ConfigMap(ctx context.Context, namespace string, name string) (*model.ConfigMap, error) {
-	return nil, nil
+func (r *query) ConfigMap(ctx context.Context, namespace, name string) (*model.ConfigMap, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	cm := &corev1.ConfigMap{}
+	nn := types.NamespacedName{Namespace: namespace, Name: name}
+	if err := c.Get(ctx, nn, cm); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetConfigMap))
+		return nil, nil
+	}
+
+	out := model.GetConfigMap(cm)
+	return &out, nil
 }
 
 func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error) {

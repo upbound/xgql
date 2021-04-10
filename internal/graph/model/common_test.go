@@ -190,6 +190,7 @@ func TestGetSecret(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "cool",
 				},
+				Type: corev1.SecretType("cool"),
 				Data: map[string][]byte{"cool": []byte("secret")},
 			},
 			want: Secret{
@@ -203,6 +204,8 @@ func TestGetSecret(t *testing.T) {
 				Metadata: &ObjectMeta{
 					Name: "cool",
 				},
+				Type: pointer.StringPtr("cool"),
+				Data: map[string][]byte{"cool": []byte("secret")},
 			},
 		},
 		"Empty": {
@@ -218,6 +221,57 @@ func TestGetSecret(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			got := GetSecret(tc.s)
 			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Secret{}, "Raw")); diff != "" {
+				t.Errorf("\n%s\nGetSecret(...): -want, +got\n:%s", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestGetConfigMap(t *testing.T) {
+	cases := map[string]struct {
+		reason string
+		cm     *corev1.ConfigMap
+		want   ConfigMap
+	}{
+		"Full": {
+			reason: "All supported fields should be converted to our model",
+			cm: &corev1.ConfigMap{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					Kind:       "ConfigMap",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "cool",
+				},
+				Data: map[string]string{"cool": "secret"},
+			},
+			want: ConfigMap{
+				ID: ReferenceID{
+					APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					Kind:       "ConfigMap",
+					Name:       "cool",
+				},
+				APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+				Kind:       "ConfigMap",
+				Metadata: &ObjectMeta{
+					Name: "cool",
+				},
+				Data: map[string]string{"cool": "secret"},
+			},
+		},
+		"Empty": {
+			reason: "Absent optional fields should be absent in our model",
+			cm:     &corev1.ConfigMap{},
+			want: ConfigMap{
+				Metadata: &ObjectMeta{},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			got := GetConfigMap(tc.cm)
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ConfigMap{}, "Raw")); diff != "" {
 				t.Errorf("\n%s\nGetSecret(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

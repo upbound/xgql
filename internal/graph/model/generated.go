@@ -314,25 +314,6 @@ type Condition struct {
 	Message *string `json:"message"`
 }
 
-// A ConfigMap holds configuration data.
-type ConfigMap struct {
-	// An opaque identifier that is unique across all types.
-	ID ReferenceID `json:"id"`
-	// The underlying Kubernetes API version of this resource.
-	APIVersion string `json:"apiVersion"`
-	// The underlying Kubernetes API kind of this resource.
-	Kind string `json:"kind"`
-	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
-	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
-}
-
-func (ConfigMap) IsNode()               {}
-func (ConfigMap) IsKubernetesResource() {}
-
 // A Configuration extends Crossplane with support for new composite resources.
 type Configuration struct {
 	// An opaque identifier that is unique across all types.
@@ -857,25 +838,6 @@ type ProviderStatus struct {
 }
 
 func (ProviderStatus) IsConditionedStatus() {}
-
-// A Secret holds secret data.
-type Secret struct {
-	// An opaque identifier that is unique across all types.
-	ID ReferenceID `json:"id"`
-	// The underlying Kubernetes API version of this resource.
-	APIVersion string `json:"apiVersion"`
-	// The underlying Kubernetes API kind of this resource.
-	Kind string `json:"kind"`
-	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
-	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
-}
-
-func (Secret) IsNode()               {}
-func (Secret) IsKubernetesResource() {}
 
 // A TypeReference references a type of Kubernetes resource by API version and
 // kind.

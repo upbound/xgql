@@ -224,6 +224,7 @@ type ComplexityRoot struct {
 
 	ConfigMap struct {
 		APIVersion func(childComplexity int) int
+		Data       func(childComplexity int, keys []string) int
 		Events     func(childComplexity int) int
 		ID         func(childComplexity int) int
 		Kind       func(childComplexity int) int
@@ -556,11 +557,13 @@ type ComplexityRoot struct {
 
 	Secret struct {
 		APIVersion func(childComplexity int) int
+		Data       func(childComplexity int, keys []string) int
 		Events     func(childComplexity int) int
 		ID         func(childComplexity int) int
 		Kind       func(childComplexity int) int
 		Metadata   func(childComplexity int) int
 		Raw        func(childComplexity int) int
+		Type       func(childComplexity int) int
 	}
 
 	TypeReference struct {
@@ -601,6 +604,7 @@ type CompositionResolver interface {
 	Events(ctx context.Context, obj *model.Composition) (*model.EventConnection, error)
 }
 type ConfigMapResolver interface {
+	Data(ctx context.Context, obj *model.ConfigMap, keys []string) ([]*string, error)
 	Events(ctx context.Context, obj *model.ConfigMap) (*model.EventConnection, error)
 }
 type ConfigurationResolver interface {
@@ -665,6 +669,7 @@ type QueryResolver interface {
 	CompositeResourceClaim(ctx context.Context, xr model.ReferenceID) (*model.CompositeResourceClaim, error)
 }
 type SecretResolver interface {
+	Data(ctx context.Context, obj *model.Secret, keys []string) ([]*string, error)
 	Events(ctx context.Context, obj *model.Secret) (*model.EventConnection, error)
 }
 
@@ -1308,6 +1313,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ConfigMap.APIVersion(childComplexity), true
+
+	case "ConfigMap.data":
+		if e.complexity.ConfigMap.Data == nil {
+			break
+		}
+
+		args, err := ec.field_ConfigMap_data_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ConfigMap.Data(childComplexity, args["keys"].([]string)), true
 
 	case "ConfigMap.events":
 		if e.complexity.ConfigMap.Events == nil {
@@ -2825,6 +2842,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Secret.APIVersion(childComplexity), true
 
+	case "Secret.data":
+		if e.complexity.Secret.Data == nil {
+			break
+		}
+
+		args, err := ec.field_Secret_data_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Secret.Data(childComplexity, args["keys"].([]string)), true
+
 	case "Secret.events":
 		if e.complexity.Secret.Events == nil {
 			break
@@ -2859,6 +2888,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Secret.Raw(childComplexity), true
+
+	case "Secret.type":
+		if e.complexity.Secret.Type == nil {
+			break
+		}
+
+		return e.complexity.Secret.Type(childComplexity), true
 
 	case "TypeReference.apiVersion":
 		if e.complexity.TypeReference.APIVersion == nil {
@@ -3618,31 +3654,55 @@ enum EventType {
   WARNING
 }
 
-# TODO(negz): Expose secret type.
-
-# TODO(negz): Expose a data(key: String!): String field for Secrets and
-# ConfigMaps.
-
 """
 A Secret holds secret data.
 """
 type Secret implements Node & KubernetesResource {
-  "An opaque identifier that is unique across all types."
+  """
+  An opaque identifier that is unique across all types.
+  """
   id: ID!
 
-  "The underlying Kubernetes API version of this resource."
+  """
+  The underlying Kubernetes API version of this resource.
+  """
   apiVersion: String!
 
-  "The underlying Kubernetes API kind of this resource."
+  """
+  The underlying Kubernetes API kind of this resource.
+  """
   kind: String!
 
-  "Metadata that is common to all Kubernetes API resources."
+  """
+  Metadata that is common to all Kubernetes API resources.
+  """
   metadata: ObjectMeta!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
+  """
+  Type of this secret.
+  """
+  type: String
+
+  """
+  A raw JSON representation of the underlying Kubernetes resource.
+  """
   raw: JSONObject!
 
-  "Events pertaining to this resource."
+  """
+  Data stored in this secret. Returned values are base64 decoded. The returned
+  array of values will always be the same length and order as the supplied array
+  of keys. Keys that don't exist will return a null value.
+  """
+  data(
+    """
+    Data keys for which to return values.
+    """
+    keys: [String!]!
+  ): [String]! @goField(forceResolver: true)
+
+  """
+  Events pertaining to this resource.
+  """
   events: EventConnection! @goField(forceResolver: true)
 }
 
@@ -3650,22 +3710,48 @@ type Secret implements Node & KubernetesResource {
 A ConfigMap holds configuration data.
 """
 type ConfigMap implements Node & KubernetesResource {
-  "An opaque identifier that is unique across all types."
+  """
+  An opaque identifier that is unique across all types.
+  """
   id: ID!
 
-  "The underlying Kubernetes API version of this resource."
+  """
+  The underlying Kubernetes API version of this resource.
+  """
   apiVersion: String!
 
-  "The underlying Kubernetes API kind of this resource."
+  """
+  The underlying Kubernetes API kind of this resource.
+  """
   kind: String!
 
-  "Metadata that is common to all Kubernetes API resources."
+  """
+  Metadata that is common to all Kubernetes API resources.
+  """
   metadata: ObjectMeta!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
+  """
+  A raw JSON representation of the underlying Kubernetes resource.
+  """
   raw: JSONObject!
 
-  "Events pertaining to this resource."
+  # TODO(negz): Support binaryData too? What would the return value be?
+
+  """
+  Data stored in this secret. The returned array of values will always be the
+  same length and order as the supplied array of keys. Keys that don't exist
+  will return a null value.
+  """
+  data(
+    """
+    Data keys for which to return values
+    """
+    keys: [String!]!
+  ): [String]! @goField(forceResolver: true)
+
+  """
+  Events pertaining to this resource.
+  """
   events: EventConnection! @goField(forceResolver: true)
 }
 
@@ -4926,6 +5012,21 @@ func (ec *executionContext) field_CompositeResourceDefinition_definedCompositeRe
 	return args, nil
 }
 
+func (ec *executionContext) field_ConfigMap_data_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["keys"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keys"))
+		arg0, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["keys"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Configuration_revisions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -5259,6 +5360,21 @@ func (ec *executionContext) field_Query_secret_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Secret_data_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["keys"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keys"))
+		arg0, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["keys"] = arg0
 	return args, nil
 }
 
@@ -8415,6 +8531,48 @@ func (ec *executionContext) _ConfigMap_raw(ctx context.Context, field graphql.Co
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ConfigMap_data(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ConfigMap",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_ConfigMap_data_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ConfigMap().Data(rctx, obj, args["keys"].([]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*string)
+	fc.Result = res
+	return ec.marshalNString2ᚕᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigMap_events(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
@@ -15433,6 +15591,38 @@ func (ec *executionContext) _Secret_metadata(ctx context.Context, field graphql.
 	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Secret_type(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Secret",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Secret_raw(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -15466,6 +15656,48 @@ func (ec *executionContext) _Secret_raw(ctx context.Context, field graphql.Colle
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Secret_data(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Secret",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Secret_data_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Secret().Data(rctx, obj, args["keys"].([]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*string)
+	fc.Result = res
+	return ec.marshalNString2ᚕᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Secret_events(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
@@ -17970,6 +18202,20 @@ func (ec *executionContext) _ConfigMap(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "data":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ConfigMap_data(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "events":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -19982,11 +20228,27 @@ func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "type":
+			out.Values[i] = ec._Secret_type(ctx, field, obj)
 		case "raw":
 			out.Values[i] = ec._Secret_raw(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "data":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Secret_data(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "events":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -20838,6 +21100,36 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 	ret := make(graphql.Array, len(v))
 	for i := range v {
 		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalNString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOString2ᚖstring(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕᚖstring(ctx context.Context, sel ast.SelectionSet, v []*string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOString2ᚖstring(ctx, sel, v[i])
 	}
 
 	return ret

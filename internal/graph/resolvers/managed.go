@@ -12,10 +12,6 @@ import (
 	"github.com/upbound/xgql/internal/graph/model"
 )
 
-const (
-	errGetSecret = "cannot get secret"
-)
-
 type managedResource struct {
 	clients ClientCache
 }
