@@ -383,9 +383,9 @@ type ComplexityRoot struct {
 	}
 
 	ManagedResourceSpec struct {
-		ConnectionSecret func(childComplexity int) int
-		DeletionPolicy   func(childComplexity int) int
-		ProviderConfig   func(childComplexity int) int
+		ConnectionSecret  func(childComplexity int) int
+		DeletionPolicy    func(childComplexity int) int
+		ProviderConfigRef func(childComplexity int) int
 	}
 
 	ManagedResourceStatus struct {
@@ -444,6 +444,10 @@ type ComplexityRoot struct {
 		Metadata   func(childComplexity int) int
 		Raw        func(childComplexity int) int
 		Status     func(childComplexity int) int
+	}
+
+	ProviderConfigReference struct {
+		Name func(childComplexity int) int
 	}
 
 	ProviderConfigStatus struct {
@@ -584,7 +588,6 @@ type ManagedResourceResolver interface {
 }
 type ManagedResourceSpecResolver interface {
 	ConnectionSecret(ctx context.Context, obj *model.ManagedResourceSpec) (*model.Secret, error)
-	ProviderConfig(ctx context.Context, obj *model.ManagedResourceSpec) (*model.ProviderConfig, error)
 }
 type ObjectMetaResolver interface {
 	Owners(ctx context.Context, obj *model.ObjectMeta, controller *bool) (*model.OwnerConnection, error)
@@ -1957,12 +1960,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ManagedResourceSpec.DeletionPolicy(childComplexity), true
 
-	case "ManagedResourceSpec.providerConfig":
-		if e.complexity.ManagedResourceSpec.ProviderConfig == nil {
+	case "ManagedResourceSpec.providerConfigRef":
+		if e.complexity.ManagedResourceSpec.ProviderConfigRef == nil {
 			break
 		}
 
-		return e.complexity.ManagedResourceSpec.ProviderConfig(childComplexity), true
+		return e.complexity.ManagedResourceSpec.ProviderConfigRef(childComplexity), true
 
 	case "ManagedResourceStatus.conditions":
 		if e.complexity.ManagedResourceStatus.Conditions == nil {
@@ -2232,6 +2235,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProviderConfig.Status(childComplexity), true
+
+	case "ProviderConfigReference.name":
+		if e.complexity.ProviderConfigReference.Name == nil {
+			break
+		}
+
+		return e.complexity.ProviderConfigReference.Name(childComplexity), true
 
 	case "ProviderConfigStatus.conditions":
 		if e.complexity.ProviderConfigStatus.Conditions == nil {
@@ -3953,13 +3963,21 @@ type ManagedResourceSpec {
   The provider configuration configures how this managed resource interacts
   with an external system.
   """
-  providerConfig: ProviderConfig @goField(forceResolver: true)
+  providerConfigRef: ProviderConfigReference
 
   """
   The deletion policy specifies what will happen to the underlying external
   resource when this managed resource is deleted.
   """
   deletionPolicy: DeletionPolicy
+}
+
+"""
+A reference to the ProviderConfig used by a particular managed resource.
+"""
+type ProviderConfigReference {
+  "Name of the provider config."
+  name: String!
 }
 
 """
@@ -10914,7 +10932,7 @@ func (ec *executionContext) _ManagedResourceSpec_connectionSecret(ctx context.Co
 	return ec.marshalOSecret2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecret(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ManagedResourceSpec_providerConfig(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResourceSpec) (ret graphql.Marshaler) {
+func (ec *executionContext) _ManagedResourceSpec_providerConfigRef(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResourceSpec) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10925,14 +10943,14 @@ func (ec *executionContext) _ManagedResourceSpec_providerConfig(ctx context.Cont
 		Object:     "ManagedResourceSpec",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ManagedResourceSpec().ProviderConfig(rctx, obj)
+		return obj.ProviderConfigRef, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10941,9 +10959,9 @@ func (ec *executionContext) _ManagedResourceSpec_providerConfig(ctx context.Cont
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProviderConfig)
+	res := resTmp.(*model.ProviderConfigReference)
 	fc.Result = res
-	return ec.marshalOProviderConfig2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfig(ctx, field.Selections, res)
+	return ec.marshalOProviderConfigReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigReference(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResourceSpec_deletionPolicy(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResourceSpec) (ret graphql.Marshaler) {
@@ -12243,6 +12261,41 @@ func (ec *executionContext) _ProviderConfig_raw(ctx context.Context, field graph
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProviderConfigReference_name(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfigReference) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProviderConfigReference",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderConfigStatus_conditions(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfigStatus) (ret graphql.Marshaler) {
@@ -17236,17 +17289,8 @@ func (ec *executionContext) _ManagedResourceSpec(ctx context.Context, sel ast.Se
 				res = ec._ManagedResourceSpec_connectionSecret(ctx, field, obj)
 				return res
 			})
-		case "providerConfig":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ManagedResourceSpec_providerConfig(ctx, field, obj)
-				return res
-			})
+		case "providerConfigRef":
+			out.Values[i] = ec._ManagedResourceSpec_providerConfigRef(ctx, field, obj)
 		case "deletionPolicy":
 			out.Values[i] = ec._ManagedResourceSpec_deletionPolicy(ctx, field, obj)
 		default:
@@ -17581,6 +17625,33 @@ func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.Selecti
 			out.Values[i] = ec._ProviderConfig_raw(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var providerConfigReferenceImplementors = []string{"ProviderConfigReference"}
+
+func (ec *executionContext) _ProviderConfigReference(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConfigReference) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, providerConfigReferenceImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProviderConfigReference")
+		case "name":
+			out.Values[i] = ec._ProviderConfigReference_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -19903,11 +19974,11 @@ func (ec *executionContext) marshalOProvider2ᚕgithubᚗcomᚋupboundᚋxgqlᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalOProviderConfig2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfig(ctx context.Context, sel ast.SelectionSet, v *model.ProviderConfig) graphql.Marshaler {
+func (ec *executionContext) marshalOProviderConfigReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigReference(ctx context.Context, sel ast.SelectionSet, v *model.ProviderConfigReference) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._ProviderConfig(ctx, sel, v)
+	return ec._ProviderConfigReference(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOProviderConfigStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigStatus(ctx context.Context, sel ast.SelectionSet, v *model.ProviderConfigStatus) graphql.Marshaler {

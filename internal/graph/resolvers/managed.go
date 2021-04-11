@@ -62,10 +62,3 @@ func (r *managedResourceSpec) ConnectionSecret(ctx context.Context, obj *model.M
 	out := model.GetSecret(s)
 	return &out, nil
 }
-
-func (r *managedResourceSpec) ProviderConfig(ctx context.Context, obj *model.ManagedResourceSpec) (*model.ProviderConfig, error) {
-	// TODO(negz): How can we resolve this? We only know the name of the config,
-	// not its apiVersion and kind. I can't immediately think of an approach
-	// that isn't hacky and/or expensive.
-	return nil, nil
-}

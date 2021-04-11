@@ -702,6 +702,12 @@ type ProviderConfig struct {
 func (ProviderConfig) IsNode()               {}
 func (ProviderConfig) IsKubernetesResource() {}
 
+// A reference to the ProviderConfig used by a particular managed resource.
+type ProviderConfigReference struct {
+	// Name of the provider config.
+	Name string `json:"name"`
+}
+
 // A ProviderConfigStatus represents the observed state of a provider config.
 type ProviderConfigStatus struct {
 	// The observed condition of this resource.
