@@ -98,7 +98,7 @@ type Query {
   """
   customResourceDefinitions(
     """
-    Only return XRDs that are owned by the supplied provider revision.
+    Only return CRDs that are owned by the supplied provider revision.
     """
     revision: ID
   ): CustomResourceDefinitionConnection!
