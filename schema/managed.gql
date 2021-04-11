@@ -42,13 +42,21 @@ type ManagedResourceSpec {
   The provider configuration configures how this managed resource interacts
   with an external system.
   """
-  providerConfig: ProviderConfig @goField(forceResolver: true)
+  providerConfigRef: ProviderConfigReference
 
   """
   The deletion policy specifies what will happen to the underlying external
   resource when this managed resource is deleted.
   """
   deletionPolicy: DeletionPolicy
+}
+
+"""
+A reference to the ProviderConfig used by a particular managed resource.
+"""
+type ProviderConfigReference {
+  "Name of the provider config."
+  name: String!
 }
 
 """
