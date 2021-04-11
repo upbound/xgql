@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	corev1 "k8s.io/api/core/v1"
+	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/utils/pointer"
@@ -576,6 +577,171 @@ func TestQueryProviderRevisions(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.pc, got); diff != "" {
 				t.Errorf("\n%s\nq.Revisions(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestQueryCustomResourceDefinitions(t *testing.T) {
+	errBoom := errors.New("boom")
+
+	id := model.ReferenceID{
+		APIVersion: pkgv1.ConfigurationRevisionGroupVersionKind.GroupVersion().String(),
+		Kind:       pkgv1.ConfigurationRevisionKind,
+		Name:       "example",
+	}
+
+	owned := kextv1.CustomResourceDefinition{ObjectMeta: metav1.ObjectMeta{
+		Name: "coolconfig",
+		OwnerReferences: []metav1.OwnerReference{
+			// Some spurious owner references that we should ignore.
+			{
+				APIVersion: "wat",
+			},
+			{
+				APIVersion: id.APIVersion,
+				Kind:       "wat",
+			},
+			{
+				APIVersion: id.APIVersion,
+				Kind:       id.Kind,
+				Name:       "wat",
+			},
+			// The reference that indicates this XRD is owned by our desired
+			// ConfigurationRevision (or a ConfigurationRevision generally).
+			{
+				APIVersion: id.APIVersion,
+				Kind:       id.Kind,
+				Name:       id.Name,
+			},
+		},
+	}}
+	gowned := model.GetCustomResourceDefinition(&owned)
+
+	dangler := kextv1.CustomResourceDefinition{ObjectMeta: metav1.ObjectMeta{Name: "coolconfig"}}
+	gdangler := model.GetCustomResourceDefinition(&dangler)
+
+	type args struct {
+		ctx      context.Context
+		revision *model.ReferenceID
+	}
+	type want struct {
+		xrdc *model.CustomResourceDefinitionConnection
+		err  error
+		errs gqlerror.List
+	}
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"GetClientError": {
+			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{}, errBoom
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+				},
+			},
+		},
+		"ListCRDsError": {
+			reason: "If we can't list CRDs we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(errBoom),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errListConfigs).Error()),
+				},
+			},
+		},
+		"AllCRDs": {
+			reason: "We should successfully return all CRDs we can list and model when no arguments are supplied.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*kextv1.CustomResourceDefinitionList) = kextv1.CustomResourceDefinitionList{
+							Items: []kextv1.CustomResourceDefinition{
+								dangler,
+								owned,
+							},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				xrdc: &model.CustomResourceDefinitionConnection{
+					Nodes: []model.CustomResourceDefinition{
+						gdangler,
+						gowned,
+					},
+					TotalCount: 2,
+				},
+			},
+		},
+		"OwnedCRDs": {
+			reason: "We should successfully return the CRDs we can list and model that are owned by the supplied ID.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*kextv1.CustomResourceDefinitionList) = kextv1.CustomResourceDefinitionList{
+							Items: []kextv1.CustomResourceDefinition{
+								dangler,
+								owned,
+							},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				revision: &id,
+			},
+			want: want{
+				xrdc: &model.CustomResourceDefinitionConnection{
+					Nodes: []model.CustomResourceDefinition{
+						gowned,
+					},
+					TotalCount: 1,
+				},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			q := &query{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := q.CustomResourceDefinitions(tc.args.ctx, tc.args.revision)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\nq.Configurations(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\nq.Configurations(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.xrdc, got); diff != "" {
+				t.Errorf("\n%s\nq.Configurations(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
 	}

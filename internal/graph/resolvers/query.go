@@ -6,6 +6,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
+	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
@@ -191,7 +192,39 @@ func (r *query) ProviderRevisions(ctx context.Context, provider *model.Reference
 }
 
 func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.ReferenceID) (*model.CustomResourceDefinitionConnection, error) {
-	return nil, nil
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	in := &kextv1.CustomResourceDefinitionList{}
+	if err := c.List(ctx, in); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errListConfigs))
+		return nil, nil
+	}
+
+	out := &model.CustomResourceDefinitionConnection{
+		Nodes: make([]model.CustomResourceDefinition, 0),
+	}
+
+	for i := range in.Items {
+		xrd := &in.Items[i]
+
+		// We only want CRDs owned by this config revision, but this one isn't.
+		if revision != nil && !containsID(xrd.GetOwnerReferences(), *revision) {
+			continue
+		}
+
+		out.Nodes = append(out.Nodes, model.GetCustomResourceDefinition(xrd))
+		out.TotalCount++
+	}
+
+	return out, nil
 }
 
 func (r *query) ManagedResources(ctx context.Context, crd model.ReferenceID) (*model.ManagedResourceConnection, error) {
@@ -296,12 +329,12 @@ func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *mode
 	for i := range in.Items {
 		xrd := &in.Items[i]
 
-		// We only want dangling XRs but this one is owned by a config revision.
+		// We only want dangling XRDs but this one is owned by a config revision.
 		if pointer.BoolPtrDerefOr(dangling, false) && containsCR(xrd.GetOwnerReferences()) {
 			continue
 		}
 
-		// We only want XRs owned by this config revision, but this one isn't.
+		// We only want XRDs owned by this config revision, but this one isn't.
 		if revision != nil && !containsID(xrd.GetOwnerReferences(), *revision) {
 			continue
 		}
