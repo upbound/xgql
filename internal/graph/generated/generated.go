@@ -53,6 +53,7 @@ type ResolverRoot interface {
 	GenericResource() GenericResourceResolver
 	ManagedResource() ManagedResourceResolver
 	ManagedResourceSpec() ManagedResourceSpecResolver
+	Mutation() MutationResolver
 	ObjectMeta() ObjectMetaResolver
 	Provider() ProviderResolver
 	ProviderConfig() ProviderConfigResolver
@@ -301,6 +302,10 @@ type ComplexityRoot struct {
 		CurrentRevision   func(childComplexity int) int
 	}
 
+	CreateKubernetesResourcePayload struct {
+		Resource func(childComplexity int) int
+	}
+
 	CustomResourceDefinition struct {
 		APIVersion       func(childComplexity int) int
 		DefinedResources func(childComplexity int, version *string) int
@@ -345,6 +350,10 @@ type ComplexityRoot struct {
 
 	CustomResourceValidation struct {
 		OpenAPIV3Schema func(childComplexity int) int
+	}
+
+	DeleteKubernetesResourcePayload struct {
+		Resource func(childComplexity int) int
 	}
 
 	Event struct {
@@ -410,6 +419,12 @@ type ComplexityRoot struct {
 
 	ManagedResourceStatus struct {
 		Conditions func(childComplexity int) int
+	}
+
+	Mutation struct {
+		CreateKubernetesResource func(childComplexity int, input model.CreateKubernetesResourceInput) int
+		DeleteKubernetesResource func(childComplexity int, id model.ReferenceID) int
+		UpdateKubernetesResource func(childComplexity int, id model.ReferenceID, input model.UpdateKubernetesResourceInput) int
 	}
 
 	ObjectMeta struct {
@@ -562,6 +577,10 @@ type ComplexityRoot struct {
 		APIVersion func(childComplexity int) int
 		Kind       func(childComplexity int) int
 	}
+
+	UpdateKubernetesResourcePayload struct {
+		Resource func(childComplexity int) int
+	}
 }
 
 type CompositeResourceResolver interface {
@@ -627,6 +646,11 @@ type ManagedResourceResolver interface {
 }
 type ManagedResourceSpecResolver interface {
 	ConnectionSecret(ctx context.Context, obj *model.ManagedResourceSpec) (*model.Secret, error)
+}
+type MutationResolver interface {
+	CreateKubernetesResource(ctx context.Context, input model.CreateKubernetesResourceInput) (*model.CreateKubernetesResourcePayload, error)
+	UpdateKubernetesResource(ctx context.Context, id model.ReferenceID, input model.UpdateKubernetesResourceInput) (*model.UpdateKubernetesResourcePayload, error)
+	DeleteKubernetesResource(ctx context.Context, id model.ReferenceID) (*model.DeleteKubernetesResourcePayload, error)
 }
 type ObjectMetaResolver interface {
 	Owners(ctx context.Context, obj *model.ObjectMeta) (*model.OwnerConnection, error)
@@ -1668,6 +1692,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ConfigurationStatus.CurrentRevision(childComplexity), true
 
+	case "CreateKubernetesResourcePayload.resource":
+		if e.complexity.CreateKubernetesResourcePayload.Resource == nil {
+			break
+		}
+
+		return e.complexity.CreateKubernetesResourcePayload.Resource(childComplexity), true
+
 	case "CustomResourceDefinition.apiVersion":
 		if e.complexity.CustomResourceDefinition.APIVersion == nil {
 			break
@@ -1847,6 +1878,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CustomResourceValidation.OpenAPIV3Schema(childComplexity), true
+
+	case "DeleteKubernetesResourcePayload.resource":
+		if e.complexity.DeleteKubernetesResourcePayload.Resource == nil {
+			break
+		}
+
+		return e.complexity.DeleteKubernetesResourcePayload.Resource(childComplexity), true
 
 	case "Event.apiVersion":
 		if e.complexity.Event.APIVersion == nil {
@@ -2113,6 +2151,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ManagedResourceStatus.Conditions(childComplexity), true
+
+	case "Mutation.createKubernetesResource":
+		if e.complexity.Mutation.CreateKubernetesResource == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createKubernetesResource_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateKubernetesResource(childComplexity, args["input"].(model.CreateKubernetesResourceInput)), true
+
+	case "Mutation.deleteKubernetesResource":
+		if e.complexity.Mutation.DeleteKubernetesResource == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteKubernetesResource_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteKubernetesResource(childComplexity, args["id"].(model.ReferenceID)), true
+
+	case "Mutation.updateKubernetesResource":
+		if e.complexity.Mutation.UpdateKubernetesResource == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateKubernetesResource_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateKubernetesResource(childComplexity, args["id"].(model.ReferenceID), args["input"].(model.UpdateKubernetesResourceInput)), true
 
 	case "ObjectMeta.annotations":
 		if e.complexity.ObjectMeta.Annotations == nil {
@@ -2858,6 +2932,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.TypeReference.Kind(childComplexity), true
 
+	case "UpdateKubernetesResourcePayload.resource":
+		if e.complexity.UpdateKubernetesResourcePayload.Resource == nil {
+			break
+		}
+
+		return e.complexity.UpdateKubernetesResourcePayload.Resource(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -2875,6 +2956,20 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 			first = false
 			data := ec._Query(ctx, rc.Operation.SelectionSet)
+			var buf bytes.Buffer
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
+	case ast.Mutation:
+		return func(ctx context.Context) *graphql.Response {
+			if !first {
+				return nil
+			}
+			first = false
+			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
 			var buf bytes.Buffer
 			data.MarshalGQL(&buf)
 
@@ -4367,6 +4462,82 @@ type ManagedResourceStatus implements ConditionedStatus {
   conditions: [Condition!]
 }
 `, BuiltIn: false},
+	{Name: "schema/mutations.gql", Input: `"""
+Mutation is the root type for GraphQL mutations.
+"""
+type Mutation {
+  """
+  Create a Kubernetes resource.
+  """
+  createKubernetesResource(
+    "The inputs to the creation."
+    input: CreateKubernetesResourceInput!
+  ): CreateKubernetesResourcePayload!
+
+  """
+  Update a Kubernetes resource.
+  """
+  updateKubernetesResource(
+    "The ID of the resource to be updated."
+    id: ID!
+
+    "The inputs to the update."
+    input: UpdateKubernetesResourceInput!
+  ): UpdateKubernetesResourcePayload!
+
+  # TODO(negz): Support patching, too?
+
+  """
+  Delete a Kubernetes resource.
+  """
+  deleteKubernetesResource(
+    "The ID of the resource to be deleted."
+    id: ID!
+  ): DeleteKubernetesResourcePayload!
+}
+
+"""
+CreateKubernetesResourceInput is the input required to create a Kubernetes
+resource.
+"""
+input CreateKubernetesResourceInput {
+  "The Kubernetes resource to be created, as raw JSON."
+  raw: JSONObject!
+}
+
+"""
+CreateKubernetesResourcePayload is the result of creating a Kubernetes resource.
+"""
+type CreateKubernetesResourcePayload {
+  "The created Kubernetes resource. Null if the create failed."
+  resource: KubernetesResource
+}
+
+"""
+UpdateKubernetesResourceInput is the input required to update a Kubernetes
+resource.
+"""
+input UpdateKubernetesResourceInput {
+  "The Kubernetes resource to be updated, as raw JSON."
+  raw: JSONObject!
+}
+
+"""
+UpdateKubernetesResourcePayload is the result of updating a Kubernetes resource.
+"""
+type UpdateKubernetesResourcePayload {
+  "The updated Kubernetes resource. Null if the update failed."
+  resource: KubernetesResource
+}
+
+"""
+DeleteKubernetesResourcePayload is the result of deleting a Kubernetes resource.
+"""
+type DeleteKubernetesResourcePayload {
+  "The deleted Kubernetes resource. Null if the delete failed."
+  resource: KubernetesResource
+}
+`, BuiltIn: false},
 	{Name: "schema/package.gql", Input: `"""
 A RevisionActivationPolicy indicates how a provider or configuration package
 should activate its revisions.
@@ -4972,6 +5143,60 @@ func (ec *executionContext) field_CustomResourceDefinition_definedResources_args
 		}
 	}
 	args["version"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createKubernetesResource_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.CreateKubernetesResourceInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCreateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourceInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteKubernetesResource_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateKubernetesResource_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.UpdateKubernetesResourceInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourceInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
 	return args, nil
 }
 
@@ -10001,6 +10226,38 @@ func (ec *executionContext) _ConfigurationStatus_currentIdentifier(ctx context.C
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _CreateKubernetesResourcePayload_resource(ctx context.Context, field graphql.CollectedField, obj *model.CreateKubernetesResourcePayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CreateKubernetesResourcePayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Resource, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.KubernetesResource)
+	fc.Result = res
+	return ec.marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _CustomResourceDefinition_id(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -10851,6 +11108,38 @@ func (ec *executionContext) _CustomResourceValidation_openAPIV3Schema(ctx contex
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOJSONObject2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteKubernetesResourcePayload_resource(ctx context.Context, field graphql.CollectedField, obj *model.DeleteKubernetesResourcePayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteKubernetesResourcePayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Resource, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.KubernetesResource)
+	fc.Result = res
+	return ec.marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Event_id(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
@@ -12133,6 +12422,132 @@ func (ec *executionContext) _ManagedResourceStatus_conditions(ctx context.Contex
 	res := resTmp.([]model.Condition)
 	fc.Result = res
 	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createKubernetesResource(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createKubernetesResource_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateKubernetesResource(rctx, args["input"].(model.CreateKubernetesResourceInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.CreateKubernetesResourcePayload)
+	fc.Result = res
+	return ec.marshalNCreateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourcePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateKubernetesResource(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateKubernetesResource_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateKubernetesResource(rctx, args["id"].(model.ReferenceID), args["input"].(model.UpdateKubernetesResourceInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateKubernetesResourcePayload)
+	fc.Result = res
+	return ec.marshalNUpdateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteKubernetesResource(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteKubernetesResource_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteKubernetesResource(rctx, args["id"].(model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteKubernetesResourcePayload)
+	fc.Result = res
+	return ec.marshalNDeleteKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeleteKubernetesResourcePayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ObjectMeta_name(ctx context.Context, field graphql.CollectedField, obj *model.ObjectMeta) (ret graphql.Marshaler) {
@@ -15566,6 +15981,38 @@ func (ec *executionContext) _TypeReference_kind(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _UpdateKubernetesResourcePayload_resource(ctx context.Context, field graphql.CollectedField, obj *model.UpdateKubernetesResourcePayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateKubernetesResourcePayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Resource, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.KubernetesResource)
+	fc.Result = res
+	return ec.marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -16652,6 +17099,46 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 // endregion **************************** field.gotpl *****************************
 
 // region    **************************** input.gotpl *****************************
+
+func (ec *executionContext) unmarshalInputCreateKubernetesResourceInput(ctx context.Context, obj interface{}) (model.CreateKubernetesResourceInput, error) {
+	var it model.CreateKubernetesResourceInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "raw":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("raw"))
+			it.Raw, err = ec.unmarshalNJSONObject2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateKubernetesResourceInput(ctx context.Context, obj interface{}) (model.UpdateKubernetesResourceInput, error) {
+	var it model.UpdateKubernetesResourceInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "raw":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("raw"))
+			it.Raw, err = ec.unmarshalNJSONObject2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
 
 // endregion **************************** input.gotpl *****************************
 
@@ -18417,6 +18904,30 @@ func (ec *executionContext) _ConfigurationStatus(ctx context.Context, sel ast.Se
 	return out
 }
 
+var createKubernetesResourcePayloadImplementors = []string{"CreateKubernetesResourcePayload"}
+
+func (ec *executionContext) _CreateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, obj *model.CreateKubernetesResourcePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createKubernetesResourcePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateKubernetesResourcePayload")
+		case "resource":
+			out.Values[i] = ec._CreateKubernetesResourcePayload_resource(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var customResourceDefinitionImplementors = []string{"CustomResourceDefinition", "Node", "KubernetesResource", "ManagedResourceDefinition", "ProviderConfigDefinition"}
 
 func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinition) graphql.Marshaler {
@@ -18673,6 +19184,30 @@ func (ec *executionContext) _CustomResourceValidation(ctx context.Context, sel a
 			out.Values[i] = graphql.MarshalString("CustomResourceValidation")
 		case "openAPIV3Schema":
 			out.Values[i] = ec._CustomResourceValidation_openAPIV3Schema(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deleteKubernetesResourcePayloadImplementors = []string{"DeleteKubernetesResourcePayload"}
+
+func (ec *executionContext) _DeleteKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteKubernetesResourcePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteKubernetesResourcePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteKubernetesResourcePayload")
+		case "resource":
+			out.Values[i] = ec._DeleteKubernetesResourcePayload_resource(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19058,6 +19593,47 @@ func (ec *executionContext) _ManagedResourceStatus(ctx context.Context, sel ast.
 			out.Values[i] = graphql.MarshalString("ManagedResourceStatus")
 		case "conditions":
 			out.Values[i] = ec._ManagedResourceStatus_conditions(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var mutationImplementors = []string{"Mutation"}
+
+func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
+
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Mutation",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Mutation")
+		case "createKubernetesResource":
+			out.Values[i] = ec._Mutation_createKubernetesResource(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateKubernetesResource":
+			out.Values[i] = ec._Mutation_updateKubernetesResource(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteKubernetesResource":
+			out.Values[i] = ec._Mutation_deleteKubernetesResource(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20030,6 +20606,30 @@ func (ec *executionContext) _TypeReference(ctx context.Context, sel ast.Selectio
 	return out
 }
 
+var updateKubernetesResourcePayloadImplementors = []string{"UpdateKubernetesResourcePayload"}
+
+func (ec *executionContext) _UpdateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateKubernetesResourcePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateKubernetesResourcePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateKubernetesResourcePayload")
+		case "resource":
+			out.Values[i] = ec._UpdateKubernetesResourcePayload_resource(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var __DirectiveImplementors = []string{"__Directive"}
 
 func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionSet, obj *introspection.Directive) graphql.Marshaler {
@@ -20506,6 +21106,25 @@ func (ec *executionContext) marshalNConfigurationSpec2ᚖgithubᚗcomᚋupbound�
 	return ec._ConfigurationSpec(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourceInput(ctx context.Context, v interface{}) (model.CreateKubernetesResourceInput, error) {
+	res, err := ec.unmarshalInputCreateKubernetesResourceInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v model.CreateKubernetesResourcePayload) graphql.Marshaler {
+	return ec._CreateKubernetesResourcePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v *model.CreateKubernetesResourcePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._CreateKubernetesResourcePayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNCustomResourceDefinition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinition(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinition) graphql.Marshaler {
 	return ec._CustomResourceDefinition(ctx, sel, &v)
 }
@@ -20546,6 +21165,20 @@ func (ec *executionContext) marshalNCustomResourceDefinitionSpec2ᚖgithubᚗcom
 
 func (ec *executionContext) marshalNCustomResourceDefinitionVersion2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinitionVersion) graphql.Marshaler {
 	return ec._CustomResourceDefinitionVersion(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeleteKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v model.DeleteKubernetesResourcePayload) graphql.Marshaler {
+	return ec._DeleteKubernetesResourcePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeleteKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteKubernetesResourcePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteKubernetesResourcePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNEvent2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEvent(ctx context.Context, sel ast.SelectionSet, v model.Event) graphql.Marshaler {
@@ -20816,6 +21449,25 @@ func (ec *executionContext) marshalNTypeReference2ᚖgithubᚗcomᚋupboundᚋxg
 		return graphql.Null
 	}
 	return ec._TypeReference(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourceInput(ctx context.Context, v interface{}) (model.UpdateKubernetesResourceInput, error) {
+	res, err := ec.unmarshalInputUpdateKubernetesResourceInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v model.UpdateKubernetesResourcePayload) graphql.Marshaler {
+	return ec._UpdateKubernetesResourcePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateKubernetesResourcePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateKubernetesResourcePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

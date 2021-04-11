@@ -460,6 +460,19 @@ type ConfigurationStatus struct {
 
 func (ConfigurationStatus) IsConditionedStatus() {}
 
+// CreateKubernetesResourceInput is the input required to create a Kubernetes
+// resource.
+type CreateKubernetesResourceInput struct {
+	// The Kubernetes resource to be created, as raw JSON.
+	Raw string `json:"raw"`
+}
+
+// CreateKubernetesResourcePayload is the result of creating a Kubernetes resource.
+type CreateKubernetesResourcePayload struct {
+	// The created Kubernetes resource. Null if the create failed.
+	Resource KubernetesResource `json:"resource"`
+}
+
 // A CustomResourceDefinition defines a type of custom resource that extends the
 // set of resources supported by the Kubernetes API.
 type CustomResourceDefinition struct {
@@ -566,6 +579,12 @@ type CustomResourceDefinitionVersion struct {
 type CustomResourceValidation struct {
 	// OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning.
 	OpenAPIV3Schema *string `json:"openAPIV3Schema"`
+}
+
+// DeleteKubernetesResourcePayload is the result of deleting a Kubernetes resource.
+type DeleteKubernetesResourcePayload struct {
+	// The deleted Kubernetes resource. Null if the delete failed.
+	Resource KubernetesResource `json:"resource"`
 }
 
 // An EventConnection represents a connection to events.
@@ -862,6 +881,19 @@ type TypeReference struct {
 	APIVersion string `json:"apiVersion"`
 	// The Kubernetes API kind of the referenced resource.
 	Kind string `json:"kind"`
+}
+
+// UpdateKubernetesResourceInput is the input required to update a Kubernetes
+// resource.
+type UpdateKubernetesResourceInput struct {
+	// The Kubernetes resource to be updated, as raw JSON.
+	Raw string `json:"raw"`
+}
+
+// UpdateKubernetesResourcePayload is the result of updating a Kubernetes resource.
+type UpdateKubernetesResourcePayload struct {
+	// The updated Kubernetes resource. Null if the update failed.
+	Resource KubernetesResource `json:"resource"`
 }
 
 // A ConditionStatus represensts the status of a condition.

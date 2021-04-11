@@ -1,0 +1,75 @@
+"""
+Mutation is the root type for GraphQL mutations.
+"""
+type Mutation {
+  """
+  Create a Kubernetes resource.
+  """
+  createKubernetesResource(
+    "The inputs to the creation."
+    input: CreateKubernetesResourceInput!
+  ): CreateKubernetesResourcePayload!
+
+  """
+  Update a Kubernetes resource.
+  """
+  updateKubernetesResource(
+    "The ID of the resource to be updated."
+    id: ID!
+
+    "The inputs to the update."
+    input: UpdateKubernetesResourceInput!
+  ): UpdateKubernetesResourcePayload!
+
+  # TODO(negz): Support patching, too?
+
+  """
+  Delete a Kubernetes resource.
+  """
+  deleteKubernetesResource(
+    "The ID of the resource to be deleted."
+    id: ID!
+  ): DeleteKubernetesResourcePayload!
+}
+
+"""
+CreateKubernetesResourceInput is the input required to create a Kubernetes
+resource.
+"""
+input CreateKubernetesResourceInput {
+  "The Kubernetes resource to be created, as raw JSON."
+  raw: JSONObject!
+}
+
+"""
+CreateKubernetesResourcePayload is the result of creating a Kubernetes resource.
+"""
+type CreateKubernetesResourcePayload {
+  "The created Kubernetes resource. Null if the create failed."
+  resource: KubernetesResource
+}
+
+"""
+UpdateKubernetesResourceInput is the input required to update a Kubernetes
+resource.
+"""
+input UpdateKubernetesResourceInput {
+  "The Kubernetes resource to be updated, as raw JSON."
+  raw: JSONObject!
+}
+
+"""
+UpdateKubernetesResourcePayload is the result of updating a Kubernetes resource.
+"""
+type UpdateKubernetesResourcePayload {
+  "The updated Kubernetes resource. Null if the update failed."
+  resource: KubernetesResource
+}
+
+"""
+DeleteKubernetesResourcePayload is the result of deleting a Kubernetes resource.
+"""
+type DeleteKubernetesResourcePayload {
+  "The deleted Kubernetes resource. Null if the delete failed."
+  resource: KubernetesResource
+}
