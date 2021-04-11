@@ -9,13 +9,16 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/pointer"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
 	"github.com/upbound/xgql/internal/auth"
+	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/model"
 )
 
@@ -58,6 +61,53 @@ func (r *query) KubernetesResource(ctx context.Context, id model.ReferenceID) (m
 		graphql.AddError(ctx, errors.Wrap(err, errModelResource))
 		return nil, nil
 	}
+	return out, nil
+}
+
+func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string, listKind, namespace *string) (*model.KubernetesResourceConnection, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	gopts := []clients.GetOption{}
+	lopts := []client.ListOption{}
+	if namespace != nil {
+		gopts = []clients.GetOption{clients.ForNamespace(*namespace)}
+		lopts = []client.ListOption{client.InNamespace(*namespace)}
+	}
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds, gopts...)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	in := &kunstructured.UnstructuredList{}
+	in.SetAPIVersion(apiVersion)
+	in.SetKind(kind + "List")
+	if listKind != nil && *listKind != "" {
+		in.SetKind(*listKind)
+	}
+
+	if err := c.List(ctx, in, lopts...); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errListResources))
+		return nil, nil
+	}
+
+	out := &model.KubernetesResourceConnection{
+		Nodes: make([]model.KubernetesResource, 0, len(in.Items)),
+	}
+
+	for i := range in.Items {
+		kr, err := model.GetKubernetesResource(&in.Items[i])
+		if err != nil {
+			graphql.AddError(ctx, errors.Wrap(err, errModelResource))
+			continue
+		}
+		out.Nodes = append(out.Nodes, kr)
+		out.TotalCount++
+	}
+
 	return out, nil
 }
 
@@ -227,14 +277,6 @@ func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.R
 	return out, nil
 }
 
-func (r *query) ManagedResources(ctx context.Context, crd model.ReferenceID) (*model.ManagedResourceConnection, error) {
-	return nil, nil
-}
-
-func (r *query) ProviderConfigs(ctx context.Context, crd model.ReferenceID) (*model.ProviderConfigConnection, error) {
-	return nil, nil
-}
-
 func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -385,22 +427,6 @@ func (r *query) Compositions(ctx context.Context, revision *model.ReferenceID, d
 	}
 
 	return out, nil
-}
-
-func (r *query) CompositeResources(ctx context.Context, xrd model.ReferenceID) (*model.CompositeResourceConnection, error) {
-	return nil, nil
-}
-
-func (r *query) CompositeResource(ctx context.Context, xrc model.ReferenceID) (*model.CompositeResource, error) {
-	return nil, nil
-}
-
-func (r *query) CompositeResourceClaims(ctx context.Context, xrd model.ReferenceID) (*model.CompositeResourceClaimConnection, error) {
-	return nil, nil
-}
-
-func (r *query) CompositeResourceClaim(ctx context.Context, xr model.ReferenceID) (*model.CompositeResourceClaim, error) {
-	return nil, nil
 }
 
 func containsCR(in []metav1.OwnerReference) bool {

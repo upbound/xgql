@@ -618,14 +618,6 @@ type ManagedResource struct {
 func (ManagedResource) IsNode()               {}
 func (ManagedResource) IsKubernetesResource() {}
 
-// A ManagedResourceConnection represents a connection to managed resources.
-type ManagedResourceConnection struct {
-	// Connected nodes.
-	Nodes []ManagedResource `json:"nodes"`
-	// The total number of connected nodes.
-	TotalCount int `json:"totalCount"`
-}
-
 // A ManagedResourceStatus represents the observed state of a managed resource.
 type ManagedResourceStatus struct {
 	// The observed condition of this resource.
@@ -718,14 +710,6 @@ type ProviderConfig struct {
 
 func (ProviderConfig) IsNode()               {}
 func (ProviderConfig) IsKubernetesResource() {}
-
-// A ProviderConfigConnection represents a connection to provider configs.
-type ProviderConfigConnection struct {
-	// Connected nodes.
-	Nodes []ProviderConfig `json:"nodes"`
-	// The total number of connected nodes.
-	TotalCount int `json:"totalCount"`
-}
 
 // A reference to the ProviderConfig used by a particular managed resource.
 type ProviderConfigReference struct {
