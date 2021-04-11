@@ -132,8 +132,6 @@ func TestGet(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
 			_, err := tc.c.Get(tc.args.creds, tc.args.o...)
 			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nc.Get(...): -want error, +got:\n%s", tc.reason, diff)
