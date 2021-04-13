@@ -4,9 +4,9 @@ Time is a timestamp.
 scalar Time
 
 """
-A Map of string to arbitrary values.
+A StringMap is a map string keys to string values.
 """
-scalar Map
+scalar StringMap
 
 """
 A JSONObject contains a JSON object encoded as a string.
@@ -144,21 +144,21 @@ type ObjectMeta {
   deletionTime: Time
 
   """
-  Map of string keys and values that can be used to organize and categorize
+  A map of string keys and values that can be used to organize and categorize
   (scope and select) objects. May match selectors of replication controllers
   and services.
 
    More info: http://kubernetes.io/docs/user-guide/labels
   """
-  labels: Map
+  labels: StringMap
 
   """
-  Map of string keys and values that may be set by external tools to store and
+  A map of string keys and values that may be set by external tools to store and
   retrieve arbitrary metadata.
 
   More info: http://kubernetes.io/docs/user-guide/annotations
   """
-  annotations: Map
+  annotations: StringMap
 
   """
   Resources depended by this resource. If ALL resources in the list have been
@@ -303,7 +303,7 @@ A LabelSelector matches a Kubernetes resource by labels.
 """
 type LabelSelector {
   "The labels to match on."
-  matchLabels: Map
+  matchLabels: StringMap
 }
 
 # NOTE(negz): Event does not implement KubernetesResource simply because an

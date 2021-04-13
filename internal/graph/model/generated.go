@@ -616,7 +616,7 @@ type KubernetesResourceConnection struct {
 // A LabelSelector matches a Kubernetes resource by labels.
 type LabelSelector struct {
 	// The labels to match on.
-	MatchLabels map[string]interface{} `json:"matchLabels"`
+	MatchLabels map[string]string `json:"matchLabels"`
 }
 
 // A ManagedResource is a Kubernetes API representation of a resource in an

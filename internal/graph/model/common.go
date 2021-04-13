@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -102,6 +103,22 @@ func (id ReferenceID) MarshalGQL(w io.Writer) {
 	_, _ = w.Write([]byte(`"` + id.String() + `"`))
 }
 
+// MarshalStringMap marshals a map[string]string to GraphQL.
+func MarshalStringMap(val map[string]string) graphql.Marshaler {
+	return graphql.WriterFunc(func(w io.Writer) {
+		_ = json.NewEncoder(w).Encode(val)
+	})
+}
+
+// UnmarshalStringMap marshals a map[string]string from GraphQL.
+func UnmarshalStringMap(v interface{}) (map[string]string, error) {
+	if m, ok := v.(map[string]string); ok {
+		return m, nil
+	}
+
+	return nil, errors.Errorf("%T is not a map", v)
+}
+
 // GetConditions from the supplied Crossplane conditions.
 func GetConditions(in []xpv1.Condition) []Condition {
 	if in == nil {
@@ -131,12 +148,7 @@ func GetLabelSelector(s *metav1.LabelSelector) *LabelSelector {
 		return nil
 	}
 
-	ml := map[string]interface{}{}
-	for k, v := range s.MatchLabels {
-		ml[k] = v
-	}
-
-	return &LabelSelector{MatchLabels: ml}
+	return &LabelSelector{MatchLabels: s.MatchLabels}
 }
 
 // GetGenericResource from the suppled Kubernetes resource.

@@ -3230,9 +3230,9 @@ Time is a timestamp.
 scalar Time
 
 """
-A Map of string to arbitrary values.
+A StringMap is a map string keys to string values.
 """
-scalar Map
+scalar StringMap
 
 """
 A JSONObject contains a JSON object encoded as a string.
@@ -3370,21 +3370,21 @@ type ObjectMeta {
   deletionTime: Time
 
   """
-  Map of string keys and values that can be used to organize and categorize
+  A map of string keys and values that can be used to organize and categorize
   (scope and select) objects. May match selectors of replication controllers
   and services.
 
    More info: http://kubernetes.io/docs/user-guide/labels
   """
-  labels: Map
+  labels: StringMap
 
   """
-  Map of string keys and values that may be set by external tools to store and
+  A map of string keys and values that may be set by external tools to store and
   retrieve arbitrary metadata.
 
   More info: http://kubernetes.io/docs/user-guide/annotations
   """
-  annotations: Map
+  annotations: StringMap
 
   """
   Resources depended by this resource. If ALL resources in the list have been
@@ -3529,7 +3529,7 @@ A LabelSelector matches a Kubernetes resource by labels.
 """
 type LabelSelector {
   "The labels to match on."
-  matchLabels: Map
+  matchLabels: StringMap
 }
 
 # NOTE(negz): Event does not implement KubernetesResource simply because an
@@ -11662,9 +11662,9 @@ func (ec *executionContext) _LabelSelector_matchLabels(ctx context.Context, fiel
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(map[string]string)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalOStringMap2map(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResource_id(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
@@ -12405,9 +12405,9 @@ func (ec *executionContext) _ObjectMeta_labels(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(map[string]string)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalOStringMap2map(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ObjectMeta_annotations(ctx context.Context, field graphql.CollectedField, obj *model.ObjectMeta) (ret graphql.Marshaler) {
@@ -12437,9 +12437,9 @@ func (ec *executionContext) _ObjectMeta_annotations(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(map[string]interface{})
+	res := resTmp.(map[string]string)
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalOStringMap2map(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ObjectMeta_owners(ctx context.Context, field graphql.CollectedField, obj *model.ObjectMeta) (ret graphql.Marshaler) {
@@ -21798,21 +21798,6 @@ func (ec *executionContext) marshalOManagedResourceDefinition2githubᚗcomᚋupb
 	return ec._ManagedResourceDefinition(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOMap2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalMap(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOMap2map(ctx context.Context, sel ast.SelectionSet, v map[string]interface{}) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalMap(v)
-}
-
 func (ec *executionContext) marshalOOwner2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Owner) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -22112,6 +22097,21 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) unmarshalOStringMap2map(ctx context.Context, v interface{}) (map[string]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := model.UnmarshalStringMap(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOStringMap2map(ctx context.Context, sel ast.SelectionSet, v map[string]string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return model.MarshalStringMap(v)
 }
 
 func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
