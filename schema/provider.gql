@@ -27,10 +27,7 @@ type Provider implements Node & KubernetesResource {
   events: EventConnection! @goField(forceResolver: true)
 
   "Revisions of this provider."
-  revisions(
-    "Return only the active revision."
-    active: Boolean
-  ): ProviderRevisionConnection! @goField(forceResolver: true)
+  revisions: ProviderRevisionConnection! @goField(forceResolver: true)
 }
 
 """

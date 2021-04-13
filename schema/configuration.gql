@@ -27,10 +27,7 @@ type Configuration implements Node & KubernetesResource {
   events: EventConnection! @goField(forceResolver: true)
 
   "Revisions of this configuration."
-  revisions(
-    "Return only the active revision."
-    active: Boolean
-  ): ConfigurationRevisionConnection! @goField(forceResolver: true)
+  revisions: ConfigurationRevisionConnection! @goField(forceResolver: true)
 }
 
 """

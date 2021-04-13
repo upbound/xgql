@@ -22,7 +22,7 @@ type objectMeta struct {
 	clients ClientCache
 }
 
-func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta, controller *bool) (*model.OwnerConnection, error) {
+func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta) (*model.OwnerConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -35,14 +35,6 @@ func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta, controll
 
 	owners := make([]model.Owner, 0, len(obj.OwnerReferences))
 	for _, ref := range obj.OwnerReferences {
-		// There can be only one controller reference.
-		// https://github.com/kubernetes/community/blob/0331e/contributors/design-proposals/api-machinery/controller-ref.md
-		wantCtrl := pointer.BoolPtrDerefOr(controller, false)
-		isCtrl := pointer.BoolPtrDerefOr(ref.Controller, false)
-		if wantCtrl && !isCtrl {
-			continue
-		}
-
 		u := &kunstructured.Unstructured{}
 		u.SetAPIVersion(ref.APIVersion)
 		u.SetKind(ref.Kind)

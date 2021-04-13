@@ -30,7 +30,6 @@ func TestObjectMetaOwners(t *testing.T) {
 	ctrl := unstructured.Unstructured{}
 	ctrl.SetAPIVersion("example.org/v1")
 	ctrl.SetKind("TheController")
-	gctrl, _ := model.GetKubernetesResource(&ctrl)
 
 	// An owner
 	own := unstructured.Unstructured{}
@@ -39,9 +38,8 @@ func TestObjectMetaOwners(t *testing.T) {
 	gown, _ := model.GetKubernetesResource(&own)
 
 	type args struct {
-		ctx        context.Context
-		obj        *model.ObjectMeta
-		controller *bool
+		ctx context.Context
+		obj *model.ObjectMeta
 	}
 	type want struct {
 		oc   *model.OwnerConnection
@@ -109,42 +107,6 @@ func TestObjectMetaOwners(t *testing.T) {
 				},
 			},
 		},
-		"ControllerOnly": {
-			reason: "If we get an owner that isn't a controller reference we should continue.",
-			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
-				return &test.MockClient{
-					MockGet: test.NewMockGetFn(nil),
-				}, nil
-			}),
-			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.ObjectMeta{
-					OwnerReferences: []metav1.OwnerReference{
-						{
-							APIVersion: own.GetAPIVersion(),
-							Kind:       own.GetKind(),
-						},
-						{
-							APIVersion: ctrl.GetAPIVersion(),
-							Kind:       ctrl.GetKind(),
-							Controller: pointer.BoolPtr(true),
-						},
-					},
-				},
-				controller: pointer.BoolPtr(true),
-			},
-			want: want{
-				oc: &model.OwnerConnection{
-					Nodes: []model.Owner{
-						{
-							Resource:   gctrl,
-							Controller: pointer.BoolPtr(true),
-						},
-					},
-					TotalCount: 1,
-				},
-			},
-		},
 	}
 
 	for name, tc := range cases {
@@ -153,7 +115,7 @@ func TestObjectMetaOwners(t *testing.T) {
 
 			// Our GraphQL resolvers never return errors. We instead add an
 			// error to the GraphQL context and return early.
-			got, err := m.Owners(tc.args.ctx, tc.args.obj, tc.args.controller)
+			got, err := m.Owners(tc.args.ctx, tc.args.obj)
 			errs := graphql.GetErrors(tc.args.ctx)
 
 			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {

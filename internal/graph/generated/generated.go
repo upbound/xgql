@@ -239,7 +239,7 @@ type ComplexityRoot struct {
 		Kind       func(childComplexity int) int
 		Metadata   func(childComplexity int) int
 		Raw        func(childComplexity int) int
-		Revisions  func(childComplexity int, active *bool) int
+		Revisions  func(childComplexity int) int
 		Spec       func(childComplexity int) int
 		Status     func(childComplexity int) int
 	}
@@ -417,7 +417,7 @@ type ComplexityRoot struct {
 		Labels          func(childComplexity int) int
 		Name            func(childComplexity int) int
 		Namespace       func(childComplexity int) int
-		Owners          func(childComplexity int, controller *bool) int
+		Owners          func(childComplexity int) int
 		ResourceVersion func(childComplexity int) int
 		UID             func(childComplexity int) int
 	}
@@ -447,7 +447,7 @@ type ComplexityRoot struct {
 		Kind       func(childComplexity int) int
 		Metadata   func(childComplexity int) int
 		Raw        func(childComplexity int) int
-		Revisions  func(childComplexity int, active *bool) int
+		Revisions  func(childComplexity int) int
 		Spec       func(childComplexity int) int
 		Status     func(childComplexity int) int
 	}
@@ -594,7 +594,7 @@ type ConfigMapResolver interface {
 }
 type ConfigurationResolver interface {
 	Events(ctx context.Context, obj *model.Configuration) (*model.EventConnection, error)
-	Revisions(ctx context.Context, obj *model.Configuration, active *bool) (*model.ConfigurationRevisionConnection, error)
+	Revisions(ctx context.Context, obj *model.Configuration) (*model.ConfigurationRevisionConnection, error)
 }
 type ConfigurationRevisionResolver interface {
 	Events(ctx context.Context, obj *model.ConfigurationRevision) (*model.EventConnection, error)
@@ -619,11 +619,11 @@ type ManagedResourceSpecResolver interface {
 	ConnectionSecret(ctx context.Context, obj *model.ManagedResourceSpec) (*model.Secret, error)
 }
 type ObjectMetaResolver interface {
-	Owners(ctx context.Context, obj *model.ObjectMeta, controller *bool) (*model.OwnerConnection, error)
+	Owners(ctx context.Context, obj *model.ObjectMeta) (*model.OwnerConnection, error)
 }
 type ProviderResolver interface {
 	Events(ctx context.Context, obj *model.Provider) (*model.EventConnection, error)
-	Revisions(ctx context.Context, obj *model.Provider, active *bool) (*model.ProviderRevisionConnection, error)
+	Revisions(ctx context.Context, obj *model.Provider) (*model.ProviderRevisionConnection, error)
 }
 type ProviderConfigResolver interface {
 	Events(ctx context.Context, obj *model.ProviderConfig) (*model.EventConnection, error)
@@ -1388,12 +1388,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Configuration_revisions_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Configuration.Revisions(childComplexity, args["active"].(*bool)), true
+		return e.complexity.Configuration.Revisions(childComplexity), true
 
 	case "Configuration.spec":
 		if e.complexity.Configuration.Spec == nil {
@@ -2140,12 +2135,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ObjectMeta_owners_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.ObjectMeta.Owners(childComplexity, args["controller"].(*bool)), true
+		return e.complexity.ObjectMeta.Owners(childComplexity), true
 
 	case "ObjectMeta.resourceVersion":
 		if e.complexity.ObjectMeta.ResourceVersion == nil {
@@ -2271,12 +2261,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Provider_revisions_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Provider.Revisions(childComplexity, args["active"].(*bool)), true
+		return e.complexity.Provider.Revisions(childComplexity), true
 
 	case "Provider.spec":
 		if e.complexity.Provider.Spec == nil {
@@ -3345,10 +3330,7 @@ type ObjectMeta {
   with the controller field set to true. There cannot be more than one managing
   controller.
   """
-  owners(
-    "Return only the owner that represents the controller of this resource."
-    controller: Boolean
-  ): OwnerConnection! @goField(forceResolver: true)
+  owners: OwnerConnection! @goField(forceResolver: true)
 }
 
 """
@@ -3994,10 +3976,7 @@ type Configuration implements Node & KubernetesResource {
   events: EventConnection! @goField(forceResolver: true)
 
   "Revisions of this configuration."
-  revisions(
-    "Return only the active revision."
-    active: Boolean
-  ): ConfigurationRevisionConnection! @goField(forceResolver: true)
+  revisions: ConfigurationRevisionConnection! @goField(forceResolver: true)
 }
 
 """
@@ -4360,10 +4339,7 @@ type Provider implements Node & KubernetesResource {
   events: EventConnection! @goField(forceResolver: true)
 
   "Revisions of this provider."
-  revisions(
-    "Return only the active revision."
-    active: Boolean
-  ): ProviderRevisionConnection! @goField(forceResolver: true)
+  revisions: ProviderRevisionConnection! @goField(forceResolver: true)
 }
 
 """
@@ -4874,21 +4850,6 @@ func (ec *executionContext) field_ConfigMap_data_args(ctx context.Context, rawAr
 	return args, nil
 }
 
-func (ec *executionContext) field_Configuration_revisions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *bool
-	if tmp, ok := rawArgs["active"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
-		arg0, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["active"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_CustomResourceDefinition_definedResources_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4901,36 +4862,6 @@ func (ec *executionContext) field_CustomResourceDefinition_definedResources_args
 		}
 	}
 	args["version"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_ObjectMeta_owners_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *bool
-	if tmp, ok := rawArgs["controller"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("controller"))
-		arg0, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["controller"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Provider_revisions_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *bool
-	if tmp, ok := rawArgs["active"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
-		arg0, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["active"] = arg0
 	return args, nil
 }
 
@@ -8720,16 +8651,9 @@ func (ec *executionContext) _Configuration_revisions(ctx context.Context, field 
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Configuration_revisions_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Configuration().Revisions(rctx, obj, args["active"].(*bool))
+		return ec.resolvers.Configuration().Revisions(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12297,16 +12221,9 @@ func (ec *executionContext) _ObjectMeta_owners(ctx context.Context, field graphq
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_ObjectMeta_owners_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ObjectMeta().Owners(rctx, obj, args["controller"].(*bool))
+		return ec.resolvers.ObjectMeta().Owners(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12913,16 +12830,9 @@ func (ec *executionContext) _Provider_revisions(ctx context.Context, field graph
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Provider_revisions_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Provider().Revisions(rctx, obj, args["active"].(*bool))
+		return ec.resolvers.Provider().Revisions(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)

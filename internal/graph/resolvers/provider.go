@@ -10,7 +10,6 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/pointer"
 
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
@@ -37,7 +36,7 @@ func (r *provider) Events(ctx context.Context, obj *model.Provider) (*model.Even
 	})
 }
 
-func (r *provider) Revisions(ctx context.Context, obj *model.Provider, active *bool) (*model.ProviderRevisionConnection, error) {
+func (r *provider) Revisions(ctx context.Context, obj *model.Provider) (*model.ProviderRevisionConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -65,11 +64,6 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider, active *b
 		// one of ours.
 		// https://github.com/kubernetes/community/blob/0331e/contributors/design-proposals/api-machinery/controller-ref.md
 		if c := metav1.GetControllerOf(&pr); c == nil || c.UID != types.UID(obj.Metadata.UID) {
-			continue
-		}
-
-		// We only want the active PackageRevision, and this isn't it.
-		if pointer.BoolPtrDerefOr(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
 			continue
 		}
 

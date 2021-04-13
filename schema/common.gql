@@ -167,10 +167,7 @@ type ObjectMeta {
   with the controller field set to true. There cannot be more than one managing
   controller.
   """
-  owners(
-    "Return only the owner that represents the controller of this resource."
-    controller: Boolean
-  ): OwnerConnection! @goField(forceResolver: true)
+  owners: OwnerConnection! @goField(forceResolver: true)
 }
 
 """

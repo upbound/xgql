@@ -11,7 +11,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -61,9 +60,8 @@ func TestConfigurationRevisions(t *testing.T) {
 	other := pkgv1.ConfigurationRevision{ObjectMeta: metav1.ObjectMeta{Name: "not-ours"}}
 
 	type args struct {
-		ctx    context.Context
-		obj    *model.Configuration
-		active *bool
+		ctx context.Context
+		obj *model.Configuration
 	}
 	type want struct {
 		crc  *model.ConfigurationRevisionConnection
@@ -132,32 +130,6 @@ func TestConfigurationRevisions(t *testing.T) {
 				},
 			},
 		},
-		"ActiveRevisions": {
-			reason: "We should successfully return any active revisions we own that we can list and model.",
-			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
-				return &test.MockClient{
-					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*pkgv1.ConfigurationRevisionList) = pkgv1.ConfigurationRevisionList{
-							Items: []pkgv1.ConfigurationRevision{other, active, inactive},
-						}
-						return nil
-					}),
-				}, nil
-			}),
-			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.Configuration{
-					Metadata: &model.ObjectMeta{UID: uid},
-				},
-				active: pointer.BoolPtr(true),
-			},
-			want: want{
-				crc: &model.ConfigurationRevisionConnection{
-					Nodes:      []model.ConfigurationRevision{gactive},
-					TotalCount: 1,
-				},
-			},
-		},
 	}
 
 	for name, tc := range cases {
@@ -166,7 +138,7 @@ func TestConfigurationRevisions(t *testing.T) {
 
 			// Our GraphQL resolvers never return errors. We instead add an
 			// error to the GraphQL context and return early.
-			got, err := c.Revisions(tc.args.ctx, tc.args.obj, tc.args.active)
+			got, err := c.Revisions(tc.args.ctx, tc.args.obj)
 			errs := graphql.GetErrors(tc.args.ctx)
 
 			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
