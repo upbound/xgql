@@ -27,6 +27,9 @@ type CompositeResource implements Node & KubernetesResource {
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
+
+  "The definition of this resource."
+  definition: CompositeResourceDefinition @goField(forceResolver: true)
 }
 
 """
@@ -115,6 +118,9 @@ type CompositeResourceClaim implements Node & KubernetesResource {
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
+
+  "The definition of this resource."
+  definition: CompositeResourceDefinition @goField(forceResolver: true)
 }
 
 """

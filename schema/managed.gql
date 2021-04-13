@@ -27,7 +27,19 @@ type ManagedResource implements Node & KubernetesResource {
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
+
+  "The definition of this resource."
+  definition: ManagedResourceDefinition @goField(forceResolver: true)
 }
+
+"""
+A ManagedResourceDefinition defines a managed resource.
+
+At the time of writing a ManagedResourceDefinition will always be a
+CustomResourceDefinition. We use a union because this may change in future per
+https://github.com/crossplane/crossplane/issues/2262
+"""
+union ManagedResourceDefinition = CustomResourceDefinition
 
 """
 A ManagedResourceSpec represents the desired state of a managed resource.

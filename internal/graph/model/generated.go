@@ -20,9 +20,27 @@ type KubernetesResource interface {
 	IsKubernetesResource()
 }
 
+// A ManagedResourceDefinition defines a managed resource.
+//
+// At the time of writing a ManagedResourceDefinition will always be a
+// CustomResourceDefinition. We use a union because this may change in future per
+// https://github.com/crossplane/crossplane/issues/2262
+type ManagedResourceDefinition interface {
+	IsManagedResourceDefinition()
+}
+
 // An object with an ID.
 type Node interface {
 	IsNode()
+}
+
+// A ProviderConfigDefinition defines a provider configuration.
+//
+// At the time of writing a ProviderConfigDefinition will always be a
+// CustomResourceDefinition. We use a union because this may change in future per
+// https://github.com/crossplane/crossplane/issues/2262
+type ProviderConfigDefinition interface {
+	IsProviderConfigDefinition()
 }
 
 // A CompositeResource is a resource this is reconciled by composing other
@@ -45,6 +63,8 @@ type CompositeResource struct {
 	Raw string `json:"raw"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
+	// The definition of this resource.
+	Definition *CompositeResourceDefinition `json:"definition"`
 }
 
 func (CompositeResource) IsNode()               {}
@@ -68,6 +88,8 @@ type CompositeResourceClaim struct {
 	Raw string `json:"raw"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
+	// The definition of this resource.
+	Definition *CompositeResourceDefinition `json:"definition"`
 }
 
 func (CompositeResourceClaim) IsNode()               {}
@@ -461,8 +483,10 @@ type CustomResourceDefinition struct {
 	DefinedResources *KubernetesResourceConnection `json:"definedResources"`
 }
 
-func (CustomResourceDefinition) IsNode()               {}
-func (CustomResourceDefinition) IsKubernetesResource() {}
+func (CustomResourceDefinition) IsNode()                      {}
+func (CustomResourceDefinition) IsKubernetesResource()        {}
+func (CustomResourceDefinition) IsManagedResourceDefinition() {}
+func (CustomResourceDefinition) IsProviderConfigDefinition()  {}
 
 // A CustomResourceDefinitionConnection represents a connection to custom
 // resource definitions (CRDs).
@@ -615,6 +639,8 @@ type ManagedResource struct {
 	Raw string `json:"raw"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
+	// The definition of this resource.
+	Definition ManagedResourceDefinition `json:"definition"`
 }
 
 func (ManagedResource) IsNode()               {}
@@ -706,10 +732,12 @@ type ProviderConfig struct {
 	Metadata *ObjectMeta `json:"metadata"`
 	// The observed state of this resource.
 	Status *ProviderConfigStatus `json:"status"`
-	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
 	// A raw JSON representation of the underlying Kubernetes resource.
 	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
+	// The definition of this resource.
+	Definition ProviderConfigDefinition `json:"definition"`
 }
 
 func (ProviderConfig) IsNode()               {}
