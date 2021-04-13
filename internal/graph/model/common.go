@@ -26,7 +26,7 @@ import (
 const sep = "|"
 
 // Reference ID encoder.
-var encoder = base64.RawStdEncoding
+var encoder = base64.RawURLEncoding
 
 // Reference ID parsing errors.
 var (
