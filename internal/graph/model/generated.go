@@ -334,6 +334,8 @@ type Configuration struct {
 	Events *EventConnection `json:"events"`
 	// Revisions of this configuration.
 	Revisions *ConfigurationRevisionConnection `json:"revisions"`
+	// The active revision of this configuration.
+	ActiveRevision *ConfigurationRevision `json:"activeRevision"`
 }
 
 func (Configuration) IsNode()               {}
@@ -684,6 +686,8 @@ type Provider struct {
 	Events *EventConnection `json:"events"`
 	// Revisions of this provider.
 	Revisions *ProviderRevisionConnection `json:"revisions"`
+	// The active revision of this provider.
+	ActiveRevision *ProviderRevision `json:"activeRevision"`
 }
 
 func (Provider) IsNode()               {}

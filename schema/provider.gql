@@ -28,6 +28,9 @@ type Provider implements Node & KubernetesResource {
 
   "Revisions of this provider."
   revisions: ProviderRevisionConnection! @goField(forceResolver: true)
+
+  "The active revision of this provider."
+  activeRevision: ProviderRevision @goField(forceResolver: true)
 }
 
 """

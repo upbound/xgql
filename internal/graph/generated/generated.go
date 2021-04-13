@@ -233,15 +233,16 @@ type ComplexityRoot struct {
 	}
 
 	Configuration struct {
-		APIVersion func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Revisions  func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion     func(childComplexity int) int
+		ActiveRevision func(childComplexity int) int
+		Events         func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Kind           func(childComplexity int) int
+		Metadata       func(childComplexity int) int
+		Raw            func(childComplexity int) int
+		Revisions      func(childComplexity int) int
+		Spec           func(childComplexity int) int
+		Status         func(childComplexity int) int
 	}
 
 	ConfigurationConnection struct {
@@ -410,6 +411,7 @@ type ComplexityRoot struct {
 
 	ObjectMeta struct {
 		Annotations     func(childComplexity int) int
+		Controller      func(childComplexity int) int
 		CreationTime    func(childComplexity int) int
 		DeletionTime    func(childComplexity int) int
 		GenerateName    func(childComplexity int) int
@@ -441,15 +443,16 @@ type ComplexityRoot struct {
 	}
 
 	Provider struct {
-		APIVersion func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Revisions  func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion     func(childComplexity int) int
+		ActiveRevision func(childComplexity int) int
+		Events         func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Kind           func(childComplexity int) int
+		Metadata       func(childComplexity int) int
+		Raw            func(childComplexity int) int
+		Revisions      func(childComplexity int) int
+		Spec           func(childComplexity int) int
+		Status         func(childComplexity int) int
 	}
 
 	ProviderConfig struct {
@@ -595,6 +598,7 @@ type ConfigMapResolver interface {
 type ConfigurationResolver interface {
 	Events(ctx context.Context, obj *model.Configuration) (*model.EventConnection, error)
 	Revisions(ctx context.Context, obj *model.Configuration) (*model.ConfigurationRevisionConnection, error)
+	ActiveRevision(ctx context.Context, obj *model.Configuration) (*model.ConfigurationRevision, error)
 }
 type ConfigurationRevisionResolver interface {
 	Events(ctx context.Context, obj *model.ConfigurationRevision) (*model.EventConnection, error)
@@ -620,10 +624,12 @@ type ManagedResourceSpecResolver interface {
 }
 type ObjectMetaResolver interface {
 	Owners(ctx context.Context, obj *model.ObjectMeta) (*model.OwnerConnection, error)
+	Controller(ctx context.Context, obj *model.ObjectMeta) (model.KubernetesResource, error)
 }
 type ProviderResolver interface {
 	Events(ctx context.Context, obj *model.Provider) (*model.EventConnection, error)
 	Revisions(ctx context.Context, obj *model.Provider) (*model.ProviderRevisionConnection, error)
+	ActiveRevision(ctx context.Context, obj *model.Provider) (*model.ProviderRevision, error)
 }
 type ProviderConfigResolver interface {
 	Events(ctx context.Context, obj *model.ProviderConfig) (*model.EventConnection, error)
@@ -1347,6 +1353,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Configuration.APIVersion(childComplexity), true
+
+	case "Configuration.activeRevision":
+		if e.complexity.Configuration.ActiveRevision == nil {
+			break
+		}
+
+		return e.complexity.Configuration.ActiveRevision(childComplexity), true
 
 	case "Configuration.events":
 		if e.complexity.Configuration.Events == nil {
@@ -2081,6 +2094,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ObjectMeta.Annotations(childComplexity), true
 
+	case "ObjectMeta.controller":
+		if e.complexity.ObjectMeta.Controller == nil {
+			break
+		}
+
+		return e.complexity.ObjectMeta.Controller(childComplexity), true
+
 	case "ObjectMeta.creationTime":
 		if e.complexity.ObjectMeta.CreationTime == nil {
 			break
@@ -2220,6 +2240,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Provider.APIVersion(childComplexity), true
+
+	case "Provider.activeRevision":
+		if e.complexity.Provider.ActiveRevision == nil {
+			break
+		}
+
+		return e.complexity.Provider.ActiveRevision(childComplexity), true
 
 	case "Provider.events":
 		if e.complexity.Provider.Events == nil {
@@ -3331,6 +3358,16 @@ type ObjectMeta {
   controller.
   """
   owners: OwnerConnection! @goField(forceResolver: true)
+
+  """
+  The controller of this resource, if any. In Kubernetes exactly one owner of a
+  resource may be its "controller" - the resource that manages its lifecycle. A
+  Crossplane Provider creates and manipulates ProviderRevisions and each
+  ProviderRevision creates and manipulates CustomResourceDefinitions in turn. In
+  this example the Provider would be the controller of its ProviderRevisions,
+  and the ProviderRevisions would be the controller of their CRDs.
+  """
+  controller: KubernetesResource @goField(forceResolver: true)
 }
 
 """
@@ -3977,6 +4014,9 @@ type Configuration implements Node & KubernetesResource {
 
   "Revisions of this configuration."
   revisions: ConfigurationRevisionConnection! @goField(forceResolver: true)
+
+  "The active revision of this configuration."
+  activeRevision: ConfigurationRevision @goField(forceResolver: true)
 }
 
 """
@@ -4340,6 +4380,9 @@ type Provider implements Node & KubernetesResource {
 
   "Revisions of this provider."
   revisions: ProviderRevisionConnection! @goField(forceResolver: true)
+
+  "The active revision of this provider."
+  activeRevision: ProviderRevision @goField(forceResolver: true)
 }
 
 """
@@ -8670,6 +8713,38 @@ func (ec *executionContext) _Configuration_revisions(ctx context.Context, field 
 	return ec.marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Configuration_activeRevision(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Configuration",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Configuration().ActiveRevision(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ConfigurationRevision)
+	fc.Result = res
+	return ec.marshalOConfigurationRevision2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevision(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _ConfigurationConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12240,6 +12315,38 @@ func (ec *executionContext) _ObjectMeta_owners(ctx context.Context, field graphq
 	return ec.marshalNOwnerConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _ObjectMeta_controller(ctx context.Context, field graphql.CollectedField, obj *model.ObjectMeta) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ObjectMeta",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ObjectMeta().Controller(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.KubernetesResource)
+	fc.Result = res
+	return ec.marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Owner_resource(ctx context.Context, field graphql.CollectedField, obj *model.Owner) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -12847,6 +12954,38 @@ func (ec *executionContext) _Provider_revisions(ctx context.Context, field graph
 	res := resTmp.(*model.ProviderRevisionConnection)
 	fc.Result = res
 	return ec.marshalNProviderRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Provider_activeRevision(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Provider",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Provider().ActiveRevision(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProviderRevision)
+	fc.Result = res
+	return ec.marshalOProviderRevision2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevision(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderConfig_id(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
@@ -17701,6 +17840,17 @@ func (ec *executionContext) _Configuration(ctx context.Context, sel ast.Selectio
 				}
 				return res
 			})
+		case "activeRevision":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Configuration_activeRevision(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18693,6 +18843,17 @@ func (ec *executionContext) _ObjectMeta(ctx context.Context, sel ast.SelectionSe
 				}
 				return res
 			})
+		case "controller":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ObjectMeta_controller(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18866,6 +19027,17 @@ func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet,
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			})
+		case "activeRevision":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Provider_activeRevision(ctx, field, obj)
 				return res
 			})
 		default:
@@ -21041,6 +21213,13 @@ func (ec *executionContext) marshalOConfigurationRevision2ᚕgithubᚗcomᚋupbo
 	return ret
 }
 
+func (ec *executionContext) marshalOConfigurationRevision2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevision(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationRevision) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ConfigurationRevision(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOConfigurationRevisionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionStatus(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationRevisionStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -21538,6 +21717,13 @@ func (ec *executionContext) marshalOProviderRevision2ᚕgithubᚗcomᚋupbound�
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) marshalOProviderRevision2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevision(ctx context.Context, sel ast.SelectionSet, v *model.ProviderRevision) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ProviderRevision(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOProviderRevisionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionStatus(ctx context.Context, sel ast.SelectionSet, v *model.ProviderRevisionStatus) graphql.Marshaler {

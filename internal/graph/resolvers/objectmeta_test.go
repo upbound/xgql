@@ -130,3 +130,145 @@ func TestObjectMetaOwners(t *testing.T) {
 		})
 	}
 }
+
+func TestObjectMetaController(t *testing.T) {
+	errBoom := errors.New("boom")
+
+	// The controller
+	ctrl := unstructured.Unstructured{}
+	ctrl.SetAPIVersion("example.org/v1")
+	ctrl.SetKind("TheController")
+	gctrl, _ := model.GetKubernetesResource(&ctrl)
+
+	// An owner
+	own := unstructured.Unstructured{}
+	own.SetAPIVersion("example.org/v1")
+	own.SetKind("AnOwner")
+
+	type args struct {
+		ctx context.Context
+		obj *model.ObjectMeta
+	}
+	type want struct {
+		kr   model.KubernetesResource
+		err  error
+		errs gqlerror.List
+	}
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"GetClientError": {
+			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{}, errBoom
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+				},
+			},
+		},
+		"GetControllerError": {
+			reason: "If we can't get the controller we should add the error to the GraphQL context and continue.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(errBoom),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.ObjectMeta{
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: ctrl.GetAPIVersion(),
+							Kind:       ctrl.GetKind(),
+							Controller: pointer.BoolPtr(true),
+						},
+					},
+				},
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetOwner).Error()),
+				},
+			},
+		},
+		"FoundController": {
+			reason: "If we find and model the controller we should return it.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.ObjectMeta{
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: own.GetAPIVersion(),
+							Kind:       own.GetKind(),
+						},
+						{
+							APIVersion: ctrl.GetAPIVersion(),
+							Kind:       ctrl.GetKind(),
+							Controller: pointer.BoolPtr(true),
+						},
+					},
+				},
+			},
+			want: want{
+				kr: gctrl,
+			},
+		},
+		"NoController": {
+			reason: "If there is no controller we should return nil.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.ObjectMeta{
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: own.GetAPIVersion(),
+							Kind:       own.GetKind(),
+						},
+					},
+				},
+			},
+			want: want{
+				kr: nil,
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			m := &objectMeta{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := m.Controller(tc.args.ctx, tc.args.obj)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\nq.Owners(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\nq.Owners(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.kr, got); diff != "" {
+				t.Errorf("\n%s\nq.Owners(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}

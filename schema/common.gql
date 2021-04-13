@@ -168,6 +168,16 @@ type ObjectMeta {
   controller.
   """
   owners: OwnerConnection! @goField(forceResolver: true)
+
+  """
+  The controller of this resource, if any. In Kubernetes exactly one owner of a
+  resource may be its "controller" - the resource that manages its lifecycle. A
+  Crossplane Provider creates and manipulates ProviderRevisions and each
+  ProviderRevision creates and manipulates CustomResourceDefinitions in turn. In
+  this example the Provider would be the controller of its ProviderRevisions,
+  and the ProviderRevisions would be the controller of their CRDs.
+  """
+  controller: KubernetesResource @goField(forceResolver: true)
 }
 
 """
