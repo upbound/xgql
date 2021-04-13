@@ -93,6 +93,7 @@ func TestGetCompositeResource(t *testing.T) {
 			if diff := cmp.Diff(tc.want, got,
 				cmpopts.IgnoreFields(CompositeResource{}, "Raw"),
 				cmpopts.EquateApproxTime(1*time.Second),
+				cmp.AllowUnexported(ObjectMeta{}),
 			); diff != "" {
 				t.Errorf("\n%s\nGetCompositeResource(...): -want, +got\n:%s", tc.reason, diff)
 			}
@@ -171,6 +172,7 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 			if diff := cmp.Diff(tc.want, got,
 				cmpopts.IgnoreFields(CompositeResourceClaim{}, "Raw"),
 				cmpopts.EquateApproxTime(1*time.Second),
+				cmp.AllowUnexported(ObjectMeta{}),
 			); diff != "" {
 				t.Errorf("\n%s\nGetCompositeResourceClaim(...): -want, +got\n:%s", tc.reason, diff)
 			}

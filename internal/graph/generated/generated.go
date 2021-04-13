@@ -413,13 +413,13 @@ type ComplexityRoot struct {
 	}
 
 	ObjectMeta struct {
-		Annotations     func(childComplexity int) int
+		Annotations     func(childComplexity int, keys []string) int
 		Controller      func(childComplexity int) int
 		CreationTime    func(childComplexity int) int
 		DeletionTime    func(childComplexity int) int
 		GenerateName    func(childComplexity int) int
 		Generation      func(childComplexity int) int
-		Labels          func(childComplexity int) int
+		Labels          func(childComplexity int, keys []string) int
 		Name            func(childComplexity int) int
 		Namespace       func(childComplexity int) int
 		Owners          func(childComplexity int) int
@@ -2119,7 +2119,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.ObjectMeta.Annotations(childComplexity), true
+		args, err := ec.field_ObjectMeta_annotations_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ObjectMeta.Annotations(childComplexity, args["keys"].([]string)), true
 
 	case "ObjectMeta.controller":
 		if e.complexity.ObjectMeta.Controller == nil {
@@ -2161,7 +2166,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.ObjectMeta.Labels(childComplexity), true
+		args, err := ec.field_ObjectMeta_labels_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ObjectMeta.Labels(childComplexity, args["keys"].([]string)), true
 
 	case "ObjectMeta.name":
 		if e.complexity.ObjectMeta.Name == nil {
@@ -3378,7 +3388,7 @@ type ObjectMeta {
 
    More info: http://kubernetes.io/docs/user-guide/labels
   """
-  labels: StringMap
+  labels("Label keys for which to return values." keys: [String!]): StringMap
 
   """
   A map of string keys and values that may be set by external tools to store and
@@ -3386,7 +3396,10 @@ type ObjectMeta {
 
   More info: http://kubernetes.io/docs/user-guide/annotations
   """
-  annotations: StringMap
+  annotations(
+    "Annotation keys for which to return values."
+    keys: [String!]
+  ): StringMap
 
   """
   Resources depended by this resource. If ALL resources in the list have been
@@ -4959,6 +4972,36 @@ func (ec *executionContext) field_CustomResourceDefinition_definedResources_args
 		}
 	}
 	args["version"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ObjectMeta_annotations_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["keys"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keys"))
+		arg0, err = ec.unmarshalOString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["keys"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ObjectMeta_labels_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["keys"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keys"))
+		arg0, err = ec.unmarshalOString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["keys"] = arg0
 	return args, nil
 }
 
@@ -12374,14 +12417,21 @@ func (ec *executionContext) _ObjectMeta_labels(ctx context.Context, field graphq
 		Object:     "ObjectMeta",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_ObjectMeta_labels_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Labels, nil
+		return obj.Labels(args["keys"].([]string)), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12406,14 +12456,21 @@ func (ec *executionContext) _ObjectMeta_annotations(ctx context.Context, field g
 		Object:     "ObjectMeta",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_ObjectMeta_annotations_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Annotations, nil
+		return obj.Annotations(args["keys"].([]string)), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)

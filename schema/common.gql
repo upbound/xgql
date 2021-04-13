@@ -154,7 +154,7 @@ type ObjectMeta {
 
    More info: http://kubernetes.io/docs/user-guide/labels
   """
-  labels: StringMap
+  labels("Label keys for which to return values." keys: [String!]): StringMap
 
   """
   A map of string keys and values that may be set by external tools to store and
@@ -162,7 +162,10 @@ type ObjectMeta {
 
   More info: http://kubernetes.io/docs/user-guide/annotations
   """
-  annotations: StringMap
+  annotations(
+    "Annotation keys for which to return values."
+    keys: [String!]
+  ): StringMap
 
   """
   Resources depended by this resource. If ALL resources in the list have been

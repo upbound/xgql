@@ -167,7 +167,7 @@ func TestGetGenericResource(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetGenericResource(tc.u)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(GenericResource{}, "Raw")); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(GenericResource{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetGenericResource(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -268,7 +268,7 @@ func TestGetSecret(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetSecret(tc.s)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Secret{}, "Raw"), cmp.AllowUnexported(Secret{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Secret{}, "Raw"), cmp.AllowUnexported(Secret{}, ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetSecret(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -366,7 +366,7 @@ func TestGetConfigMap(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetConfigMap(tc.cm)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ConfigMap{}, "Raw"), cmp.AllowUnexported(ConfigMap{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ConfigMap{}, "Raw"), cmp.AllowUnexported(ConfigMap{}, ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetSecret(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -472,7 +472,7 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetCustomResourceDefinition(tc.crd)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(CustomResourceDefinition{}, "Raw")); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(CustomResourceDefinition{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetCustomResourceDefinition(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -481,6 +481,7 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 
 func TestGetKubernetesResource(t *testing.T) {
 	ignore := []cmp.Option{
+		cmp.AllowUnexported(Secret{}, ConfigMap{}, ObjectMeta{}),
 		cmpopts.IgnoreFields(ManagedResource{}, "Raw"),
 		cmpopts.IgnoreFields(ProviderConfig{}, "Raw"),
 		cmpopts.IgnoreFields(CompositeResource{}, "Raw"),
@@ -495,8 +496,6 @@ func TestGetKubernetesResource(t *testing.T) {
 		cmpopts.IgnoreFields(Secret{}, "Raw"),
 		cmpopts.IgnoreFields(ConfigMap{}, "Raw"),
 		cmpopts.IgnoreFields(GenericResource{}, "Raw"),
-
-		cmp.AllowUnexported(Secret{}, ConfigMap{}),
 	}
 
 	dp := DeletionPolicyDelete

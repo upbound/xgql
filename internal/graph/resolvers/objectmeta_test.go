@@ -6,6 +6,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -124,7 +125,7 @@ func TestObjectMetaOwners(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.Owners(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.oc, got); diff != "" {
+			if diff := cmp.Diff(tc.want.oc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nq.Owners(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -261,13 +262,13 @@ func TestObjectMetaController(t *testing.T) {
 			errs := graphql.GetErrors(tc.args.ctx)
 
 			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
-				t.Errorf("\n%s\nq.Owners(...): -want error, +got error:\n%s\n", tc.reason, diff)
+				t.Errorf("\n%s\nq.Controller(...): -want error, +got error:\n%s\n", tc.reason, diff)
 			}
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
-				t.Errorf("\n%s\nq.Owners(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+				t.Errorf("\n%s\nq.Controller(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.kr, got); diff != "" {
-				t.Errorf("\n%s\nq.Owners(...): -want, +got:\n%s\n", tc.reason, diff)
+			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+				t.Errorf("\n%s\nq.Controller(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
 	}
