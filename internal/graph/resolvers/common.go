@@ -49,6 +49,21 @@ func (r *secret) Events(ctx context.Context, obj *model.Secret) (*model.EventCon
 	})
 }
 
+type configMap struct {
+	clients ClientCache
+}
+
+func (r *configMap) Events(ctx context.Context, obj *model.ConfigMap) (*model.EventConnection, error) {
+	e := &events{clients: r.clients}
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: obj.APIVersion,
+		Kind:       obj.Kind,
+		Name:       obj.Metadata.Name,
+		Namespace:  pointer.StringPtrDerefOr(obj.Metadata.Namespace, ""),
+		UID:        types.UID(obj.Metadata.UID),
+	})
+}
+
 type crd struct {
 	clients ClientCache
 }

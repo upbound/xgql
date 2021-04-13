@@ -22,7 +22,7 @@ type objectMeta struct {
 	clients ClientCache
 }
 
-func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta, controller *bool) (*model.OwnerConnection, error) {
+func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta) (*model.OwnerConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -35,14 +35,6 @@ func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta, controll
 
 	owners := make([]model.Owner, 0, len(obj.OwnerReferences))
 	for _, ref := range obj.OwnerReferences {
-		// There can be only one controller reference.
-		// https://github.com/kubernetes/community/blob/0331e/contributors/design-proposals/api-machinery/controller-ref.md
-		wantCtrl := pointer.BoolPtrDerefOr(controller, false)
-		isCtrl := pointer.BoolPtrDerefOr(ref.Controller, false)
-		if wantCtrl && !isCtrl {
-			continue
-		}
-
 		u := &kunstructured.Unstructured{}
 		u.SetAPIVersion(ref.APIVersion)
 		u.SetKind(ref.Kind)
@@ -63,4 +55,41 @@ func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta, controll
 	}
 
 	return &model.OwnerConnection{Nodes: owners, TotalCount: len(owners)}, nil
+}
+
+func (r *objectMeta) Controller(ctx context.Context, obj *model.ObjectMeta) (model.KubernetesResource, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	for _, ref := range obj.OwnerReferences {
+		if !pointer.BoolPtrDerefOr(ref.Controller, false) {
+			continue
+		}
+
+		u := &kunstructured.Unstructured{}
+		u.SetAPIVersion(ref.APIVersion)
+		u.SetKind(ref.Kind)
+
+		nn := types.NamespacedName{Namespace: pointer.StringPtrDerefOr(obj.Namespace, ""), Name: ref.Name}
+		if err := c.Get(ctx, nn, u); err != nil {
+			graphql.AddError(ctx, errors.Wrap(err, errGetOwner))
+			return nil, nil
+		}
+
+		kr, err := model.GetKubernetesResource(u)
+		if err != nil {
+			graphql.AddError(ctx, errors.Wrap(err, errModelOwner))
+			return nil, nil
+		}
+		return kr, nil
+	}
+
+	return nil, nil
 }

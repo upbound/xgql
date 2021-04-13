@@ -6,6 +6,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -264,7 +265,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.DefinedCompositeResources(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.crc, got); diff != "" {
+			if diff := cmp.Diff(tc.want.crc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nq.DefinedCompositeResources(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -524,7 +525,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.DefinedCompositeResourceClaims(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.crcc, got); diff != "" {
+			if diff := cmp.Diff(tc.want.crcc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nq.DefinedCompositeResourceClaims(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -630,7 +631,7 @@ func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.DefaultComposition(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.cmp, got); diff != "" {
+			if diff := cmp.Diff(tc.want.cmp, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.DefaultComposition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -736,7 +737,7 @@ func TestCompositeResourceDefinitionSpecEnforcedComposition(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.EnforcedComposition(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.cmp, got); diff != "" {
+			if diff := cmp.Diff(tc.want.cmp, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.EnforcedComposition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

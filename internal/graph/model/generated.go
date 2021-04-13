@@ -20,9 +20,27 @@ type KubernetesResource interface {
 	IsKubernetesResource()
 }
 
+// A ManagedResourceDefinition defines a managed resource.
+//
+// At the time of writing a ManagedResourceDefinition will always be a
+// CustomResourceDefinition. We use a union because this may change in future per
+// https://github.com/crossplane/crossplane/issues/2262
+type ManagedResourceDefinition interface {
+	IsManagedResourceDefinition()
+}
+
 // An object with an ID.
 type Node interface {
 	IsNode()
+}
+
+// A ProviderConfigDefinition defines a provider configuration.
+//
+// At the time of writing a ProviderConfigDefinition will always be a
+// CustomResourceDefinition. We use a union because this may change in future per
+// https://github.com/crossplane/crossplane/issues/2262
+type ProviderConfigDefinition interface {
+	IsProviderConfigDefinition()
 }
 
 // A CompositeResource is a resource this is reconciled by composing other
@@ -45,6 +63,8 @@ type CompositeResource struct {
 	Raw string `json:"raw"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
+	// The definition of this resource.
+	Definition *CompositeResourceDefinition `json:"definition"`
 }
 
 func (CompositeResource) IsNode()               {}
@@ -68,6 +88,8 @@ type CompositeResourceClaim struct {
 	Raw string `json:"raw"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
+	// The definition of this resource.
+	Definition *CompositeResourceDefinition `json:"definition"`
 }
 
 func (CompositeResourceClaim) IsNode()               {}
@@ -334,6 +356,8 @@ type Configuration struct {
 	Events *EventConnection `json:"events"`
 	// Revisions of this configuration.
 	Revisions *ConfigurationRevisionConnection `json:"revisions"`
+	// The active revision of this configuration.
+	ActiveRevision *ConfigurationRevision `json:"activeRevision"`
 }
 
 func (Configuration) IsNode()               {}
@@ -459,8 +483,19 @@ type CustomResourceDefinition struct {
 	DefinedResources *KubernetesResourceConnection `json:"definedResources"`
 }
 
-func (CustomResourceDefinition) IsNode()               {}
-func (CustomResourceDefinition) IsKubernetesResource() {}
+func (CustomResourceDefinition) IsNode()                      {}
+func (CustomResourceDefinition) IsKubernetesResource()        {}
+func (CustomResourceDefinition) IsManagedResourceDefinition() {}
+func (CustomResourceDefinition) IsProviderConfigDefinition()  {}
+
+// A CustomResourceDefinitionConnection represents a connection to custom
+// resource definitions (CRDs).
+type CustomResourceDefinitionConnection struct {
+	// Connected nodes.
+	Nodes []CustomResourceDefinition `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
+}
 
 // CustomResourceDefinitionNames specifies the resource and kind names of the
 // defined custom resource.
@@ -581,7 +616,7 @@ type KubernetesResourceConnection struct {
 // A LabelSelector matches a Kubernetes resource by labels.
 type LabelSelector struct {
 	// The labels to match on.
-	MatchLabels map[string]interface{} `json:"matchLabels"`
+	MatchLabels map[string]string `json:"matchLabels"`
 }
 
 // A ManagedResource is a Kubernetes API representation of a resource in an
@@ -604,6 +639,8 @@ type ManagedResource struct {
 	Raw string `json:"raw"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
+	// The definition of this resource.
+	Definition ManagedResourceDefinition `json:"definition"`
 }
 
 func (ManagedResource) IsNode()               {}
@@ -675,6 +712,8 @@ type Provider struct {
 	Events *EventConnection `json:"events"`
 	// Revisions of this provider.
 	Revisions *ProviderRevisionConnection `json:"revisions"`
+	// The active revision of this provider.
+	ActiveRevision *ProviderRevision `json:"activeRevision"`
 }
 
 func (Provider) IsNode()               {}
@@ -693,10 +732,12 @@ type ProviderConfig struct {
 	Metadata *ObjectMeta `json:"metadata"`
 	// The observed state of this resource.
 	Status *ProviderConfigStatus `json:"status"`
-	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
 	// A raw JSON representation of the underlying Kubernetes resource.
 	Raw string `json:"raw"`
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
+	// The definition of this resource.
+	Definition ProviderConfigDefinition `json:"definition"`
 }
 
 func (ProviderConfig) IsNode()               {}
@@ -813,25 +854,6 @@ type ProviderStatus struct {
 }
 
 func (ProviderStatus) IsConditionedStatus() {}
-
-// A Secret holds secret data.
-type Secret struct {
-	// An opaque identifier that is unique across all types.
-	ID ReferenceID `json:"id"`
-	// The underlying Kubernetes API version of this resource.
-	APIVersion string `json:"apiVersion"`
-	// The underlying Kubernetes API kind of this resource.
-	Kind string `json:"kind"`
-	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
-	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
-}
-
-func (Secret) IsNode()               {}
-func (Secret) IsKubernetesResource() {}
 
 // A TypeReference references a type of Kubernetes resource by API version and
 // kind.

@@ -3,9 +3,105 @@ Query is the root type for GraphQL queries.
 """
 type Query {
   """
+  An arbitrary Kubernetes resource. Types that are known to xgql will be
+  returned appropriately (e.g. a Crossplane provider will be of the GraphQL
+  Provider type). Types that are not known to xgql will be returned as a
+  GenericResource.
+  """
+  kubernetesResource(
+    "The ID of the desired resource."
+    id: ID!
+  ): KubernetesResource
+
+  """
+  All extant Kubernetes resources of an arbitrary type. Types that are known to
+  xgql will be returned appropriately (e.g. a Crossplane provider will be of the
+  GraphQL Provider type). Types that are not known to xgql will be returned as a
+  GenericResource.
+  """
+  kubernetesResources(
+    """
+    API Version of the desired resource type.
+    """
+    apiVersion: String!
+
+    """
+    Kind of the desired resource type.
+    """
+    kind: String!
+
+    """
+    List kind of the desired resource type. Defaults to the supplied kind
+    suffixed with 'List', which is appropriate for the vast majority of kinds.
+    """
+    listKind: String
+
+    """
+    Return resources from only this namespace. Has no effect on cluster scoped
+    resources. Leave unset to return namespaced resources from all namespaces.
+    """
+    namespace: String
+  ): KubernetesResourceConnection!
+
+  """
+  Kubernetes events.
+  """
+  events(
+    "Only return events associated with the supplied ID."
+    involved: ID
+  ): EventConnection!
+
+  """
+  A Kubernetes secret.
+  """
+  secret(
+    "The secret's namespace"
+    namespace: String!
+
+    "The secret's name"
+    name: String!
+  ): Secret
+
+  """
+  A Kubernetes config map.
+  """
+  configMap(
+    "The config map's namespace"
+    namespace: String!
+
+    "The config map's name"
+    name: String!
+  ): ConfigMap
+
+  """
   Providers that are currently installed.
   """
   providers: ProviderConnection!
+
+  """
+  Provider revisions that currently exist.
+  """
+  providerRevisions(
+    """
+    Only return revisions owned by the supplied provider.
+    """
+    provider: ID
+
+    """
+    Only return active provider revisions.
+    """
+    active: Boolean
+  ): ProviderRevisionConnection!
+
+  """
+  Custom Resource Definitions (CRDs) that currently exist.
+  """
+  customResourceDefinitions(
+    """
+    Only return CRDs that are owned by the supplied provider revision.
+    """
+    revision: ID
+  ): CustomResourceDefinitionConnection!
 
   """
   Configurations that are currently installed.
@@ -13,11 +109,26 @@ type Query {
   configurations: ConfigurationConnection!
 
   """
+  Configuration revisions that currently exist.
+  """
+  configurationRevisions(
+    """
+    Only return revisions owned by the supplied configuration.
+    """
+    configuration: ID
+
+    """
+    Only return active provider revisions.
+    """
+    active: Boolean
+  ): ConfigurationRevisionConnection!
+
+  """
   Composite Resource Definitions (XRDs) that currently exist.
   """
   compositeResourceDefinitions(
     """
-    Only return XRDs that are owned by the supplied configuration revision ID.
+    Only return XRDs that are owned by the supplied configuration revision.
     """
     revision: ID
 
@@ -44,14 +155,6 @@ type Query {
     """
     dangling: Boolean = false
   ): CompositionConnection!
-
-  """
-  Kubernetes events.
-  """
-  events(
-    "Only return events associated with the supplied ID."
-    involved: ID
-  ): EventConnection!
 }
 
 """
@@ -60,6 +163,18 @@ A ProviderConnection represents a connection to providers.
 type ProviderConnection {
   "Connected nodes."
   nodes: [Provider!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
+}
+
+"""
+A CustomResourceDefinitionConnection represents a connection to custom
+resource definitions (CRDs).
+"""
+type CustomResourceDefinitionConnection {
+  "Connected nodes."
+  nodes: [CustomResourceDefinition!]
 
   "The total number of connected nodes."
   totalCount: Int!

@@ -6,6 +6,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -17,7 +18,15 @@ import (
 
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
+	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/model"
+)
+
+var (
+	_ generated.GenericResourceResolver          = &genericResource{}
+	_ generated.SecretResolver                   = &secret{}
+	_ generated.ConfigMapResolver                = &configMap{}
+	_ generated.CustomResourceDefinitionResolver = &crd{}
 )
 
 func TestCRDDefinedResources(t *testing.T) {
@@ -205,7 +214,7 @@ func TestCRDDefinedResources(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.DefinedResources(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.krc, got); diff != "" {
+			if diff := cmp.Diff(tc.want.krc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nq.DefinedResources(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

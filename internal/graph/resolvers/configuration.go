@@ -9,7 +9,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/pointer"
 
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
@@ -38,7 +37,7 @@ func (r *configuration) Events(ctx context.Context, obj *model.Configuration) (*
 	})
 }
 
-func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration, active *bool) (*model.ConfigurationRevisionConnection, error) {
+func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration) (*model.ConfigurationRevisionConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -69,16 +68,50 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration,
 			continue
 		}
 
-		// We only want the active PackageRevision, and this isn't it.
-		if pointer.BoolPtrDerefOr(active, false) && cr.Spec.DesiredState != pkgv1.PackageRevisionActive {
-			continue
-		}
-
 		out.Nodes = append(out.Nodes, model.GetConfigurationRevision(&cr))
 		out.TotalCount++
 	}
 
 	return out, nil
+}
+
+func (r *configuration) ActiveRevision(ctx context.Context, obj *model.Configuration) (*model.ConfigurationRevision, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	in := &pkgv1.ConfigurationRevisionList{}
+	if err := c.List(ctx, in); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errListConfigRevs))
+		return nil, nil
+	}
+
+	for i := range in.Items {
+		cr := in.Items[i] // So we don't take the address of a range variable.
+
+		// This revision is not active.
+		if cr.Spec.DesiredState != pkgv1.PackageRevisionActive {
+			continue
+		}
+
+		// We're not the controller reference of this ConfigurationRevision;
+		// it's not one of ours.
+		// https://github.com/kubernetes/community/blob/0331e/contributors/design-proposals/api-machinery/controller-ref.md
+		if c := metav1.GetControllerOf(&cr); c == nil || c.UID != types.UID(obj.Metadata.UID) {
+			continue
+		}
+
+		out := model.GetConfigurationRevision(&cr)
+		return &out, nil
+	}
+
+	return nil, nil
 }
 
 type configurationRevision struct {

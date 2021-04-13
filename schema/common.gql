@@ -4,12 +4,16 @@ Time is a timestamp.
 scalar Time
 
 """
-A Map of string to arbitrary values.
+A StringMap is a 'map' of string keys to string values, i.e. an object with
+string keys and string values. Note that despite this value being returned as a
+'real' object (as opposed to JSON encoded as a string like JSONObject) this type
+is still a scalar, and thus it's not possible to query at key granularity; you
+always get the whole map.
 """
-scalar Map
+scalar StringMap
 
 """
-A JSONObject contains a JSON object encoded as a string.
+A JSONObject contains an opaque JSON object encoded as a string.
 """
 scalar JSONObject
 
@@ -144,21 +148,24 @@ type ObjectMeta {
   deletionTime: Time
 
   """
-  Map of string keys and values that can be used to organize and categorize
+  A map of string keys and values that can be used to organize and categorize
   (scope and select) objects. May match selectors of replication controllers
   and services.
 
    More info: http://kubernetes.io/docs/user-guide/labels
   """
-  labels: Map
+  labels("Label keys for which to return values." keys: [String!]): StringMap
 
   """
-  Map of string keys and values that may be set by external tools to store and
+  A map of string keys and values that may be set by external tools to store and
   retrieve arbitrary metadata.
 
   More info: http://kubernetes.io/docs/user-guide/annotations
   """
-  annotations: Map
+  annotations(
+    "Annotation keys for which to return values."
+    keys: [String!]
+  ): StringMap
 
   """
   Resources depended by this resource. If ALL resources in the list have been
@@ -167,10 +174,17 @@ type ObjectMeta {
   with the controller field set to true. There cannot be more than one managing
   controller.
   """
-  owners(
-    "Return only the owner that represents the controller of this resource."
-    controller: Boolean
-  ): OwnerConnection! @goField(forceResolver: true)
+  owners: OwnerConnection! @goField(forceResolver: true)
+
+  """
+  The controller of this resource, if any. In Kubernetes exactly one owner of a
+  resource may be its "controller" - the resource that manages its lifecycle. A
+  Crossplane Provider creates and manipulates ProviderRevisions and each
+  ProviderRevision creates and manipulates CustomResourceDefinitions in turn. In
+  this example the Provider would be the controller of its ProviderRevisions,
+  and the ProviderRevisions would be the controller of their CRDs.
+  """
+  controller: KubernetesResource @goField(forceResolver: true)
 }
 
 """
@@ -296,7 +310,7 @@ A LabelSelector matches a Kubernetes resource by labels.
 """
 type LabelSelector {
   "The labels to match on."
-  matchLabels: Map
+  matchLabels: StringMap
 }
 
 # NOTE(negz): Event does not implement KubernetesResource simply because an
@@ -372,22 +386,86 @@ enum EventType {
 A Secret holds secret data.
 """
 type Secret implements Node & KubernetesResource {
-  "An opaque identifier that is unique across all types."
+  """
+  An opaque identifier that is unique across all types.
+  """
   id: ID!
 
-  "The underlying Kubernetes API version of this resource."
+  """
+  The underlying Kubernetes API version of this resource.
+  """
   apiVersion: String!
 
-  "The underlying Kubernetes API kind of this resource."
+  """
+  The underlying Kubernetes API kind of this resource.
+  """
   kind: String!
 
-  "Metadata that is common to all Kubernetes API resources."
+  """
+  Metadata that is common to all Kubernetes API resources.
+  """
   metadata: ObjectMeta!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
+  """
+  Type of this secret.
+  """
+  type: String
+
+  """
+  The data stored in this secret. Values are not base64 encoded.
+  """
+  data("Data keys for which to return values." keys: [String!]): StringMap
+
+  """
+  A raw JSON representation of the underlying Kubernetes resource.
+  """
   raw: JSONObject!
 
-  "Events pertaining to this resource."
+  """
+  Events pertaining to this resource.
+  """
+  events: EventConnection! @goField(forceResolver: true)
+}
+
+"""
+A ConfigMap holds configuration data.
+"""
+type ConfigMap implements Node & KubernetesResource {
+  """
+  An opaque identifier that is unique across all types.
+  """
+  id: ID!
+
+  """
+  The underlying Kubernetes API version of this resource.
+  """
+  apiVersion: String!
+
+  """
+  The underlying Kubernetes API kind of this resource.
+  """
+  kind: String!
+
+  """
+  Metadata that is common to all Kubernetes API resources.
+  """
+  metadata: ObjectMeta!
+
+  """
+  The data stored in this config map.
+  """
+  data("Data keys for which to return values." keys: [String!]): StringMap
+
+  """
+  A raw JSON representation of the underlying Kubernetes resource.
+  """
+  raw: JSONObject!
+
+  # TODO(negz): Support binaryData too? What would the return value be?
+
+  """
+  Events pertaining to this resource.
+  """
   events: EventConnection! @goField(forceResolver: true)
 }
 

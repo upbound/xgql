@@ -56,7 +56,7 @@ func TestGetCompositeResource(t *testing.T) {
 					Name: "cool",
 				},
 				Spec: &CompositeResourceSpec{
-					CompositionSelector:               &LabelSelector{MatchLabels: map[string]interface{}{"cool": "very"}},
+					CompositionSelector:               &LabelSelector{MatchLabels: map[string]string{"cool": "very"}},
 					CompositionReference:              &corev1.ObjectReference{Name: "coolcmp"},
 					ClaimReference:                    &corev1.ObjectReference{Name: "coolclaim"},
 					ResourceReferences:                []corev1.ObjectReference{{Name: "coolmanaged"}},
@@ -93,6 +93,7 @@ func TestGetCompositeResource(t *testing.T) {
 			if diff := cmp.Diff(tc.want, got,
 				cmpopts.IgnoreFields(CompositeResource{}, "Raw"),
 				cmpopts.EquateApproxTime(1*time.Second),
+				cmp.AllowUnexported(ObjectMeta{}),
 			); diff != "" {
 				t.Errorf("\n%s\nGetCompositeResource(...): -want, +got\n:%s", tc.reason, diff)
 			}
@@ -140,7 +141,7 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 					Name:      "cool",
 				},
 				Spec: &CompositeResourceClaimSpec{
-					CompositionSelector:               &LabelSelector{MatchLabels: map[string]interface{}{"cool": "very"}},
+					CompositionSelector:               &LabelSelector{MatchLabels: map[string]string{"cool": "very"}},
 					CompositionReference:              &corev1.ObjectReference{Name: "coolcmp"},
 					ResourceReference:                 &corev1.ObjectReference{Name: "coolxr"},
 					WritesConnectionSecretToReference: &xpv1.SecretReference{Namespace: "default", Name: "coolsecret"},
@@ -171,6 +172,7 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 			if diff := cmp.Diff(tc.want, got,
 				cmpopts.IgnoreFields(CompositeResourceClaim{}, "Raw"),
 				cmpopts.EquateApproxTime(1*time.Second),
+				cmp.AllowUnexported(ObjectMeta{}),
 			); diff != "" {
 				t.Errorf("\n%s\nGetCompositeResourceClaim(...): -want, +got\n:%s", tc.reason, diff)
 			}

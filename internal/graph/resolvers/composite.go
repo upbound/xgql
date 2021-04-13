@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
@@ -16,11 +17,13 @@ import (
 )
 
 const (
-	errGetComposition = "cannot get composition"
-	errGetXR          = "cannot get composite resource"
-	errGetXRC         = "cannot get composite resource claim"
-	errGetComposed    = "cannot get composed resource"
-	errModelComposed  = "cannot model composed resource"
+	errListXRDs            = "cannot list composite resource definitions"
+	errMalformedAPIVersion = "cannot parse malformed API version"
+	errGetComposition      = "cannot get composition"
+	errGetXR               = "cannot get composite resource"
+	errGetXRC              = "cannot get composite resource claim"
+	errGetComposed         = "cannot get composed resource"
+	errModelComposed       = "cannot model composed resource"
 )
 
 type compositeResource struct {
@@ -35,6 +38,52 @@ func (r *compositeResource) Events(ctx context.Context, obj *model.CompositeReso
 		Name:       obj.Metadata.Name,
 		UID:        types.UID(obj.Metadata.UID),
 	})
+}
+
+func (r *compositeResource) Definition(ctx context.Context, obj *model.CompositeResource) (*model.CompositeResourceDefinition, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	in := &extv1.CompositeResourceDefinitionList{}
+	if err := c.List(ctx, in); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errListXRDs))
+		return nil, nil
+	}
+
+	gv, err := schema.ParseGroupVersion(obj.APIVersion)
+	if err != nil {
+		// This should be pretty much impossible - the API server should not
+		// return resources with malformed API versions.
+		graphql.AddError(ctx, errors.Wrap(err, errMalformedAPIVersion))
+		return nil, nil
+	}
+
+	for i := range in.Items {
+		xrd := in.Items[i] // So we don't take the address of a range variable.
+
+		if xrd.Spec.Group != gv.Group {
+			continue
+		}
+
+		if xrd.Spec.Names.Kind != obj.Kind {
+			continue
+		}
+
+		out := model.GetCompositeResourceDefinition(&xrd)
+		return &out, nil
+	}
+
+	// This should also be impossible - all XRs should be defined by an XRD. If
+	// we get here we've hit an edge case like finding  a resource that quacks
+	// like an XR but is not one.
+	return nil, nil
 }
 
 type compositeResourceSpec struct {
@@ -175,6 +224,56 @@ func (r *compositeResourceClaim) Events(ctx context.Context, obj *model.Composit
 		Name:       obj.Metadata.Name,
 		UID:        types.UID(obj.Metadata.UID),
 	})
+}
+
+func (r *compositeResourceClaim) Definition(ctx context.Context, obj *model.CompositeResourceClaim) (*model.CompositeResourceDefinition, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	in := &extv1.CompositeResourceDefinitionList{}
+	if err := c.List(ctx, in); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errListXRDs))
+		return nil, nil
+	}
+
+	gv, err := schema.ParseGroupVersion(obj.APIVersion)
+	if err != nil {
+		// This should be pretty much impossible - the API server should not
+		// return resources with malformed API versions.
+		graphql.AddError(ctx, errors.Wrap(err, errMalformedAPIVersion))
+		return nil, nil
+	}
+
+	for i := range in.Items {
+		xrd := in.Items[i] // So we don't take the address of a range variable.
+
+		if xrd.Spec.ClaimNames == nil {
+			continue
+		}
+
+		if xrd.Spec.Group != gv.Group {
+			continue
+		}
+
+		if xrd.Spec.ClaimNames.Kind != obj.Kind {
+			continue
+		}
+
+		out := model.GetCompositeResourceDefinition(&xrd)
+		return &out, nil
+	}
+
+	// This should also be impossible - all XRCs should be defined by an XRD. If
+	// we get here we've hit an edge case like finding  a resource that quacks
+	// like an XRC but is not one.
+	return nil, nil
 }
 
 type compositeResourceClaimSpec struct {

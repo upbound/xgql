@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -12,6 +13,7 @@ import (
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/json"
+	"k8s.io/utils/pointer"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
@@ -101,6 +103,22 @@ func (id ReferenceID) MarshalGQL(w io.Writer) {
 	_, _ = w.Write([]byte(`"` + id.String() + `"`))
 }
 
+// MarshalStringMap marshals a map[string]string to GraphQL.
+func MarshalStringMap(val map[string]string) graphql.Marshaler {
+	return graphql.WriterFunc(func(w io.Writer) {
+		_ = json.NewEncoder(w).Encode(val)
+	})
+}
+
+// UnmarshalStringMap marshals a map[string]string from GraphQL.
+func UnmarshalStringMap(v interface{}) (map[string]string, error) {
+	if m, ok := v.(map[string]string); ok {
+		return m, nil
+	}
+
+	return nil, errors.Errorf("%T is not a map", v)
+}
+
 // GetConditions from the supplied Crossplane conditions.
 func GetConditions(in []xpv1.Condition) []Condition {
 	if in == nil {
@@ -130,12 +148,7 @@ func GetLabelSelector(s *metav1.LabelSelector) *LabelSelector {
 		return nil
 	}
 
-	ml := map[string]interface{}{}
-	for k, v := range s.MatchLabels {
-		ml[k] = v
-	}
-
-	return &LabelSelector{MatchLabels: ml}
+	return &LabelSelector{MatchLabels: s.MatchLabels}
 }
 
 // GetGenericResource from the suppled Kubernetes resource.
@@ -154,22 +167,137 @@ func GetGenericResource(u *kunstructured.Unstructured) GenericResource {
 	}
 }
 
-// TODO(negz): Does this need to exist? It's identical to GenericResource.
+// A Secret holds secret data.
+type Secret struct {
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+
+	// Type of this secret.
+	Type *string `json:"type"`
+
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+
+	data map[string]string
+}
+
+// IsNode indicates that a Secret satisfies the GraphQL Node interface.
+func (Secret) IsNode() {}
+
+// IsKubernetesResource indicates that a Secret satisfies the GraphQL
+// IsKubernetesResource interface.
+func (Secret) IsKubernetesResource() {}
+
+// Data of this secret.
+func (s *Secret) Data(keys []string) map[string]string {
+	if keys == nil || s.data == nil {
+		return s.data
+	}
+	out := make(map[string]string)
+	for _, k := range keys {
+		if v, ok := s.data[k]; ok {
+			out[k] = v
+		}
+	}
+	return out
+}
+
+// A ConfigMap holds configuration data.
+type ConfigMap struct {
+	// An opaque identifier that is unique across all types.
+	ID ReferenceID `json:"id"`
+
+	// The underlying Kubernetes API version of this resource.
+	APIVersion string `json:"apiVersion"`
+
+	// The underlying Kubernetes API kind of this resource.
+	Kind string `json:"kind"`
+
+	// Metadata that is common to all Kubernetes API resources.
+	Metadata *ObjectMeta `json:"metadata"`
+
+	// A raw JSON representation of the underlying Kubernetes resource.
+	Raw string `json:"raw"`
+
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
+
+	data map[string]string
+}
+
+// Data of this config map.
+func (cm *ConfigMap) Data(keys []string) map[string]string {
+	if keys == nil || cm.data == nil {
+		return cm.data
+	}
+	out := make(map[string]string)
+	for _, k := range keys {
+		if v, ok := cm.data[k]; ok {
+			out[k] = v
+		}
+	}
+	return out
+}
+
+// IsNode indicates that a ConfigMap satisfies the GraphQL Node interface.
+func (ConfigMap) IsNode() {}
+
+// IsKubernetesResource indicates that a ConfigMap satisfies the GraphQL
+// IsKubernetesResource interface.
+func (ConfigMap) IsKubernetesResource() {}
 
 // GetSecret from the suppled Kubernetes Secret
 func GetSecret(s *corev1.Secret) Secret {
-	return Secret{
+	out := Secret{
 		ID: ReferenceID{
-			APIVersion: s.APIVersion,
-			Kind:       s.Kind,
+			APIVersion: corev1.SchemeGroupVersion.String(),
+			Kind:       "Secret",
 			Namespace:  s.GetNamespace(),
 			Name:       s.GetName(),
 		},
-
-		APIVersion: s.APIVersion,
-		Kind:       s.Kind,
+		APIVersion: corev1.SchemeGroupVersion.String(),
+		Kind:       "Secret",
 		Metadata:   GetObjectMeta(s),
 		Raw:        raw(s),
+	}
+
+	if s.Data != nil {
+		out.data = make(map[string]string)
+		for k, v := range s.Data {
+			out.data[k] = string(v)
+		}
+	}
+
+	if s.Type != "" {
+		out.Type = pointer.StringPtr(string(s.Type))
+	}
+
+	return out
+}
+
+// GetConfigMap from the supplied Kubernetes ConfigMap.
+func GetConfigMap(cm *corev1.ConfigMap) ConfigMap {
+	return ConfigMap{
+		ID: ReferenceID{
+			APIVersion: corev1.SchemeGroupVersion.String(),
+			Kind:       "ConfigMap",
+			Namespace:  cm.GetNamespace(),
+			Name:       cm.GetName(),
+		},
+		APIVersion: corev1.SchemeGroupVersion.String(),
+		Kind:       "ConfigMap",
+		Metadata:   GetObjectMeta(cm),
+		Raw:        raw(cm),
+		data:       cm.Data,
 	}
 }
 
@@ -345,6 +473,13 @@ func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, e
 			return nil, errors.Wrap(err, "cannot convert secret")
 		}
 		return GetSecret(sec), nil
+
+	case u.GroupVersionKind() == schema.GroupVersionKind{Group: corev1.GroupName, Version: "v1", Kind: "ConfigMap"}:
+		cm := &corev1.ConfigMap{}
+		if err := convert(u, cm); err != nil {
+			return nil, errors.Wrap(err, "cannot convert config map")
+		}
+		return GetConfigMap(cm), nil
 
 	default:
 		return GetGenericResource(u), nil

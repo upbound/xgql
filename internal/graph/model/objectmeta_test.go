@@ -50,9 +50,9 @@ func TestGetObjectMeta(t *testing.T) {
 				Generation:      42,
 				CreationTime:    created,
 				DeletionTime:    &deleted,
-				Labels:          map[string]interface{}{"cool": "very"},
-				Annotations:     map[string]interface{}{"cool": "very"},
 				OwnerReferences: []metav1.OwnerReference{{Name: "owner"}},
+				labels:          map[string]string{"cool": "very"},
+				annotations:     map[string]string{"cool": "very"},
 			},
 		},
 		"Empty": {
@@ -66,8 +66,92 @@ func TestGetObjectMeta(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			got := GetObjectMeta(tc.o)
 			// metav1.Time trims timestamps to second resolution.
-			if diff := cmp.Diff(tc.want, got, cmpopts.EquateApproxTime(1*time.Second)); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.EquateApproxTime(1*time.Second), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetObjectMeta(...): -want, +got\n:%s", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestObjectMetaLabels(t *testing.T) {
+	l := map[string]string{
+		"some":   "data",
+		"more":   "datas",
+		"somuch": "ofthedata",
+	}
+
+	cases := map[string]struct {
+		reason string
+		om     *ObjectMeta
+		keys   []string
+		want   map[string]string
+	}{
+		"NilData": {
+			reason: "If no labels exists no labels should be returned.",
+			om:     &ObjectMeta{},
+			keys:   []string{"dataplz"},
+			want:   nil,
+		},
+		"AllData": {
+			reason: "If no keys are passed no labels should be returned.",
+			om:     &ObjectMeta{labels: l},
+			want:   l,
+		},
+		"SomeData": {
+			reason: "If keys are passed only those keys (if they exist) should be returned.",
+			om:     &ObjectMeta{labels: l},
+			keys:   []string{"some", "dataplz"},
+			want:   map[string]string{"some": "data"},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			got := tc.om.Labels(tc.keys)
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("\n%s\nom.Labels(...): -want, +got\n:%s", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestObjectMetaAnnotations(t *testing.T) {
+	a := map[string]string{
+		"some":   "data",
+		"more":   "datas",
+		"somuch": "ofthedata",
+	}
+
+	cases := map[string]struct {
+		reason string
+		om     *ObjectMeta
+		keys   []string
+		want   map[string]string
+	}{
+		"NilData": {
+			reason: "If no annotations exists no annotations should be returned.",
+			om:     &ObjectMeta{},
+			keys:   []string{"dataplz"},
+			want:   nil,
+		},
+		"AllData": {
+			reason: "If no keys are passed no annotations should be returned.",
+			om:     &ObjectMeta{annotations: a},
+			want:   a,
+		},
+		"SomeData": {
+			reason: "If keys are passed only those keys (if they exist) should be returned.",
+			om:     &ObjectMeta{annotations: a},
+			keys:   []string{"some", "dataplz"},
+			want:   map[string]string{"some": "data"},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			got := tc.om.Annotations(tc.keys)
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("\n%s\nom.Annotations(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
 	}

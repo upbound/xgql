@@ -17,9 +17,10 @@ import (
 // at spec.resourceRefs and spec.compositionRef to probably be a composite
 // resource claim.
 func ProbablyClaim(u *unstructured.Unstructured) bool {
-	cerr := fieldpath.Pave(u.Object).GetValueInto("spec.compositionRef", &corev1.ObjectReference{})
-	rerr := fieldpath.Pave(u.Object).GetValueInto("spec.resourceRef", &corev1.ObjectReference{})
-	return cerr == nil && rerr == nil
+	// TODO(negz): Require spec.compositionRef be set too once
+	// https://github.com/crossplane/crossplane/issues/2263 is addressed.
+	err := fieldpath.Pave(u.Object).GetValueInto("spec.resourceRef", &corev1.ObjectReference{})
+	return err == nil
 }
 
 // An Claim composite resource claim.

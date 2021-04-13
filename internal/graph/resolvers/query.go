@@ -6,24 +6,169 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
+	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/pointer"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
 	"github.com/upbound/xgql/internal/auth"
+	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/model"
 )
 
 const (
+	errGetResource   = "cannot get Kubernetes resource"
+	errModelResource = "cannot model Kubernetes resource"
 	errGetClient     = "cannot get client"
+	errGetSecret     = "cannot get secret"
+	errGetConfigMap  = "cannot get config map"
 	errListProviders = "cannot list providers"
 	errListConfigs   = "cannot list configurations"
 )
 
 type query struct {
 	clients ClientCache
+}
+
+func (r *query) KubernetesResource(ctx context.Context, id model.ReferenceID) (model.KubernetesResource, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	u := &unstructured.Unstructured{}
+	u.SetAPIVersion(id.APIVersion)
+	u.SetKind(id.Kind)
+	nn := types.NamespacedName{Namespace: id.Namespace, Name: id.Name}
+	if err := c.Get(ctx, nn, u); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetResource))
+		return nil, nil
+	}
+
+	out, err := model.GetKubernetesResource(u)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errModelResource))
+		return nil, nil
+	}
+	return out, nil
+}
+
+func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string, listKind, namespace *string) (*model.KubernetesResourceConnection, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	gopts := []clients.GetOption{}
+	lopts := []client.ListOption{}
+	if namespace != nil {
+		gopts = []clients.GetOption{clients.ForNamespace(*namespace)}
+		lopts = []client.ListOption{client.InNamespace(*namespace)}
+	}
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds, gopts...)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	in := &kunstructured.UnstructuredList{}
+	in.SetAPIVersion(apiVersion)
+	in.SetKind(kind + "List")
+	if listKind != nil && *listKind != "" {
+		in.SetKind(*listKind)
+	}
+
+	if err := c.List(ctx, in, lopts...); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errListResources))
+		return nil, nil
+	}
+
+	out := &model.KubernetesResourceConnection{
+		Nodes: make([]model.KubernetesResource, 0, len(in.Items)),
+	}
+
+	for i := range in.Items {
+		kr, err := model.GetKubernetesResource(&in.Items[i])
+		if err != nil {
+			graphql.AddError(ctx, errors.Wrap(err, errModelResource))
+			continue
+		}
+		out.Nodes = append(out.Nodes, kr)
+		out.TotalCount++
+	}
+
+	return out, nil
+}
+
+func (r *query) Events(ctx context.Context, involved *model.ReferenceID) (*model.EventConnection, error) {
+	e := events{clients: r.clients}
+	if involved == nil {
+		// Resolve all events.
+		return e.Resolve(ctx, nil)
+	}
+
+	// Resolve events pertaining to the supplied ID.
+	return e.Resolve(ctx, &corev1.ObjectReference{
+		APIVersion: involved.APIVersion,
+		Kind:       involved.Kind,
+		Namespace:  involved.Namespace,
+		Name:       involved.Name,
+	})
+}
+
+func (r *query) Secret(ctx context.Context, namespace, name string) (*model.Secret, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	s := &corev1.Secret{}
+	nn := types.NamespacedName{Namespace: namespace, Name: name}
+	if err := c.Get(ctx, nn, s); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetSecret))
+		return nil, nil
+	}
+
+	out := model.GetSecret(s)
+	return &out, nil
+}
+
+func (r *query) ConfigMap(ctx context.Context, namespace, name string) (*model.ConfigMap, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	cm := &corev1.ConfigMap{}
+	nn := types.NamespacedName{Namespace: namespace, Name: name}
+	if err := c.Get(ctx, nn, cm); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetConfigMap))
+		return nil, nil
+	}
+
+	out := model.GetConfigMap(cm)
+	return &out, nil
 }
 
 func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error) {
@@ -50,6 +195,83 @@ func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error
 
 	for i := range in.Items {
 		out.Nodes = append(out.Nodes, model.GetProvider(&in.Items[i]))
+	}
+
+	return out, nil
+}
+
+func (r *query) ProviderRevisions(ctx context.Context, provider *model.ReferenceID, active *bool) (*model.ProviderRevisionConnection, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	in := &pkgv1.ProviderRevisionList{}
+	if err := c.List(ctx, in); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errListProviderRevs))
+		return nil, nil
+	}
+
+	out := &model.ProviderRevisionConnection{
+		Nodes: make([]model.ProviderRevision, 0),
+	}
+
+	for i := range in.Items {
+		pr := in.Items[i] // So we don't take the address of a range variable.
+
+		// The supplied provider is not an owner of this PackageRevision.
+		if provider != nil && !containsID(pr.OwnerReferences, *provider) {
+			continue
+		}
+
+		// We only want the active PackageRevision, and this isn't it.
+		if pointer.BoolPtrDerefOr(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
+			continue
+		}
+
+		out.Nodes = append(out.Nodes, model.GetProviderRevision(&pr))
+		out.TotalCount++
+	}
+
+	return out, nil
+}
+
+func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.ReferenceID) (*model.CustomResourceDefinitionConnection, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	in := &kextv1.CustomResourceDefinitionList{}
+	if err := c.List(ctx, in); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errListConfigs))
+		return nil, nil
+	}
+
+	out := &model.CustomResourceDefinitionConnection{
+		Nodes: make([]model.CustomResourceDefinition, 0),
+	}
+
+	for i := range in.Items {
+		xrd := &in.Items[i]
+
+		// We only want CRDs owned by this config revision, but this one isn't.
+		if revision != nil && !containsID(xrd.GetOwnerReferences(), *revision) {
+			continue
+		}
+
+		out.Nodes = append(out.Nodes, model.GetCustomResourceDefinition(xrd))
+		out.TotalCount++
 	}
 
 	return out, nil
@@ -84,6 +306,47 @@ func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnect
 	return out, nil
 }
 
+func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID, active *bool) (*model.ConfigurationRevisionConnection, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	in := &pkgv1.ConfigurationRevisionList{}
+	if err := c.List(ctx, in); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errListConfigRevs))
+		return nil, nil
+	}
+
+	out := &model.ConfigurationRevisionConnection{
+		Nodes: make([]model.ConfigurationRevision, 0),
+	}
+
+	for i := range in.Items {
+		pr := in.Items[i] // So we don't take the address of a range variable.
+
+		// The supplied configuration is not an owner of this PackageRevision.
+		if configuration != nil && !containsID(pr.OwnerReferences, *configuration) {
+			continue
+		}
+
+		// We only want the active PackageRevision, and this isn't it.
+		if pointer.BoolPtrDerefOr(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
+			continue
+		}
+
+		out.Nodes = append(out.Nodes, model.GetConfigurationRevision(&pr))
+		out.TotalCount++
+	}
+
+	return out, nil
+}
+
 func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositeResourceDefinitionConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -108,12 +371,12 @@ func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *mode
 	for i := range in.Items {
 		xrd := &in.Items[i]
 
-		// We only want dangling XRs but this one is owned by a config revision.
+		// We only want dangling XRDs but this one is owned by a config revision.
 		if pointer.BoolPtrDerefOr(dangling, false) && containsCR(xrd.GetOwnerReferences()) {
 			continue
 		}
 
-		// We only want XRs owned by this config revision, but this one isn't.
+		// We only want XRDs owned by this config revision, but this one isn't.
 		if revision != nil && !containsID(xrd.GetOwnerReferences(), *revision) {
 			continue
 		}
@@ -192,20 +455,4 @@ func containsID(in []metav1.OwnerReference, id model.ReferenceID) bool {
 		return true
 	}
 	return false
-}
-
-func (r *query) Events(ctx context.Context, involved *model.ReferenceID) (*model.EventConnection, error) {
-	e := events{clients: r.clients}
-	if involved == nil {
-		// Resolve all events.
-		return e.Resolve(ctx, nil)
-	}
-
-	// Resolve events pertaining to the supplied ID.
-	return e.Resolve(ctx, &corev1.ObjectReference{
-		APIVersion: involved.APIVersion,
-		Kind:       involved.Kind,
-		Namespace:  involved.Namespace,
-		Name:       involved.Name,
-	})
 }

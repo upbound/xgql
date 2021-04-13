@@ -29,6 +29,9 @@ models:
   ID:
     model:
       - github.com/upbound/xgql/internal/graph/model.ReferenceID
+  StringMap:
+    model:
+      - github.com/upbound/xgql/internal/graph/model.StringMap
   Int:
     model:
       - github.com/99designs/gqlgen/graphql.Int

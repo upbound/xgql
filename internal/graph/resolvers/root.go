@@ -52,6 +52,11 @@ func (r *Root) Secret() generated.SecretResolver {
 	return &secret{clients: r.clients}
 }
 
+// ConfigMap resolves properties of the ConfigMap GraphQL type.
+func (r *Root) ConfigMap() generated.ConfigMapResolver {
+	return &configMap{clients: r.clients}
+}
+
 // CompositeResource resolves properties of the CompositeResource GraphQL type.
 func (r *Root) CompositeResource() generated.CompositeResourceResolver {
 	return &compositeResource{clients: r.clients}

@@ -167,8 +167,50 @@ func TestGetGenericResource(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetGenericResource(tc.u)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(GenericResource{}, "Raw")); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(GenericResource{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetGenericResource(...): -want, +got\n:%s", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestSecretData(t *testing.T) {
+	d := map[string]string{
+		"some":   "data",
+		"more":   "datas",
+		"somuch": "ofthedata",
+	}
+
+	cases := map[string]struct {
+		reason string
+		s      *Secret
+		keys   []string
+		want   map[string]string
+	}{
+		"NilData": {
+			reason: "If no data exists no data should be returned.",
+			s:      &Secret{},
+			keys:   []string{"dataplz"},
+			want:   nil,
+		},
+		"AllData": {
+			reason: "If no keys are passed no data should be returned.",
+			s:      &Secret{data: d},
+			want:   d,
+		},
+		"SomeData": {
+			reason: "If keys are passed only those keys (if they exist) should be returned.",
+			s:      &Secret{data: d},
+			keys:   []string{"some", "dataplz"},
+			want:   map[string]string{"some": "data"},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			got := tc.s.Data(tc.keys)
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("\n%s\ns.Data(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
 	}
@@ -184,32 +226,41 @@ func TestGetSecret(t *testing.T) {
 			reason: "All supported fields should be converted to our model",
 			s: &corev1.Secret{
 				TypeMeta: metav1.TypeMeta{
-					APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					APIVersion: corev1.SchemeGroupVersion.String(),
 					Kind:       "Secret",
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "cool",
 				},
+				Type: corev1.SecretType("cool"),
 				Data: map[string][]byte{"cool": []byte("secret")},
 			},
 			want: Secret{
 				ID: ReferenceID{
-					APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					APIVersion: corev1.SchemeGroupVersion.String(),
 					Kind:       "Secret",
 					Name:       "cool",
 				},
-				APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+				APIVersion: corev1.SchemeGroupVersion.String(),
 				Kind:       "Secret",
 				Metadata: &ObjectMeta{
 					Name: "cool",
 				},
+				Type: pointer.StringPtr("cool"),
+				data: map[string]string{"cool": "secret"},
 			},
 		},
 		"Empty": {
 			reason: "Absent optional fields should be absent in our model",
 			s:      &corev1.Secret{},
 			want: Secret{
-				Metadata: &ObjectMeta{},
+				ID: ReferenceID{
+					APIVersion: corev1.SchemeGroupVersion.String(),
+					Kind:       "Secret",
+				},
+				APIVersion: corev1.SchemeGroupVersion.String(),
+				Kind:       "Secret",
+				Metadata:   &ObjectMeta{},
 			},
 		},
 	}
@@ -217,7 +268,105 @@ func TestGetSecret(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetSecret(tc.s)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Secret{}, "Raw")); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Secret{}, "Raw"), cmp.AllowUnexported(Secret{}, ObjectMeta{})); diff != "" {
+				t.Errorf("\n%s\nGetSecret(...): -want, +got\n:%s", tc.reason, diff)
+			}
+		})
+	}
+}
+func TestConfigMapData(t *testing.T) {
+	d := map[string]string{
+		"some":   "data",
+		"more":   "datas",
+		"somuch": "ofthedata",
+	}
+
+	cases := map[string]struct {
+		reason string
+		cm     *ConfigMap
+		keys   []string
+		want   map[string]string
+	}{
+		"NilData": {
+			reason: "If no data exists no data should be returned.",
+			cm:     &ConfigMap{},
+			keys:   []string{"dataplz"},
+			want:   nil,
+		},
+		"AllData": {
+			reason: "If no keys are passed no data should be returned.",
+			cm:     &ConfigMap{data: d},
+			want:   d,
+		},
+		"SomeData": {
+			reason: "If keys are passed only those keys (if they exist) should be returned.",
+			cm:     &ConfigMap{data: d},
+			keys:   []string{"some", "dataplz"},
+			want:   map[string]string{"some": "data"},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			got := tc.cm.Data(tc.keys)
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("\n%s\ncm.Data(...): -want, +got\n:%s", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestGetConfigMap(t *testing.T) {
+	cases := map[string]struct {
+		reason string
+		cm     *corev1.ConfigMap
+		want   ConfigMap
+	}{
+		"Full": {
+			reason: "All supported fields should be converted to our model",
+			cm: &corev1.ConfigMap{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: corev1.SchemeGroupVersion.String(),
+					Kind:       "ConfigMap",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "cool",
+				},
+				Data: map[string]string{"cool": "secret"},
+			},
+			want: ConfigMap{
+				ID: ReferenceID{
+					APIVersion: corev1.SchemeGroupVersion.String(),
+					Kind:       "ConfigMap",
+					Name:       "cool",
+				},
+				APIVersion: corev1.SchemeGroupVersion.String(),
+				Kind:       "ConfigMap",
+				Metadata: &ObjectMeta{
+					Name: "cool",
+				},
+				data: map[string]string{"cool": "secret"},
+			},
+		},
+		"Empty": {
+			reason: "Absent optional fields should be absent in our model",
+			cm:     &corev1.ConfigMap{},
+			want: ConfigMap{
+				ID: ReferenceID{
+					APIVersion: corev1.SchemeGroupVersion.String(),
+					Kind:       "ConfigMap",
+				},
+				APIVersion: corev1.SchemeGroupVersion.String(),
+				Kind:       "ConfigMap",
+				Metadata:   &ObjectMeta{},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			got := GetConfigMap(tc.cm)
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ConfigMap{}, "Raw"), cmp.AllowUnexported(ConfigMap{}, ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetSecret(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -323,7 +472,7 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetCustomResourceDefinition(tc.crd)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(CustomResourceDefinition{}, "Raw")); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(CustomResourceDefinition{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetCustomResourceDefinition(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -332,6 +481,7 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 
 func TestGetKubernetesResource(t *testing.T) {
 	ignore := []cmp.Option{
+		cmp.AllowUnexported(Secret{}, ConfigMap{}, ObjectMeta{}),
 		cmpopts.IgnoreFields(ManagedResource{}, "Raw"),
 		cmpopts.IgnoreFields(ProviderConfig{}, "Raw"),
 		cmpopts.IgnoreFields(CompositeResource{}, "Raw"),
@@ -344,6 +494,7 @@ func TestGetKubernetesResource(t *testing.T) {
 		cmpopts.IgnoreFields(Composition{}, "Raw"),
 		cmpopts.IgnoreFields(CustomResourceDefinition{}, "Raw"),
 		cmpopts.IgnoreFields(Secret{}, "Raw"),
+		cmpopts.IgnoreFields(ConfigMap{}, "Raw"),
 		cmpopts.IgnoreFields(GenericResource{}, "Raw"),
 	}
 
@@ -587,11 +738,30 @@ func TestGetKubernetesResource(t *testing.T) {
 			want: want{
 				kr: Secret{
 					ID: ReferenceID{
-						APIVersion: schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+						APIVersion: corev1.SchemeGroupVersion.String(),
 						Kind:       "Secret",
 					},
-					APIVersion: schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
+					APIVersion: corev1.SchemeGroupVersion.String(),
 					Kind:       "Secret",
+					Metadata:   &ObjectMeta{},
+				},
+			},
+		},
+		"ConfigMap": {
+			u: func() *kunstructured.Unstructured {
+				u := &kunstructured.Unstructured{}
+				u.SetAPIVersion(schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String())
+				u.SetKind("ConfigMap")
+				return u
+			}(),
+			want: want{
+				kr: ConfigMap{
+					ID: ReferenceID{
+						APIVersion: corev1.SchemeGroupVersion.String(),
+						Kind:       "ConfigMap",
+					},
+					APIVersion: corev1.SchemeGroupVersion.String(),
+					Kind:       "ConfigMap",
 					Metadata:   &ObjectMeta{},
 				},
 			},
