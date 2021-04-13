@@ -187,7 +187,7 @@ type Secret struct {
 	// A raw JSON representation of the underlying Kubernetes resource.
 	Raw string `json:"raw"`
 
-	Data map[string][]byte
+	data map[string]string
 }
 
 // IsNode indicates that a Secret satisfies the GraphQL Node interface.
@@ -197,26 +197,17 @@ func (Secret) IsNode() {}
 // IsKubernetesResource interface.
 func (Secret) IsKubernetesResource() {}
 
-// GetSecret from the suppled Kubernetes Secret
-func GetSecret(s *corev1.Secret) Secret {
-	out := Secret{
-		ID: ReferenceID{
-			APIVersion: corev1.SchemeGroupVersion.String(),
-			Kind:       "Secret",
-			Namespace:  s.GetNamespace(),
-			Name:       s.GetName(),
-		},
-		APIVersion: corev1.SchemeGroupVersion.String(),
-		Kind:       "Secret",
-		Metadata:   GetObjectMeta(s),
-		Data:       s.Data,
-		Raw:        raw(s),
+// Data of this secret.
+func (s *Secret) Data(keys []string) map[string]string {
+	if keys == nil || s.data == nil {
+		return s.data
 	}
-
-	if s.Type != "" {
-		out.Type = pointer.StringPtr(string(s.Type))
+	out := make(map[string]string)
+	for _, k := range keys {
+		if v, ok := s.data[k]; ok {
+			out[k] = v
+		}
 	}
-
 	return out
 }
 
@@ -237,7 +228,24 @@ type ConfigMap struct {
 	// A raw JSON representation of the underlying Kubernetes resource.
 	Raw string `json:"raw"`
 
-	Data map[string]string
+	// Events pertaining to this resource.
+	Events *EventConnection `json:"events"`
+
+	data map[string]string
+}
+
+// Data of this config map.
+func (cm *ConfigMap) Data(keys []string) map[string]string {
+	if keys == nil || cm.data == nil {
+		return cm.data
+	}
+	out := make(map[string]string)
+	for _, k := range keys {
+		if v, ok := cm.data[k]; ok {
+			out[k] = v
+		}
+	}
+	return out
 }
 
 // IsNode indicates that a ConfigMap satisfies the GraphQL Node interface.
@@ -246,6 +254,35 @@ func (ConfigMap) IsNode() {}
 // IsKubernetesResource indicates that a ConfigMap satisfies the GraphQL
 // IsKubernetesResource interface.
 func (ConfigMap) IsKubernetesResource() {}
+
+// GetSecret from the suppled Kubernetes Secret
+func GetSecret(s *corev1.Secret) Secret {
+	out := Secret{
+		ID: ReferenceID{
+			APIVersion: corev1.SchemeGroupVersion.String(),
+			Kind:       "Secret",
+			Namespace:  s.GetNamespace(),
+			Name:       s.GetName(),
+		},
+		APIVersion: corev1.SchemeGroupVersion.String(),
+		Kind:       "Secret",
+		Metadata:   GetObjectMeta(s),
+		Raw:        raw(s),
+	}
+
+	if s.Data != nil {
+		out.data = make(map[string]string)
+		for k, v := range s.Data {
+			out.data[k] = string(v)
+		}
+	}
+
+	if s.Type != "" {
+		out.Type = pointer.StringPtr(string(s.Type))
+	}
+
+	return out
+}
 
 // GetConfigMap from the supplied Kubernetes ConfigMap.
 func GetConfigMap(cm *corev1.ConfigMap) ConfigMap {
@@ -259,8 +296,8 @@ func GetConfigMap(cm *corev1.ConfigMap) ConfigMap {
 		APIVersion: corev1.SchemeGroupVersion.String(),
 		Kind:       "ConfigMap",
 		Metadata:   GetObjectMeta(cm),
-		Data:       cm.Data,
 		Raw:        raw(cm),
+		data:       cm.Data,
 	}
 }
 

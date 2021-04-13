@@ -390,7 +390,7 @@ func TestQuerySecret(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Secret(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.sec, got); diff != "" {
+			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{})); diff != "" {
 				t.Errorf("\n%s\ns.Secret(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -408,7 +408,7 @@ func TestQueryConfigMap(t *testing.T) {
 		name      string
 	}
 	type want struct {
-		sec  *model.ConfigMap
+		cm   *model.ConfigMap
 		err  error
 		errs gqlerror.List
 	}
@@ -460,7 +460,7 @@ func TestQueryConfigMap(t *testing.T) {
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
-				sec: &gsec,
+				cm: &gsec,
 			},
 		},
 	}
@@ -480,7 +480,7 @@ func TestQueryConfigMap(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.ConfigMap(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.sec, got); diff != "" {
+			if diff := cmp.Diff(tc.want.cm, got, cmp.AllowUnexported(model.ConfigMap{})); diff != "" {
 				t.Errorf("\n%s\ns.ConfigMap(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

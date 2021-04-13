@@ -4,12 +4,16 @@ Time is a timestamp.
 scalar Time
 
 """
-A StringMap is a map string keys to string values.
+A StringMap is a 'map' of string keys to string values, i.e. an object with
+string keys and string values. Note that despite this value being returned as a
+'real' object (as opposed to JSON encoded as a string like JSONObject) this type
+is still a scalar, and thus it's not possible to query at key granularity; you
+always get the whole map.
 """
 scalar StringMap
 
 """
-A JSONObject contains a JSON object encoded as a string.
+A JSONObject contains an opaque JSON object encoded as a string.
 """
 scalar JSONObject
 
@@ -405,21 +409,14 @@ type Secret implements Node & KubernetesResource {
   type: String
 
   """
+  The data stored in this secret. Values are not base64 encoded.
+  """
+  data("Data keys for which to return values." keys: [String!]): StringMap
+
+  """
   A raw JSON representation of the underlying Kubernetes resource.
   """
   raw: JSONObject!
-
-  """
-  Data stored in this secret. Returned values are base64 decoded. The returned
-  array of values will always be the same length and order as the supplied array
-  of keys. Keys that don't exist will return a null value.
-  """
-  data(
-    """
-    Data keys for which to return values.
-    """
-    keys: [String!]!
-  ): [String]! @goField(forceResolver: true)
 
   """
   Events pertaining to this resource.
@@ -452,23 +449,16 @@ type ConfigMap implements Node & KubernetesResource {
   metadata: ObjectMeta!
 
   """
+  The data stored in this config map.
+  """
+  data("Data keys for which to return values." keys: [String!]): StringMap
+
+  """
   A raw JSON representation of the underlying Kubernetes resource.
   """
   raw: JSONObject!
 
   # TODO(negz): Support binaryData too? What would the return value be?
-
-  """
-  Data stored in this secret. The returned array of values will always be the
-  same length and order as the supplied array of keys. Keys that don't exist
-  will return a null value.
-  """
-  data(
-    """
-    Data keys for which to return values
-    """
-    keys: [String!]!
-  ): [String]! @goField(forceResolver: true)
 
   """
   Events pertaining to this resource.
