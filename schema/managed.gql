@@ -22,8 +22,8 @@ type ManagedResource implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ManagedResourceStatus!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)

@@ -20,6 +20,18 @@ import (
 	"github.com/upbound/xgql/internal/unstructured"
 )
 
+// MarshalUnstructured marshals Unstructured JSON bytes to GraphQL.
+func MarshalUnstructured(val []byte) graphql.Marshaler {
+	return graphql.WriterFunc(func(w io.Writer) {
+		_, _ = w.Write(val)
+	})
+}
+
+// UnmarshalUnstructured marshals Unstructured JSON bytes from GraphQL.
+func UnmarshalUnstructured(v interface{}) ([]byte, error) {
+	return json.Marshal(v)
+}
+
 // MarshalStringMap marshals a map[string]string to GraphQL.
 func MarshalStringMap(val map[string]string) graphql.Marshaler {
 	return graphql.WriterFunc(func(w io.Writer) {
@@ -77,10 +89,10 @@ func GetGenericResource(u *kunstructured.Unstructured) GenericResource {
 			Namespace:  u.GetNamespace(),
 			Name:       u.GetName(),
 		},
-		APIVersion: u.GetAPIVersion(),
-		Kind:       u.GetKind(),
-		Metadata:   GetObjectMeta(u),
-		Raw:        raw(u),
+		APIVersion:   u.GetAPIVersion(),
+		Kind:         u.GetKind(),
+		Metadata:     GetObjectMeta(u),
+		Unstructured: unstruct(u),
 	}
 }
 
@@ -101,8 +113,9 @@ type Secret struct {
 	// Type of this secret.
 	Type *string `json:"type"`
 
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes
+	// resource.
+	Unstructured []byte `json:"raw"`
 
 	data map[string]string
 }
@@ -142,8 +155,9 @@ type ConfigMap struct {
 	// Metadata that is common to all Kubernetes API resources.
 	Metadata *ObjectMeta `json:"metadata"`
 
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes
+	// resource.
+	Unstructured []byte `json:"raw"`
 
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
@@ -181,10 +195,10 @@ func GetSecret(s *corev1.Secret) Secret {
 			Namespace:  s.GetNamespace(),
 			Name:       s.GetName(),
 		},
-		APIVersion: corev1.SchemeGroupVersion.String(),
-		Kind:       "Secret",
-		Metadata:   GetObjectMeta(s),
-		Raw:        raw(s),
+		APIVersion:   corev1.SchemeGroupVersion.String(),
+		Kind:         "Secret",
+		Metadata:     GetObjectMeta(s),
+		Unstructured: unstruct(s),
 	}
 
 	if s.Data != nil {
@@ -210,11 +224,11 @@ func GetConfigMap(cm *corev1.ConfigMap) ConfigMap {
 			Namespace:  cm.GetNamespace(),
 			Name:       cm.GetName(),
 		},
-		APIVersion: corev1.SchemeGroupVersion.String(),
-		Kind:       "ConfigMap",
-		Metadata:   GetObjectMeta(cm),
-		Raw:        raw(cm),
-		data:       cm.Data,
+		APIVersion:   corev1.SchemeGroupVersion.String(),
+		Kind:         "ConfigMap",
+		Metadata:     GetObjectMeta(cm),
+		Unstructured: unstruct(cm),
+		data:         cm.Data,
 	}
 }
 
@@ -252,8 +266,7 @@ func GetCustomResourceDefinitionVersions(in []kextv1.CustomResourceDefinitionVer
 
 		if s := in[i].Schema; s != nil && s.OpenAPIV3Schema != nil {
 			if raw, err := json.Marshal(s.OpenAPIV3Schema); err == nil {
-				schema := string(raw)
-				out[i].Schema = &CustomResourceValidation{OpenAPIV3Schema: &schema}
+				out[i].Schema = &CustomResourceValidation{OpenAPIV3Schema: raw}
 			}
 		}
 	}
@@ -309,8 +322,8 @@ func GetCustomResourceDefinition(crd *kextv1.CustomResourceDefinition) CustomRes
 			Names:    GetCustomResourceDefinitionNames(crd.Spec.Names),
 			Versions: GetCustomResourceDefinitionVersions(crd.Spec.Versions),
 		},
-		Status: GetCustomResourceDefinitionStatus(crd.Status),
-		Raw:    raw(crd),
+		Status:       GetCustomResourceDefinitionStatus(crd.Status),
+		Unstructured: unstruct(crd),
 	}
 }
 

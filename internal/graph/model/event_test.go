@@ -77,7 +77,7 @@ func TestGetEvent(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetEvent(tc.s)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Event{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Event{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetEvent(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

@@ -38,7 +38,7 @@ resource.
 """
 input CreateKubernetesResourceInput {
   "The Kubernetes resource to be created, as raw JSON."
-  raw: JSONObject!
+  unstructured: Unstructured!
 }
 
 """
@@ -55,7 +55,7 @@ resource.
 """
 input UpdateKubernetesResourceInput {
   "The Kubernetes resource to be updated, as raw JSON."
-  raw: JSONObject!
+  unstructured: Unstructured!
 }
 
 """

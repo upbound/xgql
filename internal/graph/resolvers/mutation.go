@@ -33,7 +33,7 @@ func (r *mutation) CreateKubernetesResource(ctx context.Context, input model.Cre
 	}
 
 	u := &unstructured.Unstructured{}
-	if err := json.Unmarshal([]byte(input.Raw), u); err != nil {
+	if err := json.Unmarshal(input.Unstructured, u); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errUnmarshalRaw))
 		return nil, nil
 	}
@@ -63,7 +63,7 @@ func (r *mutation) UpdateKubernetesResource(ctx context.Context, _ model.Referen
 	}
 
 	u := &unstructured.Unstructured{}
-	if err := json.Unmarshal([]byte(input.Raw), u); err != nil {
+	if err := json.Unmarshal(input.Unstructured, u); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errUnmarshalRaw))
 		return nil, nil
 	}

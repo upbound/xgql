@@ -16,10 +16,10 @@ import (
 )
 
 func TestGetCompositeResourceDefinition(t *testing.T) {
-	schema := `{"cool":true}`
+	schema := []byte(`{"cool":true}`)
 
 	rschema := runtime.RawExtension{}
-	json.Unmarshal([]byte(schema), &rschema)
+	json.Unmarshal(schema, &rschema)
 
 	cases := map[string]struct {
 		reason string
@@ -114,7 +114,7 @@ func TestGetCompositeResourceDefinition(t *testing.T) {
 						Name:          "v1",
 						Referenceable: true,
 						Served:        true,
-						Schema:        &CompositeResourceValidation{OpenAPIV3Schema: pointer.StringPtr(schema)},
+						Schema:        &CompositeResourceValidation{OpenAPIV3Schema: schema},
 					}},
 					DefaultCompositionReference:  &xpv1.Reference{Name: "default"},
 					EnforcedCompositionReference: &xpv1.Reference{Name: "enforced"},
@@ -149,7 +149,7 @@ func TestGetCompositeResourceDefinition(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetCompositeResourceDefinition(tc.xrd)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(CompositeResourceDefinition{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(CompositeResourceDefinition{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetCompositeResourceDefinition(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -228,7 +228,7 @@ func TestGetComposition(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetComposition(tc.xrd)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Composition{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Composition{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetComposition(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

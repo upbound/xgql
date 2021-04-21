@@ -97,7 +97,7 @@ func TestGetProvider(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetProvider(tc.cfg)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Provider{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Provider{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetProvider(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -199,7 +199,7 @@ func TestGetProviderRevision(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetProviderRevision(tc.cfg)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ProviderRevision{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ProviderRevision{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetProviderRevision(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -289,7 +289,7 @@ func TestGetConfiguration(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetConfiguration(tc.cfg)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Configuration{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Configuration{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetConfiguration(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -391,7 +391,7 @@ func TestGetConfigurationRevision(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetConfigurationRevision(tc.cfg)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ConfigurationRevision{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ConfigurationRevision{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetConfigurationRevision(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

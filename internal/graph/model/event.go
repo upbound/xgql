@@ -42,8 +42,8 @@ type Event struct {
 	// The time at which this event was most recently recorded.
 	LastTime *time.Time `json:"lastTime"`
 
-	// A raw JSON representation of the event.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the event.
+	Unstructured []byte `json:"raw"`
 
 	InvolvedObjectRef corev1.ObjectReference
 }
@@ -78,7 +78,7 @@ func GetEvent(e *corev1.Event) Event {
 		Kind:              e.Kind,
 		Metadata:          GetObjectMeta(e),
 		Type:              GetEventType(e.Type),
-		Raw:               raw(e),
+		Unstructured:      unstruct(e),
 		InvolvedObjectRef: e.InvolvedObject,
 	}
 

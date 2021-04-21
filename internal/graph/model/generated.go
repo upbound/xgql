@@ -59,8 +59,8 @@ type CompositeResource struct {
 	Spec *CompositeResourceSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *CompositeResourceStatus `json:"status"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes resource.
+	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
 	// The definition of this resource.
@@ -84,8 +84,8 @@ type CompositeResourceClaim struct {
 	Spec *CompositeResourceClaimSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *CompositeResourceClaimStatus `json:"status"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes resource.
+	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
 	// The definition of this resource.
@@ -154,8 +154,8 @@ type CompositeResourceDefinition struct {
 	Spec *CompositeResourceDefinitionSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *CompositeResourceDefinitionStatus `json:"status"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes resource.
+	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
 	// Composite resources (XRs) defined by this XRD.
@@ -262,7 +262,7 @@ func (CompositeResourceStatus) IsConditionedStatus() {}
 // resource.
 type CompositeResourceValidation struct {
 	// OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning.
-	OpenAPIV3Schema *string `json:"openAPIV3Schema"`
+	OpenAPIV3Schema []byte `json:"openAPIV3Schema"`
 }
 
 // A Composition defines the group of resources to be created when a compatible
@@ -280,8 +280,8 @@ type Composition struct {
 	Spec *CompositionSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *CompositionStatus `json:"status"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes resource.
+	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
 }
@@ -350,8 +350,8 @@ type Configuration struct {
 	Spec *ConfigurationSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *ConfigurationStatus `json:"status"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes resource.
+	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
 	// Revisions of this configuration.
@@ -385,8 +385,8 @@ type ConfigurationRevision struct {
 	Spec *ConfigurationRevisionSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *ConfigurationRevisionStatus `json:"status"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes resource.
+	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
 }
@@ -464,7 +464,7 @@ func (ConfigurationStatus) IsConditionedStatus() {}
 // resource.
 type CreateKubernetesResourceInput struct {
 	// The Kubernetes resource to be created, as raw JSON.
-	Raw string `json:"raw"`
+	Unstructured []byte `json:"unstructured"`
 }
 
 // CreateKubernetesResourcePayload is the result of creating a Kubernetes resource.
@@ -488,8 +488,8 @@ type CustomResourceDefinition struct {
 	Spec *CustomResourceDefinitionSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *CustomResourceDefinitionStatus `json:"status"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes resource.
+	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
 	// Custom resources defined by this CRD
@@ -578,7 +578,7 @@ type CustomResourceDefinitionVersion struct {
 // resource.
 type CustomResourceValidation struct {
 	// OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning.
-	OpenAPIV3Schema *string `json:"openAPIV3Schema"`
+	OpenAPIV3Schema []byte `json:"openAPIV3Schema"`
 }
 
 // DeleteKubernetesResourcePayload is the result of deleting a Kubernetes resource.
@@ -615,8 +615,8 @@ type GenericResource struct {
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
 	Metadata *ObjectMeta `json:"metadata"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes resource.
+	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
 }
@@ -654,8 +654,8 @@ type ManagedResource struct {
 	Spec *ManagedResourceSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *ManagedResourceStatus `json:"status"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes resource.
+	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
 	// The definition of this resource.
@@ -725,8 +725,8 @@ type Provider struct {
 	Spec *ProviderSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *ProviderStatus `json:"status"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes resource.
+	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
 	// Revisions of this provider.
@@ -751,8 +751,8 @@ type ProviderConfig struct {
 	Metadata *ObjectMeta `json:"metadata"`
 	// The observed state of this resource.
 	Status *ProviderConfigStatus `json:"status"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes resource.
+	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
 	// The definition of this resource.
@@ -800,8 +800,8 @@ type ProviderRevision struct {
 	Spec *ProviderRevisionSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *ProviderRevisionStatus `json:"status"`
-	// A raw JSON representation of the underlying Kubernetes resource.
-	Raw string `json:"raw"`
+	// An unstructured JSON representation of the underlying Kubernetes resource.
+	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
 }
@@ -887,7 +887,7 @@ type TypeReference struct {
 // resource.
 type UpdateKubernetesResourceInput struct {
 	// The Kubernetes resource to be updated, as raw JSON.
-	Raw string `json:"raw"`
+	Unstructured []byte `json:"unstructured"`
 }
 
 // UpdateKubernetesResourcePayload is the result of updating a Kubernetes resource.

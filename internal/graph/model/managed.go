@@ -65,7 +65,7 @@ func GetManagedResource(u *kunstructured.Unstructured) ManagedResource {
 			ProviderConfigRef:                 GetProviderConfigReference(mg.GetProviderConfigReference()),
 			DeletionPolicy:                    GetDeletionPolicy(mg.GetDeletionPolicy()),
 		},
-		Status: GetManagedResourceStatus(mg),
-		Raw:    raw(mg),
+		Status:       GetManagedResourceStatus(mg),
+		Unstructured: unstruct(mg),
 	}
 }

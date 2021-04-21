@@ -60,8 +60,8 @@ func GetCompositeResource(u *kunstructured.Unstructured) CompositeResource {
 			ResourceReferences:                xr.GetResourceReferences(),
 			WritesConnectionSecretToReference: xr.GetWriteConnectionSecretToReference(),
 		},
-		Status: GetCompositeResourceStatus(xr),
-		Raw:    raw(xr),
+		Status:       GetCompositeResourceStatus(xr),
+		Unstructured: unstruct(xr),
 	}
 }
 
@@ -126,7 +126,7 @@ func GetCompositeResourceClaim(u *kunstructured.Unstructured) CompositeResourceC
 			ResourceReference:                 xrc.GetResourceReference(),
 			WritesConnectionSecretToReference: delocalize(xrc.GetWriteConnectionSecretToReference(), xrc.GetNamespace()),
 		},
-		Status: GetCompositeResourceClaimStatus(xrc),
-		Raw:    raw(xrc),
+		Status:       GetCompositeResourceClaimStatus(xrc),
+		Unstructured: unstruct(xrc),
 	}
 }

@@ -68,27 +68,27 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	CompositeResource struct {
-		APIVersion func(childComplexity int) int
-		Definition func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Definition   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Spec         func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	CompositeResourceClaim struct {
-		APIVersion func(childComplexity int) int
-		Definition func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Definition   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Spec         func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	CompositeResourceClaimConnection struct {
@@ -129,9 +129,9 @@ type ComplexityRoot struct {
 		ID                             func(childComplexity int) int
 		Kind                           func(childComplexity int) int
 		Metadata                       func(childComplexity int) int
-		Raw                            func(childComplexity int) int
 		Spec                           func(childComplexity int) int
 		Status                         func(childComplexity int) int
+		Unstructured                   func(childComplexity int) int
 	}
 
 	CompositeResourceDefinitionConnection struct {
@@ -193,14 +193,14 @@ type ComplexityRoot struct {
 	}
 
 	Composition struct {
-		APIVersion func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Spec         func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	CompositionConnection struct {
@@ -226,13 +226,13 @@ type ComplexityRoot struct {
 	}
 
 	ConfigMap struct {
-		APIVersion func(childComplexity int) int
-		Data       func(childComplexity int, keys []string) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Data         func(childComplexity int, keys []string) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	Configuration struct {
@@ -242,10 +242,10 @@ type ComplexityRoot struct {
 		ID             func(childComplexity int) int
 		Kind           func(childComplexity int) int
 		Metadata       func(childComplexity int) int
-		Raw            func(childComplexity int) int
 		Revisions      func(childComplexity int) int
 		Spec           func(childComplexity int) int
 		Status         func(childComplexity int) int
+		Unstructured   func(childComplexity int) int
 	}
 
 	ConfigurationConnection struct {
@@ -254,14 +254,14 @@ type ComplexityRoot struct {
 	}
 
 	ConfigurationRevision struct {
-		APIVersion func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Spec         func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	ConfigurationRevisionConnection struct {
@@ -313,9 +313,9 @@ type ComplexityRoot struct {
 		ID               func(childComplexity int) int
 		Kind             func(childComplexity int) int
 		Metadata         func(childComplexity int) int
-		Raw              func(childComplexity int) int
 		Spec             func(childComplexity int) int
 		Status           func(childComplexity int) int
+		Unstructured     func(childComplexity int) int
 	}
 
 	CustomResourceDefinitionConnection struct {
@@ -366,10 +366,10 @@ type ComplexityRoot struct {
 		LastTime       func(childComplexity int) int
 		Message        func(childComplexity int) int
 		Metadata       func(childComplexity int) int
-		Raw            func(childComplexity int) int
 		Reason         func(childComplexity int) int
 		Source         func(childComplexity int) int
 		Type           func(childComplexity int) int
+		Unstructured   func(childComplexity int) int
 	}
 
 	EventConnection struct {
@@ -382,12 +382,12 @@ type ComplexityRoot struct {
 	}
 
 	GenericResource struct {
-		APIVersion func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	KubernetesResourceConnection struct {
@@ -400,15 +400,15 @@ type ComplexityRoot struct {
 	}
 
 	ManagedResource struct {
-		APIVersion func(childComplexity int) int
-		Definition func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Definition   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Spec         func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	ManagedResourceSpec struct {
@@ -467,21 +467,21 @@ type ComplexityRoot struct {
 		ID             func(childComplexity int) int
 		Kind           func(childComplexity int) int
 		Metadata       func(childComplexity int) int
-		Raw            func(childComplexity int) int
 		Revisions      func(childComplexity int) int
 		Spec           func(childComplexity int) int
 		Status         func(childComplexity int) int
+		Unstructured   func(childComplexity int) int
 	}
 
 	ProviderConfig struct {
-		APIVersion func(childComplexity int) int
-		Definition func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Definition   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	ProviderConfigReference struct {
@@ -499,14 +499,14 @@ type ComplexityRoot struct {
 	}
 
 	ProviderRevision struct {
-		APIVersion func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Spec         func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	ProviderRevisionConnection struct {
@@ -563,14 +563,14 @@ type ComplexityRoot struct {
 	}
 
 	Secret struct {
-		APIVersion func(childComplexity int) int
-		Data       func(childComplexity int, keys []string) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Type       func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Data         func(childComplexity int, keys []string) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Type         func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	TypeReference struct {
@@ -746,13 +746,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResource.Metadata(childComplexity), true
 
-	case "CompositeResource.raw":
-		if e.complexity.CompositeResource.Raw == nil {
-			break
-		}
-
-		return e.complexity.CompositeResource.Raw(childComplexity), true
-
 	case "CompositeResource.spec":
 		if e.complexity.CompositeResource.Spec == nil {
 			break
@@ -766,6 +759,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CompositeResource.Status(childComplexity), true
+
+	case "CompositeResource.unstructured":
+		if e.complexity.CompositeResource.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.CompositeResource.Unstructured(childComplexity), true
 
 	case "CompositeResourceClaim.apiVersion":
 		if e.complexity.CompositeResourceClaim.APIVersion == nil {
@@ -809,13 +809,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResourceClaim.Metadata(childComplexity), true
 
-	case "CompositeResourceClaim.raw":
-		if e.complexity.CompositeResourceClaim.Raw == nil {
-			break
-		}
-
-		return e.complexity.CompositeResourceClaim.Raw(childComplexity), true
-
 	case "CompositeResourceClaim.spec":
 		if e.complexity.CompositeResourceClaim.Spec == nil {
 			break
@@ -829,6 +822,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CompositeResourceClaim.Status(childComplexity), true
+
+	case "CompositeResourceClaim.unstructured":
+		if e.complexity.CompositeResourceClaim.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceClaim.Unstructured(childComplexity), true
 
 	case "CompositeResourceClaimConnection.nodes":
 		if e.complexity.CompositeResourceClaimConnection.Nodes == nil {
@@ -973,13 +973,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResourceDefinition.Metadata(childComplexity), true
 
-	case "CompositeResourceDefinition.raw":
-		if e.complexity.CompositeResourceDefinition.Raw == nil {
-			break
-		}
-
-		return e.complexity.CompositeResourceDefinition.Raw(childComplexity), true
-
 	case "CompositeResourceDefinition.spec":
 		if e.complexity.CompositeResourceDefinition.Spec == nil {
 			break
@@ -993,6 +986,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CompositeResourceDefinition.Status(childComplexity), true
+
+	case "CompositeResourceDefinition.unstructured":
+		if e.complexity.CompositeResourceDefinition.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceDefinition.Unstructured(childComplexity), true
 
 	case "CompositeResourceDefinitionConnection.nodes":
 		if e.complexity.CompositeResourceDefinitionConnection.Nodes == nil {
@@ -1246,13 +1246,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Composition.Metadata(childComplexity), true
 
-	case "Composition.raw":
-		if e.complexity.Composition.Raw == nil {
-			break
-		}
-
-		return e.complexity.Composition.Raw(childComplexity), true
-
 	case "Composition.spec":
 		if e.complexity.Composition.Spec == nil {
 			break
@@ -1266,6 +1259,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Composition.Status(childComplexity), true
+
+	case "Composition.unstructured":
+		if e.complexity.Composition.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.Composition.Unstructured(childComplexity), true
 
 	case "CompositionConnection.nodes":
 		if e.complexity.CompositionConnection.Nodes == nil {
@@ -1384,12 +1384,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ConfigMap.Metadata(childComplexity), true
 
-	case "ConfigMap.raw":
-		if e.complexity.ConfigMap.Raw == nil {
+	case "ConfigMap.unstructured":
+		if e.complexity.ConfigMap.Unstructured == nil {
 			break
 		}
 
-		return e.complexity.ConfigMap.Raw(childComplexity), true
+		return e.complexity.ConfigMap.Unstructured(childComplexity), true
 
 	case "Configuration.apiVersion":
 		if e.complexity.Configuration.APIVersion == nil {
@@ -1433,13 +1433,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Configuration.Metadata(childComplexity), true
 
-	case "Configuration.raw":
-		if e.complexity.Configuration.Raw == nil {
-			break
-		}
-
-		return e.complexity.Configuration.Raw(childComplexity), true
-
 	case "Configuration.revisions":
 		if e.complexity.Configuration.Revisions == nil {
 			break
@@ -1460,6 +1453,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Configuration.Status(childComplexity), true
+
+	case "Configuration.unstructured":
+		if e.complexity.Configuration.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.Configuration.Unstructured(childComplexity), true
 
 	case "ConfigurationConnection.nodes":
 		if e.complexity.ConfigurationConnection.Nodes == nil {
@@ -1510,13 +1510,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ConfigurationRevision.Metadata(childComplexity), true
 
-	case "ConfigurationRevision.raw":
-		if e.complexity.ConfigurationRevision.Raw == nil {
-			break
-		}
-
-		return e.complexity.ConfigurationRevision.Raw(childComplexity), true
-
 	case "ConfigurationRevision.spec":
 		if e.complexity.ConfigurationRevision.Spec == nil {
 			break
@@ -1530,6 +1523,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ConfigurationRevision.Status(childComplexity), true
+
+	case "ConfigurationRevision.unstructured":
+		if e.complexity.ConfigurationRevision.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.ConfigurationRevision.Unstructured(childComplexity), true
 
 	case "ConfigurationRevisionConnection.nodes":
 		if e.complexity.ConfigurationRevisionConnection.Nodes == nil {
@@ -1746,13 +1746,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CustomResourceDefinition.Metadata(childComplexity), true
 
-	case "CustomResourceDefinition.raw":
-		if e.complexity.CustomResourceDefinition.Raw == nil {
-			break
-		}
-
-		return e.complexity.CustomResourceDefinition.Raw(childComplexity), true
-
 	case "CustomResourceDefinition.spec":
 		if e.complexity.CustomResourceDefinition.Spec == nil {
 			break
@@ -1766,6 +1759,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CustomResourceDefinition.Status(childComplexity), true
+
+	case "CustomResourceDefinition.unstructured":
+		if e.complexity.CustomResourceDefinition.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.CustomResourceDefinition.Unstructured(childComplexity), true
 
 	case "CustomResourceDefinitionConnection.nodes":
 		if e.complexity.CustomResourceDefinitionConnection.Nodes == nil {
@@ -1949,13 +1949,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Event.Metadata(childComplexity), true
 
-	case "Event.raw":
-		if e.complexity.Event.Raw == nil {
-			break
-		}
-
-		return e.complexity.Event.Raw(childComplexity), true
-
 	case "Event.reason":
 		if e.complexity.Event.Reason == nil {
 			break
@@ -1976,6 +1969,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Event.Type(childComplexity), true
+
+	case "Event.unstructured":
+		if e.complexity.Event.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.Event.Unstructured(childComplexity), true
 
 	case "EventConnection.nodes":
 		if e.complexity.EventConnection.Nodes == nil {
@@ -2033,12 +2033,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GenericResource.Metadata(childComplexity), true
 
-	case "GenericResource.raw":
-		if e.complexity.GenericResource.Raw == nil {
+	case "GenericResource.unstructured":
+		if e.complexity.GenericResource.Unstructured == nil {
 			break
 		}
 
-		return e.complexity.GenericResource.Raw(childComplexity), true
+		return e.complexity.GenericResource.Unstructured(childComplexity), true
 
 	case "KubernetesResourceConnection.nodes":
 		if e.complexity.KubernetesResourceConnection.Nodes == nil {
@@ -2103,13 +2103,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ManagedResource.Metadata(childComplexity), true
 
-	case "ManagedResource.raw":
-		if e.complexity.ManagedResource.Raw == nil {
-			break
-		}
-
-		return e.complexity.ManagedResource.Raw(childComplexity), true
-
 	case "ManagedResource.spec":
 		if e.complexity.ManagedResource.Spec == nil {
 			break
@@ -2123,6 +2116,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ManagedResource.Status(childComplexity), true
+
+	case "ManagedResource.unstructured":
+		if e.complexity.ManagedResource.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.ManagedResource.Unstructured(childComplexity), true
 
 	case "ManagedResourceSpec.connectionSecret":
 		if e.complexity.ManagedResourceSpec.ConnectionSecret == nil {
@@ -2387,13 +2387,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Provider.Metadata(childComplexity), true
 
-	case "Provider.raw":
-		if e.complexity.Provider.Raw == nil {
-			break
-		}
-
-		return e.complexity.Provider.Raw(childComplexity), true
-
 	case "Provider.revisions":
 		if e.complexity.Provider.Revisions == nil {
 			break
@@ -2414,6 +2407,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Provider.Status(childComplexity), true
+
+	case "Provider.unstructured":
+		if e.complexity.Provider.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.Provider.Unstructured(childComplexity), true
 
 	case "ProviderConfig.apiVersion":
 		if e.complexity.ProviderConfig.APIVersion == nil {
@@ -2457,19 +2457,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProviderConfig.Metadata(childComplexity), true
 
-	case "ProviderConfig.raw":
-		if e.complexity.ProviderConfig.Raw == nil {
-			break
-		}
-
-		return e.complexity.ProviderConfig.Raw(childComplexity), true
-
 	case "ProviderConfig.status":
 		if e.complexity.ProviderConfig.Status == nil {
 			break
 		}
 
 		return e.complexity.ProviderConfig.Status(childComplexity), true
+
+	case "ProviderConfig.unstructured":
+		if e.complexity.ProviderConfig.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.ProviderConfig.Unstructured(childComplexity), true
 
 	case "ProviderConfigReference.name":
 		if e.complexity.ProviderConfigReference.Name == nil {
@@ -2541,13 +2541,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProviderRevision.Metadata(childComplexity), true
 
-	case "ProviderRevision.raw":
-		if e.complexity.ProviderRevision.Raw == nil {
-			break
-		}
-
-		return e.complexity.ProviderRevision.Raw(childComplexity), true
-
 	case "ProviderRevision.spec":
 		if e.complexity.ProviderRevision.Spec == nil {
 			break
@@ -2561,6 +2554,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProviderRevision.Status(childComplexity), true
+
+	case "ProviderRevision.unstructured":
+		if e.complexity.ProviderRevision.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.ProviderRevision.Unstructured(childComplexity), true
 
 	case "ProviderRevisionConnection.nodes":
 		if e.complexity.ProviderRevisionConnection.Nodes == nil {
@@ -2904,19 +2904,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Secret.Metadata(childComplexity), true
 
-	case "Secret.raw":
-		if e.complexity.Secret.Raw == nil {
-			break
-		}
-
-		return e.complexity.Secret.Raw(childComplexity), true
-
 	case "Secret.type":
 		if e.complexity.Secret.Type == nil {
 			break
 		}
 
 		return e.complexity.Secret.Type(childComplexity), true
+
+	case "Secret.unstructured":
+		if e.complexity.Secret.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.Secret.Unstructured(childComplexity), true
 
 	case "TypeReference.apiVersion":
 		if e.complexity.TypeReference.APIVersion == nil {
@@ -3026,8 +3026,8 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
   "The observed state of this resource."
   status: CompositeResourceDefinitionStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3215,7 +3215,7 @@ resource.
 """
 type CompositeResourceValidation {
   "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
-  openAPIV3Schema: JSONObject
+  openAPIV3Schema: Unstructured
 }
 
 """
@@ -3292,8 +3292,8 @@ type Composition implements Node & KubernetesResource {
   "The observed state of this resource."
   status: CompositionStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3335,16 +3335,16 @@ scalar Time
 """
 A StringMap is a 'map' of string keys to string values, i.e. an object with
 string keys and string values. Note that despite this value being returned as a
-'real' object (as opposed to JSON encoded as a string like JSONObject) this type
+'real' object (as opposed to JSON encoded as a string like JSON) this type
 is still a scalar, and thus it's not possible to query at key granularity; you
 always get the whole map.
 """
 scalar StringMap
 
 """
-A JSONObject contains an opaque JSON object encoded as a string.
+Unstructured, schemaless JSON.
 """
-scalar JSONObject
+scalar Unstructured
 
 """
 An object with an ID.
@@ -3370,8 +3370,8 @@ interface KubernetesResource {
   "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection!
@@ -3417,8 +3417,8 @@ type GenericResource implements Node & KubernetesResource {
   "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3686,8 +3686,8 @@ type Event implements Node {
   "The time at which this event was most recently recorded."
   lastTime: Time
 
-  "A raw JSON representation of the event."
-  raw: JSONObject!
+  "An unstructured JSON representation of the event."
+  unstructured: Unstructured!
 }
 
 """
@@ -3746,9 +3746,9 @@ type Secret implements Node & KubernetesResource {
   data("Data keys for which to return values." keys: [String!]): StringMap
 
   """
-  A raw JSON representation of the underlying Kubernetes resource.
+  An unstructured JSON representation of the underlying Kubernetes resource.
   """
-  raw: JSONObject!
+  unstructured: Unstructured!
 
   """
   Events pertaining to this resource.
@@ -3786,9 +3786,9 @@ type ConfigMap implements Node & KubernetesResource {
   data("Data keys for which to return values." keys: [String!]): StringMap
 
   """
-  A raw JSON representation of the underlying Kubernetes resource.
+  An unstructured JSON representation of the underlying Kubernetes resource.
   """
-  raw: JSONObject!
+  unstructured: Unstructured!
 
   # TODO(negz): Support binaryData too? What would the return value be?
 
@@ -3821,8 +3821,8 @@ type CustomResourceDefinition implements Node & KubernetesResource {
   "The observed state of this resource."
   status: CustomResourceDefinitionStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3934,7 +3934,7 @@ resource.
 """
 type CustomResourceValidation {
   "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
-  openAPIV3Schema: JSONObject
+  openAPIV3Schema: Unstructured
 }
 
 """
@@ -3970,8 +3970,8 @@ type CompositeResource implements Node & KubernetesResource {
   "The observed state of this resource."
   status: CompositeResourceStatus!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4061,8 +4061,8 @@ type CompositeResourceClaim implements Node & KubernetesResource {
   "The observed state of this resource."
   status: CompositeResourceClaimStatus!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4144,8 +4144,8 @@ type Configuration implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ConfigurationStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4262,8 +4262,8 @@ type ConfigurationRevision implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ConfigurationRevisionStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4386,8 +4386,8 @@ type ManagedResource implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ManagedResourceStatus!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4502,7 +4502,7 @@ resource.
 """
 input CreateKubernetesResourceInput {
   "The Kubernetes resource to be created, as raw JSON."
-  raw: JSONObject!
+  unstructured: Unstructured!
 }
 
 """
@@ -4519,7 +4519,7 @@ resource.
 """
 input UpdateKubernetesResourceInput {
   "The Kubernetes resource to be updated, as raw JSON."
-  raw: JSONObject!
+  unstructured: Unstructured!
 }
 
 """
@@ -4598,8 +4598,8 @@ type Provider implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ProviderStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4715,8 +4715,8 @@ type ProviderRevision implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ProviderRevisionStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4824,8 +4824,8 @@ type ProviderConfig implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ProviderConfigStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -5739,7 +5739,7 @@ func (ec *executionContext) _CompositeResource_status(ctx context.Context, field
 	return ec.marshalNCompositeResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResource_raw(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResource_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -5757,7 +5757,7 @@ func (ec *executionContext) _CompositeResource_raw(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5769,9 +5769,9 @@ func (ec *executionContext) _CompositeResource_raw(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResource_events(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
@@ -6051,7 +6051,7 @@ func (ec *executionContext) _CompositeResourceClaim_status(ctx context.Context, 
 	return ec.marshalNCompositeResourceClaimStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResourceClaim_raw(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResourceClaim_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6069,7 +6069,7 @@ func (ec *executionContext) _CompositeResourceClaim_raw(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6081,9 +6081,9 @@ func (ec *executionContext) _CompositeResourceClaim_raw(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaim_events(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
@@ -6750,7 +6750,7 @@ func (ec *executionContext) _CompositeResourceDefinition_status(ctx context.Cont
 	return ec.marshalOCompositeResourceDefinitionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResourceDefinition_raw(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResourceDefinition_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6768,7 +6768,7 @@ func (ec *executionContext) _CompositeResourceDefinition_raw(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6780,9 +6780,9 @@ func (ec *executionContext) _CompositeResourceDefinition_raw(ctx context.Context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinition_events(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
@@ -7915,9 +7915,9 @@ func (ec *executionContext) _CompositeResourceValidation_openAPIV3Schema(ctx con
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalOJSONObject2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Composition_id(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
@@ -8127,7 +8127,7 @@ func (ec *executionContext) _Composition_status(ctx context.Context, field graph
 	return ec.marshalOCompositionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Composition_raw(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
+func (ec *executionContext) _Composition_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -8145,7 +8145,7 @@ func (ec *executionContext) _Composition_raw(ctx context.Context, field graphql.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8157,9 +8157,9 @@ func (ec *executionContext) _Composition_raw(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Composition_events(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
@@ -8714,7 +8714,7 @@ func (ec *executionContext) _ConfigMap_data(ctx context.Context, field graphql.C
 	return ec.marshalOStringMap2map(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ConfigMap_raw(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
+func (ec *executionContext) _ConfigMap_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -8732,7 +8732,7 @@ func (ec *executionContext) _ConfigMap_raw(ctx context.Context, field graphql.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8744,9 +8744,9 @@ func (ec *executionContext) _ConfigMap_raw(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigMap_events(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
@@ -8991,7 +8991,7 @@ func (ec *executionContext) _Configuration_status(ctx context.Context, field gra
 	return ec.marshalOConfigurationStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Configuration_raw(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
+func (ec *executionContext) _Configuration_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -9009,7 +9009,7 @@ func (ec *executionContext) _Configuration_raw(ctx context.Context, field graphq
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9021,9 +9021,9 @@ func (ec *executionContext) _Configuration_raw(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Configuration_events(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
@@ -9402,7 +9402,7 @@ func (ec *executionContext) _ConfigurationRevision_status(ctx context.Context, f
 	return ec.marshalOConfigurationRevisionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ConfigurationRevision_raw(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevision) (ret graphql.Marshaler) {
+func (ec *executionContext) _ConfigurationRevision_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevision) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -9420,7 +9420,7 @@ func (ec *executionContext) _ConfigurationRevision_raw(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9432,9 +9432,9 @@ func (ec *executionContext) _ConfigurationRevision_raw(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationRevision_events(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevision) (ret graphql.Marshaler) {
@@ -10465,7 +10465,7 @@ func (ec *executionContext) _CustomResourceDefinition_status(ctx context.Context
 	return ec.marshalOCustomResourceDefinitionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CustomResourceDefinition_raw(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
+func (ec *executionContext) _CustomResourceDefinition_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10483,7 +10483,7 @@ func (ec *executionContext) _CustomResourceDefinition_raw(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10495,9 +10495,9 @@ func (ec *executionContext) _CustomResourceDefinition_raw(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinition_events(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
@@ -11105,9 +11105,9 @@ func (ec *executionContext) _CustomResourceValidation_openAPIV3Schema(ctx contex
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalOJSONObject2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DeleteKubernetesResourcePayload_resource(ctx context.Context, field graphql.CollectedField, obj *model.DeleteKubernetesResourcePayload) (ret graphql.Marshaler) {
@@ -11541,7 +11541,7 @@ func (ec *executionContext) _Event_lastTime(ctx context.Context, field graphql.C
 	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Event_raw(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
+func (ec *executionContext) _Event_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11559,7 +11559,7 @@ func (ec *executionContext) _Event_raw(ctx context.Context, field graphql.Collec
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11571,9 +11571,9 @@ func (ec *executionContext) _Event_raw(ctx context.Context, field graphql.Collec
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _EventConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.EventConnection) (ret graphql.Marshaler) {
@@ -11815,7 +11815,7 @@ func (ec *executionContext) _GenericResource_metadata(ctx context.Context, field
 	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _GenericResource_raw(ctx context.Context, field graphql.CollectedField, obj *model.GenericResource) (ret graphql.Marshaler) {
+func (ec *executionContext) _GenericResource_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.GenericResource) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11833,7 +11833,7 @@ func (ec *executionContext) _GenericResource_raw(ctx context.Context, field grap
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11845,9 +11845,9 @@ func (ec *executionContext) _GenericResource_raw(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _GenericResource_events(ctx context.Context, field graphql.CollectedField, obj *model.GenericResource) (ret graphql.Marshaler) {
@@ -12194,7 +12194,7 @@ func (ec *executionContext) _ManagedResource_status(ctx context.Context, field g
 	return ec.marshalNManagedResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ManagedResource_raw(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
+func (ec *executionContext) _ManagedResource_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -12212,7 +12212,7 @@ func (ec *executionContext) _ManagedResource_raw(ctx context.Context, field grap
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12224,9 +12224,9 @@ func (ec *executionContext) _ManagedResource_raw(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResource_events(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
@@ -13470,7 +13470,7 @@ func (ec *executionContext) _Provider_status(ctx context.Context, field graphql.
 	return ec.marshalOProviderStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Provider_raw(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
+func (ec *executionContext) _Provider_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -13488,7 +13488,7 @@ func (ec *executionContext) _Provider_raw(ctx context.Context, field graphql.Col
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13500,9 +13500,9 @@ func (ec *executionContext) _Provider_raw(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Provider_events(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
@@ -13779,7 +13779,7 @@ func (ec *executionContext) _ProviderConfig_status(ctx context.Context, field gr
 	return ec.marshalOProviderConfigStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProviderConfig_raw(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
+func (ec *executionContext) _ProviderConfig_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -13797,7 +13797,7 @@ func (ec *executionContext) _ProviderConfig_raw(ctx context.Context, field graph
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13809,9 +13809,9 @@ func (ec *executionContext) _ProviderConfig_raw(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderConfig_events(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
@@ -14254,7 +14254,7 @@ func (ec *executionContext) _ProviderRevision_status(ctx context.Context, field 
 	return ec.marshalOProviderRevisionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProviderRevision_raw(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevision) (ret graphql.Marshaler) {
+func (ec *executionContext) _ProviderRevision_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevision) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -14272,7 +14272,7 @@ func (ec *executionContext) _ProviderRevision_raw(ctx context.Context, field gra
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14284,9 +14284,9 @@ func (ec *executionContext) _ProviderRevision_raw(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderRevision_events(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevision) (ret graphql.Marshaler) {
@@ -15841,7 +15841,7 @@ func (ec *executionContext) _Secret_data(ctx context.Context, field graphql.Coll
 	return ec.marshalOStringMap2map(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Secret_raw(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
+func (ec *executionContext) _Secret_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -15859,7 +15859,7 @@ func (ec *executionContext) _Secret_raw(ctx context.Context, field graphql.Colle
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15871,9 +15871,9 @@ func (ec *executionContext) _Secret_raw(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Secret_events(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
@@ -17106,11 +17106,11 @@ func (ec *executionContext) unmarshalInputCreateKubernetesResourceInput(ctx cont
 
 	for k, v := range asMap {
 		switch k {
-		case "raw":
+		case "unstructured":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("raw"))
-			it.Raw, err = ec.unmarshalNJSONObject2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unstructured"))
+			it.Unstructured, err = ec.unmarshalNUnstructured2ᚕbyte(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17126,11 +17126,11 @@ func (ec *executionContext) unmarshalInputUpdateKubernetesResourceInput(ctx cont
 
 	for k, v := range asMap {
 		switch k {
-		case "raw":
+		case "unstructured":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("raw"))
-			it.Raw, err = ec.unmarshalNJSONObject2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unstructured"))
+			it.Unstructured, err = ec.unmarshalNUnstructured2ᚕbyte(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17528,8 +17528,8 @@ func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.Sele
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "raw":
-			out.Values[i] = ec._CompositeResource_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._CompositeResource_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -17610,8 +17610,8 @@ func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "raw":
-			out.Values[i] = ec._CompositeResourceClaim_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._CompositeResourceClaim_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -17878,8 +17878,8 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 			}
 		case "status":
 			out.Values[i] = ec._CompositeResourceDefinition_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._CompositeResourceDefinition_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._CompositeResourceDefinition_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -18312,8 +18312,8 @@ func (ec *executionContext) _Composition(ctx context.Context, sel ast.SelectionS
 			}
 		case "status":
 			out.Values[i] = ec._Composition_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._Composition_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._Composition_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -18501,8 +18501,8 @@ func (ec *executionContext) _ConfigMap(ctx context.Context, sel ast.SelectionSet
 			}
 		case "data":
 			out.Values[i] = ec._ConfigMap_data(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._ConfigMap_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._ConfigMap_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -18569,8 +18569,8 @@ func (ec *executionContext) _Configuration(ctx context.Context, sel ast.Selectio
 			}
 		case "status":
 			out.Values[i] = ec._Configuration_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._Configuration_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._Configuration_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -18691,8 +18691,8 @@ func (ec *executionContext) _ConfigurationRevision(ctx context.Context, sel ast.
 			}
 		case "status":
 			out.Values[i] = ec._ConfigurationRevision_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._ConfigurationRevision_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._ConfigurationRevision_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -18966,8 +18966,8 @@ func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel a
 			}
 		case "status":
 			out.Values[i] = ec._CustomResourceDefinition_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._CustomResourceDefinition_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._CustomResourceDefinition_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -19278,8 +19278,8 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Event_firstTime(ctx, field, obj)
 		case "lastTime":
 			out.Values[i] = ec._Event_lastTime(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._Event_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._Event_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -19378,8 +19378,8 @@ func (ec *executionContext) _GenericResource(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "raw":
-			out.Values[i] = ec._GenericResource_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._GenericResource_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -19502,8 +19502,8 @@ func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "raw":
-			out.Values[i] = ec._ManagedResource_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._ManagedResource_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -19858,8 +19858,8 @@ func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "status":
 			out.Values[i] = ec._Provider_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._Provider_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._Provider_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -19946,8 +19946,8 @@ func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.Selecti
 			}
 		case "status":
 			out.Values[i] = ec._ProviderConfig_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._ProviderConfig_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._ProviderConfig_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -20107,8 +20107,8 @@ func (ec *executionContext) _ProviderRevision(ctx context.Context, sel ast.Selec
 			}
 		case "status":
 			out.Values[i] = ec._ProviderRevision_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._ProviderRevision_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._ProviderRevision_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -20544,8 +20544,8 @@ func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Secret_type(ctx, field, obj)
 		case "data":
 			out.Values[i] = ec._Secret_data(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._Secret_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._Secret_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -21224,21 +21224,6 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNJSONObject2string(ctx context.Context, v interface{}) (string, error) {
-	res, err := graphql.UnmarshalString(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNJSONObject2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalString(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
-}
-
 func (ec *executionContext) marshalNKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx context.Context, sel ast.SelectionSet, v model.KubernetesResource) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -21449,6 +21434,27 @@ func (ec *executionContext) marshalNTypeReference2ᚖgithubᚗcomᚋupboundᚋxg
 		return graphql.Null
 	}
 	return ec._TypeReference(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUnstructured2ᚕbyte(ctx context.Context, v interface{}) ([]byte, error) {
+	res, err := model.UnmarshalUnstructured(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUnstructured2ᚕbyte(ctx context.Context, sel ast.SelectionSet, v []byte) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := model.MarshalUnstructured(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNUpdateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourceInput(ctx context.Context, v interface{}) (model.UpdateKubernetesResourceInput, error) {
@@ -22352,21 +22358,6 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return graphql.MarshalInt(*v)
 }
 
-func (ec *executionContext) unmarshalOJSONObject2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalString(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOJSONObject2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalString(*v)
-}
-
 func (ec *executionContext) marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx context.Context, sel ast.SelectionSet, v model.KubernetesResource) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -22771,6 +22762,21 @@ func (ec *executionContext) marshalOTypeReference2ᚖgithubᚗcomᚋupboundᚋxg
 		return graphql.Null
 	}
 	return ec._TypeReference(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOUnstructured2ᚕbyte(ctx context.Context, v interface{}) ([]byte, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := model.UnmarshalUnstructured(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUnstructured2ᚕbyte(ctx context.Context, sel ast.SelectionSet, v []byte) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return model.MarshalUnstructured(v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

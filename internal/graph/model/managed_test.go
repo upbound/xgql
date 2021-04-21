@@ -76,7 +76,7 @@ func TestGetManagedResource(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			got := GetManagedResource(tc.u)
 
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ManagedResource{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ManagedResource{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetManagedResource(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
