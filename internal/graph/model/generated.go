@@ -465,6 +465,8 @@ func (ConfigurationStatus) IsConditionedStatus() {}
 type CreateKubernetesResourceInput struct {
 	// The Kubernetes resource to be created, as raw JSON.
 	Unstructured []byte `json:"unstructured"`
+	// Patches that should be applied to the Kubernetes resource before creation.
+	Patches []Patch `json:"patches"`
 }
 
 // CreateKubernetesResourcePayload is the result of creating a Kubernetes resource.
@@ -689,6 +691,38 @@ type OwnerConnection struct {
 	TotalCount int `json:"totalCount"`
 }
 
+// A Patch that should be applied to an unstructured input before it is submitted.
+type Patch struct {
+	// A field path references a field within a Kubernetes object via a simple
+	// string. API conventions describe the syntax as "standard JavaScript syntax for
+	// accessing that field, assuming the JSON object was transformed into a
+	// JavaScript object, without the leading dot, such as metadata.name".
+	//
+	// Valid examples:
+	//
+	// * metadata.name
+	// * spec.containers[0].name
+	// * data[.config.yml]
+	// * metadata.annotations['crossplane.io/external-name']
+	// * spec.items[0][8]
+	// * apiVersion
+	// * [42]
+	//
+	// Invalid examples:
+	//
+	// * .metadata.name - Leading period.
+	// * metadata..name - Double period.
+	// * metadata.name. - Trailing period.
+	// * spec.containers[] - Empty brackets.
+	// * spec.containers.[0].name - Period before open bracket.
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	FieldPath string `json:"fieldPath"`
+	// Unstructured JSON to be patched in at the suppled field path. This could be a
+	// string, an object, or any other valid JSON.
+	JSON []byte `json:"json"`
+}
+
 // A PolicyRule holds information that describes a KubernetesRBAC policy rule.
 type PolicyRule struct {
 	// Verbs is a list of verbs that apply to ALL the resources specified by this
@@ -888,6 +922,8 @@ type TypeReference struct {
 type UpdateKubernetesResourceInput struct {
 	// The Kubernetes resource to be updated, as raw JSON.
 	Unstructured []byte `json:"unstructured"`
+	// Patches that should be applied to the Kubernetes resource before updating.
+	Patches []Patch `json:"patches"`
 }
 
 // UpdateKubernetesResourcePayload is the result of updating a Kubernetes resource.

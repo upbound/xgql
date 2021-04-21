@@ -4485,8 +4485,6 @@ type Mutation {
     input: UpdateKubernetesResourceInput!
   ): UpdateKubernetesResourcePayload!
 
-  # TODO(negz): Support patching, too?
-
   """
   Delete a Kubernetes resource.
   """
@@ -4494,6 +4492,48 @@ type Mutation {
     "The ID of the resource to be deleted."
     id: ID!
   ): DeleteKubernetesResourcePayload!
+
+  # TODO(negz): Support strongly typed mutations for well-known types like
+  # providers and configurations.
+}
+
+"""
+A Patch that should be applied to an unstructured input before it is submitted.
+"""
+input Patch {
+  """
+  A field path references a field within a Kubernetes object via a simple
+  string. API conventions describe the syntax as "standard JavaScript syntax for
+  accessing that field, assuming the JSON object was transformed into a
+  JavaScript object, without the leading dot, such as metadata.name".
+
+  Valid examples:
+
+  * metadata.name
+  * spec.containers[0].name
+  * data[.config.yml]
+  * metadata.annotations['crossplane.io/external-name']
+  * spec.items[0][8]
+  * apiVersion
+  * [42]
+
+  Invalid examples:
+
+  * .metadata.name - Leading period.
+  * metadata..name - Double period.
+  * metadata.name. - Trailing period.
+  * spec.containers[] - Empty brackets.
+  * spec.containers.[0].name - Period before open bracket.
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath: String!
+
+  """
+  Unstructured JSON to be patched in at the suppled field path. This could be a
+  string, an object, or any other valid JSON.
+  """
+  json: Unstructured!
 }
 
 """
@@ -4503,6 +4543,9 @@ resource.
 input CreateKubernetesResourceInput {
   "The Kubernetes resource to be created, as raw JSON."
   unstructured: Unstructured!
+
+  "Patches that should be applied to the Kubernetes resource before creation."
+  patches: [Patch!]
 }
 
 """
@@ -4520,6 +4563,9 @@ resource.
 input UpdateKubernetesResourceInput {
   "The Kubernetes resource to be updated, as raw JSON."
   unstructured: Unstructured!
+
+  "Patches that should be applied to the Kubernetes resource before updating."
+  patches: [Patch!]
 }
 
 """
@@ -17114,6 +17160,42 @@ func (ec *executionContext) unmarshalInputCreateKubernetesResourceInput(ctx cont
 			if err != nil {
 				return it, err
 			}
+		case "patches":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("patches"))
+			it.Patches, err = ec.unmarshalOPatch2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatchᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPatch(ctx context.Context, obj interface{}) (model.Patch, error) {
+	var it model.Patch
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "fieldPath":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fieldPath"))
+			it.FieldPath, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "json":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("json"))
+			it.JSON, err = ec.unmarshalNUnstructured2ᚕbyte(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -17131,6 +17213,14 @@ func (ec *executionContext) unmarshalInputUpdateKubernetesResourceInput(ctx cont
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unstructured"))
 			it.Unstructured, err = ec.unmarshalNUnstructured2ᚕbyte(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "patches":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("patches"))
+			it.Patches, err = ec.unmarshalOPatch2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatchᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21306,6 +21396,11 @@ func (ec *executionContext) marshalNPackageRevisionDesiredState2githubᚗcomᚋu
 	return v
 }
 
+func (ec *executionContext) unmarshalNPatch2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatch(ctx context.Context, v interface{}) (model.Patch, error) {
+	res, err := ec.unmarshalInputPatch(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNPolicyRule2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRule(ctx context.Context, sel ast.SelectionSet, v model.PolicyRule) graphql.Marshaler {
 	return ec._PolicyRule(ctx, sel, &v)
 }
@@ -22480,6 +22575,30 @@ func (ec *executionContext) marshalOPackagePullPolicy2ᚖgithubᚗcomᚋupbound�
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOPatch2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatchᚄ(ctx context.Context, v interface{}) ([]model.Patch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]model.Patch, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNPatch2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatch(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) marshalOPolicyRule2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRuleᚄ(ctx context.Context, sel ast.SelectionSet, v []model.PolicyRule) graphql.Marshaler {

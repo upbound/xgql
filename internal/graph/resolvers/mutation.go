@@ -2,20 +2,52 @@ package resolvers
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/util/json"
+	"k8s.io/client-go/util/retry"
+
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
+	"github.com/crossplane/crossplane-runtime/pkg/resource"
 
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/graph/model"
 )
 
 const (
-	errCreateResource = "cannot create Kubernetes resource"
-	errUnmarshalRaw   = "cannot unmarshal input raw JSON"
+	errCreateResource        = "cannot create Kubernetes resource"
+	errUpdateResource        = "cannot update Kubernetes resource"
+	errDeleteResource        = "cannot delete Kubernetes resource"
+	errUnmarshalUnstructured = "cannot unmarshal input unstructured JSON"
+
+	errFmtUnmarshalPatch = "cannot unmarshal unstructured patch JSON at index %d"
+	errFmtPatch          = "cannot apply patch at index %d"
 )
+
+// IsRetriable indicates that an error may succeed if retried.
+func IsRetriable(err error) bool { //nolint:gocyclo // It's just a big old switch.
+	switch {
+	case kerrors.IsTimeout(err):
+		return true
+	case kerrors.IsServerTimeout(err):
+		return true
+	case kerrors.IsInternalError(err):
+		return true
+	case kerrors.IsTooManyRequests(err):
+		return true
+	case kerrors.IsUnexpectedServerError(err):
+		return true
+	case kerrors.ReasonForError(err) == v1.StatusReasonUnknown:
+		// This error doesn't seem to be from Kubernetes.
+		return true
+	default:
+		return false
+	}
+}
 
 type mutation struct {
 	clients ClientCache
@@ -34,11 +66,24 @@ func (r *mutation) CreateKubernetesResource(ctx context.Context, input model.Cre
 
 	u := &unstructured.Unstructured{}
 	if err := json.Unmarshal(input.Unstructured, u); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, errUnmarshalRaw))
+		graphql.AddError(ctx, errors.Wrap(err, errUnmarshalUnstructured))
 		return nil, nil
 	}
 
-	if err := c.Create(ctx, u); err != nil {
+	pv := fieldpath.Pave(u.Object)
+	for i, p := range input.Patches {
+		var v interface{}
+		if err := json.Unmarshal(p.JSON, &v); err != nil {
+			graphql.AddError(ctx, errors.Wrapf(err, errFmtUnmarshalPatch, i))
+			return nil, nil
+		}
+		if err := pv.SetValue(p.FieldPath, v); err != nil {
+			graphql.AddError(ctx, errors.Wrapf(err, errFmtPatch, i))
+			return nil, nil
+		}
+	}
+
+	if err := retry.OnError(retry.DefaultBackoff, IsRetriable, func() error { return c.Create(ctx, u) }); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errCreateResource))
 		return nil, nil
 	}
@@ -51,7 +96,7 @@ func (r *mutation) CreateKubernetesResource(ctx context.Context, input model.Cre
 	return &model.CreateKubernetesResourcePayload{Resource: kr}, nil
 }
 
-func (r *mutation) UpdateKubernetesResource(ctx context.Context, _ model.ReferenceID, input model.UpdateKubernetesResourceInput) (*model.UpdateKubernetesResourcePayload, error) {
+func (r *mutation) UpdateKubernetesResource(ctx context.Context, id model.ReferenceID, input model.UpdateKubernetesResourceInput) (*model.UpdateKubernetesResourcePayload, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -64,16 +109,33 @@ func (r *mutation) UpdateKubernetesResource(ctx context.Context, _ model.Referen
 
 	u := &unstructured.Unstructured{}
 	if err := json.Unmarshal(input.Unstructured, u); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, errUnmarshalRaw))
+		graphql.AddError(ctx, errors.Wrap(err, errUnmarshalUnstructured))
 		return nil, nil
 	}
 
-	// TODO(negz): Validate that the unmarshalled resource matches the supplied
-	// ReferenceID? Or maybe just don't take ReferenceID? We don't actually need
-	// it if the caller is supplying us with the whole object as JSON.
+	pv := fieldpath.Pave(u.Object)
+	for i, p := range input.Patches {
+		var v interface{}
+		if err := json.Unmarshal(p.JSON, &v); err != nil {
+			graphql.AddError(ctx, errors.Wrapf(err, errFmtUnmarshalPatch, i))
+			return nil, nil
+		}
+		if err := pv.SetValue(p.FieldPath, v); err != nil {
+			graphql.AddError(ctx, errors.Wrapf(err, errFmtPatch, i))
+			return nil, nil
+		}
+	}
 
-	if err := c.Update(ctx, u); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, errCreateResource))
+	// We expect the caller to read, modify, then update so the supplied
+	// unstructured JSON _should_ already have the correct GVK, namespace, and
+	// name. Nonetheless we inject those within the supplied ID just in case.
+	u.SetAPIVersion(id.APIVersion)
+	u.SetKind(id.Kind)
+	u.SetNamespace(id.Namespace)
+	u.SetName(id.Name)
+
+	if err := retry.OnError(retry.DefaultBackoff, IsRetriable, func() error { return c.Update(ctx, u) }); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errUpdateResource))
 		return nil, nil
 	}
 
@@ -101,9 +163,9 @@ func (r *mutation) DeleteKubernetesResource(ctx context.Context, id model.Refere
 	u.SetKind(id.Kind)
 	u.SetNamespace(id.Namespace)
 	u.SetName(id.Name)
-	if err := c.Delete(ctx, u); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, errCreateResource))
-		return nil, nil
+	if err := retry.OnError(retry.DefaultBackoff, IsRetriable, func() error { return c.Delete(ctx, u) }); resource.IgnoreNotFound(err) != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errDeleteResource))
+		return nil, nil //nolint:nilerr // IgnoreNotFound appears to trigger this linter.
 	}
 
 	kr, err := model.GetKubernetesResource(u)
