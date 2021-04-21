@@ -132,6 +132,7 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 				ID: ReferenceID{
 					APIVersion: "example.org/v1",
 					Kind:       "CompositeResource",
+					Namespace:  "default",
 					Name:       "cool",
 				},
 				APIVersion: "example.org/v1",

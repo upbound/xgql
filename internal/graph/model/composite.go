@@ -113,6 +113,7 @@ func GetCompositeResourceClaim(u *kunstructured.Unstructured) CompositeResourceC
 		ID: ReferenceID{
 			APIVersion: xrc.GetAPIVersion(),
 			Kind:       xrc.GetKind(),
+			Namespace:  xrc.GetNamespace(),
 			Name:       xrc.GetName(),
 		},
 
