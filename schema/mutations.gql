@@ -1,0 +1,121 @@
+"""
+Mutation is the root type for GraphQL mutations.
+"""
+type Mutation {
+  """
+  Create a Kubernetes resource.
+  """
+  createKubernetesResource(
+    "The inputs to the creation."
+    input: CreateKubernetesResourceInput!
+  ): CreateKubernetesResourcePayload!
+
+  """
+  Update a Kubernetes resource.
+  """
+  updateKubernetesResource(
+    "The ID of the resource to be updated."
+    id: ID!
+
+    "The inputs to the update."
+    input: UpdateKubernetesResourceInput!
+  ): UpdateKubernetesResourcePayload!
+
+  """
+  Delete a Kubernetes resource.
+  """
+  deleteKubernetesResource(
+    "The ID of the resource to be deleted."
+    id: ID!
+  ): DeleteKubernetesResourcePayload!
+
+  # TODO(negz): Support strongly typed mutations for well-known types like
+  # providers and configurations.
+}
+
+"""
+A Patch that should be applied to an unstructured input before it is submitted.
+"""
+input Patch {
+  """
+  A field path references a field within a Kubernetes object via a simple
+  string. API conventions describe the syntax as "standard JavaScript syntax for
+  accessing that field, assuming the JSON object was transformed into a
+  JavaScript object, without the leading dot, such as metadata.name".
+
+  Valid examples:
+
+  * metadata.name
+  * spec.containers[0].name
+  * data[.config.yml]
+  * metadata.annotations['crossplane.io/external-name']
+  * spec.items[0][8]
+  * apiVersion
+  * [42]
+
+  Invalid examples:
+
+  * .metadata.name - Leading period.
+  * metadata..name - Double period.
+  * metadata.name. - Trailing period.
+  * spec.containers[] - Empty brackets.
+  * spec.containers.[0].name - Period before open bracket.
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath: String!
+
+  """
+  Unstructured JSON to be patched in at the suppled field path. This could be a
+  string, an object, or any other valid JSON.
+  """
+  json: Unstructured!
+}
+
+"""
+CreateKubernetesResourceInput is the input required to create a Kubernetes
+resource.
+"""
+input CreateKubernetesResourceInput {
+  "The Kubernetes resource to be created, as raw JSON."
+  unstructured: Unstructured!
+
+  "Patches that should be applied to the Kubernetes resource before creation."
+  patches: [Patch!]
+}
+
+"""
+CreateKubernetesResourcePayload is the result of creating a Kubernetes resource.
+"""
+type CreateKubernetesResourcePayload {
+  "The created Kubernetes resource. Null if the create failed."
+  resource: KubernetesResource
+}
+
+"""
+UpdateKubernetesResourceInput is the input required to update a Kubernetes
+resource.
+"""
+input UpdateKubernetesResourceInput {
+  "The Kubernetes resource to be updated, as raw JSON."
+  unstructured: Unstructured!
+
+  "Patches that should be applied to the Kubernetes resource before updating."
+  patches: [Patch!]
+}
+
+"""
+UpdateKubernetesResourcePayload is the result of updating a Kubernetes resource.
+"""
+type UpdateKubernetesResourcePayload {
+  "The updated Kubernetes resource. Null if the update failed."
+  resource: KubernetesResource
+}
+
+"""
+DeleteKubernetesResourcePayload is the result of deleting a Kubernetes resource.
+"""
+type DeleteKubernetesResourcePayload {
+  "The deleted Kubernetes resource. Null if the delete failed."
+  resource: KubernetesResource
+}

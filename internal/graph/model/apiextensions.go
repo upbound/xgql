@@ -61,8 +61,7 @@ func GetCompositeResourceDefinitionVersions(in []extv1.CompositeResourceDefiniti
 
 		if s := in[i].Schema; s != nil {
 			if raw, err := json.Marshal(s.OpenAPIV3Schema); err == nil {
-				schema := string(raw)
-				out[i].Schema = &CompositeResourceValidation{OpenAPIV3Schema: &schema}
+				out[i].Schema = &CompositeResourceValidation{OpenAPIV3Schema: raw}
 			}
 		}
 	}
@@ -124,8 +123,8 @@ func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) Comp
 			DefaultCompositionReference:  xrd.Spec.DefaultCompositionRef,
 			EnforcedCompositionReference: xrd.Spec.EnforcedCompositionRef,
 		},
-		Status: GetCompositeResourceDefinitionStatus(xrd.Status),
-		Raw:    raw(xrd),
+		Status:       GetCompositeResourceDefinitionStatus(xrd.Status),
+		Unstructured: unstruct(xrd),
 	}
 }
 
@@ -155,7 +154,7 @@ func GetComposition(cmp *extv1.Composition) Composition {
 			},
 			WriteConnectionSecretsToNamespace: cmp.Spec.WriteConnectionSecretsToNamespace,
 		},
-		Status: GetCompositionStatus(cmp.Status),
-		Raw:    raw(cmp),
+		Status:       GetCompositionStatus(cmp.Status),
+		Unstructured: unstruct(cmp),
 	}
 }

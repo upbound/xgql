@@ -32,6 +32,9 @@ models:
   StringMap:
     model:
       - github.com/upbound/xgql/internal/graph/model.StringMap
+  Unstructured:
+    model:
+      - github.com/upbound/xgql/internal/graph/model.Unstructured
   Int:
     model:
       - github.com/99designs/gqlgen/graphql.Int

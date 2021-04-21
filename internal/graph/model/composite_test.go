@@ -91,7 +91,7 @@ func TestGetCompositeResource(t *testing.T) {
 
 			// metav1.Time trims timestamps to second resolution.
 			if diff := cmp.Diff(tc.want, got,
-				cmpopts.IgnoreFields(CompositeResource{}, "Raw"),
+				cmpopts.IgnoreFields(CompositeResource{}, "Unstructured"),
 				cmpopts.EquateApproxTime(1*time.Second),
 				cmp.AllowUnexported(ObjectMeta{}),
 			); diff != "" {
@@ -171,7 +171,7 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 
 			// metav1.Time trims timestamps to second resolution.
 			if diff := cmp.Diff(tc.want, got,
-				cmpopts.IgnoreFields(CompositeResourceClaim{}, "Raw"),
+				cmpopts.IgnoreFields(CompositeResourceClaim{}, "Unstructured"),
 				cmpopts.EquateApproxTime(1*time.Second),
 				cmp.AllowUnexported(ObjectMeta{}),
 			); diff != "" {

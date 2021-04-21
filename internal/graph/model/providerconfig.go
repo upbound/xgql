@@ -33,10 +33,10 @@ func GetProviderConfig(u *kunstructured.Unstructured) ProviderConfig {
 			Name:       pc.GetName(),
 		},
 
-		APIVersion: pc.GetAPIVersion(),
-		Kind:       pc.GetKind(),
-		Metadata:   GetObjectMeta(pc),
-		Status:     GetProviderConfigStatus(pc),
-		Raw:        raw(pc),
+		APIVersion:   pc.GetAPIVersion(),
+		Kind:         pc.GetKind(),
+		Metadata:     GetObjectMeta(pc),
+		Status:       GetProviderConfigStatus(pc),
+		Unstructured: unstruct(pc),
 	}
 }

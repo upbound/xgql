@@ -42,6 +42,11 @@ func (r *Root) Query() generated.QueryResolver {
 	return &query{clients: r.clients}
 }
 
+// Mutation resolves GraphQL mutations.
+func (r *Root) Mutation() generated.MutationResolver {
+	return &mutation{clients: r.clients}
+}
+
 // ObjectMeta resolves properties of the ObjectMeta GraphQL type.
 func (r *Root) ObjectMeta() generated.ObjectMetaResolver {
 	return &objectMeta{clients: r.clients}

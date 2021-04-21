@@ -63,7 +63,7 @@ func TestGetGenericResource(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetGenericResource(tc.u)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(GenericResource{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(GenericResource{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetGenericResource(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -164,7 +164,7 @@ func TestGetSecret(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetSecret(tc.s)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Secret{}, "Raw"), cmp.AllowUnexported(Secret{}, ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Secret{}, "Unstructured"), cmp.AllowUnexported(Secret{}, ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetSecret(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -262,7 +262,7 @@ func TestGetConfigMap(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetConfigMap(tc.cm)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ConfigMap{}, "Raw"), cmp.AllowUnexported(ConfigMap{}, ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ConfigMap{}, "Unstructured"), cmp.AllowUnexported(ConfigMap{}, ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetSecret(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -340,7 +340,7 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 					Versions: []CustomResourceDefinitionVersion{{
 						Name:   "v1",
 						Served: true,
-						Schema: &CustomResourceValidation{OpenAPIV3Schema: pointer.StringPtr(string(jschema))},
+						Schema: &CustomResourceValidation{OpenAPIV3Schema: jschema},
 					}},
 				},
 				Status: &CustomResourceDefinitionStatus{
@@ -368,7 +368,7 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			got := GetCustomResourceDefinition(tc.crd)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(CustomResourceDefinition{}, "Raw"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(CustomResourceDefinition{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetCustomResourceDefinition(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})
@@ -378,20 +378,20 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 func TestGetKubernetesResource(t *testing.T) {
 	ignore := []cmp.Option{
 		cmp.AllowUnexported(Secret{}, ConfigMap{}, ObjectMeta{}),
-		cmpopts.IgnoreFields(ManagedResource{}, "Raw"),
-		cmpopts.IgnoreFields(ProviderConfig{}, "Raw"),
-		cmpopts.IgnoreFields(CompositeResource{}, "Raw"),
-		cmpopts.IgnoreFields(CompositeResourceClaim{}, "Raw"),
-		cmpopts.IgnoreFields(Provider{}, "Raw"),
-		cmpopts.IgnoreFields(ProviderRevision{}, "Raw"),
-		cmpopts.IgnoreFields(Configuration{}, "Raw"),
-		cmpopts.IgnoreFields(ConfigurationRevision{}, "Raw"),
-		cmpopts.IgnoreFields(CompositeResourceDefinition{}, "Raw"),
-		cmpopts.IgnoreFields(Composition{}, "Raw"),
-		cmpopts.IgnoreFields(CustomResourceDefinition{}, "Raw"),
-		cmpopts.IgnoreFields(Secret{}, "Raw"),
-		cmpopts.IgnoreFields(ConfigMap{}, "Raw"),
-		cmpopts.IgnoreFields(GenericResource{}, "Raw"),
+		cmpopts.IgnoreFields(ManagedResource{}, "Unstructured"),
+		cmpopts.IgnoreFields(ProviderConfig{}, "Unstructured"),
+		cmpopts.IgnoreFields(CompositeResource{}, "Unstructured"),
+		cmpopts.IgnoreFields(CompositeResourceClaim{}, "Unstructured"),
+		cmpopts.IgnoreFields(Provider{}, "Unstructured"),
+		cmpopts.IgnoreFields(ProviderRevision{}, "Unstructured"),
+		cmpopts.IgnoreFields(Configuration{}, "Unstructured"),
+		cmpopts.IgnoreFields(ConfigurationRevision{}, "Unstructured"),
+		cmpopts.IgnoreFields(CompositeResourceDefinition{}, "Unstructured"),
+		cmpopts.IgnoreFields(Composition{}, "Unstructured"),
+		cmpopts.IgnoreFields(CustomResourceDefinition{}, "Unstructured"),
+		cmpopts.IgnoreFields(Secret{}, "Unstructured"),
+		cmpopts.IgnoreFields(ConfigMap{}, "Unstructured"),
+		cmpopts.IgnoreFields(GenericResource{}, "Unstructured"),
 	}
 
 	dp := DeletionPolicyDelete

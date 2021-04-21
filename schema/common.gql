@@ -6,16 +6,16 @@ scalar Time
 """
 A StringMap is a 'map' of string keys to string values, i.e. an object with
 string keys and string values. Note that despite this value being returned as a
-'real' object (as opposed to JSON encoded as a string like JSONObject) this type
+'real' object (as opposed to JSON encoded as a string like JSON) this type
 is still a scalar, and thus it's not possible to query at key granularity; you
 always get the whole map.
 """
 scalar StringMap
 
 """
-A JSONObject contains an opaque JSON object encoded as a string.
+Unstructured, schemaless JSON.
 """
-scalar JSONObject
+scalar Unstructured
 
 """
 An object with an ID.
@@ -41,8 +41,8 @@ interface KubernetesResource {
   "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection!
@@ -88,8 +88,8 @@ type GenericResource implements Node & KubernetesResource {
   "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -357,8 +357,8 @@ type Event implements Node {
   "The time at which this event was most recently recorded."
   lastTime: Time
 
-  "A raw JSON representation of the event."
-  raw: JSONObject!
+  "An unstructured JSON representation of the event."
+  unstructured: Unstructured!
 }
 
 """
@@ -417,9 +417,9 @@ type Secret implements Node & KubernetesResource {
   data("Data keys for which to return values." keys: [String!]): StringMap
 
   """
-  A raw JSON representation of the underlying Kubernetes resource.
+  An unstructured JSON representation of the underlying Kubernetes resource.
   """
-  raw: JSONObject!
+  unstructured: Unstructured!
 
   """
   Events pertaining to this resource.
@@ -457,9 +457,9 @@ type ConfigMap implements Node & KubernetesResource {
   data("Data keys for which to return values." keys: [String!]): StringMap
 
   """
-  A raw JSON representation of the underlying Kubernetes resource.
+  An unstructured JSON representation of the underlying Kubernetes resource.
   """
-  raw: JSONObject!
+  unstructured: Unstructured!
 
   # TODO(negz): Support binaryData too? What would the return value be?
 
@@ -492,8 +492,8 @@ type CustomResourceDefinition implements Node & KubernetesResource {
   "The observed state of this resource."
   status: CustomResourceDefinitionStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -605,7 +605,7 @@ resource.
 """
 type CustomResourceValidation {
   "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
-  openAPIV3Schema: JSONObject
+  openAPIV3Schema: Unstructured
 }
 
 """

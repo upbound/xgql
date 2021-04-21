@@ -8,15 +8,15 @@ import (
 	"k8s.io/apimachinery/pkg/util/json"
 )
 
-// raw returns the supplied object as a JSON string. It panics if the object
-// cannot be marshalled as JSON, which _should_ only happen if this program is
-// fundamentally broken - e.g. trying to use a weird runtime.Object.
-func raw(obj runtime.Object) string {
+// unstruct returns the supplied object as unstructured JSON bytes. It panics if
+// the object cannot be marshalled as JSON, which _should_ only happen if this
+// program is fundamentally broken - e.g. trying to use a weird runtime.Object.
+func unstruct(obj runtime.Object) []byte {
 	out, err := json.Marshal(obj)
 	if err != nil {
 		panic(err)
 	}
-	return string(out)
+	return out
 }
 
 func convert(from *kunstructured.Unstructured, to runtime.Object) error {

@@ -53,6 +53,7 @@ type ResolverRoot interface {
 	GenericResource() GenericResourceResolver
 	ManagedResource() ManagedResourceResolver
 	ManagedResourceSpec() ManagedResourceSpecResolver
+	Mutation() MutationResolver
 	ObjectMeta() ObjectMetaResolver
 	Provider() ProviderResolver
 	ProviderConfig() ProviderConfigResolver
@@ -67,27 +68,27 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	CompositeResource struct {
-		APIVersion func(childComplexity int) int
-		Definition func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Definition   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Spec         func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	CompositeResourceClaim struct {
-		APIVersion func(childComplexity int) int
-		Definition func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Definition   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Spec         func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	CompositeResourceClaimConnection struct {
@@ -128,9 +129,9 @@ type ComplexityRoot struct {
 		ID                             func(childComplexity int) int
 		Kind                           func(childComplexity int) int
 		Metadata                       func(childComplexity int) int
-		Raw                            func(childComplexity int) int
 		Spec                           func(childComplexity int) int
 		Status                         func(childComplexity int) int
+		Unstructured                   func(childComplexity int) int
 	}
 
 	CompositeResourceDefinitionConnection struct {
@@ -192,14 +193,14 @@ type ComplexityRoot struct {
 	}
 
 	Composition struct {
-		APIVersion func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Spec         func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	CompositionConnection struct {
@@ -225,13 +226,13 @@ type ComplexityRoot struct {
 	}
 
 	ConfigMap struct {
-		APIVersion func(childComplexity int) int
-		Data       func(childComplexity int, keys []string) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Data         func(childComplexity int, keys []string) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	Configuration struct {
@@ -241,10 +242,10 @@ type ComplexityRoot struct {
 		ID             func(childComplexity int) int
 		Kind           func(childComplexity int) int
 		Metadata       func(childComplexity int) int
-		Raw            func(childComplexity int) int
 		Revisions      func(childComplexity int) int
 		Spec           func(childComplexity int) int
 		Status         func(childComplexity int) int
+		Unstructured   func(childComplexity int) int
 	}
 
 	ConfigurationConnection struct {
@@ -253,14 +254,14 @@ type ComplexityRoot struct {
 	}
 
 	ConfigurationRevision struct {
-		APIVersion func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Spec         func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	ConfigurationRevisionConnection struct {
@@ -301,6 +302,10 @@ type ComplexityRoot struct {
 		CurrentRevision   func(childComplexity int) int
 	}
 
+	CreateKubernetesResourcePayload struct {
+		Resource func(childComplexity int) int
+	}
+
 	CustomResourceDefinition struct {
 		APIVersion       func(childComplexity int) int
 		DefinedResources func(childComplexity int, version *string) int
@@ -308,9 +313,9 @@ type ComplexityRoot struct {
 		ID               func(childComplexity int) int
 		Kind             func(childComplexity int) int
 		Metadata         func(childComplexity int) int
-		Raw              func(childComplexity int) int
 		Spec             func(childComplexity int) int
 		Status           func(childComplexity int) int
+		Unstructured     func(childComplexity int) int
 	}
 
 	CustomResourceDefinitionConnection struct {
@@ -347,6 +352,10 @@ type ComplexityRoot struct {
 		OpenAPIV3Schema func(childComplexity int) int
 	}
 
+	DeleteKubernetesResourcePayload struct {
+		Resource func(childComplexity int) int
+	}
+
 	Event struct {
 		APIVersion     func(childComplexity int) int
 		Count          func(childComplexity int) int
@@ -357,10 +366,10 @@ type ComplexityRoot struct {
 		LastTime       func(childComplexity int) int
 		Message        func(childComplexity int) int
 		Metadata       func(childComplexity int) int
-		Raw            func(childComplexity int) int
 		Reason         func(childComplexity int) int
 		Source         func(childComplexity int) int
 		Type           func(childComplexity int) int
+		Unstructured   func(childComplexity int) int
 	}
 
 	EventConnection struct {
@@ -373,12 +382,12 @@ type ComplexityRoot struct {
 	}
 
 	GenericResource struct {
-		APIVersion func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	KubernetesResourceConnection struct {
@@ -391,15 +400,15 @@ type ComplexityRoot struct {
 	}
 
 	ManagedResource struct {
-		APIVersion func(childComplexity int) int
-		Definition func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Definition   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Spec         func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	ManagedResourceSpec struct {
@@ -410,6 +419,12 @@ type ComplexityRoot struct {
 
 	ManagedResourceStatus struct {
 		Conditions func(childComplexity int) int
+	}
+
+	Mutation struct {
+		CreateKubernetesResource func(childComplexity int, input model.CreateKubernetesResourceInput) int
+		DeleteKubernetesResource func(childComplexity int, id model.ReferenceID) int
+		UpdateKubernetesResource func(childComplexity int, id model.ReferenceID, input model.UpdateKubernetesResourceInput) int
 	}
 
 	ObjectMeta struct {
@@ -452,21 +467,21 @@ type ComplexityRoot struct {
 		ID             func(childComplexity int) int
 		Kind           func(childComplexity int) int
 		Metadata       func(childComplexity int) int
-		Raw            func(childComplexity int) int
 		Revisions      func(childComplexity int) int
 		Spec           func(childComplexity int) int
 		Status         func(childComplexity int) int
+		Unstructured   func(childComplexity int) int
 	}
 
 	ProviderConfig struct {
-		APIVersion func(childComplexity int) int
-		Definition func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Definition   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	ProviderConfigReference struct {
@@ -484,14 +499,14 @@ type ComplexityRoot struct {
 	}
 
 	ProviderRevision struct {
-		APIVersion func(childComplexity int) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Spec       func(childComplexity int) int
-		Status     func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Spec         func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	ProviderRevisionConnection struct {
@@ -548,19 +563,23 @@ type ComplexityRoot struct {
 	}
 
 	Secret struct {
-		APIVersion func(childComplexity int) int
-		Data       func(childComplexity int, keys []string) int
-		Events     func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Kind       func(childComplexity int) int
-		Metadata   func(childComplexity int) int
-		Raw        func(childComplexity int) int
-		Type       func(childComplexity int) int
+		APIVersion   func(childComplexity int) int
+		Data         func(childComplexity int, keys []string) int
+		Events       func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Kind         func(childComplexity int) int
+		Metadata     func(childComplexity int) int
+		Type         func(childComplexity int) int
+		Unstructured func(childComplexity int) int
 	}
 
 	TypeReference struct {
 		APIVersion func(childComplexity int) int
 		Kind       func(childComplexity int) int
+	}
+
+	UpdateKubernetesResourcePayload struct {
+		Resource func(childComplexity int) int
 	}
 }
 
@@ -627,6 +646,11 @@ type ManagedResourceResolver interface {
 }
 type ManagedResourceSpecResolver interface {
 	ConnectionSecret(ctx context.Context, obj *model.ManagedResourceSpec) (*model.Secret, error)
+}
+type MutationResolver interface {
+	CreateKubernetesResource(ctx context.Context, input model.CreateKubernetesResourceInput) (*model.CreateKubernetesResourcePayload, error)
+	UpdateKubernetesResource(ctx context.Context, id model.ReferenceID, input model.UpdateKubernetesResourceInput) (*model.UpdateKubernetesResourcePayload, error)
+	DeleteKubernetesResource(ctx context.Context, id model.ReferenceID) (*model.DeleteKubernetesResourcePayload, error)
 }
 type ObjectMetaResolver interface {
 	Owners(ctx context.Context, obj *model.ObjectMeta) (*model.OwnerConnection, error)
@@ -722,13 +746,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResource.Metadata(childComplexity), true
 
-	case "CompositeResource.raw":
-		if e.complexity.CompositeResource.Raw == nil {
-			break
-		}
-
-		return e.complexity.CompositeResource.Raw(childComplexity), true
-
 	case "CompositeResource.spec":
 		if e.complexity.CompositeResource.Spec == nil {
 			break
@@ -742,6 +759,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CompositeResource.Status(childComplexity), true
+
+	case "CompositeResource.unstructured":
+		if e.complexity.CompositeResource.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.CompositeResource.Unstructured(childComplexity), true
 
 	case "CompositeResourceClaim.apiVersion":
 		if e.complexity.CompositeResourceClaim.APIVersion == nil {
@@ -785,13 +809,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResourceClaim.Metadata(childComplexity), true
 
-	case "CompositeResourceClaim.raw":
-		if e.complexity.CompositeResourceClaim.Raw == nil {
-			break
-		}
-
-		return e.complexity.CompositeResourceClaim.Raw(childComplexity), true
-
 	case "CompositeResourceClaim.spec":
 		if e.complexity.CompositeResourceClaim.Spec == nil {
 			break
@@ -805,6 +822,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CompositeResourceClaim.Status(childComplexity), true
+
+	case "CompositeResourceClaim.unstructured":
+		if e.complexity.CompositeResourceClaim.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceClaim.Unstructured(childComplexity), true
 
 	case "CompositeResourceClaimConnection.nodes":
 		if e.complexity.CompositeResourceClaimConnection.Nodes == nil {
@@ -949,13 +973,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResourceDefinition.Metadata(childComplexity), true
 
-	case "CompositeResourceDefinition.raw":
-		if e.complexity.CompositeResourceDefinition.Raw == nil {
-			break
-		}
-
-		return e.complexity.CompositeResourceDefinition.Raw(childComplexity), true
-
 	case "CompositeResourceDefinition.spec":
 		if e.complexity.CompositeResourceDefinition.Spec == nil {
 			break
@@ -969,6 +986,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CompositeResourceDefinition.Status(childComplexity), true
+
+	case "CompositeResourceDefinition.unstructured":
+		if e.complexity.CompositeResourceDefinition.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceDefinition.Unstructured(childComplexity), true
 
 	case "CompositeResourceDefinitionConnection.nodes":
 		if e.complexity.CompositeResourceDefinitionConnection.Nodes == nil {
@@ -1222,13 +1246,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Composition.Metadata(childComplexity), true
 
-	case "Composition.raw":
-		if e.complexity.Composition.Raw == nil {
-			break
-		}
-
-		return e.complexity.Composition.Raw(childComplexity), true
-
 	case "Composition.spec":
 		if e.complexity.Composition.Spec == nil {
 			break
@@ -1242,6 +1259,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Composition.Status(childComplexity), true
+
+	case "Composition.unstructured":
+		if e.complexity.Composition.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.Composition.Unstructured(childComplexity), true
 
 	case "CompositionConnection.nodes":
 		if e.complexity.CompositionConnection.Nodes == nil {
@@ -1360,12 +1384,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ConfigMap.Metadata(childComplexity), true
 
-	case "ConfigMap.raw":
-		if e.complexity.ConfigMap.Raw == nil {
+	case "ConfigMap.unstructured":
+		if e.complexity.ConfigMap.Unstructured == nil {
 			break
 		}
 
-		return e.complexity.ConfigMap.Raw(childComplexity), true
+		return e.complexity.ConfigMap.Unstructured(childComplexity), true
 
 	case "Configuration.apiVersion":
 		if e.complexity.Configuration.APIVersion == nil {
@@ -1409,13 +1433,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Configuration.Metadata(childComplexity), true
 
-	case "Configuration.raw":
-		if e.complexity.Configuration.Raw == nil {
-			break
-		}
-
-		return e.complexity.Configuration.Raw(childComplexity), true
-
 	case "Configuration.revisions":
 		if e.complexity.Configuration.Revisions == nil {
 			break
@@ -1436,6 +1453,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Configuration.Status(childComplexity), true
+
+	case "Configuration.unstructured":
+		if e.complexity.Configuration.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.Configuration.Unstructured(childComplexity), true
 
 	case "ConfigurationConnection.nodes":
 		if e.complexity.ConfigurationConnection.Nodes == nil {
@@ -1486,13 +1510,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ConfigurationRevision.Metadata(childComplexity), true
 
-	case "ConfigurationRevision.raw":
-		if e.complexity.ConfigurationRevision.Raw == nil {
-			break
-		}
-
-		return e.complexity.ConfigurationRevision.Raw(childComplexity), true
-
 	case "ConfigurationRevision.spec":
 		if e.complexity.ConfigurationRevision.Spec == nil {
 			break
@@ -1506,6 +1523,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ConfigurationRevision.Status(childComplexity), true
+
+	case "ConfigurationRevision.unstructured":
+		if e.complexity.ConfigurationRevision.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.ConfigurationRevision.Unstructured(childComplexity), true
 
 	case "ConfigurationRevisionConnection.nodes":
 		if e.complexity.ConfigurationRevisionConnection.Nodes == nil {
@@ -1668,6 +1692,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ConfigurationStatus.CurrentRevision(childComplexity), true
 
+	case "CreateKubernetesResourcePayload.resource":
+		if e.complexity.CreateKubernetesResourcePayload.Resource == nil {
+			break
+		}
+
+		return e.complexity.CreateKubernetesResourcePayload.Resource(childComplexity), true
+
 	case "CustomResourceDefinition.apiVersion":
 		if e.complexity.CustomResourceDefinition.APIVersion == nil {
 			break
@@ -1715,13 +1746,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CustomResourceDefinition.Metadata(childComplexity), true
 
-	case "CustomResourceDefinition.raw":
-		if e.complexity.CustomResourceDefinition.Raw == nil {
-			break
-		}
-
-		return e.complexity.CustomResourceDefinition.Raw(childComplexity), true
-
 	case "CustomResourceDefinition.spec":
 		if e.complexity.CustomResourceDefinition.Spec == nil {
 			break
@@ -1735,6 +1759,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CustomResourceDefinition.Status(childComplexity), true
+
+	case "CustomResourceDefinition.unstructured":
+		if e.complexity.CustomResourceDefinition.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.CustomResourceDefinition.Unstructured(childComplexity), true
 
 	case "CustomResourceDefinitionConnection.nodes":
 		if e.complexity.CustomResourceDefinitionConnection.Nodes == nil {
@@ -1848,6 +1879,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CustomResourceValidation.OpenAPIV3Schema(childComplexity), true
 
+	case "DeleteKubernetesResourcePayload.resource":
+		if e.complexity.DeleteKubernetesResourcePayload.Resource == nil {
+			break
+		}
+
+		return e.complexity.DeleteKubernetesResourcePayload.Resource(childComplexity), true
+
 	case "Event.apiVersion":
 		if e.complexity.Event.APIVersion == nil {
 			break
@@ -1911,13 +1949,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Event.Metadata(childComplexity), true
 
-	case "Event.raw":
-		if e.complexity.Event.Raw == nil {
-			break
-		}
-
-		return e.complexity.Event.Raw(childComplexity), true
-
 	case "Event.reason":
 		if e.complexity.Event.Reason == nil {
 			break
@@ -1938,6 +1969,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Event.Type(childComplexity), true
+
+	case "Event.unstructured":
+		if e.complexity.Event.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.Event.Unstructured(childComplexity), true
 
 	case "EventConnection.nodes":
 		if e.complexity.EventConnection.Nodes == nil {
@@ -1995,12 +2033,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GenericResource.Metadata(childComplexity), true
 
-	case "GenericResource.raw":
-		if e.complexity.GenericResource.Raw == nil {
+	case "GenericResource.unstructured":
+		if e.complexity.GenericResource.Unstructured == nil {
 			break
 		}
 
-		return e.complexity.GenericResource.Raw(childComplexity), true
+		return e.complexity.GenericResource.Unstructured(childComplexity), true
 
 	case "KubernetesResourceConnection.nodes":
 		if e.complexity.KubernetesResourceConnection.Nodes == nil {
@@ -2065,13 +2103,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ManagedResource.Metadata(childComplexity), true
 
-	case "ManagedResource.raw":
-		if e.complexity.ManagedResource.Raw == nil {
-			break
-		}
-
-		return e.complexity.ManagedResource.Raw(childComplexity), true
-
 	case "ManagedResource.spec":
 		if e.complexity.ManagedResource.Spec == nil {
 			break
@@ -2085,6 +2116,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ManagedResource.Status(childComplexity), true
+
+	case "ManagedResource.unstructured":
+		if e.complexity.ManagedResource.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.ManagedResource.Unstructured(childComplexity), true
 
 	case "ManagedResourceSpec.connectionSecret":
 		if e.complexity.ManagedResourceSpec.ConnectionSecret == nil {
@@ -2113,6 +2151,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ManagedResourceStatus.Conditions(childComplexity), true
+
+	case "Mutation.createKubernetesResource":
+		if e.complexity.Mutation.CreateKubernetesResource == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createKubernetesResource_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateKubernetesResource(childComplexity, args["input"].(model.CreateKubernetesResourceInput)), true
+
+	case "Mutation.deleteKubernetesResource":
+		if e.complexity.Mutation.DeleteKubernetesResource == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteKubernetesResource_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteKubernetesResource(childComplexity, args["id"].(model.ReferenceID)), true
+
+	case "Mutation.updateKubernetesResource":
+		if e.complexity.Mutation.UpdateKubernetesResource == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateKubernetesResource_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateKubernetesResource(childComplexity, args["id"].(model.ReferenceID), args["input"].(model.UpdateKubernetesResourceInput)), true
 
 	case "ObjectMeta.annotations":
 		if e.complexity.ObjectMeta.Annotations == nil {
@@ -2313,13 +2387,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Provider.Metadata(childComplexity), true
 
-	case "Provider.raw":
-		if e.complexity.Provider.Raw == nil {
-			break
-		}
-
-		return e.complexity.Provider.Raw(childComplexity), true
-
 	case "Provider.revisions":
 		if e.complexity.Provider.Revisions == nil {
 			break
@@ -2340,6 +2407,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Provider.Status(childComplexity), true
+
+	case "Provider.unstructured":
+		if e.complexity.Provider.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.Provider.Unstructured(childComplexity), true
 
 	case "ProviderConfig.apiVersion":
 		if e.complexity.ProviderConfig.APIVersion == nil {
@@ -2383,19 +2457,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProviderConfig.Metadata(childComplexity), true
 
-	case "ProviderConfig.raw":
-		if e.complexity.ProviderConfig.Raw == nil {
-			break
-		}
-
-		return e.complexity.ProviderConfig.Raw(childComplexity), true
-
 	case "ProviderConfig.status":
 		if e.complexity.ProviderConfig.Status == nil {
 			break
 		}
 
 		return e.complexity.ProviderConfig.Status(childComplexity), true
+
+	case "ProviderConfig.unstructured":
+		if e.complexity.ProviderConfig.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.ProviderConfig.Unstructured(childComplexity), true
 
 	case "ProviderConfigReference.name":
 		if e.complexity.ProviderConfigReference.Name == nil {
@@ -2467,13 +2541,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProviderRevision.Metadata(childComplexity), true
 
-	case "ProviderRevision.raw":
-		if e.complexity.ProviderRevision.Raw == nil {
-			break
-		}
-
-		return e.complexity.ProviderRevision.Raw(childComplexity), true
-
 	case "ProviderRevision.spec":
 		if e.complexity.ProviderRevision.Spec == nil {
 			break
@@ -2487,6 +2554,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProviderRevision.Status(childComplexity), true
+
+	case "ProviderRevision.unstructured":
+		if e.complexity.ProviderRevision.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.ProviderRevision.Unstructured(childComplexity), true
 
 	case "ProviderRevisionConnection.nodes":
 		if e.complexity.ProviderRevisionConnection.Nodes == nil {
@@ -2830,19 +2904,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Secret.Metadata(childComplexity), true
 
-	case "Secret.raw":
-		if e.complexity.Secret.Raw == nil {
-			break
-		}
-
-		return e.complexity.Secret.Raw(childComplexity), true
-
 	case "Secret.type":
 		if e.complexity.Secret.Type == nil {
 			break
 		}
 
 		return e.complexity.Secret.Type(childComplexity), true
+
+	case "Secret.unstructured":
+		if e.complexity.Secret.Unstructured == nil {
+			break
+		}
+
+		return e.complexity.Secret.Unstructured(childComplexity), true
 
 	case "TypeReference.apiVersion":
 		if e.complexity.TypeReference.APIVersion == nil {
@@ -2857,6 +2931,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TypeReference.Kind(childComplexity), true
+
+	case "UpdateKubernetesResourcePayload.resource":
+		if e.complexity.UpdateKubernetesResourcePayload.Resource == nil {
+			break
+		}
+
+		return e.complexity.UpdateKubernetesResourcePayload.Resource(childComplexity), true
 
 	}
 	return 0, false
@@ -2875,6 +2956,20 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 			first = false
 			data := ec._Query(ctx, rc.Operation.SelectionSet)
+			var buf bytes.Buffer
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
+	case ast.Mutation:
+		return func(ctx context.Context) *graphql.Response {
+			if !first {
+				return nil
+			}
+			first = false
+			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
 			var buf bytes.Buffer
 			data.MarshalGQL(&buf)
 
@@ -2931,8 +3026,8 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
   "The observed state of this resource."
   status: CompositeResourceDefinitionStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3120,7 +3215,7 @@ resource.
 """
 type CompositeResourceValidation {
   "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
-  openAPIV3Schema: JSONObject
+  openAPIV3Schema: Unstructured
 }
 
 """
@@ -3197,8 +3292,8 @@ type Composition implements Node & KubernetesResource {
   "The observed state of this resource."
   status: CompositionStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3240,16 +3335,16 @@ scalar Time
 """
 A StringMap is a 'map' of string keys to string values, i.e. an object with
 string keys and string values. Note that despite this value being returned as a
-'real' object (as opposed to JSON encoded as a string like JSONObject) this type
+'real' object (as opposed to JSON encoded as a string like JSON) this type
 is still a scalar, and thus it's not possible to query at key granularity; you
 always get the whole map.
 """
 scalar StringMap
 
 """
-A JSONObject contains an opaque JSON object encoded as a string.
+Unstructured, schemaless JSON.
 """
-scalar JSONObject
+scalar Unstructured
 
 """
 An object with an ID.
@@ -3275,8 +3370,8 @@ interface KubernetesResource {
   "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection!
@@ -3322,8 +3417,8 @@ type GenericResource implements Node & KubernetesResource {
   "Metadata that is common to all Kubernetes API resources."
   metadata: ObjectMeta!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3591,8 +3686,8 @@ type Event implements Node {
   "The time at which this event was most recently recorded."
   lastTime: Time
 
-  "A raw JSON representation of the event."
-  raw: JSONObject!
+  "An unstructured JSON representation of the event."
+  unstructured: Unstructured!
 }
 
 """
@@ -3651,9 +3746,9 @@ type Secret implements Node & KubernetesResource {
   data("Data keys for which to return values." keys: [String!]): StringMap
 
   """
-  A raw JSON representation of the underlying Kubernetes resource.
+  An unstructured JSON representation of the underlying Kubernetes resource.
   """
-  raw: JSONObject!
+  unstructured: Unstructured!
 
   """
   Events pertaining to this resource.
@@ -3691,9 +3786,9 @@ type ConfigMap implements Node & KubernetesResource {
   data("Data keys for which to return values." keys: [String!]): StringMap
 
   """
-  A raw JSON representation of the underlying Kubernetes resource.
+  An unstructured JSON representation of the underlying Kubernetes resource.
   """
-  raw: JSONObject!
+  unstructured: Unstructured!
 
   # TODO(negz): Support binaryData too? What would the return value be?
 
@@ -3726,8 +3821,8 @@ type CustomResourceDefinition implements Node & KubernetesResource {
   "The observed state of this resource."
   status: CustomResourceDefinitionStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3839,7 +3934,7 @@ resource.
 """
 type CustomResourceValidation {
   "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
-  openAPIV3Schema: JSONObject
+  openAPIV3Schema: Unstructured
 }
 
 """
@@ -3875,8 +3970,8 @@ type CompositeResource implements Node & KubernetesResource {
   "The observed state of this resource."
   status: CompositeResourceStatus!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3966,8 +4061,8 @@ type CompositeResourceClaim implements Node & KubernetesResource {
   "The observed state of this resource."
   status: CompositeResourceClaimStatus!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4049,8 +4144,8 @@ type Configuration implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ConfigurationStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4167,8 +4262,8 @@ type ConfigurationRevision implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ConfigurationRevisionStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4291,8 +4386,8 @@ type ManagedResource implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ManagedResourceStatus!
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4367,6 +4462,128 @@ type ManagedResourceStatus implements ConditionedStatus {
   conditions: [Condition!]
 }
 `, BuiltIn: false},
+	{Name: "schema/mutations.gql", Input: `"""
+Mutation is the root type for GraphQL mutations.
+"""
+type Mutation {
+  """
+  Create a Kubernetes resource.
+  """
+  createKubernetesResource(
+    "The inputs to the creation."
+    input: CreateKubernetesResourceInput!
+  ): CreateKubernetesResourcePayload!
+
+  """
+  Update a Kubernetes resource.
+  """
+  updateKubernetesResource(
+    "The ID of the resource to be updated."
+    id: ID!
+
+    "The inputs to the update."
+    input: UpdateKubernetesResourceInput!
+  ): UpdateKubernetesResourcePayload!
+
+  """
+  Delete a Kubernetes resource.
+  """
+  deleteKubernetesResource(
+    "The ID of the resource to be deleted."
+    id: ID!
+  ): DeleteKubernetesResourcePayload!
+
+  # TODO(negz): Support strongly typed mutations for well-known types like
+  # providers and configurations.
+}
+
+"""
+A Patch that should be applied to an unstructured input before it is submitted.
+"""
+input Patch {
+  """
+  A field path references a field within a Kubernetes object via a simple
+  string. API conventions describe the syntax as "standard JavaScript syntax for
+  accessing that field, assuming the JSON object was transformed into a
+  JavaScript object, without the leading dot, such as metadata.name".
+
+  Valid examples:
+
+  * metadata.name
+  * spec.containers[0].name
+  * data[.config.yml]
+  * metadata.annotations['crossplane.io/external-name']
+  * spec.items[0][8]
+  * apiVersion
+  * [42]
+
+  Invalid examples:
+
+  * .metadata.name - Leading period.
+  * metadata..name - Double period.
+  * metadata.name. - Trailing period.
+  * spec.containers[] - Empty brackets.
+  * spec.containers.[0].name - Period before open bracket.
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath: String!
+
+  """
+  Unstructured JSON to be patched in at the suppled field path. This could be a
+  string, an object, or any other valid JSON.
+  """
+  json: Unstructured!
+}
+
+"""
+CreateKubernetesResourceInput is the input required to create a Kubernetes
+resource.
+"""
+input CreateKubernetesResourceInput {
+  "The Kubernetes resource to be created, as raw JSON."
+  unstructured: Unstructured!
+
+  "Patches that should be applied to the Kubernetes resource before creation."
+  patches: [Patch!]
+}
+
+"""
+CreateKubernetesResourcePayload is the result of creating a Kubernetes resource.
+"""
+type CreateKubernetesResourcePayload {
+  "The created Kubernetes resource. Null if the create failed."
+  resource: KubernetesResource
+}
+
+"""
+UpdateKubernetesResourceInput is the input required to update a Kubernetes
+resource.
+"""
+input UpdateKubernetesResourceInput {
+  "The Kubernetes resource to be updated, as raw JSON."
+  unstructured: Unstructured!
+
+  "Patches that should be applied to the Kubernetes resource before updating."
+  patches: [Patch!]
+}
+
+"""
+UpdateKubernetesResourcePayload is the result of updating a Kubernetes resource.
+"""
+type UpdateKubernetesResourcePayload {
+  "The updated Kubernetes resource. Null if the update failed."
+  resource: KubernetesResource
+}
+
+"""
+DeleteKubernetesResourcePayload is the result of deleting a Kubernetes resource.
+"""
+type DeleteKubernetesResourcePayload {
+  "The deleted Kubernetes resource. Null if the delete failed."
+  resource: KubernetesResource
+}
+`, BuiltIn: false},
 	{Name: "schema/package.gql", Input: `"""
 A RevisionActivationPolicy indicates how a provider or configuration package
 should activate its revisions.
@@ -4427,8 +4644,8 @@ type Provider implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ProviderStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4544,8 +4761,8 @@ type ProviderRevision implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ProviderRevisionStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4653,8 +4870,8 @@ type ProviderConfig implements Node & KubernetesResource {
   "The observed state of this resource."
   status: ProviderConfigStatus
 
-  "A raw JSON representation of the underlying Kubernetes resource."
-  raw: JSONObject!
+  "An unstructured JSON representation of the underlying Kubernetes resource."
+  unstructured: Unstructured!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4972,6 +5189,60 @@ func (ec *executionContext) field_CustomResourceDefinition_definedResources_args
 		}
 	}
 	args["version"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createKubernetesResource_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.CreateKubernetesResourceInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCreateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourceInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteKubernetesResource_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateKubernetesResource_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 model.UpdateKubernetesResourceInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourceInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
 	return args, nil
 }
 
@@ -5514,7 +5785,7 @@ func (ec *executionContext) _CompositeResource_status(ctx context.Context, field
 	return ec.marshalNCompositeResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResource_raw(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResource_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -5532,7 +5803,7 @@ func (ec *executionContext) _CompositeResource_raw(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5544,9 +5815,9 @@ func (ec *executionContext) _CompositeResource_raw(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResource_events(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
@@ -5826,7 +6097,7 @@ func (ec *executionContext) _CompositeResourceClaim_status(ctx context.Context, 
 	return ec.marshalNCompositeResourceClaimStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResourceClaim_raw(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResourceClaim_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -5844,7 +6115,7 @@ func (ec *executionContext) _CompositeResourceClaim_raw(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5856,9 +6127,9 @@ func (ec *executionContext) _CompositeResourceClaim_raw(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaim_events(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
@@ -6525,7 +6796,7 @@ func (ec *executionContext) _CompositeResourceDefinition_status(ctx context.Cont
 	return ec.marshalOCompositeResourceDefinitionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CompositeResourceDefinition_raw(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
+func (ec *executionContext) _CompositeResourceDefinition_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6543,7 +6814,7 @@ func (ec *executionContext) _CompositeResourceDefinition_raw(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6555,9 +6826,9 @@ func (ec *executionContext) _CompositeResourceDefinition_raw(ctx context.Context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinition_events(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
@@ -7690,9 +7961,9 @@ func (ec *executionContext) _CompositeResourceValidation_openAPIV3Schema(ctx con
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalOJSONObject2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Composition_id(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
@@ -7902,7 +8173,7 @@ func (ec *executionContext) _Composition_status(ctx context.Context, field graph
 	return ec.marshalOCompositionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Composition_raw(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
+func (ec *executionContext) _Composition_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -7920,7 +8191,7 @@ func (ec *executionContext) _Composition_raw(ctx context.Context, field graphql.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7932,9 +8203,9 @@ func (ec *executionContext) _Composition_raw(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Composition_events(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
@@ -8489,7 +8760,7 @@ func (ec *executionContext) _ConfigMap_data(ctx context.Context, field graphql.C
 	return ec.marshalOStringMap2map(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ConfigMap_raw(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
+func (ec *executionContext) _ConfigMap_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -8507,7 +8778,7 @@ func (ec *executionContext) _ConfigMap_raw(ctx context.Context, field graphql.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8519,9 +8790,9 @@ func (ec *executionContext) _ConfigMap_raw(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigMap_events(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
@@ -8766,7 +9037,7 @@ func (ec *executionContext) _Configuration_status(ctx context.Context, field gra
 	return ec.marshalOConfigurationStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Configuration_raw(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
+func (ec *executionContext) _Configuration_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -8784,7 +9055,7 @@ func (ec *executionContext) _Configuration_raw(ctx context.Context, field graphq
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8796,9 +9067,9 @@ func (ec *executionContext) _Configuration_raw(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Configuration_events(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
@@ -9177,7 +9448,7 @@ func (ec *executionContext) _ConfigurationRevision_status(ctx context.Context, f
 	return ec.marshalOConfigurationRevisionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ConfigurationRevision_raw(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevision) (ret graphql.Marshaler) {
+func (ec *executionContext) _ConfigurationRevision_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevision) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -9195,7 +9466,7 @@ func (ec *executionContext) _ConfigurationRevision_raw(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9207,9 +9478,9 @@ func (ec *executionContext) _ConfigurationRevision_raw(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationRevision_events(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevision) (ret graphql.Marshaler) {
@@ -10001,6 +10272,38 @@ func (ec *executionContext) _ConfigurationStatus_currentIdentifier(ctx context.C
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _CreateKubernetesResourcePayload_resource(ctx context.Context, field graphql.CollectedField, obj *model.CreateKubernetesResourcePayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CreateKubernetesResourcePayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Resource, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.KubernetesResource)
+	fc.Result = res
+	return ec.marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _CustomResourceDefinition_id(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -10208,7 +10511,7 @@ func (ec *executionContext) _CustomResourceDefinition_status(ctx context.Context
 	return ec.marshalOCustomResourceDefinitionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _CustomResourceDefinition_raw(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
+func (ec *executionContext) _CustomResourceDefinition_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -10226,7 +10529,7 @@ func (ec *executionContext) _CustomResourceDefinition_raw(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10238,9 +10541,9 @@ func (ec *executionContext) _CustomResourceDefinition_raw(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinition_events(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
@@ -10848,9 +11151,41 @@ func (ec *executionContext) _CustomResourceValidation_openAPIV3Schema(ctx contex
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalOJSONObject2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOUnstructured2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeleteKubernetesResourcePayload_resource(ctx context.Context, field graphql.CollectedField, obj *model.DeleteKubernetesResourcePayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "DeleteKubernetesResourcePayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Resource, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.KubernetesResource)
+	fc.Result = res
+	return ec.marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Event_id(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
@@ -11252,7 +11587,7 @@ func (ec *executionContext) _Event_lastTime(ctx context.Context, field graphql.C
 	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Event_raw(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
+func (ec *executionContext) _Event_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11270,7 +11605,7 @@ func (ec *executionContext) _Event_raw(ctx context.Context, field graphql.Collec
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11282,9 +11617,9 @@ func (ec *executionContext) _Event_raw(ctx context.Context, field graphql.Collec
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _EventConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.EventConnection) (ret graphql.Marshaler) {
@@ -11526,7 +11861,7 @@ func (ec *executionContext) _GenericResource_metadata(ctx context.Context, field
 	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _GenericResource_raw(ctx context.Context, field graphql.CollectedField, obj *model.GenericResource) (ret graphql.Marshaler) {
+func (ec *executionContext) _GenericResource_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.GenericResource) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11544,7 +11879,7 @@ func (ec *executionContext) _GenericResource_raw(ctx context.Context, field grap
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11556,9 +11891,9 @@ func (ec *executionContext) _GenericResource_raw(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _GenericResource_events(ctx context.Context, field graphql.CollectedField, obj *model.GenericResource) (ret graphql.Marshaler) {
@@ -11905,7 +12240,7 @@ func (ec *executionContext) _ManagedResource_status(ctx context.Context, field g
 	return ec.marshalNManagedResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ManagedResource_raw(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
+func (ec *executionContext) _ManagedResource_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11923,7 +12258,7 @@ func (ec *executionContext) _ManagedResource_raw(ctx context.Context, field grap
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11935,9 +12270,9 @@ func (ec *executionContext) _ManagedResource_raw(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResource_events(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
@@ -12133,6 +12468,132 @@ func (ec *executionContext) _ManagedResourceStatus_conditions(ctx context.Contex
 	res := resTmp.([]model.Condition)
 	fc.Result = res
 	return ec.marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConditionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createKubernetesResource(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createKubernetesResource_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateKubernetesResource(rctx, args["input"].(model.CreateKubernetesResourceInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.CreateKubernetesResourcePayload)
+	fc.Result = res
+	return ec.marshalNCreateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourcePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateKubernetesResource(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateKubernetesResource_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateKubernetesResource(rctx, args["id"].(model.ReferenceID), args["input"].(model.UpdateKubernetesResourceInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.UpdateKubernetesResourcePayload)
+	fc.Result = res
+	return ec.marshalNUpdateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteKubernetesResource(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteKubernetesResource_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteKubernetesResource(rctx, args["id"].(model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeleteKubernetesResourcePayload)
+	fc.Result = res
+	return ec.marshalNDeleteKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeleteKubernetesResourcePayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ObjectMeta_name(ctx context.Context, field graphql.CollectedField, obj *model.ObjectMeta) (ret graphql.Marshaler) {
@@ -13055,7 +13516,7 @@ func (ec *executionContext) _Provider_status(ctx context.Context, field graphql.
 	return ec.marshalOProviderStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Provider_raw(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
+func (ec *executionContext) _Provider_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -13073,7 +13534,7 @@ func (ec *executionContext) _Provider_raw(ctx context.Context, field graphql.Col
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13085,9 +13546,9 @@ func (ec *executionContext) _Provider_raw(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Provider_events(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
@@ -13364,7 +13825,7 @@ func (ec *executionContext) _ProviderConfig_status(ctx context.Context, field gr
 	return ec.marshalOProviderConfigStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConfigStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProviderConfig_raw(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
+func (ec *executionContext) _ProviderConfig_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -13382,7 +13843,7 @@ func (ec *executionContext) _ProviderConfig_raw(ctx context.Context, field graph
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13394,9 +13855,9 @@ func (ec *executionContext) _ProviderConfig_raw(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderConfig_events(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
@@ -13839,7 +14300,7 @@ func (ec *executionContext) _ProviderRevision_status(ctx context.Context, field 
 	return ec.marshalOProviderRevisionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ProviderRevision_raw(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevision) (ret graphql.Marshaler) {
+func (ec *executionContext) _ProviderRevision_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevision) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -13857,7 +14318,7 @@ func (ec *executionContext) _ProviderRevision_raw(ctx context.Context, field gra
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13869,9 +14330,9 @@ func (ec *executionContext) _ProviderRevision_raw(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderRevision_events(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevision) (ret graphql.Marshaler) {
@@ -15426,7 +15887,7 @@ func (ec *executionContext) _Secret_data(ctx context.Context, field graphql.Coll
 	return ec.marshalOStringMap2map(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Secret_raw(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
+func (ec *executionContext) _Secret_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -15444,7 +15905,7 @@ func (ec *executionContext) _Secret_raw(ctx context.Context, field graphql.Colle
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Raw, nil
+		return obj.Unstructured, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15456,9 +15917,9 @@ func (ec *executionContext) _Secret_raw(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNJSONObject2string(ctx, field.Selections, res)
+	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Secret_events(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
@@ -15564,6 +16025,38 @@ func (ec *executionContext) _TypeReference_kind(ctx context.Context, field graph
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdateKubernetesResourcePayload_resource(ctx context.Context, field graphql.CollectedField, obj *model.UpdateKubernetesResourcePayload) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateKubernetesResourcePayload",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Resource, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(model.KubernetesResource)
+	fc.Result = res
+	return ec.marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -16653,6 +17146,90 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputCreateKubernetesResourceInput(ctx context.Context, obj interface{}) (model.CreateKubernetesResourceInput, error) {
+	var it model.CreateKubernetesResourceInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "unstructured":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unstructured"))
+			it.Unstructured, err = ec.unmarshalNUnstructured2ᚕbyte(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "patches":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("patches"))
+			it.Patches, err = ec.unmarshalOPatch2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatchᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPatch(ctx context.Context, obj interface{}) (model.Patch, error) {
+	var it model.Patch
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "fieldPath":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fieldPath"))
+			it.FieldPath, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "json":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("json"))
+			it.JSON, err = ec.unmarshalNUnstructured2ᚕbyte(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateKubernetesResourceInput(ctx context.Context, obj interface{}) (model.UpdateKubernetesResourceInput, error) {
+	var it model.UpdateKubernetesResourceInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "unstructured":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unstructured"))
+			it.Unstructured, err = ec.unmarshalNUnstructured2ᚕbyte(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "patches":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("patches"))
+			it.Patches, err = ec.unmarshalOPatch2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatchᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -17041,8 +17618,8 @@ func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.Sele
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "raw":
-			out.Values[i] = ec._CompositeResource_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._CompositeResource_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -17123,8 +17700,8 @@ func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "raw":
-			out.Values[i] = ec._CompositeResourceClaim_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._CompositeResourceClaim_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -17391,8 +17968,8 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 			}
 		case "status":
 			out.Values[i] = ec._CompositeResourceDefinition_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._CompositeResourceDefinition_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._CompositeResourceDefinition_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -17825,8 +18402,8 @@ func (ec *executionContext) _Composition(ctx context.Context, sel ast.SelectionS
 			}
 		case "status":
 			out.Values[i] = ec._Composition_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._Composition_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._Composition_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -18014,8 +18591,8 @@ func (ec *executionContext) _ConfigMap(ctx context.Context, sel ast.SelectionSet
 			}
 		case "data":
 			out.Values[i] = ec._ConfigMap_data(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._ConfigMap_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._ConfigMap_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -18082,8 +18659,8 @@ func (ec *executionContext) _Configuration(ctx context.Context, sel ast.Selectio
 			}
 		case "status":
 			out.Values[i] = ec._Configuration_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._Configuration_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._Configuration_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -18204,8 +18781,8 @@ func (ec *executionContext) _ConfigurationRevision(ctx context.Context, sel ast.
 			}
 		case "status":
 			out.Values[i] = ec._ConfigurationRevision_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._ConfigurationRevision_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._ConfigurationRevision_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -18417,6 +18994,30 @@ func (ec *executionContext) _ConfigurationStatus(ctx context.Context, sel ast.Se
 	return out
 }
 
+var createKubernetesResourcePayloadImplementors = []string{"CreateKubernetesResourcePayload"}
+
+func (ec *executionContext) _CreateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, obj *model.CreateKubernetesResourcePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createKubernetesResourcePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateKubernetesResourcePayload")
+		case "resource":
+			out.Values[i] = ec._CreateKubernetesResourcePayload_resource(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var customResourceDefinitionImplementors = []string{"CustomResourceDefinition", "Node", "KubernetesResource", "ManagedResourceDefinition", "ProviderConfigDefinition"}
 
 func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinition) graphql.Marshaler {
@@ -18455,8 +19056,8 @@ func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel a
 			}
 		case "status":
 			out.Values[i] = ec._CustomResourceDefinition_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._CustomResourceDefinition_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._CustomResourceDefinition_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -18684,6 +19285,30 @@ func (ec *executionContext) _CustomResourceValidation(ctx context.Context, sel a
 	return out
 }
 
+var deleteKubernetesResourcePayloadImplementors = []string{"DeleteKubernetesResourcePayload"}
+
+func (ec *executionContext) _DeleteKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteKubernetesResourcePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteKubernetesResourcePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteKubernetesResourcePayload")
+		case "resource":
+			out.Values[i] = ec._DeleteKubernetesResourcePayload_resource(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var eventImplementors = []string{"Event", "Node"}
 
 func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, obj *model.Event) graphql.Marshaler {
@@ -18743,8 +19368,8 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Event_firstTime(ctx, field, obj)
 		case "lastTime":
 			out.Values[i] = ec._Event_lastTime(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._Event_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._Event_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -18843,8 +19468,8 @@ func (ec *executionContext) _GenericResource(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "raw":
-			out.Values[i] = ec._GenericResource_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._GenericResource_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -18967,8 +19592,8 @@ func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "raw":
-			out.Values[i] = ec._ManagedResource_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._ManagedResource_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -19058,6 +19683,47 @@ func (ec *executionContext) _ManagedResourceStatus(ctx context.Context, sel ast.
 			out.Values[i] = graphql.MarshalString("ManagedResourceStatus")
 		case "conditions":
 			out.Values[i] = ec._ManagedResourceStatus_conditions(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var mutationImplementors = []string{"Mutation"}
+
+func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
+
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Mutation",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Mutation")
+		case "createKubernetesResource":
+			out.Values[i] = ec._Mutation_createKubernetesResource(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateKubernetesResource":
+			out.Values[i] = ec._Mutation_updateKubernetesResource(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteKubernetesResource":
+			out.Values[i] = ec._Mutation_deleteKubernetesResource(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19282,8 +19948,8 @@ func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "status":
 			out.Values[i] = ec._Provider_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._Provider_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._Provider_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -19370,8 +20036,8 @@ func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.Selecti
 			}
 		case "status":
 			out.Values[i] = ec._ProviderConfig_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._ProviderConfig_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._ProviderConfig_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -19531,8 +20197,8 @@ func (ec *executionContext) _ProviderRevision(ctx context.Context, sel ast.Selec
 			}
 		case "status":
 			out.Values[i] = ec._ProviderRevision_status(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._ProviderRevision_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._ProviderRevision_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -19968,8 +20634,8 @@ func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Secret_type(ctx, field, obj)
 		case "data":
 			out.Values[i] = ec._Secret_data(ctx, field, obj)
-		case "raw":
-			out.Values[i] = ec._Secret_raw(ctx, field, obj)
+		case "unstructured":
+			out.Values[i] = ec._Secret_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -20019,6 +20685,30 @@ func (ec *executionContext) _TypeReference(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updateKubernetesResourcePayloadImplementors = []string{"UpdateKubernetesResourcePayload"}
+
+func (ec *executionContext) _UpdateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateKubernetesResourcePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateKubernetesResourcePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateKubernetesResourcePayload")
+		case "resource":
+			out.Values[i] = ec._UpdateKubernetesResourcePayload_resource(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20506,6 +21196,25 @@ func (ec *executionContext) marshalNConfigurationSpec2ᚖgithubᚗcomᚋupbound�
 	return ec._ConfigurationSpec(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourceInput(ctx context.Context, v interface{}) (model.CreateKubernetesResourceInput, error) {
+	res, err := ec.unmarshalInputCreateKubernetesResourceInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v model.CreateKubernetesResourcePayload) graphql.Marshaler {
+	return ec._CreateKubernetesResourcePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v *model.CreateKubernetesResourcePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._CreateKubernetesResourcePayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNCustomResourceDefinition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinition(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinition) graphql.Marshaler {
 	return ec._CustomResourceDefinition(ctx, sel, &v)
 }
@@ -20548,6 +21257,20 @@ func (ec *executionContext) marshalNCustomResourceDefinitionVersion2githubᚗcom
 	return ec._CustomResourceDefinitionVersion(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNDeleteKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeleteKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v model.DeleteKubernetesResourcePayload) graphql.Marshaler {
+	return ec._DeleteKubernetesResourcePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeleteKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteKubernetesResourcePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteKubernetesResourcePayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNEvent2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEvent(ctx context.Context, sel ast.SelectionSet, v model.Event) graphql.Marshaler {
 	return ec._Event(ctx, sel, &v)
 }
@@ -20583,21 +21306,6 @@ func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}
 
 func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
 	res := graphql.MarshalInt(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
-}
-
-func (ec *executionContext) unmarshalNJSONObject2string(ctx context.Context, v interface{}) (string, error) {
-	res, err := graphql.UnmarshalString(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNJSONObject2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -20686,6 +21394,11 @@ func (ec *executionContext) unmarshalNPackageRevisionDesiredState2githubᚗcom�
 
 func (ec *executionContext) marshalNPackageRevisionDesiredState2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackageRevisionDesiredState(ctx context.Context, sel ast.SelectionSet, v model.PackageRevisionDesiredState) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalNPatch2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatch(ctx context.Context, v interface{}) (model.Patch, error) {
+	res, err := ec.unmarshalInputPatch(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNPolicyRule2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRule(ctx context.Context, sel ast.SelectionSet, v model.PolicyRule) graphql.Marshaler {
@@ -20816,6 +21529,46 @@ func (ec *executionContext) marshalNTypeReference2ᚖgithubᚗcomᚋupboundᚋxg
 		return graphql.Null
 	}
 	return ec._TypeReference(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUnstructured2ᚕbyte(ctx context.Context, v interface{}) ([]byte, error) {
+	res, err := model.UnmarshalUnstructured(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUnstructured2ᚕbyte(ctx context.Context, sel ast.SelectionSet, v []byte) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := model.MarshalUnstructured(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourceInput(ctx context.Context, v interface{}) (model.UpdateKubernetesResourceInput, error) {
+	res, err := ec.unmarshalInputUpdateKubernetesResourceInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v model.UpdateKubernetesResourcePayload) graphql.Marshaler {
+	return ec._UpdateKubernetesResourcePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateKubernetesResourcePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateKubernetesResourcePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -21700,21 +22453,6 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return graphql.MarshalInt(*v)
 }
 
-func (ec *executionContext) unmarshalOJSONObject2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalString(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOJSONObject2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalString(*v)
-}
-
 func (ec *executionContext) marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx context.Context, sel ast.SelectionSet, v model.KubernetesResource) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -21837,6 +22575,30 @@ func (ec *executionContext) marshalOPackagePullPolicy2ᚖgithubᚗcomᚋupbound�
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOPatch2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatchᚄ(ctx context.Context, v interface{}) ([]model.Patch, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]model.Patch, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNPatch2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatch(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) marshalOPolicyRule2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPolicyRuleᚄ(ctx context.Context, sel ast.SelectionSet, v []model.PolicyRule) graphql.Marshaler {
@@ -22119,6 +22881,21 @@ func (ec *executionContext) marshalOTypeReference2ᚖgithubᚗcomᚋupboundᚋxg
 		return graphql.Null
 	}
 	return ec._TypeReference(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOUnstructured2ᚕbyte(ctx context.Context, v interface{}) ([]byte, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := model.UnmarshalUnstructured(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUnstructured2ᚕbyte(ctx context.Context, sel ast.SelectionSet, v []byte) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return model.MarshalUnstructured(v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {
