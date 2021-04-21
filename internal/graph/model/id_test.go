@@ -23,7 +23,7 @@ func TestReferenceID(t *testing.T) {
 				Namespace:  "default",
 				Name:       "example",
 			},
-			want: "Q9NFX2d2Jf5F00VfZ3b-S01TKiwqQ9NFX2d2",
+			want: "O7_pXWsa_kW_6V1r_ktFSyUnJTu_6V1r",
 		},
 		"ClusterScoped": {
 			reason: "It should be possible to encode a cluster scoped ID",
@@ -32,7 +32,7 @@ func TestReferenceID(t *testing.T) {
 				Kind:       "ExampleKind",
 				Name:       "example",
 			},
-			want: "Q9NFX2d2Jf5F00VfZ3b-S01TK0PTRV9ndg",
+			want: "O7_pXWsa_kW_6V1r_ktFSyY7v-ldaw",
 		},
 	}
 
@@ -61,7 +61,7 @@ func TestParseReferenceID(t *testing.T) {
 	}{
 		"Namespaced": {
 			reason: "It should be possible to decode a namespaced ID",
-			id:     "Q9NFX2d2Jf5F00VfZ3b-S01TKiwqQ9NFX2d2",
+			id:     "O7_pXWsa_kW_6V1r_ktFSyUnJTu_6V1r",
 			want: want{
 				id: ReferenceID{
 					APIVersion: "example.org/v1",
@@ -73,7 +73,7 @@ func TestParseReferenceID(t *testing.T) {
 		},
 		"ClusterScoped": {
 			reason: "It should be possible to decode a cluster scoped ID",
-			id:     "Q9NFX2d2Jf5F00VfZ3b-S01TK0PTRV9ndg",
+			id:     "O7_pXWsa_kW_6V1r_ktFSyY7v-ldaw",
 			want: want{
 				id: ReferenceID{
 					APIVersion: "example.org/v1",
