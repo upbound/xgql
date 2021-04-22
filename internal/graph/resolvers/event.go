@@ -2,6 +2,7 @@ package resolvers
 
 import (
 	"context"
+	"sort"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
@@ -50,6 +51,8 @@ func (r *events) Resolve(ctx context.Context, obj *corev1.ObjectReference) (*mod
 		for i := range in.Items {
 			out.Nodes = append(out.Nodes, model.GetEvent(&in.Items[i]))
 		}
+
+		sort.Stable(sort.Reverse(out))
 		return out, nil
 	}
 
@@ -74,6 +77,7 @@ func (r *events) Resolve(ctx context.Context, obj *corev1.ObjectReference) (*mod
 		out.TotalCount++
 	}
 
+	sort.Stable(sort.Reverse(out))
 	return out, nil
 }
 

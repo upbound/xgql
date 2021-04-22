@@ -696,7 +696,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 			},
 			want: want{
 				pc: &model.ProviderRevisionConnection{
-					Nodes:      []model.ProviderRevision{gother, gactive, ginactive},
+					Nodes:      []model.ProviderRevision{gactive, ginactive, gother},
 					TotalCount: 3,
 				},
 			},
@@ -1145,7 +1145,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 			},
 			want: want{
 				pc: &model.ConfigurationRevisionConnection{
-					Nodes:      []model.ConfigurationRevision{gother, gactive, ginactive},
+					Nodes:      []model.ConfigurationRevision{gactive, ginactive, gother},
 					TotalCount: 3,
 				},
 			},

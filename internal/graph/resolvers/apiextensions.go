@@ -2,6 +2,7 @@ package resolvers
 
 import (
 	"context"
+	"sort"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
@@ -76,6 +77,7 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 		out.Nodes = append(out.Nodes, model.GetCompositeResource(&in.Items[i]))
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 
@@ -131,6 +133,7 @@ func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.Com
 		out.Nodes = append(out.Nodes, model.GetCompositeResourceClaim(&in.Items[i]))
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 
