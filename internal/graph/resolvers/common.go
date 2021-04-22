@@ -2,6 +2,7 @@ package resolvers
 
 import (
 	"context"
+	"sort"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
@@ -132,6 +133,7 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 		out.Nodes = append(out.Nodes, kr)
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 

@@ -2,6 +2,7 @@ package resolvers
 
 import (
 	"context"
+	"sort"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
@@ -108,6 +109,7 @@ func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string
 		out.TotalCount++
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 
@@ -197,6 +199,7 @@ func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error
 		out.Nodes = append(out.Nodes, model.GetProvider(&in.Items[i]))
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 
@@ -238,6 +241,7 @@ func (r *query) ProviderRevisions(ctx context.Context, provider *model.Reference
 		out.TotalCount++
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 
@@ -274,6 +278,7 @@ func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.R
 		out.TotalCount++
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 
@@ -303,6 +308,7 @@ func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnect
 		out.Nodes = append(out.Nodes, model.GetConfiguration(&in.Items[i]))
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 
@@ -344,6 +350,7 @@ func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model
 		out.TotalCount++
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 
@@ -385,6 +392,7 @@ func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *mode
 		out.TotalCount++
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 
@@ -426,6 +434,7 @@ func (r *query) Compositions(ctx context.Context, revision *model.ReferenceID, d
 		out.TotalCount++
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 

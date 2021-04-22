@@ -2,6 +2,7 @@ package resolvers
 
 import (
 	"context"
+	"sort"
 	"strings"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -71,6 +72,7 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider) (*model.P
 		out.TotalCount++
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 

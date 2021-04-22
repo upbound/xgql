@@ -2,6 +2,7 @@ package resolvers
 
 import (
 	"context"
+	"sort"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
@@ -180,6 +181,7 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 		out.TotalCount++
 	}
 
+	sort.Stable(out)
 	return out, nil
 }
 
