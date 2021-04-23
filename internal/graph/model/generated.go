@@ -542,6 +542,8 @@ type CustomResourceDefinitionSpec struct {
 	Group string `json:"group"`
 	// Names specifies the resource and kind names of the defined custom resource.
 	Names *CustomResourceDefinitionNames `json:"names"`
+	// Scope of the defined custom resource.
+	Scope ResourceScope `json:"scope"`
 	// Versions is the list of all API versions of the defined custom resource.
 	// Version names are used to compute the order in which served versions are
 	// listed in API discovery. If the version string is "kube-like", it will sort
@@ -1160,6 +1162,53 @@ func (e *PackageRevisionDesiredState) UnmarshalGQL(v interface{}) error {
 }
 
 func (e PackageRevisionDesiredState) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+// ResourceScope defines the scopes available to custom resources.
+type ResourceScope string
+
+const (
+	// Cluster scoped resources exist outside any namespace. The combination of their
+	// API version, kind, and name must be unique within a cluster.
+	ResourceScopeClusterScoped ResourceScope = "CLUSTER_SCOPED"
+	// Namespace scoped resources exist within a particular namespace. The
+	// combination of their API version, kind, and name must be unique only within
+	// their namespace.
+	ResourceScopeNamespaceScoped ResourceScope = "NAMESPACE_SCOPED"
+)
+
+var AllResourceScope = []ResourceScope{
+	ResourceScopeClusterScoped,
+	ResourceScopeNamespaceScoped,
+}
+
+func (e ResourceScope) IsValid() bool {
+	switch e {
+	case ResourceScopeClusterScoped, ResourceScopeNamespaceScoped:
+		return true
+	}
+	return false
+}
+
+func (e ResourceScope) String() string {
+	return string(e)
+}
+
+func (e *ResourceScope) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ResourceScope(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ResourceScope", str)
+	}
+	return nil
+}
+
+func (e ResourceScope) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

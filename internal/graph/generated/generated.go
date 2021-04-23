@@ -335,6 +335,7 @@ type ComplexityRoot struct {
 	CustomResourceDefinitionSpec struct {
 		Group    func(childComplexity int) int
 		Names    func(childComplexity int) int
+		Scope    func(childComplexity int) int
 		Versions func(childComplexity int) int
 	}
 
@@ -1836,6 +1837,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CustomResourceDefinitionSpec.Names(childComplexity), true
+
+	case "CustomResourceDefinitionSpec.scope":
+		if e.complexity.CustomResourceDefinitionSpec.Scope == nil {
+			break
+		}
+
+		return e.complexity.CustomResourceDefinitionSpec.Scope(childComplexity), true
 
 	case "CustomResourceDefinitionSpec.versions":
 		if e.complexity.CustomResourceDefinitionSpec.Versions == nil {
@@ -3852,6 +3860,11 @@ type CustomResourceDefinitionSpec {
   names: CustomResourceDefinitionNames!
 
   """
+  Scope of the defined custom resource.
+  """
+  scope: ResourceScope!
+
+  """
   Versions is the list of all API versions of the defined custom resource.
   Version names are used to compute the order in which served versions are
   listed in API discovery. If the version string is "kube-like", it will sort
@@ -3864,6 +3877,24 @@ type CustomResourceDefinitionSpec {
   v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10.
   """
   versions: [CustomResourceDefinitionVersion!]
+}
+
+"""
+ResourceScope defines the scopes available to custom resources.
+"""
+enum ResourceScope {
+  """
+  Cluster scoped resources exist outside any namespace. The combination of their
+  API version, kind, and name must be unique within a cluster.
+  """
+  CLUSTER_SCOPED
+
+  """
+  Namespace scoped resources exist within a particular namespace. The
+  combination of their API version, kind, and name must be unique only within
+  their namespace.
+  """
+  NAMESPACE_SCOPED
 }
 
 """
@@ -10956,6 +10987,41 @@ func (ec *executionContext) _CustomResourceDefinitionSpec_names(ctx context.Cont
 	res := resTmp.(*model.CustomResourceDefinitionNames)
 	fc.Result = res
 	return ec.marshalNCustomResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CustomResourceDefinitionSpec_scope(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinitionSpec) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "CustomResourceDefinitionSpec",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Scope, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.ResourceScope)
+	fc.Result = res
+	return ec.marshalNResourceScope2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐResourceScope(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinitionSpec_versions(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinitionSpec) (ret graphql.Marshaler) {
@@ -19190,6 +19256,11 @@ func (ec *executionContext) _CustomResourceDefinitionSpec(ctx context.Context, s
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "scope":
+			out.Values[i] = ec._CustomResourceDefinitionSpec_scope(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "versions":
 			out.Values[i] = ec._CustomResourceDefinitionSpec_versions(ctx, field, obj)
 		default:
@@ -21480,6 +21551,16 @@ func (ec *executionContext) marshalNProviderSpec2ᚖgithubᚗcomᚋupboundᚋxgq
 		return graphql.Null
 	}
 	return ec._ProviderSpec(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNResourceScope2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐResourceScope(ctx context.Context, v interface{}) (model.ResourceScope, error) {
+	var res model.ResourceScope
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNResourceScope2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐResourceScope(ctx context.Context, sel ast.SelectionSet, v model.ResourceScope) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
