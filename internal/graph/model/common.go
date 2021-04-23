@@ -251,6 +251,18 @@ func GetCustomResourceDefinitionNames(in kextv1.CustomResourceDefinitionNames) *
 	return out
 }
 
+// GetResourceScope from the suppled Kubernetes scope.
+func GetResourceScope(in kextv1.ResourceScope) ResourceScope {
+	switch in {
+	case kextv1.ClusterScoped:
+		return ResourceScopeClusterScoped
+	case kextv1.NamespaceScoped:
+		return ResourceScopeNamespaceScoped
+	default:
+		return ""
+	}
+}
+
 // GetCustomResourceDefinitionVersions from the supplied Kubernetes versions.
 func GetCustomResourceDefinitionVersions(in []kextv1.CustomResourceDefinitionVersion) []CustomResourceDefinitionVersion {
 	if in == nil {
@@ -320,6 +332,7 @@ func GetCustomResourceDefinition(crd *kextv1.CustomResourceDefinition) CustomRes
 		Spec: &CustomResourceDefinitionSpec{
 			Group:    crd.Spec.Group,
 			Names:    GetCustomResourceDefinitionNames(crd.Spec.Names),
+			Scope:    GetResourceScope(crd.Spec.Scope),
 			Versions: GetCustomResourceDefinitionVersions(crd.Spec.Versions),
 		},
 		Status:       GetCustomResourceDefinitionStatus(crd.Status),

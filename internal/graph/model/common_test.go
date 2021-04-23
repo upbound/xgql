@@ -299,6 +299,7 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 						ListKind:   "ClusterExampleList",
 						Categories: []string{"example"},
 					},
+					Scope: kextv1.NamespaceScoped,
 					Versions: []kextv1.CustomResourceDefinitionVersion{{
 						Name:   "v1",
 						Served: true,
@@ -337,6 +338,7 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 						ListKind:   pointer.StringPtr("ClusterExampleList"),
 						Categories: []string{"example"},
 					},
+					Scope: ResourceScopeNamespaceScoped,
 					Versions: []CustomResourceDefinitionVersion{{
 						Name:   "v1",
 						Served: true,
