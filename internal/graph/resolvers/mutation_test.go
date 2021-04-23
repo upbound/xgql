@@ -146,7 +146,7 @@ func TestCreateKubernetesResource(t *testing.T) {
 				input: model.CreateKubernetesResourceInput{
 					Unstructured: uj,
 					Patches: []model.Patch{{
-						JSON: []byte("\""),
+						Unstructured: []byte("\""),
 					}},
 				},
 			},
@@ -166,8 +166,8 @@ func TestCreateKubernetesResource(t *testing.T) {
 				input: model.CreateKubernetesResourceInput{
 					Unstructured: uj,
 					Patches: []model.Patch{{
-						FieldPath: "..", // An invalid field path.
-						JSON:      []byte("{}"),
+						FieldPath:    "..", // An invalid field path.
+						Unstructured: []byte("{}"),
 					}},
 				},
 			},
@@ -314,7 +314,7 @@ func TestUpdateKubernetesResource(t *testing.T) {
 				input: model.UpdateKubernetesResourceInput{
 					Unstructured: uj,
 					Patches: []model.Patch{{
-						JSON: []byte("\""),
+						Unstructured: []byte("\""),
 					}},
 				},
 			},
@@ -334,8 +334,8 @@ func TestUpdateKubernetesResource(t *testing.T) {
 				input: model.UpdateKubernetesResourceInput{
 					Unstructured: uj,
 					Patches: []model.Patch{{
-						FieldPath: "..", // An invalid field path.
-						JSON:      []byte("{}"),
+						FieldPath:    "..", // An invalid field path.
+						Unstructured: []byte("{}"),
 					}},
 				},
 			},

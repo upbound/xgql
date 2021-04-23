@@ -23,7 +23,7 @@ type CompositeResource implements Node & KubernetesResource {
   status: CompositeResourceStatus!
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -114,7 +114,7 @@ type CompositeResourceClaim implements Node & KubernetesResource {
   status: CompositeResourceClaimStatus!
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)

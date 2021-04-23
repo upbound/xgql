@@ -3027,7 +3027,7 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
   status: CompositeResourceDefinitionStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3215,7 +3215,7 @@ resource.
 """
 type CompositeResourceValidation {
   "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
-  openAPIV3Schema: Unstructured
+  openAPIV3Schema: JSON
 }
 
 """
@@ -3293,7 +3293,7 @@ type Composition implements Node & KubernetesResource {
   status: CompositionStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3344,7 +3344,7 @@ scalar StringMap
 """
 Unstructured, schemaless JSON.
 """
-scalar Unstructured
+scalar JSON
 
 """
 An object with an ID.
@@ -3371,7 +3371,7 @@ interface KubernetesResource {
   metadata: ObjectMeta!
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection!
@@ -3418,7 +3418,7 @@ type GenericResource implements Node & KubernetesResource {
   metadata: ObjectMeta!
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3687,7 +3687,7 @@ type Event implements Node {
   lastTime: Time
 
   "An unstructured JSON representation of the event."
-  unstructured: Unstructured!
+  unstructured: JSON!
 }
 
 """
@@ -3748,7 +3748,7 @@ type Secret implements Node & KubernetesResource {
   """
   An unstructured JSON representation of the underlying Kubernetes resource.
   """
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   """
   Events pertaining to this resource.
@@ -3788,7 +3788,7 @@ type ConfigMap implements Node & KubernetesResource {
   """
   An unstructured JSON representation of the underlying Kubernetes resource.
   """
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   # TODO(negz): Support binaryData too? What would the return value be?
 
@@ -3822,7 +3822,7 @@ type CustomResourceDefinition implements Node & KubernetesResource {
   status: CustomResourceDefinitionStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3934,7 +3934,7 @@ resource.
 """
 type CustomResourceValidation {
   "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
-  openAPIV3Schema: Unstructured
+  openAPIV3Schema: JSON
 }
 
 """
@@ -3971,7 +3971,7 @@ type CompositeResource implements Node & KubernetesResource {
   status: CompositeResourceStatus!
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4062,7 +4062,7 @@ type CompositeResourceClaim implements Node & KubernetesResource {
   status: CompositeResourceClaimStatus!
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4145,7 +4145,7 @@ type Configuration implements Node & KubernetesResource {
   status: ConfigurationStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4263,7 +4263,7 @@ type ConfigurationRevision implements Node & KubernetesResource {
   status: ConfigurationRevisionStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4387,7 +4387,7 @@ type ManagedResource implements Node & KubernetesResource {
   status: ManagedResourceStatus!
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4533,7 +4533,7 @@ input Patch {
   Unstructured JSON to be patched in at the suppled field path. This could be a
   string, an object, or any other valid JSON.
   """
-  json: Unstructured!
+  unstructured: JSON!
 }
 
 """
@@ -4542,7 +4542,7 @@ resource.
 """
 input CreateKubernetesResourceInput {
   "The Kubernetes resource to be created, as raw JSON."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Patches that should be applied to the Kubernetes resource before creation."
   patches: [Patch!]
@@ -4562,7 +4562,7 @@ resource.
 """
 input UpdateKubernetesResourceInput {
   "The Kubernetes resource to be updated, as raw JSON."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Patches that should be applied to the Kubernetes resource before updating."
   patches: [Patch!]
@@ -4645,7 +4645,7 @@ type Provider implements Node & KubernetesResource {
   status: ProviderStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4762,7 +4762,7 @@ type ProviderRevision implements Node & KubernetesResource {
   status: ProviderRevisionStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4871,7 +4871,7 @@ type ProviderConfig implements Node & KubernetesResource {
   status: ProviderConfigStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -5817,7 +5817,7 @@ func (ec *executionContext) _CompositeResource_unstructured(ctx context.Context,
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResource_events(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
@@ -6129,7 +6129,7 @@ func (ec *executionContext) _CompositeResourceClaim_unstructured(ctx context.Con
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaim_events(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
@@ -6828,7 +6828,7 @@ func (ec *executionContext) _CompositeResourceDefinition_unstructured(ctx contex
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceDefinition_events(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
@@ -7963,7 +7963,7 @@ func (ec *executionContext) _CompositeResourceValidation_openAPIV3Schema(ctx con
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalOUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalOJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Composition_id(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
@@ -8205,7 +8205,7 @@ func (ec *executionContext) _Composition_unstructured(ctx context.Context, field
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Composition_events(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
@@ -8792,7 +8792,7 @@ func (ec *executionContext) _ConfigMap_unstructured(ctx context.Context, field g
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigMap_events(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
@@ -9069,7 +9069,7 @@ func (ec *executionContext) _Configuration_unstructured(ctx context.Context, fie
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Configuration_events(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
@@ -9480,7 +9480,7 @@ func (ec *executionContext) _ConfigurationRevision_unstructured(ctx context.Cont
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ConfigurationRevision_events(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevision) (ret graphql.Marshaler) {
@@ -10543,7 +10543,7 @@ func (ec *executionContext) _CustomResourceDefinition_unstructured(ctx context.C
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CustomResourceDefinition_events(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
@@ -11153,7 +11153,7 @@ func (ec *executionContext) _CustomResourceValidation_openAPIV3Schema(ctx contex
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalOUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalOJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DeleteKubernetesResourcePayload_resource(ctx context.Context, field graphql.CollectedField, obj *model.DeleteKubernetesResourcePayload) (ret graphql.Marshaler) {
@@ -11619,7 +11619,7 @@ func (ec *executionContext) _Event_unstructured(ctx context.Context, field graph
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _EventConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.EventConnection) (ret graphql.Marshaler) {
@@ -11893,7 +11893,7 @@ func (ec *executionContext) _GenericResource_unstructured(ctx context.Context, f
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _GenericResource_events(ctx context.Context, field graphql.CollectedField, obj *model.GenericResource) (ret graphql.Marshaler) {
@@ -12272,7 +12272,7 @@ func (ec *executionContext) _ManagedResource_unstructured(ctx context.Context, f
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResource_events(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
@@ -13548,7 +13548,7 @@ func (ec *executionContext) _Provider_unstructured(ctx context.Context, field gr
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Provider_events(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
@@ -13857,7 +13857,7 @@ func (ec *executionContext) _ProviderConfig_unstructured(ctx context.Context, fi
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderConfig_events(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
@@ -14332,7 +14332,7 @@ func (ec *executionContext) _ProviderRevision_unstructured(ctx context.Context, 
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProviderRevision_events(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevision) (ret graphql.Marshaler) {
@@ -15919,7 +15919,7 @@ func (ec *executionContext) _Secret_unstructured(ctx context.Context, field grap
 	}
 	res := resTmp.([]byte)
 	fc.Result = res
-	return ec.marshalNUnstructured2ᚕbyte(ctx, field.Selections, res)
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Secret_events(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
@@ -17156,7 +17156,7 @@ func (ec *executionContext) unmarshalInputCreateKubernetesResourceInput(ctx cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unstructured"))
-			it.Unstructured, err = ec.unmarshalNUnstructured2ᚕbyte(ctx, v)
+			it.Unstructured, err = ec.unmarshalNJSON2ᚕbyte(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17188,11 +17188,11 @@ func (ec *executionContext) unmarshalInputPatch(ctx context.Context, obj interfa
 			if err != nil {
 				return it, err
 			}
-		case "json":
+		case "unstructured":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("json"))
-			it.JSON, err = ec.unmarshalNUnstructured2ᚕbyte(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unstructured"))
+			it.Unstructured, err = ec.unmarshalNJSON2ᚕbyte(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17212,7 +17212,7 @@ func (ec *executionContext) unmarshalInputUpdateKubernetesResourceInput(ctx cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unstructured"))
-			it.Unstructured, err = ec.unmarshalNUnstructured2ᚕbyte(ctx, v)
+			it.Unstructured, err = ec.unmarshalNJSON2ᚕbyte(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21314,6 +21314,27 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) unmarshalNJSON2ᚕbyte(ctx context.Context, v interface{}) ([]byte, error) {
+	res, err := model.UnmarshalJSON(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNJSON2ᚕbyte(ctx context.Context, sel ast.SelectionSet, v []byte) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := model.MarshalJSON(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx context.Context, sel ast.SelectionSet, v model.KubernetesResource) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -21529,27 +21550,6 @@ func (ec *executionContext) marshalNTypeReference2ᚖgithubᚗcomᚋupboundᚋxg
 		return graphql.Null
 	}
 	return ec._TypeReference(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNUnstructured2ᚕbyte(ctx context.Context, v interface{}) ([]byte, error) {
-	res, err := model.UnmarshalUnstructured(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNUnstructured2ᚕbyte(ctx context.Context, sel ast.SelectionSet, v []byte) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := model.MarshalUnstructured(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
 }
 
 func (ec *executionContext) unmarshalNUpdateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourceInput(ctx context.Context, v interface{}) (model.UpdateKubernetesResourceInput, error) {
@@ -22453,6 +22453,21 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return graphql.MarshalInt(*v)
 }
 
+func (ec *executionContext) unmarshalOJSON2ᚕbyte(ctx context.Context, v interface{}) ([]byte, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := model.UnmarshalJSON(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOJSON2ᚕbyte(ctx context.Context, sel ast.SelectionSet, v []byte) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return model.MarshalJSON(v)
+}
+
 func (ec *executionContext) marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx context.Context, sel ast.SelectionSet, v model.KubernetesResource) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -22881,21 +22896,6 @@ func (ec *executionContext) marshalOTypeReference2ᚖgithubᚗcomᚋupboundᚋxg
 		return graphql.Null
 	}
 	return ec._TypeReference(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOUnstructured2ᚕbyte(ctx context.Context, v interface{}) ([]byte, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := model.UnmarshalUnstructured(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOUnstructured2ᚕbyte(ctx context.Context, sel ast.SelectionSet, v []byte) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return model.MarshalUnstructured(v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

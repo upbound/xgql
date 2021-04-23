@@ -20,15 +20,15 @@ import (
 	"github.com/upbound/xgql/internal/unstructured"
 )
 
-// MarshalUnstructured marshals Unstructured JSON bytes to GraphQL.
-func MarshalUnstructured(val []byte) graphql.Marshaler {
+// MarshalJSON marshals Unstructured JSON bytes to GraphQL.
+func MarshalJSON(val []byte) graphql.Marshaler {
 	return graphql.WriterFunc(func(w io.Writer) {
 		_, _ = w.Write(val)
 	})
 }
 
-// UnmarshalUnstructured marshals Unstructured JSON bytes from GraphQL.
-func UnmarshalUnstructured(v interface{}) ([]byte, error) {
+// UnmarshalJSON marshals Unstructured JSON bytes from GraphQL.
+func UnmarshalJSON(v interface{}) ([]byte, error) {
 	return json.Marshal(v)
 }
 
