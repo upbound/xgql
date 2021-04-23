@@ -21,7 +21,7 @@ type Provider implements Node & KubernetesResource {
   status: ProviderStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -138,7 +138,7 @@ type ProviderRevision implements Node & KubernetesResource {
   status: ProviderRevisionStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)

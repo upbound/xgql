@@ -19,7 +19,7 @@ type ProviderConfig implements Node & KubernetesResource {
   status: ProviderConfigStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)

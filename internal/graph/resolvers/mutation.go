@@ -73,7 +73,7 @@ func (r *mutation) CreateKubernetesResource(ctx context.Context, input model.Cre
 	pv := fieldpath.Pave(u.Object)
 	for i, p := range input.Patches {
 		var v interface{}
-		if err := json.Unmarshal(p.JSON, &v); err != nil {
+		if err := json.Unmarshal(p.Unstructured, &v); err != nil {
 			graphql.AddError(ctx, errors.Wrapf(err, errFmtUnmarshalPatch, i))
 			return nil, nil
 		}
@@ -116,7 +116,7 @@ func (r *mutation) UpdateKubernetesResource(ctx context.Context, id model.Refere
 	pv := fieldpath.Pave(u.Object)
 	for i, p := range input.Patches {
 		var v interface{}
-		if err := json.Unmarshal(p.JSON, &v); err != nil {
+		if err := json.Unmarshal(p.Unstructured, &v); err != nil {
 			graphql.AddError(ctx, errors.Wrapf(err, errFmtUnmarshalPatch, i))
 			return nil, nil
 		}

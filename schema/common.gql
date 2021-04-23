@@ -15,7 +15,7 @@ scalar StringMap
 """
 Unstructured, schemaless JSON.
 """
-scalar Unstructured
+scalar JSON
 
 """
 An object with an ID.
@@ -42,7 +42,7 @@ interface KubernetesResource {
   metadata: ObjectMeta!
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection!
@@ -89,7 +89,7 @@ type GenericResource implements Node & KubernetesResource {
   metadata: ObjectMeta!
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -358,7 +358,7 @@ type Event implements Node {
   lastTime: Time
 
   "An unstructured JSON representation of the event."
-  unstructured: Unstructured!
+  unstructured: JSON!
 }
 
 """
@@ -419,7 +419,7 @@ type Secret implements Node & KubernetesResource {
   """
   An unstructured JSON representation of the underlying Kubernetes resource.
   """
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   """
   Events pertaining to this resource.
@@ -459,7 +459,7 @@ type ConfigMap implements Node & KubernetesResource {
   """
   An unstructured JSON representation of the underlying Kubernetes resource.
   """
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   # TODO(negz): Support binaryData too? What would the return value be?
 
@@ -493,7 +493,7 @@ type CustomResourceDefinition implements Node & KubernetesResource {
   status: CustomResourceDefinitionStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -605,7 +605,7 @@ resource.
 """
 type CustomResourceValidation {
   "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
-  openAPIV3Schema: Unstructured
+  openAPIV3Schema: JSON
 }
 
 """

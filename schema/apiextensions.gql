@@ -22,7 +22,7 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
   status: CompositeResourceDefinitionStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -210,7 +210,7 @@ resource.
 """
 type CompositeResourceValidation {
   "OpenAPIV3Schema is the OpenAPI v3 schema to use for validation and pruning."
-  openAPIV3Schema: Unstructured
+  openAPIV3Schema: JSON
 }
 
 """
@@ -288,7 +288,7 @@ type Composition implements Node & KubernetesResource {
   status: CompositionStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)

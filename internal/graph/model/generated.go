@@ -720,7 +720,7 @@ type Patch struct {
 	FieldPath string `json:"fieldPath"`
 	// Unstructured JSON to be patched in at the suppled field path. This could be a
 	// string, an object, or any other valid JSON.
-	JSON []byte `json:"json"`
+	Unstructured []byte `json:"unstructured"`
 }
 
 // A PolicyRule holds information that describes a KubernetesRBAC policy rule.

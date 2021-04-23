@@ -21,7 +21,7 @@ type Configuration implements Node & KubernetesResource {
   status: ConfigurationStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -139,7 +139,7 @@ type ConfigurationRevision implements Node & KubernetesResource {
   status: ConfigurationRevisionStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
-  unstructured: Unstructured!
+  unstructured: JSON!
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
