@@ -29,7 +29,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
@@ -132,14 +131,15 @@ func main() {
 	cfg, err := clients.Config()
 	kingpin.FatalIfError(err, "cannot create client config")
 
-	// We create a global REST mapper once here with _our_ credentials (not the
-	// bearer token of each caller) because doing so is very slow; it can take
-	// 10-15 seconds. Kubernetes allows any authenticated user to access the
-	// discovery API via the system:discovery ClusterRoleBinding.
-	t := time.Now()
-	rm, err := apiutil.NewDynamicRESTMapper(cfg)
+	// Our Kubernetes clients need to know what REST API resources are offered
+	// by the API server. The discovery process takes a few ms and makes many
+	// API server calls. Kubernetes allows any authenticated user to access the
+	// discovery API via the system:discovery ClusterRoleBinding, so we create
+	// a global REST mapper using our own credentials for all clients to share.
+	// Discovery happens once at startup, and then once any time a client asks
+	// for an unknown kind of API resource (subject to caching/rate limiting).
+	rm, err := clients.RESTMapper(cfg)
 	kingpin.FatalIfError(err, "cannot create REST mapper")
-	log.Debug("Created REST mapper", "duration", time.Since(t))
 
 	ca := clients.NewCache(s,
 		clients.Anonymize(cfg),

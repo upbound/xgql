@@ -9,12 +9,14 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"golang.org/x/time/rate"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
 
@@ -52,11 +54,27 @@ func Config() (*rest.Config, error) {
 	// a controller and we expect to be creating many clients, so we tune these
 	// back down to the client-go defaults.
 	cfg.QPS = 5
-	cfg.Burst = 10
+	cfg.Burst = 20
 
+	cfg.Timeout = 5 * time.Second
 	cfg.UserAgent = "xgql/" + version.Version
 
 	return cfg, nil
+}
+
+// RESTMapper returns a 'REST mapper' that discovers an API server's available
+// REST API endpoints. The returned REST mapper is intended to be shared by many
+// clients. It is 'dynamic' in that it will attempt to rediscover API endpoints
+// any time a client asks for a kind of resource that is unknown to it. Each
+// discovery process may burst up to 100 API server requests per second, and
+// average 20 requests per second. Rediscovery may not happen more frequently
+// than once every 20 seconds.
+func RESTMapper(cfg *rest.Config) (meta.RESTMapper, error) {
+	dcfg := rest.CopyConfig(cfg)
+	dcfg.QPS = 20
+	dcfg.Burst = 100
+
+	return apiutil.NewDynamicRESTMapper(dcfg, apiutil.WithLimiter(rate.NewLimiter(rate.Limit(0.05), 1)))
 }
 
 // Anonymize the supplied config by returning a copy with all authentication
