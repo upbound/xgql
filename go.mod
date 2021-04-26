@@ -20,6 +20,7 @@ require (
 	go.opentelemetry.io/otel/sdk v0.19.0
 	go.opentelemetry.io/otel/sdk/metric v0.19.0
 	go.opentelemetry.io/otel/trace v0.19.0
+	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	k8s.io/api v0.20.2
 	k8s.io/apiextensions-apiserver v0.20.1
