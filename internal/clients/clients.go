@@ -56,7 +56,6 @@ func Config() (*rest.Config, error) {
 	cfg.QPS = 5
 	cfg.Burst = 20
 
-	cfg.Timeout = 5 * time.Second
 	cfg.UserAgent = "xgql/" + version.Version
 
 	return cfg, nil
