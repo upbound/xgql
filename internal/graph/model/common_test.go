@@ -23,6 +23,41 @@ import (
 	"github.com/upbound/xgql/internal/unstructured"
 )
 
+func TestGetConditions(t *testing.T) {
+	c := xpv1.Available().WithMessage("I'm here!")
+	cases := map[string]struct {
+		reason string
+		in     []xpv1.Condition
+		want   []Condition
+	}{
+		"Full": {
+			reason: "All supported fields should be converted to our model",
+			in:     []xpv1.Condition{c},
+			want: []Condition{{
+				Type:               string(xpv1.TypeReady),
+				Status:             ConditionStatusTrue,
+				Reason:             string(xpv1.ReasonAvailable),
+				LastTransitionTime: c.LastTransitionTime.Time,
+				Message:            pointer.StringPtr("I'm here!"),
+			}},
+		},
+		"Empty": {
+			reason: "Absent optional fields should be absent in our model",
+			in:     []xpv1.Condition{{}},
+			want:   []Condition{{}},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			got := GetConditions(tc.in)
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("\n%s\nGetConditions(...): -want, +got\n:%s", tc.reason, diff)
+			}
+		})
+	}
+}
+
 func TestGetGenericResource(t *testing.T) {
 	cases := map[string]struct {
 		reason string
