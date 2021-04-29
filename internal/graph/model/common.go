@@ -48,6 +48,20 @@ func UnmarshalStringMap(v interface{}) (map[string]string, error) {
 	return nil, errors.Errorf("%T is not a map", v)
 }
 
+// GetConditionStatus from the supplied Crossplane status.
+func GetConditionStatus(s corev1.ConditionStatus) ConditionStatus {
+	switch s {
+	case corev1.ConditionTrue:
+		return ConditionStatusTrue
+	case corev1.ConditionFalse:
+		return ConditionStatusFalse
+	case corev1.ConditionUnknown:
+		return ConditionStatusUnknown
+	default:
+		return ConditionStatus(s)
+	}
+}
+
 // GetConditions from the supplied Crossplane conditions.
 func GetConditions(in []xpv1.Condition) []Condition {
 	if in == nil {
@@ -60,7 +74,7 @@ func GetConditions(in []xpv1.Condition) []Condition {
 
 		out[i] = Condition{
 			Type:               string(c.Type),
-			Status:             ConditionStatus(c.Status),
+			Status:             GetConditionStatus(c.Status),
 			LastTransitionTime: c.LastTransitionTime.Time,
 			Reason:             string(c.Reason),
 		}
@@ -298,7 +312,7 @@ func GetCustomResourceDefinitionConditions(in []kextv1.CustomResourceDefinitionC
 
 		out[i] = Condition{
 			Type:               string(c.Type),
-			Status:             ConditionStatus(c.Status),
+			Status:             GetConditionStatus(corev1.ConditionStatus(c.Status)),
 			LastTransitionTime: c.LastTransitionTime.Time,
 			Reason:             c.Reason,
 		}
