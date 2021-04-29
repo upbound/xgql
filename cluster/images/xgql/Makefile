@@ -2,7 +2,7 @@ PLATFORMS := linux_amd64 linux_arm64 linux_arm
 include ../../../build/makelib/common.mk
 
 IMAGE = $(BUILD_REGISTRY)/xgql-$(ARCH)
-OSBASEIMAGE = gcr.io/distroless/static:nonroot
+OSBASEIMAGE = gcr.io/distroless/static@sha256:d2b0ec3141031720cf5eedef3493b8e129bc91935a43b50562fbe5429878d96b
 include ../../../build/makelib/image.mk
 
 ifeq ($(PLATFORM),$(filter $(PLATFORM),darwin_amd64 windows_amd64)) 
