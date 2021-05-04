@@ -1,5 +1,6 @@
 # xgql [![CI](https://github.com/upbound/xgql/actions/workflows/ci.yml/badge.svg)](https://github.com/upbound/xgql/actions/workflows/ci.yml) [![Codecov](https://codecov.io/gh/upbound/xgql/branch/main/graph/badge.svg?token=QCRHAiqe1T)](https://codecov.io/gh/upbound/xgql)
-An experimental @crossplane GraphQL API.
+
+A GraphQL API for [Crossplane].
 
 Crossplane is built atop the Kubernetes API, and makes heavy use of types that
 may added and removed at runtime; for example installing a `Provider` adds many
@@ -90,7 +91,8 @@ attempt to find and authenticate to a cluster by reading your `~/.kube/config`
 file. All authentication methods are stripped from the kubeconfig file so
 GraphQL requests must still supply authz headers.
 
+[crossplane]: https://crossplane.io
 [controller-runtime]: https://github.com/kubernetes-sigs/controller-runtime
 [gqlgen]: https://github.com/99designs/gqlgen
 [bearer token]: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#putting-a-bearer-token-in-a-request
-[Impersonation headers]: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#user-impersonation
+[impersonation headers]: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#user-impersonation
