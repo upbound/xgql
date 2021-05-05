@@ -20,7 +20,7 @@ type CompositeResource implements Node & KubernetesResource {
   spec: CompositeResourceSpec!
 
   "The observed state of this resource."
-  status: CompositeResourceStatus!
+  status: CompositeResourceStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
@@ -111,7 +111,7 @@ type CompositeResourceClaim implements Node & KubernetesResource {
   spec: CompositeResourceClaimSpec!
 
   "The observed state of this resource."
-  status: CompositeResourceClaimStatus!
+  status: CompositeResourceClaimStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
