@@ -3999,7 +3999,7 @@ type CompositeResource implements Node & KubernetesResource {
   spec: CompositeResourceSpec!
 
   "The observed state of this resource."
-  status: CompositeResourceStatus!
+  status: CompositeResourceStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
@@ -4090,7 +4090,7 @@ type CompositeResourceClaim implements Node & KubernetesResource {
   spec: CompositeResourceClaimSpec!
 
   "The observed state of this resource."
-  status: CompositeResourceClaimStatus!
+  status: CompositeResourceClaimStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
@@ -4415,7 +4415,7 @@ type ManagedResource implements Node & KubernetesResource {
   spec: ManagedResourceSpec!
 
   "The observed state of this resource."
-  status: ManagedResourceStatus!
+  status: ManagedResourceStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
@@ -5806,14 +5806,11 @@ func (ec *executionContext) _CompositeResource_status(ctx context.Context, field
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.CompositeResourceStatus)
 	fc.Result = res
-	return ec.marshalNCompositeResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceStatus(ctx, field.Selections, res)
+	return ec.marshalOCompositeResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResource_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
@@ -6118,14 +6115,11 @@ func (ec *executionContext) _CompositeResourceClaim_status(ctx context.Context, 
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.CompositeResourceClaimStatus)
 	fc.Result = res
-	return ec.marshalNCompositeResourceClaimStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimStatus(ctx, field.Selections, res)
+	return ec.marshalOCompositeResourceClaimStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _CompositeResourceClaim_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
@@ -12296,14 +12290,11 @@ func (ec *executionContext) _ManagedResource_status(ctx context.Context, field g
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.ManagedResourceStatus)
 	fc.Result = res
-	return ec.marshalNManagedResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceStatus(ctx, field.Selections, res)
+	return ec.marshalOManagedResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ManagedResource_unstructured(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
@@ -17681,9 +17672,6 @@ func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.Sele
 			}
 		case "status":
 			out.Values[i] = ec._CompositeResource_status(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "unstructured":
 			out.Values[i] = ec._CompositeResource_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -17763,9 +17751,6 @@ func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast
 			}
 		case "status":
 			out.Values[i] = ec._CompositeResourceClaim_status(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "unstructured":
 			out.Values[i] = ec._CompositeResourceClaim_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -19660,9 +19645,6 @@ func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.Select
 			}
 		case "status":
 			out.Values[i] = ec._ManagedResource_status(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "unstructured":
 			out.Values[i] = ec._ManagedResource_unstructured(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -21083,16 +21065,6 @@ func (ec *executionContext) marshalNCompositeResourceClaimSpec2ᚖgithubᚗcom�
 	return ec._CompositeResourceClaimSpec(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceClaimStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimStatus) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceClaimStatus(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNCompositeResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceConnection) graphql.Marshaler {
 	return ec._CompositeResourceConnection(ctx, sel, &v)
 }
@@ -21157,16 +21129,6 @@ func (ec *executionContext) marshalNCompositeResourceSpec2ᚖgithubᚗcomᚋupbo
 		return graphql.Null
 	}
 	return ec._CompositeResourceSpec(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNCompositeResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceStatus) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceStatus(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNComposition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx context.Context, sel ast.SelectionSet, v model.Composition) graphql.Marshaler {
@@ -21438,16 +21400,6 @@ func (ec *executionContext) marshalNManagedResourceSpec2ᚖgithubᚗcomᚋupboun
 		return graphql.Null
 	}
 	return ec._ManagedResourceSpec(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNManagedResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceStatus(ctx context.Context, sel ast.SelectionSet, v *model.ManagedResourceStatus) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._ManagedResourceStatus(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx context.Context, sel ast.SelectionSet, v *model.ObjectMeta) graphql.Marshaler {
@@ -22006,6 +21958,13 @@ func (ec *executionContext) marshalOCompositeResourceClaimConnectionDetails2ᚖg
 	return ec._CompositeResourceClaimConnectionDetails(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOCompositeResourceClaimStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CompositeResourceClaimStatus(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOCompositeResourceConnectionDetails2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnectionDetails(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceConnectionDetails) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -22119,6 +22078,13 @@ func (ec *executionContext) marshalOCompositeResourceDefinitionVersion2ᚕgithub
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) marshalOCompositeResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceStatus(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CompositeResourceStatus(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOCompositeResourceValidation2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceValidation(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceValidation) graphql.Marshaler {
@@ -22615,6 +22581,13 @@ func (ec *executionContext) marshalOManagedResourceDefinition2githubᚗcomᚋupb
 		return graphql.Null
 	}
 	return ec._ManagedResourceDefinition(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOManagedResourceStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceStatus(ctx context.Context, sel ast.SelectionSet, v *model.ManagedResourceStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ManagedResourceStatus(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOOwner2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Owner) graphql.Marshaler {

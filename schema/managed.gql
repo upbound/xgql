@@ -20,7 +20,7 @@ type ManagedResource implements Node & KubernetesResource {
   spec: ManagedResourceSpec!
 
   "The observed state of this resource."
-  status: ManagedResourceStatus!
+  status: ManagedResourceStatus
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
