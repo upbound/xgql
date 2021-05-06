@@ -21,10 +21,12 @@ func emptyMR() *Managed {
 
 func TestProbablyManaged(t *testing.T) {
 	cases := map[string]struct {
-		u    *unstructured.Unstructured
-		want bool
+		reason string
+		u      *unstructured.Unstructured
+		want   bool
 	}{
 		"Probably": {
+			reason: "A cluster scoped resource with a string providerConfigRef.name is most likely a managed resource",
 			u: func() *unstructured.Unstructured {
 				o := map[string]interface{}{}
 				fieldpath.Pave(o).SetString("spec.providerConfigRef.name", "coolprovider")
@@ -32,11 +34,23 @@ func TestProbablyManaged(t *testing.T) {
 			}(),
 			want: true,
 		},
-		"ProbablyNot": {
+		"WeirdProviderConfigRefType": {
+			reason: "A cluster scoped resource with an int providerConfigRef.name is not a managed resource",
 			u: func() *unstructured.Unstructured {
 				o := map[string]interface{}{}
 				fieldpath.Pave(o).SetValue("spec.providerConfigRef.name", 42) // Not a string.
 				return &unstructured.Unstructured{Object: o}
+			}(),
+			want: false,
+		},
+		"Namespaced": {
+			reason: "A namespaced resource with a string providerConfigRef.name is not a managed resource",
+			u: func() *unstructured.Unstructured {
+				o := map[string]interface{}{}
+				fieldpath.Pave(o).SetString("spec.providerConfigRef.name", "coolprovider")
+				u := &unstructured.Unstructured{Object: o}
+				u.SetNamespace("default")
+				return u
 			}(),
 			want: false,
 		},
@@ -46,7 +60,7 @@ func TestProbablyManaged(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			got := ProbablyManaged(tc.u)
 			if diff := cmp.Diff(tc.want, got); diff != "" {
-				t.Errorf("\nProbablyManaged(...): -want, +got:\n%s", diff)
+				t.Errorf("\n%s\nProbablyManaged(...): -want, +got:\n%s", tc.reason, diff)
 			}
 		})
 	}

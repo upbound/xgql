@@ -13,14 +13,29 @@ import (
 // github.com/crossplane-runtime/pkg/resource/unstructured/composite.
 
 // ProbablyClaim returns true if the supplied *Unstructured is probably a
-// composite resource claim. It considers any resource with object references
-// at spec.resourceRefs and spec.compositionRef to probably be a composite
-// resource claim.
+// composite resource claim. It considers any namespaced resource with at least
+// one of the fields we inject into the OpenAPI schema of resource claims set.
+// Note that it is possible for this to produce a false negative. All of these
+// injected fields are optional so it's possible that a claim has none of them
+// set. Such a claim would not be functional, as indicated by not having a
+// (composite) resource ref set.
 func ProbablyClaim(u *unstructured.Unstructured) bool {
-	// TODO(negz): Require spec.compositionRef be set too once
-	// https://github.com/crossplane/crossplane/issues/2263 is addressed.
-	err := fieldpath.Pave(u.Object).GetValueInto("spec.resourceRef", &corev1.ObjectReference{})
-	return err == nil
+
+	p := fieldpath.Pave(u.Object)
+	switch {
+	case u.GetNamespace() == "":
+		return false
+	case p.GetValueInto("spec.compositionRef", &corev1.ObjectReference{}) == nil:
+		return true
+	case p.GetValueInto("spec.compositionSelector", &metav1.LabelSelector{}) == nil:
+		return true
+	case p.GetValueInto("spec.resourceRef", &corev1.ObjectReference{}) == nil:
+		return true
+	case p.GetValueInto("spec.writeConnectionSecretToRef", &xpv1.LocalSecretReference{}) == nil:
+		return true
+	}
+
+	return false
 }
 
 // An Claim composite resource claim.

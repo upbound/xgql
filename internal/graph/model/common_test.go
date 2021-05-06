@@ -499,6 +499,7 @@ func TestGetKubernetesResource(t *testing.T) {
 			u: func() *kunstructured.Unstructured {
 				// Set resource refs to convince unstructured.ProbablyClaim
 				xrc := &unstructured.Claim{}
+				xrc.SetNamespace("default")
 				xrc.SetName("cool")
 				xrc.SetCompositionReference(&corev1.ObjectReference{Name: "cmp"})
 				xrc.SetResourceReference(&corev1.ObjectReference{Name: "xr"})
@@ -506,8 +507,14 @@ func TestGetKubernetesResource(t *testing.T) {
 			}(),
 			want: want{
 				kr: CompositeResourceClaim{
-					ID:       ReferenceID{Name: "cool"},
-					Metadata: &ObjectMeta{Name: "cool"},
+					ID: ReferenceID{
+						Namespace: "default",
+						Name:      "cool",
+					},
+					Metadata: &ObjectMeta{
+						Namespace: pointer.StringPtr("default"),
+						Name:      "cool",
+					},
 					Spec: &CompositeResourceClaimSpec{
 						CompositionReference: &corev1.ObjectReference{Name: "cmp"},
 						ResourceReference:    &corev1.ObjectReference{Name: "xr"},

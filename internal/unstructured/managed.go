@@ -8,9 +8,15 @@ import (
 )
 
 // ProbablyManaged returns true if the supplied *Unstructured is probably a
-// managed resource. It considers any resource with a string value at field path
-// spec.providerConfigRef.name to probably be a managed resource.
+// managed resource. It considers any cluster scoped resource with a string
+// value at field path spec.providerConfigRef.name to probably be a managed
+// resource. spec.providerConfigRef is technically optional, but is defaulted at
+// create time by the CRD's OpenAPI schema.
 func ProbablyManaged(u *unstructured.Unstructured) bool {
+	if u.GetNamespace() != "" {
+		return false
+	}
+
 	_, err := fieldpath.Pave(u.Object).GetString("spec.providerConfigRef.name")
 	return err == nil
 }

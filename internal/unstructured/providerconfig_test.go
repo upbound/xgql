@@ -20,10 +20,12 @@ func emptyPC() *ProviderConfig {
 
 func TestProbablyProviderConfig(t *testing.T) {
 	cases := map[string]struct {
-		u    *unstructured.Unstructured
-		want bool
+		reason string
+		u      *unstructured.Unstructured
+		want   bool
 	}{
 		"Probably": {
+			reason: "A cluster scoped resource of kind: ProviderConfig is probably a Crossplane ProviderConfig.",
 			u: func() *unstructured.Unstructured {
 				u := &unstructured.Unstructured{Object: map[string]interface{}{}}
 				u.SetKind("ProviderConfig")
@@ -31,10 +33,21 @@ func TestProbablyProviderConfig(t *testing.T) {
 			}(),
 			want: true,
 		},
-		"ProbablyNot": {
+		"WrongKind": {
+			reason: "A cluster scoped resource that is not of kind: ProviderConfig is not a Crossplane ProviderConfig.",
 			u: func() *unstructured.Unstructured {
 				u := &unstructured.Unstructured{Object: map[string]interface{}{}}
 				u.SetKind("Elephant")
+				return u
+			}(),
+			want: false,
+		},
+		"Namespaced": {
+			reason: "A namespaced resource is not a Crossplane ProviderConfig.",
+			u: func() *unstructured.Unstructured {
+				u := &unstructured.Unstructured{Object: map[string]interface{}{}}
+				u.SetNamespace("default")
+				u.SetKind("ProviderConfig")
 				return u
 			}(),
 			want: false,
@@ -45,7 +58,7 @@ func TestProbablyProviderConfig(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			got := ProbablyProviderConfig(tc.u)
 			if diff := cmp.Diff(tc.want, got); diff != "" {
-				t.Errorf("\nProbablyProviderConfig(...): -want, +got:\n%s", diff)
+				t.Errorf("\n%s\nProbablyProviderConfig(...): -want, +got:\n%s", tc.reason, diff)
 			}
 		})
 	}

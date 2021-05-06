@@ -24,29 +24,83 @@ func emptyXRC() *Claim {
 }
 func TestProbablyClaim(t *testing.T) {
 	cases := map[string]struct {
-		u    *unstructured.Unstructured
-		want bool
+		reason string
+		u      *unstructured.Unstructured
+		want   bool
 	}{
-		"Probably": {
+		"HasCompositionRef": {
+			reason: "A namespaced resource with a composition ref is probably a claim.",
 			u: func() *unstructured.Unstructured {
 				o := map[string]interface{}{}
 				fieldpath.Pave(o).SetValue("spec.compositionRef", &corev1.ObjectReference{
 					Name: "coolcomposition",
 				})
+				u := &unstructured.Unstructured{Object: o}
+				u.SetNamespace("default")
+				return u
+			}(),
+			want: true,
+		},
+		"HasCompositionSelector": {
+			reason: "A namespaced resource with a composition selector is probably a claim.",
+			u: func() *unstructured.Unstructured {
+				o := map[string]interface{}{}
+				fieldpath.Pave(o).SetValue("spec.compositionSelector", &metav1.LabelSelector{
+					MatchLabels: map[string]string{"cool": "true"},
+				})
+				u := &unstructured.Unstructured{Object: o}
+				u.SetNamespace("default")
+				return u
+			}(),
+			want: true,
+		},
+		"HasResourceRef": {
+			reason: "A namespaced resource with a resource ref is probably a claim.",
+			u: func() *unstructured.Unstructured {
+				o := map[string]interface{}{}
 				fieldpath.Pave(o).SetValue("spec.resourceRef", &corev1.ObjectReference{
 					APIVersion: "example.org/v1",
 					Kind:       "Example",
 					Name:       "coolexample",
 				})
-				return &unstructured.Unstructured{Object: o}
+				u := &unstructured.Unstructured{Object: o}
+				u.SetNamespace("default")
+				return u
 			}(),
 			want: true,
 		},
-		"ProbablyNot": {
+		"HasSecretRef": {
+			reason: "A namespaced resource with a connection secret ref is probably a claim.",
+			u: func() *unstructured.Unstructured {
+				o := map[string]interface{}{}
+				fieldpath.Pave(o).SetValue("spec.writeConnectionSecretToRef", &xpv1.LocalSecretReference{
+					Name: "coolsecret",
+				})
+				u := &unstructured.Unstructured{Object: o}
+				u.SetNamespace("default")
+				return u
+			}(),
+			want: true,
+		},
+		"ClusterScoped": {
+			reason: "A cluster scoped resource with a composition ref is not a claim.",
+			u: func() *unstructured.Unstructured {
+				o := map[string]interface{}{}
+				fieldpath.Pave(o).SetValue("spec.compositionRef", &corev1.ObjectReference{
+					Name: "coolcomposition",
+				})
+				return &unstructured.Unstructured{Object: o}
+			}(),
+			want: false,
+		},
+		"HasResourceRefs": {
+			reason: "A namespaced resource with a resourceRefs array is not a claim.",
 			u: func() *unstructured.Unstructured {
 				o := map[string]interface{}{}
 				fieldpath.Pave(o).SetValue("spec.resourceRefs", []string{"wat"}) // Not object refs.
-				return &unstructured.Unstructured{Object: o}
+				u := &unstructured.Unstructured{Object: o}
+				u.SetNamespace("default")
+				return u
 			}(),
 			want: false,
 		},
