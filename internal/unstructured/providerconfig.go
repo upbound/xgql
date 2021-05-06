@@ -8,10 +8,10 @@ import (
 )
 
 // ProbablyProviderConfig returns true if the supplied *Unstructured is probably
-// a provider config. It considers any resource of kind: ProviderConfig to
-// probably be a provider config.
+// a provider config. It considers any cluster scoped resource of kind:
+// ProviderConfig to probably be a provider config.
 func ProbablyProviderConfig(u *unstructured.Unstructured) bool {
-	return u.GetKind() == "ProviderConfig"
+	return u.GetNamespace() == "" && u.GetKind() == "ProviderConfig"
 }
 
 // A ProviderConfig resource.

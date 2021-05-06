@@ -29,14 +29,27 @@ import (
 // github.com/crossplane-runtime/pkg/resource/unstructured/composite.
 
 // ProbablyComposite returns true if the supplied *Unstructured is probably a
-// composite resource. It considers any resource with an object reference at
-// spec.compositionRef and an array of object refs at spec.resourceRefs to
-// probably be a composite resource.
+// composite resource. It considers any cluster scoped resource with at least
+// one of the fields we inject into the OpenAPI schema of composite resources set.
+// Note that it is possible for this to produce a false negative. All of these
+// injected fields are optional so it's possible that an XR has none of them
+// set. Such an XR would not be functional, as indicated by not having an array
+// of composed resource refs set.
 func ProbablyComposite(u *unstructured.Unstructured) bool {
-	cerr := fieldpath.Pave(u.Object).GetValueInto("spec.compositionRef", &corev1.ObjectReference{})
+	p := fieldpath.Pave(u.Object)
 	r := []corev1.ObjectReference{}
-	rerr := fieldpath.Pave(u.Object).GetValueInto("spec.resourceRefs", &r)
-	return cerr == nil && rerr == nil
+	switch {
+	case u.GetNamespace() != "":
+		return false
+	case p.GetValueInto("spec.compositionRef", &corev1.ObjectReference{}) == nil:
+		return true
+	case p.GetValueInto("spec.compositionSelector", &metav1.LabelSelector{}) == nil:
+		return true
+	case p.GetValueInto("spec.resourceRefs", &r) == nil:
+		return true
+	}
+
+	return false
 }
 
 // A Composite resource.
