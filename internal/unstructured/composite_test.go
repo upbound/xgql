@@ -22,27 +22,64 @@ var _ resource.Composite = &Composite{}
 func emptyXR() *Composite {
 	return &Composite{Unstructured: unstructured.Unstructured{Object: map[string]interface{}{}}}
 }
+
 func TestProbablyComposite(t *testing.T) {
 	cases := map[string]struct {
-		u    *unstructured.Unstructured
-		want bool
+		reason string
+		u      *unstructured.Unstructured
+		want   bool
 	}{
-		"Probably": {
+		"HasCompositionRef": {
+			reason: "A cluster scoped resource with a composition ref is probably an XR.",
 			u: func() *unstructured.Unstructured {
 				o := map[string]interface{}{}
 				fieldpath.Pave(o).SetValue("spec.compositionRef", &corev1.ObjectReference{
 					Name: "coolcomposition",
 				})
-				fieldpath.Pave(o).SetValue("spec.resourceRefs", []corev1.ObjectReference{{
-					APIVersion: "example.org/v1",
-					Kind:       "Example",
-					Name:       "coolexample",
-				}})
 				return &unstructured.Unstructured{Object: o}
 			}(),
 			want: true,
 		},
-		"ProbablyNot": {
+		"HasCompositionSelector": {
+			reason: "A cluster scoped resource with a composition selector is probably an XR.",
+			u: func() *unstructured.Unstructured {
+				o := map[string]interface{}{}
+				fieldpath.Pave(o).SetValue("spec.compositionSelector", &metav1.LabelSelector{
+					MatchLabels: map[string]string{"cool": "true"},
+				})
+				return &unstructured.Unstructured{Object: o}
+			}(),
+			want: true,
+		},
+		"HasResourceRefs": {
+			reason: "A cluster scoped resource with an array of resource refs is probably an XR.",
+			u: func() *unstructured.Unstructured {
+				o := map[string]interface{}{}
+				r := []corev1.ObjectReference{{
+					APIVersion: "example.org/v1",
+					Kind:       "Example",
+					Name:       "coolexample",
+				}}
+				fieldpath.Pave(o).SetValue("spec.resourceRefs", &r)
+				return &unstructured.Unstructured{Object: o}
+			}(),
+			want: true,
+		},
+		"Namespaced": {
+			reason: "A namespaced resource with a composition ref is not an XR.",
+			u: func() *unstructured.Unstructured {
+				o := map[string]interface{}{}
+				fieldpath.Pave(o).SetValue("spec.compositionRef", &corev1.ObjectReference{
+					Name: "coolcomposition",
+				})
+				u := &unstructured.Unstructured{Object: o}
+				u.SetNamespace("default")
+				return u
+			}(),
+			want: false,
+		},
+		"WeirdResourceRefs": {
+			reason: "A cluster scoped resource with a non-objectref resourceRefs array is not an XR.",
 			u: func() *unstructured.Unstructured {
 				o := map[string]interface{}{}
 				fieldpath.Pave(o).SetValue("spec.resourceRefs", []string{"wat"}) // Not object refs.

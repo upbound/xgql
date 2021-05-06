@@ -363,8 +363,6 @@ func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, e
 	// This isn't _really_ that complex; it's a long but simple switch.
 
 	switch {
-	case unstructured.ProbablyManaged(u):
-		return GetManagedResource(u), nil
 
 	case unstructured.ProbablyProviderConfig(u):
 		return GetProviderConfig(u), nil
@@ -374,6 +372,14 @@ func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, e
 
 	case unstructured.ProbablyClaim(u):
 		return GetCompositeResourceClaim(u), nil
+
+	// Note that order is important here. We want to check whether the resource
+	// seems to be a managed resource _after_ checking whether it seems to be a
+	// composite resource because it's possible to define a composite resource
+	// that would pass the ProbablyManaged check. Such a composite resource
+	// would very likely pass the ProbablyComposite check and never reach this.
+	case unstructured.ProbablyManaged(u):
+		return GetManagedResource(u), nil
 
 	case u.GroupVersionKind() == pkgv1.ProviderGroupVersionKind:
 		p := &pkgv1.Provider{}
