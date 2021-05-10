@@ -7,6 +7,7 @@ require (
 	github.com/crossplane/crossplane v1.1.0
 	github.com/crossplane/crossplane-runtime v0.13.0
 	github.com/go-chi/chi/v5 v5.0.1
+	github.com/google/addlicense v0.0.0-20210428195630-6d92264d7170
 	github.com/google/go-cmp v0.5.5
 	github.com/kjk/smaz v0.0.0-20151202183815-c61c680e82ff
 	github.com/pkg/errors v0.9.1
