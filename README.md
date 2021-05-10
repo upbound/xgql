@@ -96,3 +96,5 @@ GraphQL requests must still supply authz headers.
 [gqlgen]: https://github.com/99designs/gqlgen
 [bearer token]: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#putting-a-bearer-token-in-a-request
 [impersonation headers]: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#user-impersonation
+
+## Trivial Change to Demo CLA-Bot
