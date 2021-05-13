@@ -7,10 +7,32 @@ import (
 	"github.com/pkg/errors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
 	errRBAC = "possible RBAC permissions error"
+)
+
+// Error extension fields.
+const (
+	// Source reflects the 'source' of an error.
+	Source = "source"
+
+	// Reason reflects the 'reason' for an error.
+	Reason = "reason"
+
+	// Code is the error code, if any.
+	Code = "code"
+)
+
+// An ErrorSource indicates where an error originated.
+type ErrorSource string
+
+// Error sources.
+const (
+	ErrorSourceUnknown   ErrorSource = "Unknown"
+	ErrorSourceAPIServer ErrorSource = "APIServer"
 )
 
 // wrap adds context to a *gqlerror.Error message while maintaining metadata
@@ -25,8 +47,31 @@ func wrap(err error, message string) error {
 	return gerr
 }
 
+// Extend an error with GraphQL extensions.
+func Extend(ctx context.Context, err error, ext map[string]interface{}) *gqlerror.Error {
+	// 'Upgrade' the error to a GraphQL error if it isn't one already. We know
+	// the returned error won't be wrapped.
+	//nolint:errorlint
+	gerr := graphql.ErrorOnPath(ctx, err).(*gqlerror.Error)
+	if gerr.Extensions == nil {
+		gerr.Extensions = ext
+		return gerr
+	}
+	for k, v := range ext {
+		gerr.Extensions[k] = v
+	}
+	return gerr
+}
+
 // Error 'presents' errors encountered by GraphQL resolvers.
 func Error(ctx context.Context, err error) *gqlerror.Error {
+	s := kerrors.APIStatus(nil)
+
+	// This does not appear to be an error from the API server.
+	if !errors.As(err, &s) {
+		return Extend(ctx, err, map[string]interface{}{Source: ErrorSourceUnknown})
+	}
+
 	// Most xgql resolvers read from a controller-runtime cache that is hydrated
 	// by taking a watch on any type they're asked to read. The cache uses the
 	// credentials passed in by the caller, and will never start if those
@@ -36,12 +81,13 @@ func Error(ctx context.Context, err error) *gqlerror.Error {
 	// failing to sync". The most common reason a cache won't start is because
 	// the caller doesn't have RBAC permissions to list or watch the desired
 	// type, so we wrap the error with a hint.
-	if kerrors.IsTimeout(err) {
+	if s.Status().Reason == metav1.StatusReasonTimeout {
 		err = wrap(err, errRBAC)
 	}
 
-	// ErrorOnPath will 'upgrade' the supplied error to a GraphQL error if it
-	// wasn't one already.
-	err = graphql.ErrorOnPath(ctx, err)
-	return err.(*gqlerror.Error) //nolint:errorlint // We know err will be a *graphql.Error.
+	return Extend(ctx, err, map[string]interface{}{
+		Source: ErrorSourceAPIServer,
+		Reason: s.Status().Reason,
+		Code:   s.Status().Code,
+	})
 }
