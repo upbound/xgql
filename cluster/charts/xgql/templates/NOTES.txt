@@ -1,8 +1,2 @@
-Release: {{.Release.Name}}
+By proceeding, you are accepting to comply with terms and conditions in https://licenses.upbound.io/upbound-software-license.html
 
-Chart Name: {{.Chart.Name}}
-Chart Description: {{.Chart.Description}}
-Chart Version: {{.Chart.Version}}
-Chart Application Version: {{.Chart.AppVersion}}
-
-Kube Version: {{.Capabilities.KubeVersion}}
