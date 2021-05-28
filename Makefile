@@ -44,29 +44,18 @@ yarn.lint: yarn.install
 	@cd $(YARN_DIR); $(YARN) format
 	@cd $(YARN_DIR); $(YARN) lint
 
-# Ensure a PR is ready for review.
-reviewable: generate lint
-	@go mod tidy
-
-# Ensure branch is clean.
-check-diff: reviewable
-	@$(INFO) checking that branch is clean
-	@test -z "$$(git status --porcelain)" || $(FAIL)
-	@$(OK) branch is clean
-
 # Update the submodules, such as the common build scripts.
 submodules:
 	@git submodule sync
 	@git submodule update --init --recursive
 
-.PHONY: reviewable submodules fallthrough
+.PHONY: submodules fallthrough
 
 # ====================================================================================
 # Special Targets
 
 define XGQL_MAKE_HELP
 xgql Targets:
-    reviewable            Ensure a PR is ready for review.
     submodules            Update the submodules, such as the common build scripts.
 
 endef
