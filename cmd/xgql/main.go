@@ -117,6 +117,7 @@ func main() {
 
 	rt := chi.NewRouter()
 	rt.Use(middleware.RequestLogger(&formatter{log}))
+	rt.Use(middleware.Compress(5)) // Chi recommends compression level 5.
 	rt.Use(auth.Middleware)
 	rt.Use(version.Middleware)
 
