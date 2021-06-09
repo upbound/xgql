@@ -4,10 +4,10 @@ import (
 	"context"
 	"io/ioutil"
 	stdlog "log"
-	"net"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -76,16 +76,16 @@ var noCache = []client.Object{
 
 func main() {
 	var (
-		app         = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
-		debug       = app.Flag("debug", "Enable debug logging.").Short('d').Bool()
-		listen      = app.Flag("listen", "Address at which to listen for TLS connections. Requires TLS cert and key.").Default(":8443").String()
-		tlsCert     = app.Flag("tls-cert", "Path to the TLS certificate file used to serve TLS connections.").ExistingFile()
-		tlsKey      = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
-		insecure    = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
-		play        = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
-		tracer      = app.Flag("tracer", "Tracer to use. Set one of the following to enable tracing: \"jaeger\" or \"gcp\"").String()
-		ratio       = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
-		jaegerAgent = app.Flag("jaeger-agent", "Address of the Jaeger trace agent as [host]:[port]").String()
+		app      = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
+		debug    = app.Flag("debug", "Enable debug logging.").Short('d').Bool()
+		listen   = app.Flag("listen", "Address at which to listen for TLS connections. Requires TLS cert and key.").Default(":8443").String()
+		tlsCert  = app.Flag("tls-cert", "Path to the TLS certificate file used to serve TLS connections.").ExistingFile()
+		tlsKey   = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
+		insecure = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
+		play     = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
+		tracer   = app.Flag("trace-backend", "Tracer to use. Supported backends: \"jaeger\" or \"gcp\"").Default("jaeger").String()
+		ratio    = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
+		agent    = app.Flag("trace-agent", "Address of the Jaeger trace agent as [host]:[port]").TCP()
 	)
 	app.Version(version.Version)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
@@ -111,27 +111,20 @@ func main() {
 	}
 	switch *tracer {
 	case "jaeger":
-		log.Debug("Enabling Jaeger tracer")
-		if *jaegerAgent == "" {
-			kingpin.Fatalf("cannot enable Jaeger tracing, jaeger agent not set")
+		if *agent != nil {
+			log.Debug("Enabling Jaeger tracer")
+			exp, err := jaeger.NewRawExporter(jaeger.WithAgentEndpoint(jaeger.WithAgentHost((*agent).IP.String()), jaeger.WithAgentPort(strconv.Itoa((*agent).Port))))
+			kingpin.FatalIfError(err, "cannot create OpenTelemetry Jaeger exporter")
+			jp := trace.NewTracerProvider(append(tpOpts, trace.WithSyncer(exp))...)
+			defer func() {
+				kingpin.FatalIfError(jp.Shutdown(context.Background()), "cannot shutdown Jaeger exporter")
+			}()
 		}
-		host, port, err := net.SplitHostPort(*jaegerAgent)
-		kingpin.FatalIfError(err, "cannot parse jaeger agent as host:port")
-
-		exp, err := jaeger.NewRawExporter(jaeger.WithAgentEndpoint(jaeger.WithAgentHost(host), jaeger.WithAgentPort(port)))
-		kingpin.FatalIfError(err, "cannot create OpenTelemetry Jaeger exporter")
-		jp := trace.NewTracerProvider(append(tpOpts, trace.WithSyncer(exp))...)
-		defer func() {
-			err = jp.Shutdown(context.Background())
-			kingpin.FatalIfError(err, "cannot shutdown Jaeger exporter")
-		}()
 	case "gcp":
 		log.Debug("Enabling GCP tracer")
 		_, shutdown, err := texporter.InstallNewPipeline([]texporter.Option{}, tpOpts...)
 		kingpin.FatalIfError(err, "cannot create OpenTelemetry GCP exporter")
 		defer shutdown()
-	default:
-		log.Debug("Tracing not enabled")
 	}
 
 	// NOTE(negz): This handler is called when a cache can't watch a type that
