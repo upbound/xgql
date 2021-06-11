@@ -83,7 +83,7 @@ func main() {
 		tlsKey   = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
 		insecure = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
 		play     = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
-		tracer   = app.Flag("trace-backend", "Tracer to use. Supported backends: \"jaeger\" or \"gcp\"").Default("jaeger").String()
+		tracer   = app.Flag("trace-backend", "Tracer to use.").Default("jaeger").Enum("jaeger", "gcp")
 		ratio    = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
 		agent    = app.Flag("trace-agent", "Address of the Jaeger trace agent as [host]:[port]").TCP()
 	)
@@ -109,6 +109,7 @@ func main() {
 		trace.WithSampler(trace.ParentBased(trace.TraceIDRatioBased(*ratio))),
 		trace.WithResource(res),
 	}
+
 	switch *tracer {
 	case "jaeger":
 		if *agent != nil {
