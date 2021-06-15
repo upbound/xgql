@@ -39,7 +39,7 @@ func (t Tracer) InterceptResponse(ctx context.Context, next graphql.ResponseHand
 	}
 
 	oc := graphql.GetOperationContext(ctx)
-	ctx, span := tracer.Start(ctx, oc.OperationName, trace.WithAttributes(query.String(oc.RawQuery)))
+	ctx, span := tracer.Start(ctx, operationName(oc), trace.WithAttributes(query.String(oc.RawQuery)))
 	defer span.End()
 	if !span.IsRecording() {
 		return next(ctx)
@@ -81,4 +81,15 @@ func (t Tracer) InterceptField(ctx context.Context, next graphql.Resolver) (inte
 	}
 
 	return rsp, err
+}
+
+func operationName(oc *graphql.OperationContext) string {
+	// oc.OperationName could come as empty here, causing following error if gcp cloud trace enabled:
+	//   Failed to export to Stackdriver: rpc error: code = InvalidArgument desc = Missing span display name!
+	// We always need a name for spans to get exported to Stackdriver.
+	n := "nameless-operation"
+	if oc.OperationName != "" {
+		n = oc.OperationName
+	}
+	return n
 }
