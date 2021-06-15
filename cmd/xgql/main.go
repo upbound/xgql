@@ -15,16 +15,19 @@
 package main
 
 import (
+	"context"
 	"io/ioutil"
 	stdlog "log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/apollotracing"
 	"github.com/99designs/gqlgen/graphql/playground"
+	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -94,8 +97,9 @@ func main() {
 		tlsKey   = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
 		insecure = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
 		play     = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
-		agent    = app.Flag("trace-agent", "Address of the Jaeger trace agent. Leave unset to disable tracing.").String()
+		tracer   = app.Flag("trace-backend", "Tracer to use.").Default("jaeger").Enum("jaeger", "gcp")
 		ratio    = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
+		agent    = app.Flag("trace-agent", "Address of the Jaeger trace agent as [host]:[port]").TCP()
 	)
 	app.Version(version.Version)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
@@ -104,19 +108,38 @@ func main() {
 	log := logging.NewLogrLogger(zl.WithName("xgql"))
 
 	kingpin.FatalIfError(otelruntime.Start(), "cannot add OpenTelemetry runtime instrumentation")
+
+	// Observing a log line during startup as follows:
+	// 2021/06/08 10:03:26 <nil>
+	// This appears to be fixed with https://github.com/open-telemetry/opentelemetry-go/pull/1851
+	// However, there is no release for opentelemetry-go with this fix yet.
 	res := resource.NewWithAttributes(attribute.String("service.name", "crossplane.io/gql"))
 
 	// OpenTelemetry metrics.
 	prom, err := prometheus.InstallNewPipeline(prometheus.Config{}, basic.WithResource(res))
 	kingpin.FatalIfError(err, "cannot create OpenTelemetry Prometheus exporter")
 
-	// OpenTelemetry tracing.
-	if *agent != "" {
-		flush, err := jaeger.InstallNewPipeline(jaeger.WithAgentEndpoint(*agent), jaeger.WithSDKOptions(
-			trace.WithSampler(trace.ParentBased(trace.TraceIDRatioBased(*ratio))),
-			trace.WithResource(res)))
-		kingpin.FatalIfError(err, "cannot create OpenTelemetry Jaeger exporter")
-		defer flush()
+	tpOpts := []trace.TracerProviderOption{
+		trace.WithSampler(trace.ParentBased(trace.TraceIDRatioBased(*ratio))),
+		trace.WithResource(res),
+	}
+
+	switch *tracer {
+	case "jaeger":
+		if *agent != nil {
+			log.Debug("Enabling Jaeger tracer")
+			exp, err := jaeger.NewRawExporter(jaeger.WithAgentEndpoint(jaeger.WithAgentHost((*agent).IP.String()), jaeger.WithAgentPort(strconv.Itoa((*agent).Port))))
+			kingpin.FatalIfError(err, "cannot create OpenTelemetry Jaeger exporter")
+			jp := trace.NewTracerProvider(append(tpOpts, trace.WithSyncer(exp))...)
+			defer func() {
+				kingpin.FatalIfError(jp.Shutdown(context.Background()), "cannot shutdown Jaeger exporter")
+			}()
+		}
+	case "gcp":
+		log.Debug("Enabling GCP tracer")
+		_, shutdown, err := texporter.InstallNewPipeline([]texporter.Option{}, tpOpts...)
+		kingpin.FatalIfError(err, "cannot create OpenTelemetry GCP exporter")
+		defer shutdown()
 	}
 
 	// NOTE(negz): This handler is called when a cache can't watch a type that
