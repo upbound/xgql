@@ -5,10 +5,10 @@ import (
 )
 
 const (
-	operation = attribute.Key("crossplane.io/qgl-operation")
+	operation = attribute.Key("crossplane.io/gql-operation")
 	object    = attribute.Key("crossplane.io/gql-object")
 	field     = attribute.Key("crossplane.io/gql-field")
-	success   = attribute.Key("crossplane.io/qgl-success")
+	success   = attribute.Key("crossplane.io/gql-success")
 	query     = attribute.Key("crossplane.io/gql-query")
 	path      = attribute.Key("crossplane.io/gql-path")
 	alias     = attribute.Key("crossplane.io/gql-alias")
