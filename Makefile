@@ -22,7 +22,7 @@ YARN_DIR = lint-schema
 -include build/makelib/yarnjs.mk
 
 # Setup Helm
-HELM_VERSION=v2.17.0
+USE_HELM3 = true
 HELM_BASE_URL = https://charts.upbound.io 
 HELM_S3_BUCKET = upbound.charts
 HELM_CHARTS = xgql
