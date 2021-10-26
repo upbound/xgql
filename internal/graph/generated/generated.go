@@ -16253,6 +16253,41 @@ func (ec *executionContext) ___Directive_args(ctx context.Context, field graphql
 	return ec.marshalN__InputValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐInputValueᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) ___Directive_isRepeatable(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "__Directive",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsRepeatable, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) ___EnumValue_name(ctx context.Context, field graphql.CollectedField, obj *introspection.EnumValue) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -17205,7 +17240,10 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 func (ec *executionContext) unmarshalInputCreateKubernetesResourceInput(ctx context.Context, obj interface{}) (model.CreateKubernetesResourceInput, error) {
 	var it model.CreateKubernetesResourceInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -17233,7 +17271,10 @@ func (ec *executionContext) unmarshalInputCreateKubernetesResourceInput(ctx cont
 
 func (ec *executionContext) unmarshalInputPatch(ctx context.Context, obj interface{}) (model.Patch, error) {
 	var it model.Patch
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -17261,7 +17302,10 @@ func (ec *executionContext) unmarshalInputPatch(ctx context.Context, obj interfa
 
 func (ec *executionContext) unmarshalInputUpdateKubernetesResourceInput(ctx context.Context, obj interface{}) (model.UpdateKubernetesResourceInput, error) {
 	var it model.UpdateKubernetesResourceInput
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -17638,7 +17682,6 @@ var compositeResourceImplementors = []string{"CompositeResource", "Node", "Kuber
 
 func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -17646,40 +17689,76 @@ func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResource")
 		case "id":
-			out.Values[i] = ec._CompositeResource_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResource_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._CompositeResource_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResource_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._CompositeResource_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResource_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._CompositeResource_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResource_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "spec":
-			out.Values[i] = ec._CompositeResource_spec(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResource_spec(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "status":
-			out.Values[i] = ec._CompositeResource_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResource_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._CompositeResource_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResource_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -17690,10 +17769,16 @@ func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.Sele
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "definition":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -17701,6 +17786,11 @@ func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.Sele
 				}()
 				res = ec._CompositeResource_definition(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -17717,7 +17807,6 @@ var compositeResourceClaimImplementors = []string{"CompositeResourceClaim", "Nod
 
 func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceClaim) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceClaimImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -17725,40 +17814,76 @@ func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceClaim")
 		case "id":
-			out.Values[i] = ec._CompositeResourceClaim_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaim_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._CompositeResourceClaim_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaim_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._CompositeResourceClaim_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaim_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._CompositeResourceClaim_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaim_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "spec":
-			out.Values[i] = ec._CompositeResourceClaim_spec(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaim_spec(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "status":
-			out.Values[i] = ec._CompositeResourceClaim_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaim_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._CompositeResourceClaim_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaim_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -17769,10 +17894,16 @@ func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "definition":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -17780,6 +17911,11 @@ func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast
 				}()
 				res = ec._CompositeResourceClaim_definition(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -17796,7 +17932,6 @@ var compositeResourceClaimConnectionImplementors = []string{"CompositeResourceCl
 
 func (ec *executionContext) _CompositeResourceClaimConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceClaimConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceClaimConnectionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -17804,9 +17939,19 @@ func (ec *executionContext) _CompositeResourceClaimConnection(ctx context.Contex
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceClaimConnection")
 		case "nodes":
-			out.Values[i] = ec._CompositeResourceClaimConnection_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaimConnection_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "totalCount":
-			out.Values[i] = ec._CompositeResourceClaimConnection_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaimConnection_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -17825,7 +17970,6 @@ var compositeResourceClaimConnectionDetailsImplementors = []string{"CompositeRes
 
 func (ec *executionContext) _CompositeResourceClaimConnectionDetails(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceClaimConnectionDetails) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceClaimConnectionDetailsImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -17833,7 +17977,12 @@ func (ec *executionContext) _CompositeResourceClaimConnectionDetails(ctx context
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceClaimConnectionDetails")
 		case "lastPublishedTime":
-			out.Values[i] = ec._CompositeResourceClaimConnectionDetails_lastPublishedTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaimConnectionDetails_lastPublishedTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -17849,7 +17998,6 @@ var compositeResourceClaimSpecImplementors = []string{"CompositeResourceClaimSpe
 
 func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceClaimSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceClaimSpecImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -17858,7 +18006,8 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 			out.Values[i] = graphql.MarshalString("CompositeResourceClaimSpec")
 		case "composition":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -17866,12 +18015,23 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 				}()
 				res = ec._CompositeResourceClaimSpec_composition(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "compositionSelector":
-			out.Values[i] = ec._CompositeResourceClaimSpec_compositionSelector(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaimSpec_compositionSelector(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "resource":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -17879,10 +18039,16 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 				}()
 				res = ec._CompositeResourceClaimSpec_resource(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "connectionSecret":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -17890,6 +18056,11 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 				}()
 				res = ec._CompositeResourceClaimSpec_connectionSecret(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -17906,7 +18077,6 @@ var compositeResourceClaimStatusImplementors = []string{"CompositeResourceClaimS
 
 func (ec *executionContext) _CompositeResourceClaimStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceClaimStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceClaimStatusImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -17914,9 +18084,19 @@ func (ec *executionContext) _CompositeResourceClaimStatus(ctx context.Context, s
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceClaimStatus")
 		case "conditions":
-			out.Values[i] = ec._CompositeResourceClaimStatus_conditions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaimStatus_conditions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "connectionDetails":
-			out.Values[i] = ec._CompositeResourceClaimStatus_connectionDetails(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceClaimStatus_connectionDetails(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -17932,7 +18112,6 @@ var compositeResourceConnectionImplementors = []string{"CompositeResourceConnect
 
 func (ec *executionContext) _CompositeResourceConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceConnectionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -17940,9 +18119,19 @@ func (ec *executionContext) _CompositeResourceConnection(ctx context.Context, se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceConnection")
 		case "nodes":
-			out.Values[i] = ec._CompositeResourceConnection_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceConnection_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "totalCount":
-			out.Values[i] = ec._CompositeResourceConnection_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceConnection_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -17961,7 +18150,6 @@ var compositeResourceConnectionDetailsImplementors = []string{"CompositeResource
 
 func (ec *executionContext) _CompositeResourceConnectionDetails(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceConnectionDetails) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceConnectionDetailsImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -17969,7 +18157,12 @@ func (ec *executionContext) _CompositeResourceConnectionDetails(ctx context.Cont
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceConnectionDetails")
 		case "lastPublishedTime":
-			out.Values[i] = ec._CompositeResourceConnectionDetails_lastPublishedTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceConnectionDetails_lastPublishedTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -17985,7 +18178,6 @@ var compositeResourceDefinitionImplementors = []string{"CompositeResourceDefinit
 
 func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinition) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -17993,40 +18185,76 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinition")
 		case "id":
-			out.Values[i] = ec._CompositeResourceDefinition_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinition_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._CompositeResourceDefinition_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinition_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._CompositeResourceDefinition_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinition_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._CompositeResourceDefinition_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinition_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "spec":
-			out.Values[i] = ec._CompositeResourceDefinition_spec(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinition_spec(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "status":
-			out.Values[i] = ec._CompositeResourceDefinition_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinition_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._CompositeResourceDefinition_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinition_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18037,10 +18265,16 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "definedCompositeResources":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18051,10 +18285,16 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "definedCompositeResourceClaims":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18065,6 +18305,11 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -18081,7 +18326,6 @@ var compositeResourceDefinitionConnectionImplementors = []string{"CompositeResou
 
 func (ec *executionContext) _CompositeResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionConnectionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18089,9 +18333,19 @@ func (ec *executionContext) _CompositeResourceDefinitionConnection(ctx context.C
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionConnection")
 		case "nodes":
-			out.Values[i] = ec._CompositeResourceDefinitionConnection_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionConnection_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "totalCount":
-			out.Values[i] = ec._CompositeResourceDefinitionConnection_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionConnection_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -18110,7 +18364,6 @@ var compositeResourceDefinitionControllerStatusImplementors = []string{"Composit
 
 func (ec *executionContext) _CompositeResourceDefinitionControllerStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionControllerStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionControllerStatusImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18118,9 +18371,19 @@ func (ec *executionContext) _CompositeResourceDefinitionControllerStatus(ctx con
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionControllerStatus")
 		case "compositeResourceType":
-			out.Values[i] = ec._CompositeResourceDefinitionControllerStatus_compositeResourceType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionControllerStatus_compositeResourceType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "compositeResourceClaimType":
-			out.Values[i] = ec._CompositeResourceDefinitionControllerStatus_compositeResourceClaimType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionControllerStatus_compositeResourceClaimType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18136,7 +18399,6 @@ var compositeResourceDefinitionNamesImplementors = []string{"CompositeResourceDe
 
 func (ec *executionContext) _CompositeResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionNames) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionNamesImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18144,23 +18406,53 @@ func (ec *executionContext) _CompositeResourceDefinitionNames(ctx context.Contex
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionNames")
 		case "plural":
-			out.Values[i] = ec._CompositeResourceDefinitionNames_plural(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionNames_plural(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "singular":
-			out.Values[i] = ec._CompositeResourceDefinitionNames_singular(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionNames_singular(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "shortNames":
-			out.Values[i] = ec._CompositeResourceDefinitionNames_shortNames(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionNames_shortNames(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "kind":
-			out.Values[i] = ec._CompositeResourceDefinitionNames_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionNames_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "listKind":
-			out.Values[i] = ec._CompositeResourceDefinitionNames_listKind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionNames_listKind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "categories":
-			out.Values[i] = ec._CompositeResourceDefinitionNames_categories(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionNames_categories(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18176,7 +18468,6 @@ var compositeResourceDefinitionSpecImplementors = []string{"CompositeResourceDef
 
 func (ec *executionContext) _CompositeResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionSpecImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18184,22 +18475,43 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec(ctx context.Context
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionSpec")
 		case "group":
-			out.Values[i] = ec._CompositeResourceDefinitionSpec_group(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionSpec_group(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "names":
-			out.Values[i] = ec._CompositeResourceDefinitionSpec_names(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionSpec_names(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "claimNames":
-			out.Values[i] = ec._CompositeResourceDefinitionSpec_claimNames(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionSpec_claimNames(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "connectionSecretKeys":
-			out.Values[i] = ec._CompositeResourceDefinitionSpec_connectionSecretKeys(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionSpec_connectionSecretKeys(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "defaultComposition":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18207,10 +18519,16 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec(ctx context.Context
 				}()
 				res = ec._CompositeResourceDefinitionSpec_defaultComposition(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "enforcedComposition":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18218,9 +18536,19 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec(ctx context.Context
 				}()
 				res = ec._CompositeResourceDefinitionSpec_enforcedComposition(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "versions":
-			out.Values[i] = ec._CompositeResourceDefinitionSpec_versions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionSpec_versions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18236,7 +18564,6 @@ var compositeResourceDefinitionStatusImplementors = []string{"CompositeResourceD
 
 func (ec *executionContext) _CompositeResourceDefinitionStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionStatusImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18244,9 +18571,19 @@ func (ec *executionContext) _CompositeResourceDefinitionStatus(ctx context.Conte
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionStatus")
 		case "conditions":
-			out.Values[i] = ec._CompositeResourceDefinitionStatus_conditions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionStatus_conditions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "controllers":
-			out.Values[i] = ec._CompositeResourceDefinitionStatus_controllers(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionStatus_controllers(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18262,7 +18599,6 @@ var compositeResourceDefinitionVersionImplementors = []string{"CompositeResource
 
 func (ec *executionContext) _CompositeResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionVersion) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionVersionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18270,22 +18606,42 @@ func (ec *executionContext) _CompositeResourceDefinitionVersion(ctx context.Cont
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionVersion")
 		case "name":
-			out.Values[i] = ec._CompositeResourceDefinitionVersion_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionVersion_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "referenceable":
-			out.Values[i] = ec._CompositeResourceDefinitionVersion_referenceable(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionVersion_referenceable(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "served":
-			out.Values[i] = ec._CompositeResourceDefinitionVersion_served(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionVersion_served(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "schema":
-			out.Values[i] = ec._CompositeResourceDefinitionVersion_schema(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceDefinitionVersion_schema(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18301,7 +18657,6 @@ var compositeResourceSpecImplementors = []string{"CompositeResourceSpec"}
 
 func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceSpecImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18310,7 +18665,8 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 			out.Values[i] = graphql.MarshalString("CompositeResourceSpec")
 		case "composition":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18318,12 +18674,23 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 				}()
 				res = ec._CompositeResourceSpec_composition(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "compositionSelector":
-			out.Values[i] = ec._CompositeResourceSpec_compositionSelector(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceSpec_compositionSelector(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "claim":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18331,10 +18698,16 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 				}()
 				res = ec._CompositeResourceSpec_claim(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "connectionSecret":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18342,10 +18715,16 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 				}()
 				res = ec._CompositeResourceSpec_connectionSecret(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "resources":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18353,6 +18732,11 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 				}()
 				res = ec._CompositeResourceSpec_resources(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -18369,7 +18753,6 @@ var compositeResourceStatusImplementors = []string{"CompositeResourceStatus", "C
 
 func (ec *executionContext) _CompositeResourceStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceStatusImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18377,9 +18760,19 @@ func (ec *executionContext) _CompositeResourceStatus(ctx context.Context, sel as
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceStatus")
 		case "conditions":
-			out.Values[i] = ec._CompositeResourceStatus_conditions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceStatus_conditions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "connectionDetails":
-			out.Values[i] = ec._CompositeResourceStatus_connectionDetails(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceStatus_connectionDetails(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18395,7 +18788,6 @@ var compositeResourceValidationImplementors = []string{"CompositeResourceValidat
 
 func (ec *executionContext) _CompositeResourceValidation(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceValidation) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceValidationImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18403,7 +18795,12 @@ func (ec *executionContext) _CompositeResourceValidation(ctx context.Context, se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceValidation")
 		case "openAPIV3Schema":
-			out.Values[i] = ec._CompositeResourceValidation_openAPIV3Schema(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositeResourceValidation_openAPIV3Schema(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18419,7 +18816,6 @@ var compositionImplementors = []string{"Composition", "Node", "KubernetesResourc
 
 func (ec *executionContext) _Composition(ctx context.Context, sel ast.SelectionSet, obj *model.Composition) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18427,40 +18823,76 @@ func (ec *executionContext) _Composition(ctx context.Context, sel ast.SelectionS
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Composition")
 		case "id":
-			out.Values[i] = ec._Composition_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Composition_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._Composition_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Composition_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._Composition_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Composition_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._Composition_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Composition_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "spec":
-			out.Values[i] = ec._Composition_spec(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Composition_spec(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "status":
-			out.Values[i] = ec._Composition_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Composition_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._Composition_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Composition_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18471,6 +18903,11 @@ func (ec *executionContext) _Composition(ctx context.Context, sel ast.SelectionS
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -18487,7 +18924,6 @@ var compositionConnectionImplementors = []string{"CompositionConnection"}
 
 func (ec *executionContext) _CompositionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CompositionConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositionConnectionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18495,9 +18931,19 @@ func (ec *executionContext) _CompositionConnection(ctx context.Context, sel ast.
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositionConnection")
 		case "nodes":
-			out.Values[i] = ec._CompositionConnection_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositionConnection_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "totalCount":
-			out.Values[i] = ec._CompositionConnection_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositionConnection_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -18516,7 +18962,6 @@ var compositionSpecImplementors = []string{"CompositionSpec"}
 
 func (ec *executionContext) _CompositionSpec(ctx context.Context, sel ast.SelectionSet, obj *model.CompositionSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositionSpecImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18524,12 +18969,22 @@ func (ec *executionContext) _CompositionSpec(ctx context.Context, sel ast.Select
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositionSpec")
 		case "compositeTypeRef":
-			out.Values[i] = ec._CompositionSpec_compositeTypeRef(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositionSpec_compositeTypeRef(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "writeConnectionSecretsToNamespace":
-			out.Values[i] = ec._CompositionSpec_writeConnectionSecretsToNamespace(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositionSpec_writeConnectionSecretsToNamespace(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18545,7 +19000,6 @@ var compositionStatusImplementors = []string{"CompositionStatus", "ConditionedSt
 
 func (ec *executionContext) _CompositionStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CompositionStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositionStatusImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18553,7 +19007,12 @@ func (ec *executionContext) _CompositionStatus(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositionStatus")
 		case "conditions":
-			out.Values[i] = ec._CompositionStatus_conditions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CompositionStatus_conditions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18569,7 +19028,6 @@ var conditionImplementors = []string{"Condition"}
 
 func (ec *executionContext) _Condition(ctx context.Context, sel ast.SelectionSet, obj *model.Condition) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, conditionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18577,27 +19035,52 @@ func (ec *executionContext) _Condition(ctx context.Context, sel ast.SelectionSet
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Condition")
 		case "type":
-			out.Values[i] = ec._Condition_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Condition_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "status":
-			out.Values[i] = ec._Condition_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Condition_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "lastTransitionTime":
-			out.Values[i] = ec._Condition_lastTransitionTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Condition_lastTransitionTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "reason":
-			out.Values[i] = ec._Condition_reason(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Condition_reason(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "message":
-			out.Values[i] = ec._Condition_message(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Condition_message(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18613,7 +19096,6 @@ var configMapImplementors = []string{"ConfigMap", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _ConfigMap(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigMap) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configMapImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18621,35 +19103,66 @@ func (ec *executionContext) _ConfigMap(ctx context.Context, sel ast.SelectionSet
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigMap")
 		case "id":
-			out.Values[i] = ec._ConfigMap_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigMap_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._ConfigMap_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigMap_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._ConfigMap_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigMap_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._ConfigMap_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigMap_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "data":
-			out.Values[i] = ec._ConfigMap_data(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigMap_data(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._ConfigMap_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigMap_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18660,6 +19173,11 @@ func (ec *executionContext) _ConfigMap(ctx context.Context, sel ast.SelectionSet
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -18676,7 +19194,6 @@ var configurationImplementors = []string{"Configuration", "Node", "KubernetesRes
 
 func (ec *executionContext) _Configuration(ctx context.Context, sel ast.SelectionSet, obj *model.Configuration) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18684,40 +19201,76 @@ func (ec *executionContext) _Configuration(ctx context.Context, sel ast.Selectio
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Configuration")
 		case "id":
-			out.Values[i] = ec._Configuration_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Configuration_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._Configuration_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Configuration_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._Configuration_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Configuration_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._Configuration_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Configuration_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "spec":
-			out.Values[i] = ec._Configuration_spec(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Configuration_spec(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "status":
-			out.Values[i] = ec._Configuration_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Configuration_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._Configuration_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Configuration_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18728,10 +19281,16 @@ func (ec *executionContext) _Configuration(ctx context.Context, sel ast.Selectio
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "revisions":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18742,10 +19301,16 @@ func (ec *executionContext) _Configuration(ctx context.Context, sel ast.Selectio
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "activeRevision":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18753,6 +19318,11 @@ func (ec *executionContext) _Configuration(ctx context.Context, sel ast.Selectio
 				}()
 				res = ec._Configuration_activeRevision(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -18769,7 +19339,6 @@ var configurationConnectionImplementors = []string{"ConfigurationConnection"}
 
 func (ec *executionContext) _ConfigurationConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationConnectionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18777,9 +19346,19 @@ func (ec *executionContext) _ConfigurationConnection(ctx context.Context, sel as
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationConnection")
 		case "nodes":
-			out.Values[i] = ec._ConfigurationConnection_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationConnection_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "totalCount":
-			out.Values[i] = ec._ConfigurationConnection_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationConnection_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -18798,7 +19377,6 @@ var configurationRevisionImplementors = []string{"ConfigurationRevision", "Node"
 
 func (ec *executionContext) _ConfigurationRevision(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationRevision) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationRevisionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18806,40 +19384,76 @@ func (ec *executionContext) _ConfigurationRevision(ctx context.Context, sel ast.
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationRevision")
 		case "id":
-			out.Values[i] = ec._ConfigurationRevision_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevision_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._ConfigurationRevision_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevision_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._ConfigurationRevision_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevision_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._ConfigurationRevision_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevision_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "spec":
-			out.Values[i] = ec._ConfigurationRevision_spec(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevision_spec(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "status":
-			out.Values[i] = ec._ConfigurationRevision_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevision_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._ConfigurationRevision_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevision_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18850,6 +19464,11 @@ func (ec *executionContext) _ConfigurationRevision(ctx context.Context, sel ast.
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -18866,7 +19485,6 @@ var configurationRevisionConnectionImplementors = []string{"ConfigurationRevisio
 
 func (ec *executionContext) _ConfigurationRevisionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationRevisionConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationRevisionConnectionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18874,9 +19492,19 @@ func (ec *executionContext) _ConfigurationRevisionConnection(ctx context.Context
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationRevisionConnection")
 		case "nodes":
-			out.Values[i] = ec._ConfigurationRevisionConnection_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionConnection_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "totalCount":
-			out.Values[i] = ec._ConfigurationRevisionConnection_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionConnection_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -18895,7 +19523,6 @@ var configurationRevisionSpecImplementors = []string{"ConfigurationRevisionSpec"
 
 func (ec *executionContext) _ConfigurationRevisionSpec(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationRevisionSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationRevisionSpecImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18903,26 +19530,56 @@ func (ec *executionContext) _ConfigurationRevisionSpec(ctx context.Context, sel 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationRevisionSpec")
 		case "desiredState":
-			out.Values[i] = ec._ConfigurationRevisionSpec_desiredState(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionSpec_desiredState(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "package":
-			out.Values[i] = ec._ConfigurationRevisionSpec_package(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionSpec_package(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "packagePullPolicy":
-			out.Values[i] = ec._ConfigurationRevisionSpec_packagePullPolicy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionSpec_packagePullPolicy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "revision":
-			out.Values[i] = ec._ConfigurationRevisionSpec_revision(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionSpec_revision(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "ignoreCrossplaneConstraints":
-			out.Values[i] = ec._ConfigurationRevisionSpec_ignoreCrossplaneConstraints(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionSpec_ignoreCrossplaneConstraints(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "skipDependencyResolution":
-			out.Values[i] = ec._ConfigurationRevisionSpec_skipDependencyResolution(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionSpec_skipDependencyResolution(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18938,7 +19595,6 @@ var configurationRevisionStatusImplementors = []string{"ConfigurationRevisionSta
 
 func (ec *executionContext) _ConfigurationRevisionStatus(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationRevisionStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationRevisionStatusImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18946,18 +19602,44 @@ func (ec *executionContext) _ConfigurationRevisionStatus(ctx context.Context, se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationRevisionStatus")
 		case "conditions":
-			out.Values[i] = ec._ConfigurationRevisionStatus_conditions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionStatus_conditions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "foundDependencies":
-			out.Values[i] = ec._ConfigurationRevisionStatus_foundDependencies(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionStatus_foundDependencies(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "installedDependencies":
-			out.Values[i] = ec._ConfigurationRevisionStatus_installedDependencies(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionStatus_installedDependencies(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "invalidDependencies":
-			out.Values[i] = ec._ConfigurationRevisionStatus_invalidDependencies(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionStatus_invalidDependencies(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "permissionRequests":
-			out.Values[i] = ec._ConfigurationRevisionStatus_permissionRequests(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationRevisionStatus_permissionRequests(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "objects":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -18968,6 +19650,11 @@ func (ec *executionContext) _ConfigurationRevisionStatus(ctx context.Context, se
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -18984,7 +19671,6 @@ var configurationSpecImplementors = []string{"ConfigurationSpec"}
 
 func (ec *executionContext) _ConfigurationSpec(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationSpecImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -18992,20 +19678,50 @@ func (ec *executionContext) _ConfigurationSpec(ctx context.Context, sel ast.Sele
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationSpec")
 		case "package":
-			out.Values[i] = ec._ConfigurationSpec_package(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationSpec_package(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "revisionActivationPolicy":
-			out.Values[i] = ec._ConfigurationSpec_revisionActivationPolicy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationSpec_revisionActivationPolicy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "revisionHistoryLimit":
-			out.Values[i] = ec._ConfigurationSpec_revisionHistoryLimit(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationSpec_revisionHistoryLimit(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "packagePullPolicy":
-			out.Values[i] = ec._ConfigurationSpec_packagePullPolicy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationSpec_packagePullPolicy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "ignoreCrossplaneConstraints":
-			out.Values[i] = ec._ConfigurationSpec_ignoreCrossplaneConstraints(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationSpec_ignoreCrossplaneConstraints(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "skipDependencyResolution":
-			out.Values[i] = ec._ConfigurationSpec_skipDependencyResolution(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationSpec_skipDependencyResolution(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19021,7 +19737,6 @@ var configurationStatusImplementors = []string{"ConfigurationStatus", "Condition
 
 func (ec *executionContext) _ConfigurationStatus(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationStatusImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19029,11 +19744,26 @@ func (ec *executionContext) _ConfigurationStatus(ctx context.Context, sel ast.Se
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationStatus")
 		case "conditions":
-			out.Values[i] = ec._ConfigurationStatus_conditions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationStatus_conditions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "currentRevision":
-			out.Values[i] = ec._ConfigurationStatus_currentRevision(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationStatus_currentRevision(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "currentIdentifier":
-			out.Values[i] = ec._ConfigurationStatus_currentIdentifier(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ConfigurationStatus_currentIdentifier(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19049,7 +19779,6 @@ var createKubernetesResourcePayloadImplementors = []string{"CreateKubernetesReso
 
 func (ec *executionContext) _CreateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, obj *model.CreateKubernetesResourcePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, createKubernetesResourcePayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19057,7 +19786,12 @@ func (ec *executionContext) _CreateKubernetesResourcePayload(ctx context.Context
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CreateKubernetesResourcePayload")
 		case "resource":
-			out.Values[i] = ec._CreateKubernetesResourcePayload_resource(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CreateKubernetesResourcePayload_resource(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19073,7 +19807,6 @@ var customResourceDefinitionImplementors = []string{"CustomResourceDefinition", 
 
 func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinition) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19081,40 +19814,76 @@ func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel a
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinition")
 		case "id":
-			out.Values[i] = ec._CustomResourceDefinition_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinition_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._CustomResourceDefinition_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinition_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._CustomResourceDefinition_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinition_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._CustomResourceDefinition_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinition_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "spec":
-			out.Values[i] = ec._CustomResourceDefinition_spec(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinition_spec(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "status":
-			out.Values[i] = ec._CustomResourceDefinition_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinition_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._CustomResourceDefinition_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinition_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -19125,10 +19894,16 @@ func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel a
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "definedResources":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -19139,6 +19914,11 @@ func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel a
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -19155,7 +19935,6 @@ var customResourceDefinitionConnectionImplementors = []string{"CustomResourceDef
 
 func (ec *executionContext) _CustomResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinitionConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionConnectionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19163,9 +19942,19 @@ func (ec *executionContext) _CustomResourceDefinitionConnection(ctx context.Cont
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinitionConnection")
 		case "nodes":
-			out.Values[i] = ec._CustomResourceDefinitionConnection_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionConnection_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "totalCount":
-			out.Values[i] = ec._CustomResourceDefinitionConnection_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionConnection_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -19184,7 +19973,6 @@ var customResourceDefinitionNamesImplementors = []string{"CustomResourceDefiniti
 
 func (ec *executionContext) _CustomResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinitionNames) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionNamesImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19192,23 +19980,53 @@ func (ec *executionContext) _CustomResourceDefinitionNames(ctx context.Context, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinitionNames")
 		case "plural":
-			out.Values[i] = ec._CustomResourceDefinitionNames_plural(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionNames_plural(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "singular":
-			out.Values[i] = ec._CustomResourceDefinitionNames_singular(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionNames_singular(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "shortNames":
-			out.Values[i] = ec._CustomResourceDefinitionNames_shortNames(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionNames_shortNames(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "kind":
-			out.Values[i] = ec._CustomResourceDefinitionNames_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionNames_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "listKind":
-			out.Values[i] = ec._CustomResourceDefinitionNames_listKind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionNames_listKind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "categories":
-			out.Values[i] = ec._CustomResourceDefinitionNames_categories(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionNames_categories(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19224,7 +20042,6 @@ var customResourceDefinitionSpecImplementors = []string{"CustomResourceDefinitio
 
 func (ec *executionContext) _CustomResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinitionSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionSpecImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19232,22 +20049,42 @@ func (ec *executionContext) _CustomResourceDefinitionSpec(ctx context.Context, s
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinitionSpec")
 		case "group":
-			out.Values[i] = ec._CustomResourceDefinitionSpec_group(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionSpec_group(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "names":
-			out.Values[i] = ec._CustomResourceDefinitionSpec_names(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionSpec_names(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "scope":
-			out.Values[i] = ec._CustomResourceDefinitionSpec_scope(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionSpec_scope(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "versions":
-			out.Values[i] = ec._CustomResourceDefinitionSpec_versions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionSpec_versions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19263,7 +20100,6 @@ var customResourceDefinitionStatusImplementors = []string{"CustomResourceDefinit
 
 func (ec *executionContext) _CustomResourceDefinitionStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinitionStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionStatusImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19271,7 +20107,12 @@ func (ec *executionContext) _CustomResourceDefinitionStatus(ctx context.Context,
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinitionStatus")
 		case "conditions":
-			out.Values[i] = ec._CustomResourceDefinitionStatus_conditions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionStatus_conditions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19287,7 +20128,6 @@ var customResourceDefinitionVersionImplementors = []string{"CustomResourceDefini
 
 func (ec *executionContext) _CustomResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinitionVersion) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionVersionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19295,17 +20135,32 @@ func (ec *executionContext) _CustomResourceDefinitionVersion(ctx context.Context
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinitionVersion")
 		case "name":
-			out.Values[i] = ec._CustomResourceDefinitionVersion_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionVersion_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "served":
-			out.Values[i] = ec._CustomResourceDefinitionVersion_served(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionVersion_served(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "schema":
-			out.Values[i] = ec._CustomResourceDefinitionVersion_schema(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceDefinitionVersion_schema(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19321,7 +20176,6 @@ var customResourceValidationImplementors = []string{"CustomResourceValidation"}
 
 func (ec *executionContext) _CustomResourceValidation(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceValidation) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceValidationImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19329,7 +20183,12 @@ func (ec *executionContext) _CustomResourceValidation(ctx context.Context, sel a
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceValidation")
 		case "openAPIV3Schema":
-			out.Values[i] = ec._CustomResourceValidation_openAPIV3Schema(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._CustomResourceValidation_openAPIV3Schema(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19345,7 +20204,6 @@ var deleteKubernetesResourcePayloadImplementors = []string{"DeleteKubernetesReso
 
 func (ec *executionContext) _DeleteKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteKubernetesResourcePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteKubernetesResourcePayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19353,7 +20211,12 @@ func (ec *executionContext) _DeleteKubernetesResourcePayload(ctx context.Context
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteKubernetesResourcePayload")
 		case "resource":
-			out.Values[i] = ec._DeleteKubernetesResourcePayload_resource(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._DeleteKubernetesResourcePayload_resource(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19369,7 +20232,6 @@ var eventImplementors = []string{"Event", "Node"}
 
 func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, obj *model.Event) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19377,28 +20239,49 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Event")
 		case "id":
-			out.Values[i] = ec._Event_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._Event_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._Event_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._Event_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "involvedObject":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -19409,23 +20292,68 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "type":
-			out.Values[i] = ec._Event_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "reason":
-			out.Values[i] = ec._Event_reason(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_reason(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "message":
-			out.Values[i] = ec._Event_message(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_message(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "source":
-			out.Values[i] = ec._Event_source(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_source(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "count":
-			out.Values[i] = ec._Event_count(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_count(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "firstTime":
-			out.Values[i] = ec._Event_firstTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_firstTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "lastTime":
-			out.Values[i] = ec._Event_lastTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_lastTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._Event_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Event_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -19444,7 +20372,6 @@ var eventConnectionImplementors = []string{"EventConnection"}
 
 func (ec *executionContext) _EventConnection(ctx context.Context, sel ast.SelectionSet, obj *model.EventConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventConnectionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19452,9 +20379,19 @@ func (ec *executionContext) _EventConnection(ctx context.Context, sel ast.Select
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventConnection")
 		case "nodes":
-			out.Values[i] = ec._EventConnection_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventConnection_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "totalCount":
-			out.Values[i] = ec._EventConnection_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventConnection_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -19473,7 +20410,6 @@ var eventSourceImplementors = []string{"EventSource"}
 
 func (ec *executionContext) _EventSource(ctx context.Context, sel ast.SelectionSet, obj *model.EventSource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventSourceImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19481,7 +20417,12 @@ func (ec *executionContext) _EventSource(ctx context.Context, sel ast.SelectionS
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventSource")
 		case "component":
-			out.Values[i] = ec._EventSource_component(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._EventSource_component(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19497,7 +20438,6 @@ var genericResourceImplementors = []string{"GenericResource", "Node", "Kubernete
 
 func (ec *executionContext) _GenericResource(ctx context.Context, sel ast.SelectionSet, obj *model.GenericResource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, genericResourceImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19505,33 +20445,59 @@ func (ec *executionContext) _GenericResource(ctx context.Context, sel ast.Select
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("GenericResource")
 		case "id":
-			out.Values[i] = ec._GenericResource_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._GenericResource_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._GenericResource_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._GenericResource_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._GenericResource_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._GenericResource_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._GenericResource_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._GenericResource_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "unstructured":
-			out.Values[i] = ec._GenericResource_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._GenericResource_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -19542,6 +20508,11 @@ func (ec *executionContext) _GenericResource(ctx context.Context, sel ast.Select
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -19558,7 +20529,6 @@ var kubernetesResourceConnectionImplementors = []string{"KubernetesResourceConne
 
 func (ec *executionContext) _KubernetesResourceConnection(ctx context.Context, sel ast.SelectionSet, obj *model.KubernetesResourceConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, kubernetesResourceConnectionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19566,9 +20536,19 @@ func (ec *executionContext) _KubernetesResourceConnection(ctx context.Context, s
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("KubernetesResourceConnection")
 		case "nodes":
-			out.Values[i] = ec._KubernetesResourceConnection_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._KubernetesResourceConnection_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "totalCount":
-			out.Values[i] = ec._KubernetesResourceConnection_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._KubernetesResourceConnection_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -19587,7 +20567,6 @@ var labelSelectorImplementors = []string{"LabelSelector"}
 
 func (ec *executionContext) _LabelSelector(ctx context.Context, sel ast.SelectionSet, obj *model.LabelSelector) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, labelSelectorImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19595,7 +20574,12 @@ func (ec *executionContext) _LabelSelector(ctx context.Context, sel ast.Selectio
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("LabelSelector")
 		case "matchLabels":
-			out.Values[i] = ec._LabelSelector_matchLabels(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._LabelSelector_matchLabels(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19611,7 +20595,6 @@ var managedResourceImplementors = []string{"ManagedResource", "Node", "Kubernete
 
 func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.SelectionSet, obj *model.ManagedResource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, managedResourceImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19619,40 +20602,76 @@ func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.Select
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ManagedResource")
 		case "id":
-			out.Values[i] = ec._ManagedResource_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ManagedResource_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._ManagedResource_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ManagedResource_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._ManagedResource_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ManagedResource_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._ManagedResource_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ManagedResource_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "spec":
-			out.Values[i] = ec._ManagedResource_spec(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ManagedResource_spec(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "status":
-			out.Values[i] = ec._ManagedResource_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ManagedResource_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._ManagedResource_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ManagedResource_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -19663,10 +20682,16 @@ func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.Select
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "definition":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -19674,6 +20699,11 @@ func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.Select
 				}()
 				res = ec._ManagedResource_definition(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -19690,7 +20720,6 @@ var managedResourceSpecImplementors = []string{"ManagedResourceSpec"}
 
 func (ec *executionContext) _ManagedResourceSpec(ctx context.Context, sel ast.SelectionSet, obj *model.ManagedResourceSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, managedResourceSpecImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19699,7 +20728,8 @@ func (ec *executionContext) _ManagedResourceSpec(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("ManagedResourceSpec")
 		case "connectionSecret":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -19707,11 +20737,26 @@ func (ec *executionContext) _ManagedResourceSpec(ctx context.Context, sel ast.Se
 				}()
 				res = ec._ManagedResourceSpec_connectionSecret(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "providerConfigRef":
-			out.Values[i] = ec._ManagedResourceSpec_providerConfigRef(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ManagedResourceSpec_providerConfigRef(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "deletionPolicy":
-			out.Values[i] = ec._ManagedResourceSpec_deletionPolicy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ManagedResourceSpec_deletionPolicy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19727,7 +20772,6 @@ var managedResourceStatusImplementors = []string{"ManagedResourceStatus", "Condi
 
 func (ec *executionContext) _ManagedResourceStatus(ctx context.Context, sel ast.SelectionSet, obj *model.ManagedResourceStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, managedResourceStatusImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19735,7 +20779,12 @@ func (ec *executionContext) _ManagedResourceStatus(ctx context.Context, sel ast.
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ManagedResourceStatus")
 		case "conditions":
-			out.Values[i] = ec._ManagedResourceStatus_conditions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ManagedResourceStatus_conditions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19751,7 +20800,6 @@ var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, mutationImplementors)
-
 	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
 		Object: "Mutation",
 	})
@@ -19759,21 +20807,41 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
+		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+			Object: field.Name,
+			Field:  field,
+		})
+
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "createKubernetesResource":
-			out.Values[i] = ec._Mutation_createKubernetesResource(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createKubernetesResource(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "updateKubernetesResource":
-			out.Values[i] = ec._Mutation_updateKubernetesResource(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateKubernetesResource(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "deleteKubernetesResource":
-			out.Values[i] = ec._Mutation_deleteKubernetesResource(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteKubernetesResource(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -19792,7 +20860,6 @@ var objectMetaImplementors = []string{"ObjectMeta"}
 
 func (ec *executionContext) _ObjectMeta(ctx context.Context, sel ast.SelectionSet, obj *model.ObjectMeta) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, objectMetaImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19800,43 +20867,94 @@ func (ec *executionContext) _ObjectMeta(ctx context.Context, sel ast.SelectionSe
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ObjectMeta")
 		case "name":
-			out.Values[i] = ec._ObjectMeta_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ObjectMeta_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "generateName":
-			out.Values[i] = ec._ObjectMeta_generateName(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ObjectMeta_generateName(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "namespace":
-			out.Values[i] = ec._ObjectMeta_namespace(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ObjectMeta_namespace(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "uid":
-			out.Values[i] = ec._ObjectMeta_uid(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ObjectMeta_uid(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "resourceVersion":
-			out.Values[i] = ec._ObjectMeta_resourceVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ObjectMeta_resourceVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "generation":
-			out.Values[i] = ec._ObjectMeta_generation(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ObjectMeta_generation(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "creationTime":
-			out.Values[i] = ec._ObjectMeta_creationTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ObjectMeta_creationTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "deletionTime":
-			out.Values[i] = ec._ObjectMeta_deletionTime(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ObjectMeta_deletionTime(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "labels":
-			out.Values[i] = ec._ObjectMeta_labels(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ObjectMeta_labels(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "annotations":
-			out.Values[i] = ec._ObjectMeta_annotations(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ObjectMeta_annotations(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "owners":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -19847,10 +20965,16 @@ func (ec *executionContext) _ObjectMeta(ctx context.Context, sel ast.SelectionSe
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "controller":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -19858,6 +20982,11 @@ func (ec *executionContext) _ObjectMeta(ctx context.Context, sel ast.SelectionSe
 				}()
 				res = ec._ObjectMeta_controller(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -19874,7 +21003,6 @@ var ownerImplementors = []string{"Owner"}
 
 func (ec *executionContext) _Owner(ctx context.Context, sel ast.SelectionSet, obj *model.Owner) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, ownerImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19882,12 +21010,22 @@ func (ec *executionContext) _Owner(ctx context.Context, sel ast.SelectionSet, ob
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Owner")
 		case "resource":
-			out.Values[i] = ec._Owner_resource(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Owner_resource(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "controller":
-			out.Values[i] = ec._Owner_controller(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Owner_controller(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19903,7 +21041,6 @@ var ownerConnectionImplementors = []string{"OwnerConnection"}
 
 func (ec *executionContext) _OwnerConnection(ctx context.Context, sel ast.SelectionSet, obj *model.OwnerConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, ownerConnectionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19911,9 +21048,19 @@ func (ec *executionContext) _OwnerConnection(ctx context.Context, sel ast.Select
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("OwnerConnection")
 		case "nodes":
-			out.Values[i] = ec._OwnerConnection_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OwnerConnection_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "totalCount":
-			out.Values[i] = ec._OwnerConnection_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._OwnerConnection_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -19932,7 +21079,6 @@ var policyRuleImplementors = []string{"PolicyRule"}
 
 func (ec *executionContext) _PolicyRule(ctx context.Context, sel ast.SelectionSet, obj *model.PolicyRule) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, policyRuleImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19940,18 +21086,43 @@ func (ec *executionContext) _PolicyRule(ctx context.Context, sel ast.SelectionSe
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PolicyRule")
 		case "verbs":
-			out.Values[i] = ec._PolicyRule_verbs(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PolicyRule_verbs(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "apiGroups":
-			out.Values[i] = ec._PolicyRule_apiGroups(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PolicyRule_apiGroups(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "resources":
-			out.Values[i] = ec._PolicyRule_resources(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PolicyRule_resources(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "resourceNames":
-			out.Values[i] = ec._PolicyRule_resourceNames(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PolicyRule_resourceNames(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "nonResourceURLs":
-			out.Values[i] = ec._PolicyRule_nonResourceURLs(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PolicyRule_nonResourceURLs(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19967,7 +21138,6 @@ var providerImplementors = []string{"Provider", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet, obj *model.Provider) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -19975,40 +21145,76 @@ func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet,
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Provider")
 		case "id":
-			out.Values[i] = ec._Provider_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Provider_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._Provider_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Provider_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._Provider_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Provider_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._Provider_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Provider_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "spec":
-			out.Values[i] = ec._Provider_spec(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Provider_spec(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "status":
-			out.Values[i] = ec._Provider_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Provider_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._Provider_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Provider_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20019,10 +21225,16 @@ func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet,
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "revisions":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20033,10 +21245,16 @@ func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet,
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "activeRevision":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20044,6 +21262,11 @@ func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet,
 				}()
 				res = ec._Provider_activeRevision(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -20060,7 +21283,6 @@ var providerConfigImplementors = []string{"ProviderConfig", "Node", "KubernetesR
 
 func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConfig) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerConfigImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20068,35 +21290,66 @@ func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.Selecti
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderConfig")
 		case "id":
-			out.Values[i] = ec._ProviderConfig_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderConfig_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._ProviderConfig_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderConfig_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._ProviderConfig_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderConfig_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._ProviderConfig_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderConfig_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "status":
-			out.Values[i] = ec._ProviderConfig_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderConfig_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._ProviderConfig_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderConfig_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20107,10 +21360,16 @@ func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.Selecti
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		case "definition":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20118,6 +21377,11 @@ func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.Selecti
 				}()
 				res = ec._ProviderConfig_definition(ctx, field, obj)
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -20134,7 +21398,6 @@ var providerConfigReferenceImplementors = []string{"ProviderConfigReference"}
 
 func (ec *executionContext) _ProviderConfigReference(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConfigReference) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerConfigReferenceImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20142,7 +21405,12 @@ func (ec *executionContext) _ProviderConfigReference(ctx context.Context, sel as
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderConfigReference")
 		case "name":
-			out.Values[i] = ec._ProviderConfigReference_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderConfigReference_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -20161,7 +21429,6 @@ var providerConfigStatusImplementors = []string{"ProviderConfigStatus", "Conditi
 
 func (ec *executionContext) _ProviderConfigStatus(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConfigStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerConfigStatusImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20169,9 +21436,19 @@ func (ec *executionContext) _ProviderConfigStatus(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderConfigStatus")
 		case "conditions":
-			out.Values[i] = ec._ProviderConfigStatus_conditions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderConfigStatus_conditions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "users":
-			out.Values[i] = ec._ProviderConfigStatus_users(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderConfigStatus_users(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20187,7 +21464,6 @@ var providerConnectionImplementors = []string{"ProviderConnection"}
 
 func (ec *executionContext) _ProviderConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerConnectionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20195,9 +21471,19 @@ func (ec *executionContext) _ProviderConnection(ctx context.Context, sel ast.Sel
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderConnection")
 		case "nodes":
-			out.Values[i] = ec._ProviderConnection_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderConnection_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "totalCount":
-			out.Values[i] = ec._ProviderConnection_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderConnection_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -20216,7 +21502,6 @@ var providerRevisionImplementors = []string{"ProviderRevision", "Node", "Kuberne
 
 func (ec *executionContext) _ProviderRevision(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderRevision) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerRevisionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20224,40 +21509,76 @@ func (ec *executionContext) _ProviderRevision(ctx context.Context, sel ast.Selec
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderRevision")
 		case "id":
-			out.Values[i] = ec._ProviderRevision_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevision_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._ProviderRevision_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevision_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._ProviderRevision_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevision_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._ProviderRevision_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevision_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "spec":
-			out.Values[i] = ec._ProviderRevision_spec(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevision_spec(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "status":
-			out.Values[i] = ec._ProviderRevision_status(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevision_status(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._ProviderRevision_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevision_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20268,6 +21589,11 @@ func (ec *executionContext) _ProviderRevision(ctx context.Context, sel ast.Selec
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -20284,7 +21610,6 @@ var providerRevisionConnectionImplementors = []string{"ProviderRevisionConnectio
 
 func (ec *executionContext) _ProviderRevisionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderRevisionConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerRevisionConnectionImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20292,9 +21617,19 @@ func (ec *executionContext) _ProviderRevisionConnection(ctx context.Context, sel
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderRevisionConnection")
 		case "nodes":
-			out.Values[i] = ec._ProviderRevisionConnection_nodes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionConnection_nodes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "totalCount":
-			out.Values[i] = ec._ProviderRevisionConnection_totalCount(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionConnection_totalCount(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -20313,7 +21648,6 @@ var providerRevisionSpecImplementors = []string{"ProviderRevisionSpec"}
 
 func (ec *executionContext) _ProviderRevisionSpec(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderRevisionSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerRevisionSpecImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20321,26 +21655,56 @@ func (ec *executionContext) _ProviderRevisionSpec(ctx context.Context, sel ast.S
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderRevisionSpec")
 		case "desiredState":
-			out.Values[i] = ec._ProviderRevisionSpec_desiredState(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionSpec_desiredState(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "package":
-			out.Values[i] = ec._ProviderRevisionSpec_package(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionSpec_package(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "packagePullPolicy":
-			out.Values[i] = ec._ProviderRevisionSpec_packagePullPolicy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionSpec_packagePullPolicy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "revision":
-			out.Values[i] = ec._ProviderRevisionSpec_revision(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionSpec_revision(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "ignoreCrossplaneConstraints":
-			out.Values[i] = ec._ProviderRevisionSpec_ignoreCrossplaneConstraints(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionSpec_ignoreCrossplaneConstraints(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "skipDependencyResolution":
-			out.Values[i] = ec._ProviderRevisionSpec_skipDependencyResolution(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionSpec_skipDependencyResolution(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20356,7 +21720,6 @@ var providerRevisionStatusImplementors = []string{"ProviderRevisionStatus", "Con
 
 func (ec *executionContext) _ProviderRevisionStatus(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderRevisionStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerRevisionStatusImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20364,18 +21727,44 @@ func (ec *executionContext) _ProviderRevisionStatus(ctx context.Context, sel ast
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderRevisionStatus")
 		case "conditions":
-			out.Values[i] = ec._ProviderRevisionStatus_conditions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionStatus_conditions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "foundDependencies":
-			out.Values[i] = ec._ProviderRevisionStatus_foundDependencies(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionStatus_foundDependencies(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "installedDependencies":
-			out.Values[i] = ec._ProviderRevisionStatus_installedDependencies(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionStatus_installedDependencies(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "invalidDependencies":
-			out.Values[i] = ec._ProviderRevisionStatus_invalidDependencies(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionStatus_invalidDependencies(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "permissionRequests":
-			out.Values[i] = ec._ProviderRevisionStatus_permissionRequests(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderRevisionStatus_permissionRequests(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "objects":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20386,6 +21775,11 @@ func (ec *executionContext) _ProviderRevisionStatus(ctx context.Context, sel ast
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -20402,7 +21796,6 @@ var providerSpecImplementors = []string{"ProviderSpec"}
 
 func (ec *executionContext) _ProviderSpec(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerSpecImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20410,20 +21803,50 @@ func (ec *executionContext) _ProviderSpec(ctx context.Context, sel ast.Selection
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderSpec")
 		case "package":
-			out.Values[i] = ec._ProviderSpec_package(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderSpec_package(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "revisionActivationPolicy":
-			out.Values[i] = ec._ProviderSpec_revisionActivationPolicy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderSpec_revisionActivationPolicy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "revisionHistoryLimit":
-			out.Values[i] = ec._ProviderSpec_revisionHistoryLimit(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderSpec_revisionHistoryLimit(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "packagePullPolicy":
-			out.Values[i] = ec._ProviderSpec_packagePullPolicy(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderSpec_packagePullPolicy(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "ignoreCrossplaneConstraints":
-			out.Values[i] = ec._ProviderSpec_ignoreCrossplaneConstraints(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderSpec_ignoreCrossplaneConstraints(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "skipDependencyResolution":
-			out.Values[i] = ec._ProviderSpec_skipDependencyResolution(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderSpec_skipDependencyResolution(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20439,7 +21862,6 @@ var providerStatusImplementors = []string{"ProviderStatus", "ConditionedStatus"}
 
 func (ec *executionContext) _ProviderStatus(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerStatusImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20447,11 +21869,26 @@ func (ec *executionContext) _ProviderStatus(ctx context.Context, sel ast.Selecti
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderStatus")
 		case "conditions":
-			out.Values[i] = ec._ProviderStatus_conditions(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderStatus_conditions(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "currentRevision":
-			out.Values[i] = ec._ProviderStatus_currentRevision(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderStatus_currentRevision(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "currentIdentifier":
-			out.Values[i] = ec._ProviderStatus_currentIdentifier(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProviderStatus_currentIdentifier(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20467,7 +21904,6 @@ var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, queryImplementors)
-
 	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
 		Object: "Query",
 	})
@@ -20475,12 +21911,18 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
+		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
+			Object: field.Name,
+			Field:  field,
+		})
+
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
 		case "kubernetesResource":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20488,10 +21930,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_kubernetesResource(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "kubernetesResources":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20502,10 +21953,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20516,10 +21976,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "secret":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20527,10 +21996,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_secret(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "configMap":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20538,10 +22016,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_configMap(ctx, field)
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "providers":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20552,10 +22039,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "providerRevisions":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20566,10 +22062,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "customResourceDefinitions":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20580,10 +22085,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "configurations":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20594,10 +22108,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "configurationRevisions":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20608,10 +22131,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "compositeResourceDefinitions":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20622,10 +22154,19 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "compositions":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20636,11 +22177,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
 			})
 		case "__type":
-			out.Values[i] = ec._Query___type(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Query___type(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		case "__schema":
-			out.Values[i] = ec._Query___schema(ctx, field)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Query___schema(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20656,7 +22215,6 @@ var secretImplementors = []string{"Secret", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, obj *model.Secret) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, secretImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20664,37 +22222,73 @@ func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, o
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Secret")
 		case "id":
-			out.Values[i] = ec._Secret_id(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Secret_id(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "apiVersion":
-			out.Values[i] = ec._Secret_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Secret_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "kind":
-			out.Values[i] = ec._Secret_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Secret_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "metadata":
-			out.Values[i] = ec._Secret_metadata(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Secret_metadata(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "type":
-			out.Values[i] = ec._Secret_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Secret_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "data":
-			out.Values[i] = ec._Secret_data(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Secret_data(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "unstructured":
-			out.Values[i] = ec._Secret_unstructured(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Secret_unstructured(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "events":
 			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -20705,6 +22299,11 @@ func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, o
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
 			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -20721,7 +22320,6 @@ var typeReferenceImplementors = []string{"TypeReference"}
 
 func (ec *executionContext) _TypeReference(ctx context.Context, sel ast.SelectionSet, obj *model.TypeReference) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, typeReferenceImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20729,12 +22327,22 @@ func (ec *executionContext) _TypeReference(ctx context.Context, sel ast.Selectio
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TypeReference")
 		case "apiVersion":
-			out.Values[i] = ec._TypeReference_apiVersion(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TypeReference_apiVersion(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "kind":
-			out.Values[i] = ec._TypeReference_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._TypeReference_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -20753,7 +22361,6 @@ var updateKubernetesResourcePayloadImplementors = []string{"UpdateKubernetesReso
 
 func (ec *executionContext) _UpdateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateKubernetesResourcePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateKubernetesResourcePayloadImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20761,7 +22368,12 @@ func (ec *executionContext) _UpdateKubernetesResourcePayload(ctx context.Context
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateKubernetesResourcePayload")
 		case "resource":
-			out.Values[i] = ec._UpdateKubernetesResourcePayload_resource(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._UpdateKubernetesResourcePayload_resource(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20777,7 +22389,6 @@ var __DirectiveImplementors = []string{"__Directive"}
 
 func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionSet, obj *introspection.Directive) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __DirectiveImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20785,19 +22396,49 @@ func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionS
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Directive")
 		case "name":
-			out.Values[i] = ec.___Directive_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec.___Directive_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "locations":
-			out.Values[i] = ec.___Directive_locations(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_locations(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "args":
-			out.Values[i] = ec.___Directive_args(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_args(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isRepeatable":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Directive_isRepeatable(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -20816,7 +22457,6 @@ var __EnumValueImplementors = []string{"__EnumValue"}
 
 func (ec *executionContext) ___EnumValue(ctx context.Context, sel ast.SelectionSet, obj *introspection.EnumValue) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __EnumValueImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20824,19 +22464,39 @@ func (ec *executionContext) ___EnumValue(ctx context.Context, sel ast.SelectionS
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__EnumValue")
 		case "name":
-			out.Values[i] = ec.___EnumValue_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___EnumValue_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec.___EnumValue_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___EnumValue_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "isDeprecated":
-			out.Values[i] = ec.___EnumValue_isDeprecated(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___EnumValue_isDeprecated(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "deprecationReason":
-			out.Values[i] = ec.___EnumValue_deprecationReason(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___EnumValue_deprecationReason(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20852,7 +22512,6 @@ var __FieldImplementors = []string{"__Field"}
 
 func (ec *executionContext) ___Field(ctx context.Context, sel ast.SelectionSet, obj *introspection.Field) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __FieldImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20860,29 +22519,59 @@ func (ec *executionContext) ___Field(ctx context.Context, sel ast.SelectionSet, 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Field")
 		case "name":
-			out.Values[i] = ec.___Field_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec.___Field_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "args":
-			out.Values[i] = ec.___Field_args(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_args(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "type":
-			out.Values[i] = ec.___Field_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "isDeprecated":
-			out.Values[i] = ec.___Field_isDeprecated(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_isDeprecated(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "deprecationReason":
-			out.Values[i] = ec.___Field_deprecationReason(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Field_deprecationReason(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20898,7 +22587,6 @@ var __InputValueImplementors = []string{"__InputValue"}
 
 func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.SelectionSet, obj *introspection.InputValue) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __InputValueImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20906,19 +22594,39 @@ func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.Selection
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__InputValue")
 		case "name":
-			out.Values[i] = ec.___InputValue_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___InputValue_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "description":
-			out.Values[i] = ec.___InputValue_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___InputValue_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "type":
-			out.Values[i] = ec.___InputValue_type(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___InputValue_type(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "defaultValue":
-			out.Values[i] = ec.___InputValue_defaultValue(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___InputValue_defaultValue(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -20934,7 +22642,6 @@ var __SchemaImplementors = []string{"__Schema"}
 
 func (ec *executionContext) ___Schema(ctx context.Context, sel ast.SelectionSet, obj *introspection.Schema) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __SchemaImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20942,21 +22649,46 @@ func (ec *executionContext) ___Schema(ctx context.Context, sel ast.SelectionSet,
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Schema")
 		case "types":
-			out.Values[i] = ec.___Schema_types(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_types(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "queryType":
-			out.Values[i] = ec.___Schema_queryType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_queryType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "mutationType":
-			out.Values[i] = ec.___Schema_mutationType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_mutationType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "subscriptionType":
-			out.Values[i] = ec.___Schema_subscriptionType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_subscriptionType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "directives":
-			out.Values[i] = ec.___Schema_directives(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Schema_directives(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -20975,7 +22707,6 @@ var __TypeImplementors = []string{"__Type"}
 
 func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, obj *introspection.Type) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __TypeImplementors)
-
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
@@ -20983,26 +22714,71 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Type")
 		case "kind":
-			out.Values[i] = ec.___Type_kind(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_kind(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "name":
-			out.Values[i] = ec.___Type_name(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_name(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "description":
-			out.Values[i] = ec.___Type_description(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_description(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "fields":
-			out.Values[i] = ec.___Type_fields(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_fields(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "interfaces":
-			out.Values[i] = ec.___Type_interfaces(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_interfaces(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "possibleTypes":
-			out.Values[i] = ec.___Type_possibleTypes(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_possibleTypes(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "enumValues":
-			out.Values[i] = ec.___Type_enumValues(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_enumValues(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "inputFields":
-			out.Values[i] = ec.___Type_inputFields(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_inputFields(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		case "ofType":
-			out.Values[i] = ec.___Type_ofType(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec.___Type_ofType(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -21557,6 +23333,12 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
 	}
 
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -21642,6 +23424,13 @@ func (ec *executionContext) marshalN__Directive2ᚕgithubᚗcomᚋ99designsᚋgq
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -21715,6 +23504,13 @@ func (ec *executionContext) marshalN__DirectiveLocation2ᚕstringᚄ(ctx context
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -21764,6 +23560,13 @@ func (ec *executionContext) marshalN__InputValue2ᚕgithubᚗcomᚋ99designsᚋg
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -21805,6 +23608,13 @@ func (ec *executionContext) marshalN__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgen�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -21839,7 +23649,8 @@ func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interf
 }
 
 func (ec *executionContext) marshalOBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
-	return graphql.MarshalBoolean(v)
+	res := graphql.MarshalBoolean(v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOBoolean2ᚖbool(ctx context.Context, v interface{}) (*bool, error) {
@@ -21854,7 +23665,8 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalBoolean(*v)
+	res := graphql.MarshalBoolean(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOCompositeResource2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CompositeResource) graphql.Marshaler {
@@ -21894,6 +23706,13 @@ func (ec *executionContext) marshalOCompositeResource2ᚕgithubᚗcomᚋupbound�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -21941,6 +23760,13 @@ func (ec *executionContext) marshalOCompositeResourceClaim2ᚕgithubᚗcomᚋupb
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22009,6 +23835,13 @@ func (ec *executionContext) marshalOCompositeResourceDefinition2ᚕgithubᚗcom�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22077,6 +23910,13 @@ func (ec *executionContext) marshalOCompositeResourceDefinitionVersion2ᚕgithub
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22131,6 +23971,13 @@ func (ec *executionContext) marshalOComposition2ᚕgithubᚗcomᚋupboundᚋxgql
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22185,6 +24032,13 @@ func (ec *executionContext) marshalOCondition2ᚕgithubᚗcomᚋupboundᚋxgql�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22232,6 +24086,13 @@ func (ec *executionContext) marshalOConfiguration2ᚕgithubᚗcomᚋupboundᚋxg
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22272,6 +24133,13 @@ func (ec *executionContext) marshalOConfigurationRevision2ᚕgithubᚗcomᚋupbo
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22333,6 +24201,13 @@ func (ec *executionContext) marshalOCustomResourceDefinition2ᚕgithubᚗcomᚋu
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22380,6 +24255,13 @@ func (ec *executionContext) marshalOCustomResourceDefinitionVersion2ᚕgithubᚗ
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22443,6 +24325,13 @@ func (ec *executionContext) marshalOEvent2ᚕgithubᚗcomᚋupboundᚋxgqlᚋint
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22497,7 +24386,8 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalInt(*v)
+	res := graphql.MarshalInt(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOJSON2ᚕbyte(ctx context.Context, v interface{}) ([]byte, error) {
@@ -22512,7 +24402,8 @@ func (ec *executionContext) marshalOJSON2ᚕbyte(ctx context.Context, sel ast.Se
 	if v == nil {
 		return graphql.Null
 	}
-	return model.MarshalJSON(v)
+	res := model.MarshalJSON(v)
+	return res
 }
 
 func (ec *executionContext) marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx context.Context, sel ast.SelectionSet, v model.KubernetesResource) graphql.Marshaler {
@@ -22559,6 +24450,13 @@ func (ec *executionContext) marshalOKubernetesResource2ᚕgithubᚗcomᚋupbound
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22627,6 +24525,13 @@ func (ec *executionContext) marshalOOwner2ᚕgithubᚗcomᚋupboundᚋxgqlᚋint
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22707,6 +24612,13 @@ func (ec *executionContext) marshalOPolicyRule2ᚕgithubᚗcomᚋupboundᚋxgql�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22747,6 +24659,13 @@ func (ec *executionContext) marshalOProvider2ᚕgithubᚗcomᚋupboundᚋxgqlᚋ
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22808,6 +24727,13 @@ func (ec *executionContext) marshalOProviderRevision2ᚕgithubᚗcomᚋupbound�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22861,7 +24787,8 @@ func (ec *executionContext) unmarshalOString2string(ctx context.Context, v inter
 }
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	return graphql.MarshalString(v)
+	res := graphql.MarshalString(v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
@@ -22897,6 +24824,12 @@ func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel
 		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
 	}
 
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -22912,7 +24845,8 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalString(*v)
+	res := graphql.MarshalString(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOStringMap2map(ctx context.Context, v interface{}) (map[string]string, error) {
@@ -22927,7 +24861,8 @@ func (ec *executionContext) marshalOStringMap2map(ctx context.Context, sel ast.S
 	if v == nil {
 		return graphql.Null
 	}
-	return model.MarshalStringMap(v)
+	res := model.MarshalStringMap(v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
@@ -22942,7 +24877,8 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 	if v == nil {
 		return graphql.Null
 	}
-	return graphql.MarshalTime(*v)
+	res := graphql.MarshalTime(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOTypeReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx context.Context, sel ast.SelectionSet, v *model.TypeReference) graphql.Marshaler {
@@ -22989,6 +24925,13 @@ func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgq
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -23029,6 +24972,13 @@ func (ec *executionContext) marshalO__Field2ᚕgithubᚗcomᚋ99designsᚋgqlgen
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -23069,6 +25019,13 @@ func (ec *executionContext) marshalO__InputValue2ᚕgithubᚗcomᚋ99designsᚋg
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -23116,6 +25073,13 @@ func (ec *executionContext) marshalO__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgen�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
