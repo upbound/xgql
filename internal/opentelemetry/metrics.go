@@ -21,7 +21,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/global"
-	"go.opentelemetry.io/otel/unit"
+	"go.opentelemetry.io/otel/metric/unit"
 )
 
 // A MetricEmitter that exports OpenTelemetry metrics.
@@ -46,7 +46,7 @@ var (
 		metric.WithDescription("Total number of requests completed"),
 		metric.WithUnit(unit.Dimensionless))
 
-	reqDuration = metric.Must(meter).NewInt64ValueRecorder("request.duration.ms",
+	reqDuration = metric.Must(meter).NewInt64Histogram("request.duration.ms",
 		metric.WithDescription("The time taken to complete a request"),
 		metric.WithUnit(unit.Milliseconds))
 
@@ -58,7 +58,7 @@ var (
 		metric.WithDescription("Total number of resolvers completed"),
 		metric.WithUnit(unit.Dimensionless))
 
-	resDuration = metric.Must(meter).NewInt64ValueRecorder("resolver.duration.ms",
+	resDuration = metric.Must(meter).NewInt64Histogram("resolver.duration.ms",
 		metric.WithDescription("The time taken to resolve a field"),
 		metric.WithUnit(unit.Milliseconds))
 )
