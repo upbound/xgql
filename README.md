@@ -2,6 +2,8 @@
 
 A GraphQL API for [Crossplane].
 
+![A screenshot of an xgql query in the GraphQL Playground](/images/playground.png)
+
 Crossplane is built atop the Kubernetes API, and makes heavy use of types that
 may added and removed at runtime; for example installing a `Provider` adds many
 new types of managed resource. A typical GraphQL query like "get me all the
