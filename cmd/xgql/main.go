@@ -210,10 +210,11 @@ func main() {
 	}
 
 	h := http.Server{
-		Handler:      rt,
-		WriteTimeout: 10 * time.Second,
-		ReadTimeout:  5 * time.Second,
-		ErrorLog:     stdlog.New(ioutil.Discard, "", 0),
+		Handler:           rt,
+		WriteTimeout:      10 * time.Second,
+		ReadTimeout:       5 * time.Second,
+		ReadHeaderTimeout: 5 * time.Second,
+		ErrorLog:          stdlog.New(ioutil.Discard, "", 0),
 	}
 
 	if *tlsCert != "" && *tlsKey != "" {
