@@ -19,7 +19,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/kjk/smaz"
+	"github.com/epk/smaz"
 	"github.com/pkg/errors"
 )
 
