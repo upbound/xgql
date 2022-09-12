@@ -25,7 +25,9 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	corev1 "k8s.io/api/core/v1"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -190,6 +192,7 @@ func TestCompositeResourceDefinition(t *testing.T) {
 
 func TestCompositeResourceSpecComposition(t *testing.T) {
 	errBoom := errors.New("boom")
+	errNotFound := apierrors.NewNotFound(schema.GroupResource{}, "somename")
 
 	gcmp := model.GetComposition(&extv1.Composition{})
 
@@ -253,6 +256,23 @@ func TestCompositeResourceSpecComposition(t *testing.T) {
 				},
 			},
 		},
+		"GetCompositionNotFound": {
+			reason: "If the composition is not found we return nil",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(errNotFound),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceSpec{
+					CompositionReference: &corev1.ObjectReference{},
+				},
+			},
+			want: want{
+				cmp: nil,
+			},
+		},
 		"Success": {
 			reason: "If we can get and model the composition we should return it.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
@@ -296,6 +316,7 @@ func TestCompositeResourceSpecComposition(t *testing.T) {
 
 func TestCompositeResourceSpecClaim(t *testing.T) {
 	errBoom := errors.New("boom")
+	errNotFound := apierrors.NewNotFound(schema.GroupResource{}, "somename")
 
 	gxrc := model.GetCompositeResourceClaim(&unstructured.Unstructured{})
 
@@ -357,6 +378,23 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 				errs: gqlerror.List{
 					gqlerror.Errorf(errors.Wrap(errBoom, errGetXRC).Error()),
 				},
+			},
+		},
+		"GetClaimNotFound": {
+			reason: "If the claim is not found we return nil",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(errNotFound),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceSpec{
+					ClaimReference: &corev1.ObjectReference{},
+				},
+			},
+			want: want{
+				xrc: nil,
 			},
 		},
 		"Success": {
@@ -523,6 +561,7 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 
 func TestCompositeResourceSpecConnectionSecret(t *testing.T) {
 	errBoom := errors.New("boom")
+	errNotFound := apierrors.NewNotFound(schema.GroupResource{}, "somename")
 
 	gsec := model.GetSecret(&corev1.Secret{})
 
@@ -584,6 +623,23 @@ func TestCompositeResourceSpecConnectionSecret(t *testing.T) {
 				errs: gqlerror.List{
 					gqlerror.Errorf(errors.Wrap(errBoom, errGetSecret).Error()),
 				},
+			},
+		},
+		"GetSecretNotFound": {
+			reason: "If the secret is not found we return nil",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(errNotFound),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceSpec{
+					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+				},
+			},
+			want: want{
+				sec: nil,
 			},
 		},
 		"Success": {
@@ -779,6 +835,7 @@ func TestCompositeResourceClaimDefinition(t *testing.T) {
 
 func TestCompositeResourceClaimSpecComposition(t *testing.T) {
 	errBoom := errors.New("boom")
+	errNotFound := apierrors.NewNotFound(schema.GroupResource{}, "somename")
 
 	gcmp := model.GetComposition(&extv1.Composition{})
 
@@ -842,6 +899,23 @@ func TestCompositeResourceClaimSpecComposition(t *testing.T) {
 				},
 			},
 		},
+		"GetCompositionNotFound": {
+			reason: "If the composition is not found we return nil",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(errNotFound),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceClaimSpec{
+					CompositionReference: &corev1.ObjectReference{},
+				},
+			},
+			want: want{
+				cmp: nil,
+			},
+		},
 		"Success": {
 			reason: "If we can get and model the composition we should return it.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
@@ -885,6 +959,7 @@ func TestCompositeResourceClaimSpecComposition(t *testing.T) {
 
 func TestCompositeResourceClaimSpecResource(t *testing.T) {
 	errBoom := errors.New("boom")
+	errNotFound := apierrors.NewNotFound(schema.GroupResource{}, "somename")
 
 	gxr := model.GetCompositeResource(&unstructured.Unstructured{})
 
@@ -948,6 +1023,23 @@ func TestCompositeResourceClaimSpecResource(t *testing.T) {
 				},
 			},
 		},
+		"GetResourceNotFound": {
+			reason: "If the resource is not found we return nil",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(errNotFound),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceClaimSpec{
+					ResourceReference: &corev1.ObjectReference{},
+				},
+			},
+			want: want{
+				xr: nil,
+			},
+		},
 		"Success": {
 			reason: "If we can get and model the resource we should return it.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
@@ -991,6 +1083,7 @@ func TestCompositeResourceClaimSpecResource(t *testing.T) {
 
 func TestCompositeResourceClaimSpecConnectionSecret(t *testing.T) {
 	errBoom := errors.New("boom")
+	errNotFound := apierrors.NewNotFound(schema.GroupResource{}, "somename")
 
 	gsec := model.GetSecret(&corev1.Secret{})
 
@@ -1052,6 +1145,23 @@ func TestCompositeResourceClaimSpecConnectionSecret(t *testing.T) {
 				errs: gqlerror.List{
 					gqlerror.Errorf(errors.Wrap(errBoom, errGetSecret).Error()),
 				},
+			},
+		},
+		"GetSecretNotFound": {
+			reason: "If the secret is not found we return nil",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(errNotFound),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceClaimSpec{
+					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+				},
+			},
+			want: want{
+				sec: nil,
 			},
 		},
 		"Success": {
