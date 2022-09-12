@@ -54,6 +54,7 @@ make reviewable test build
 ./cluster/local/kind.sh helm-install
 
 # Install the latest Crossplane release (using Helm 3)
+kubectl create namespace crossplane-system
 helm repo add crossplane-stable https://charts.crossplane.io/stable
 helm install crossplane --namespace crossplane-system crossplane-stable/crossplane
 
@@ -70,17 +71,10 @@ kubectl -n crossplane-system port-forward deployment/xgql 8080
 # Open the GraphQL playground at http://localhost:8080
 
 # Create service account to make GraphQL queries
-SA_NAME=xgql-testing
-kubectl create serviceaccount ${SA_NAME}
-
-# Grant the service acccount access to all things Crossplane
-kubectl create clusterrolebinding ${SA_NAME} \
-  --clusterrole=crossplane-admin \
-  --serviceaccount=default:${SA_NAME}
+kubectl apply -f cluster/local/service-account.yaml
 
 # Get the service account's token (requires jq)
-SA_SECRET=$(kubectl get -o json serviceaccount ${SA_NAME}|jq -r '.secrets[0].name')
-SA_TOKEN=$(kubectl get -o json secret ${SA_SECRET}|jq -r '.data.token|@base64d')
+SA_TOKEN=$(kubectl get -o json secret xgql-testing|jq -r '.data.token|@base64d')
 
 # Paste this into the HTTP Headers popout in the lower right of the playground
 echo "{\"Authorization\":\"Bearer ${SA_TOKEN}\"}"
