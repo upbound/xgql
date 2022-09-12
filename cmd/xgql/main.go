@@ -16,7 +16,7 @@ package main
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	stdlog "log"
 	"net/http"
 	"os"
@@ -161,6 +161,7 @@ func main() {
 	// client-go machinery, so instead we just log it. The errors will persist
 	// until they are resolved (e.g. the user is granted the RBAC access they
 	// need) or the cache expires.
+	//nolint:reassign
 	utilruntime.ErrorHandlers = []func(error){func(err error) { log.Debug("Kubernetes runtime error", "err", err) }}
 
 	rt := chi.NewRouter()
@@ -214,7 +215,7 @@ func main() {
 		WriteTimeout:      10 * time.Second,
 		ReadTimeout:       5 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
-		ErrorLog:          stdlog.New(ioutil.Discard, "", 0),
+		ErrorLog:          stdlog.New(io.Discard, "", 0),
 	}
 
 	if *tlsCert != "" && *tlsKey != "" {

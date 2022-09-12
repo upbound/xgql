@@ -75,6 +75,7 @@ func (c Credentials) Inject(cfg *rest.Config) *rest.Config {
 
 // Hash returns a SHA-256 hash of the supplied credentials, plus any extra bytes
 // that were supplied.
+//
 //nolint:errcheck // Writing to a hash never returns an error.
 func (c Credentials) Hash(extra []byte) string {
 	h := sha256.New()
