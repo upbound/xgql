@@ -28,10 +28,10 @@ import (
 type CompositeResourceSpec struct {
 	CompositionSelector *LabelSelector `json:"compositionSelector"`
 
-	CompositionReference              *corev1.ObjectReference
-	ClaimReference                    *corev1.ObjectReference
-	ResourceReferences                []corev1.ObjectReference
-	WritesConnectionSecretToReference *xpv1.SecretReference
+	CompositionReference             *corev1.ObjectReference
+	ClaimReference                   *corev1.ObjectReference
+	ResourceReferences               []corev1.ObjectReference
+	WriteConnectionSecretToReference *xpv1.SecretReference
 }
 
 // GetCompositeResourceStatus from the supplied Crossplane composite.
@@ -68,11 +68,11 @@ func GetCompositeResource(u *kunstructured.Unstructured) CompositeResource {
 		Kind:       xr.GetKind(),
 		Metadata:   GetObjectMeta(xr),
 		Spec: &CompositeResourceSpec{
-			CompositionSelector:               GetLabelSelector(xr.GetCompositionSelector()),
-			CompositionReference:              xr.GetCompositionReference(),
-			ClaimReference:                    xr.GetClaimReference(),
-			ResourceReferences:                xr.GetResourceReferences(),
-			WritesConnectionSecretToReference: xr.GetWriteConnectionSecretToReference(),
+			CompositionSelector:              GetLabelSelector(xr.GetCompositionSelector()),
+			CompositionReference:             xr.GetCompositionReference(),
+			ClaimReference:                   xr.GetClaimReference(),
+			ResourceReferences:               xr.GetResourceReferences(),
+			WriteConnectionSecretToReference: xr.GetWriteConnectionSecretToReference(),
 		},
 		Status:       GetCompositeResourceStatus(xr),
 		Unstructured: unstruct(xr),
@@ -97,7 +97,7 @@ type CompositeResourceClaimSpec struct {
 	// We use a non-local secret reference because we need to know what
 	// namespace the secret is in when we're resolving it, when we only have
 	// access to the spec.
-	WritesConnectionSecretToReference *xpv1.SecretReference
+	WriteConnectionSecretToReference *xpv1.SecretReference
 }
 
 // GetCompositeResourceClaimStatus from the supplied Crossplane claim.
@@ -135,10 +135,10 @@ func GetCompositeResourceClaim(u *kunstructured.Unstructured) CompositeResourceC
 		Kind:       xrc.GetKind(),
 		Metadata:   GetObjectMeta(xrc),
 		Spec: &CompositeResourceClaimSpec{
-			CompositionSelector:               GetLabelSelector(xrc.GetCompositionSelector()),
-			CompositionReference:              xrc.GetCompositionReference(),
-			ResourceReference:                 xrc.GetResourceReference(),
-			WritesConnectionSecretToReference: delocalize(xrc.GetWriteConnectionSecretToReference(), xrc.GetNamespace()),
+			CompositionSelector:              GetLabelSelector(xrc.GetCompositionSelector()),
+			CompositionReference:             xrc.GetCompositionReference(),
+			ResourceReference:                xrc.GetResourceReference(),
+			WriteConnectionSecretToReference: delocalize(xrc.GetWriteConnectionSecretToReference(), xrc.GetNamespace()),
 		},
 		Status:       GetCompositeResourceClaimStatus(xrc),
 		Unstructured: unstruct(xrc),

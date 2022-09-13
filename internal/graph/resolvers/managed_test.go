@@ -218,7 +218,7 @@ func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.ManagedResourceSpec{
-					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{},
 				},
 			},
 			want: want{
@@ -237,7 +237,7 @@ func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.ManagedResourceSpec{
-					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{},
 				},
 			},
 			want: want{
@@ -256,7 +256,7 @@ func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.ManagedResourceSpec{
-					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{},
 				},
 			},
 			want: want{

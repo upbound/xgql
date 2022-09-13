@@ -134,6 +134,14 @@ func (r *compositeResourceSpec) Composition(ctx context.Context, obj *model.Comp
 	return &out, nil
 }
 
+func (r *compositeResourceSpec) CompositionRef(ctx context.Context, obj *model.CompositeResourceSpec) (*model.LocalObjectReference, error) {
+	if obj.CompositionReference == nil {
+		return nil, nil
+	}
+
+	return &model.LocalObjectReference{Name: obj.CompositionReference.Name}, nil
+}
+
 func (r *compositeResourceSpec) Claim(ctx context.Context, obj *model.CompositeResourceSpec) (*model.CompositeResourceClaim, error) {
 	if obj.ClaimReference == nil {
 		return nil, nil
@@ -165,6 +173,10 @@ func (r *compositeResourceSpec) Claim(ctx context.Context, obj *model.CompositeR
 
 	out := model.GetCompositeResourceClaim(xrc)
 	return &out, nil
+}
+
+func (r *compositeResourceSpec) ClaimRef(ctx context.Context, obj *model.CompositeResourceSpec) (*model.ObjectReference, error) {
+	return model.GetObjectReference(obj.ClaimReference), nil
 }
 
 func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.CompositeResourceSpec) (*model.KubernetesResourceConnection, error) {
@@ -207,7 +219,7 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 }
 
 func (r *compositeResourceSpec) ConnectionSecret(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error) {
-	if obj.WritesConnectionSecretToReference == nil {
+	if obj.WriteConnectionSecretToReference == nil {
 		return nil, nil
 	}
 
@@ -223,8 +235,8 @@ func (r *compositeResourceSpec) ConnectionSecret(ctx context.Context, obj *model
 
 	s := &corev1.Secret{}
 	nn := types.NamespacedName{
-		Namespace: obj.WritesConnectionSecretToReference.Namespace,
-		Name:      obj.WritesConnectionSecretToReference.Name,
+		Namespace: obj.WriteConnectionSecretToReference.Namespace,
+		Name:      obj.WriteConnectionSecretToReference.Name,
 	}
 	if err := c.Get(ctx, nn, s); err != nil {
 		if !apierrors.IsNotFound(err) {
@@ -236,6 +248,10 @@ func (r *compositeResourceSpec) ConnectionSecret(ctx context.Context, obj *model
 
 	out := model.GetSecret(s)
 	return &out, nil
+}
+
+func (r *compositeResourceSpec) WriteConnectionSecretToReference(ctx context.Context, obj *model.CompositeResourceSpec) (*model.SecretReference, error) {
+	return model.GetSecretReference(obj.WriteConnectionSecretToReference), nil
 }
 
 type compositeResourceClaim struct {
@@ -306,6 +322,14 @@ type compositeResourceClaimSpec struct {
 	clients ClientCache
 }
 
+func (r *compositeResourceClaimSpec) CompositionRef(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.LocalObjectReference, error) {
+	if obj.CompositionReference == nil {
+		return nil, nil
+	}
+
+	return &model.LocalObjectReference{Name: obj.CompositionReference.Name}, nil
+}
+
 func (r *compositeResourceClaimSpec) Composition(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.Composition, error) {
 	if obj.CompositionReference == nil {
 		return nil, nil
@@ -364,8 +388,12 @@ func (r *compositeResourceClaimSpec) Resource(ctx context.Context, obj *model.Co
 	return &out, nil
 }
 
+func (r *compositeResourceClaimSpec) ResourceRef(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.ObjectReference, error) {
+	return model.GetObjectReference(obj.ResourceReference), nil
+}
+
 func (r *compositeResourceClaimSpec) ConnectionSecret(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.Secret, error) {
-	if obj.WritesConnectionSecretToReference == nil {
+	if obj.WriteConnectionSecretToReference == nil {
 		return nil, nil
 	}
 
@@ -381,8 +409,8 @@ func (r *compositeResourceClaimSpec) ConnectionSecret(ctx context.Context, obj *
 
 	s := &corev1.Secret{}
 	nn := types.NamespacedName{
-		Namespace: obj.WritesConnectionSecretToReference.Namespace,
-		Name:      obj.WritesConnectionSecretToReference.Name,
+		Namespace: obj.WriteConnectionSecretToReference.Namespace,
+		Name:      obj.WriteConnectionSecretToReference.Name,
 	}
 	if err := c.Get(ctx, nn, s); err != nil {
 		if !apierrors.IsNotFound(err) {
@@ -394,4 +422,8 @@ func (r *compositeResourceClaimSpec) ConnectionSecret(ctx context.Context, obj *
 
 	out := model.GetSecret(s)
 	return &out, nil
+}
+
+func (r *compositeResourceClaimSpec) WriteConnectionSecretToReference(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.SecretReference, error) {
+	return model.GetSecretReference(obj.WriteConnectionSecretToReference), nil
 }

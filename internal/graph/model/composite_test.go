@@ -20,7 +20,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	core "k8s.io/api/core/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -70,11 +69,11 @@ func TestGetCompositeResource(t *testing.T) {
 					Name: "cool",
 				},
 				Spec: &CompositeResourceSpec{
-					CompositionSelector:               &LabelSelector{MatchLabels: map[string]string{"cool": "very"}},
-					CompositionReference:              &corev1.ObjectReference{Name: "coolcmp"},
-					ClaimReference:                    &corev1.ObjectReference{Name: "coolclaim"},
-					ResourceReferences:                []corev1.ObjectReference{{Name: "coolmanaged"}},
-					WritesConnectionSecretToReference: &xpv1.SecretReference{Name: "coolsecret"},
+					CompositionSelector:              &LabelSelector{MatchLabels: map[string]string{"cool": "very"}},
+					CompositionReference:             &corev1.ObjectReference{Name: "coolcmp"},
+					ClaimReference:                   &corev1.ObjectReference{Name: "coolclaim"},
+					ResourceReferences:               []corev1.ObjectReference{{Name: "coolmanaged"}},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{Name: "coolsecret"},
 				},
 				Status: &CompositeResourceStatus{
 					Conditions: []Condition{{}},
@@ -93,7 +92,7 @@ func TestGetCompositeResource(t *testing.T) {
 					// We don't mind this empty list being here because it's
 					// not exposed as part of our GraphQL API. We use it instead
 					// to resolve the resources array.
-					ResourceReferences: []core.ObjectReference{},
+					ResourceReferences: []corev1.ObjectReference{},
 				},
 			},
 		},
@@ -156,10 +155,10 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 					Name:      "cool",
 				},
 				Spec: &CompositeResourceClaimSpec{
-					CompositionSelector:               &LabelSelector{MatchLabels: map[string]string{"cool": "very"}},
-					CompositionReference:              &corev1.ObjectReference{Name: "coolcmp"},
-					ResourceReference:                 &corev1.ObjectReference{Name: "coolxr"},
-					WritesConnectionSecretToReference: &xpv1.SecretReference{Namespace: "default", Name: "coolsecret"},
+					CompositionSelector:              &LabelSelector{MatchLabels: map[string]string{"cool": "very"}},
+					CompositionReference:             &corev1.ObjectReference{Name: "coolcmp"},
+					ResourceReference:                &corev1.ObjectReference{Name: "coolxr"},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{Namespace: "default", Name: "coolsecret"},
 				},
 				Status: &CompositeResourceClaimStatus{
 					Conditions: []Condition{{}},

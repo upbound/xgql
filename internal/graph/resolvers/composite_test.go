@@ -314,6 +314,69 @@ func TestCompositeResourceSpecComposition(t *testing.T) {
 	}
 }
 
+func TestCompositeResourceSpecCompositionRef(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		obj *model.CompositeResourceSpec
+	}
+	type want struct {
+		ref  *model.LocalObjectReference
+		err  error
+		errs gqlerror.List
+	}
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"NilReference": {
+			reason:  "If the reference is nil then the response should be nil.",
+			clients: nil,
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceSpec{CompositionReference: nil},
+			},
+			want: want{
+				ref: nil,
+			},
+		},
+		"NonNilReference": {
+			reason:  "Should return a valid LocalObjectReference.",
+			clients: nil,
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceSpec{CompositionReference: &corev1.ObjectReference{Name: "some-ref-name"}},
+			},
+			want: want{
+				ref: &model.LocalObjectReference{Name: "some-ref-name"},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			s := &compositeResourceSpec{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := s.CompositionRef(tc.args.ctx, tc.args.obj)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.CompositionRef(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.CompositionRef(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+				t.Errorf("\n%s\ns.CompositionRef(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
 func TestCompositeResourceSpecClaim(t *testing.T) {
 	errBoom := errors.New("boom")
 	errNotFound := apierrors.NewNotFound(schema.GroupResource{}, "somename")
@@ -433,6 +496,71 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.xrc, got, cmpopts.IgnoreFields(model.CompositeResourceClaim{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestCompositeResourceSpecClaimRef(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		obj *model.CompositeResourceSpec
+	}
+	type want struct {
+		ref  *model.ObjectReference
+		err  error
+		errs gqlerror.List
+	}
+
+	name := "some-ref-name"
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"NilReference": {
+			reason:  "If the reference is nil then the response should be nil.",
+			clients: nil,
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceSpec{ClaimReference: nil},
+			},
+			want: want{
+				ref: nil,
+			},
+		},
+		"NonNilReference": {
+			reason:  "Should return a valid LocalObjectReference.",
+			clients: nil,
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceSpec{ClaimReference: &corev1.ObjectReference{Name: name}},
+			},
+			want: want{
+				ref: &model.ObjectReference{Name: &name},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			s := &compositeResourceSpec{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := s.ClaimRef(tc.args.ctx, tc.args.obj)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.ClaimRef(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.ClaimRef(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+				t.Errorf("\n%s\ns.ClaimRef(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
 	}
@@ -597,7 +725,7 @@ func TestCompositeResourceSpecConnectionSecret(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
-					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{},
 				},
 			},
 			want: want{
@@ -616,7 +744,7 @@ func TestCompositeResourceSpecConnectionSecret(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
-					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{},
 				},
 			},
 			want: want{
@@ -635,7 +763,7 @@ func TestCompositeResourceSpecConnectionSecret(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
-					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{},
 				},
 			},
 			want: want{
@@ -652,7 +780,7 @@ func TestCompositeResourceSpecConnectionSecret(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
-					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{},
 				},
 			},
 			want: want{
@@ -678,6 +806,72 @@ func TestCompositeResourceSpecConnectionSecret(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{}), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.ConnectionSecret(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestCompositeResourceSpecWriteConnectionSecretToReference(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		obj *model.CompositeResourceSpec
+	}
+	type want struct {
+		ref  *model.SecretReference
+		err  error
+		errs gqlerror.List
+	}
+
+	name := "some-ref-name"
+	namespace := "some-namespace"
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"NilReference": {
+			reason:  "If the reference is nil then the response should be nil.",
+			clients: nil,
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceSpec{WriteConnectionSecretToReference: nil},
+			},
+			want: want{
+				ref: nil,
+			},
+		},
+		"NonNilReference": {
+			reason:  "Should return a valid LocalObjectReference.",
+			clients: nil,
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceSpec{WriteConnectionSecretToReference: &xpv1.SecretReference{Name: name, Namespace: namespace}},
+			},
+			want: want{
+				ref: &model.SecretReference{Name: name, Namespace: namespace},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			s := &compositeResourceSpec{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := s.WriteConnectionSecretToReference(tc.args.ctx, tc.args.obj)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.WriteConnectionSecretToReference(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.WriteConnectionSecretToReference(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+				t.Errorf("\n%s\ns.WriteConnectionSecretToReference(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
 	}
@@ -957,6 +1151,69 @@ func TestCompositeResourceClaimSpecComposition(t *testing.T) {
 	}
 }
 
+func TestCompositeResourceClaimSpecCompositionRef(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		obj *model.CompositeResourceClaimSpec
+	}
+	type want struct {
+		ref  *model.LocalObjectReference
+		err  error
+		errs gqlerror.List
+	}
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"NilReference": {
+			reason:  "If the reference is nil then the response should be nil.",
+			clients: nil,
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceClaimSpec{CompositionReference: nil},
+			},
+			want: want{
+				ref: nil,
+			},
+		},
+		"NonNilReference": {
+			reason:  "Should return a valid LocalObjectReference.",
+			clients: nil,
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceClaimSpec{CompositionReference: &corev1.ObjectReference{Name: "some-ref-name"}},
+			},
+			want: want{
+				ref: &model.LocalObjectReference{Name: "some-ref-name"},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			s := &compositeResourceClaimSpec{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := s.CompositionRef(tc.args.ctx, tc.args.obj)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.CompositionRef(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.CompositionRef(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+				t.Errorf("\n%s\ns.CompositionRef(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
 func TestCompositeResourceClaimSpecResource(t *testing.T) {
 	errBoom := errors.New("boom")
 	errNotFound := apierrors.NewNotFound(schema.GroupResource{}, "somename")
@@ -1081,6 +1338,71 @@ func TestCompositeResourceClaimSpecResource(t *testing.T) {
 	}
 }
 
+func TestCompositeResourceClaimSpecResourceReference(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		obj *model.CompositeResourceClaimSpec
+	}
+	type want struct {
+		ref  *model.ObjectReference
+		err  error
+		errs gqlerror.List
+	}
+
+	name := "some-ref-name"
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"NilReference": {
+			reason:  "If the reference is nil then the response should be nil.",
+			clients: nil,
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceClaimSpec{ResourceReference: nil},
+			},
+			want: want{
+				ref: nil,
+			},
+		},
+		"NonNilReference": {
+			reason:  "Should return a valid LocalObjectReference.",
+			clients: nil,
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceClaimSpec{ResourceReference: &corev1.ObjectReference{Name: name}},
+			},
+			want: want{
+				ref: &model.ObjectReference{Name: &name},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			s := &compositeResourceClaimSpec{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := s.ResourceRef(tc.args.ctx, tc.args.obj)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.ResourceRef(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.ResourceRef(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+				t.Errorf("\n%s\ns.ResourceRef(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
 func TestCompositeResourceClaimSpecConnectionSecret(t *testing.T) {
 	errBoom := errors.New("boom")
 	errNotFound := apierrors.NewNotFound(schema.GroupResource{}, "somename")
@@ -1119,7 +1441,7 @@ func TestCompositeResourceClaimSpecConnectionSecret(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceClaimSpec{
-					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{},
 				},
 			},
 			want: want{
@@ -1138,7 +1460,7 @@ func TestCompositeResourceClaimSpecConnectionSecret(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceClaimSpec{
-					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{},
 				},
 			},
 			want: want{
@@ -1157,7 +1479,7 @@ func TestCompositeResourceClaimSpecConnectionSecret(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceClaimSpec{
-					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{},
 				},
 			},
 			want: want{
@@ -1174,7 +1496,7 @@ func TestCompositeResourceClaimSpecConnectionSecret(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceClaimSpec{
-					WritesConnectionSecretToReference: &xpv1.SecretReference{},
+					WriteConnectionSecretToReference: &xpv1.SecretReference{},
 				},
 			},
 			want: want{
@@ -1200,6 +1522,72 @@ func TestCompositeResourceClaimSpecConnectionSecret(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{}), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.ConnectionSecret(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestCompositeResourceClaimSpecWriteConnectionSecretToReference(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		obj *model.CompositeResourceClaimSpec
+	}
+	type want struct {
+		ref  *model.SecretReference
+		err  error
+		errs gqlerror.List
+	}
+
+	name := "some-ref-name"
+	namespace := "some-namespace"
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"NilReference": {
+			reason:  "If the reference is nil then the response should be nil.",
+			clients: nil,
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceClaimSpec{WriteConnectionSecretToReference: nil},
+			},
+			want: want{
+				ref: nil,
+			},
+		},
+		"NonNilReference": {
+			reason:  "Should return a valid LocalObjectReference.",
+			clients: nil,
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceClaimSpec{WriteConnectionSecretToReference: &xpv1.SecretReference{Name: name, Namespace: namespace}},
+			},
+			want: want{
+				ref: &model.SecretReference{Name: name, Namespace: namespace},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			s := &compositeResourceClaimSpec{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := s.WriteConnectionSecretToReference(tc.args.ctx, tc.args.obj)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.WriteConnectionSecretToReference(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.WriteConnectionSecretToReference(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+				t.Errorf("\n%s\ns.WriteConnectionSecretToReference(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
 	}

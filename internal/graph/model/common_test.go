@@ -24,7 +24,6 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	kschema "k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/json"
 	"k8s.io/utils/pointer"
@@ -539,17 +538,17 @@ func TestGetKubernetesResource(t *testing.T) {
 		"Provider": {
 			u: func() *kunstructured.Unstructured {
 				u := &kunstructured.Unstructured{}
-				u.SetAPIVersion(schema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String())
+				u.SetAPIVersion(kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String())
 				u.SetKind(pkgv1.ProviderKind)
 				return u
 			}(),
 			want: want{
 				kr: Provider{
 					ID: ReferenceID{
-						APIVersion: schema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
+						APIVersion: kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
 						Kind:       pkgv1.ProviderKind,
 					},
-					APIVersion: schema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
+					APIVersion: kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
 					Kind:       pkgv1.ProviderKind,
 					Metadata:   &ObjectMeta{},
 					Spec:       &ProviderSpec{},
@@ -559,17 +558,17 @@ func TestGetKubernetesResource(t *testing.T) {
 		"ProviderRevision": {
 			u: func() *kunstructured.Unstructured {
 				u := &kunstructured.Unstructured{}
-				u.SetAPIVersion(schema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String())
+				u.SetAPIVersion(kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String())
 				u.SetKind(pkgv1.ProviderRevisionKind)
 				return u
 			}(),
 			want: want{
 				kr: ProviderRevision{
 					ID: ReferenceID{
-						APIVersion: schema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
+						APIVersion: kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
 						Kind:       pkgv1.ProviderRevisionKind,
 					},
-					APIVersion: schema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
+					APIVersion: kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
 					Kind:       pkgv1.ProviderRevisionKind,
 					Metadata:   &ObjectMeta{},
 					Spec:       &ProviderRevisionSpec{},
@@ -579,17 +578,17 @@ func TestGetKubernetesResource(t *testing.T) {
 		"Configuration": {
 			u: func() *kunstructured.Unstructured {
 				u := &kunstructured.Unstructured{}
-				u.SetAPIVersion(schema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String())
+				u.SetAPIVersion(kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String())
 				u.SetKind(pkgv1.ConfigurationKind)
 				return u
 			}(),
 			want: want{
 				kr: Configuration{
 					ID: ReferenceID{
-						APIVersion: schema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
+						APIVersion: kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
 						Kind:       pkgv1.ConfigurationKind,
 					},
-					APIVersion: schema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
+					APIVersion: kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
 					Kind:       pkgv1.ConfigurationKind,
 					Metadata:   &ObjectMeta{},
 					Spec:       &ConfigurationSpec{},
@@ -599,17 +598,17 @@ func TestGetKubernetesResource(t *testing.T) {
 		"ConfigurationRevision": {
 			u: func() *kunstructured.Unstructured {
 				u := &kunstructured.Unstructured{}
-				u.SetAPIVersion(schema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String())
+				u.SetAPIVersion(kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String())
 				u.SetKind(pkgv1.ConfigurationRevisionKind)
 				return u
 			}(),
 			want: want{
 				kr: ConfigurationRevision{
 					ID: ReferenceID{
-						APIVersion: schema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
+						APIVersion: kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
 						Kind:       pkgv1.ConfigurationRevisionKind,
 					},
-					APIVersion: schema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
+					APIVersion: kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
 					Kind:       pkgv1.ConfigurationRevisionKind,
 					Metadata:   &ObjectMeta{},
 					Spec:       &ConfigurationRevisionSpec{},
@@ -619,17 +618,17 @@ func TestGetKubernetesResource(t *testing.T) {
 		"CompositeResourceDefinition": {
 			u: func() *kunstructured.Unstructured {
 				u := &kunstructured.Unstructured{}
-				u.SetAPIVersion(schema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String())
+				u.SetAPIVersion(kschema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String())
 				u.SetKind(extv1.CompositeResourceDefinitionKind)
 				return u
 			}(),
 			want: want{
 				kr: CompositeResourceDefinition{
 					ID: ReferenceID{
-						APIVersion: schema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
+						APIVersion: kschema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
 						Kind:       extv1.CompositeResourceDefinitionKind,
 					},
-					APIVersion: schema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
+					APIVersion: kschema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
 					Kind:       extv1.CompositeResourceDefinitionKind,
 					Metadata:   &ObjectMeta{},
 					Spec: &CompositeResourceDefinitionSpec{
@@ -641,17 +640,17 @@ func TestGetKubernetesResource(t *testing.T) {
 		"Composition": {
 			u: func() *kunstructured.Unstructured {
 				u := &kunstructured.Unstructured{}
-				u.SetAPIVersion(schema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String())
+				u.SetAPIVersion(kschema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String())
 				u.SetKind(extv1.CompositionKind)
 				return u
 			}(),
 			want: want{
 				kr: Composition{
 					ID: ReferenceID{
-						APIVersion: schema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
+						APIVersion: kschema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
 						Kind:       extv1.CompositionKind,
 					},
-					APIVersion: schema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
+					APIVersion: kschema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
 					Kind:       extv1.CompositionKind,
 					Metadata:   &ObjectMeta{},
 					Spec: &CompositionSpec{
@@ -663,17 +662,17 @@ func TestGetKubernetesResource(t *testing.T) {
 		"CustomResourceDefinition": {
 			u: func() *kunstructured.Unstructured {
 				u := &kunstructured.Unstructured{}
-				u.SetAPIVersion(schema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String())
+				u.SetAPIVersion(kschema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String())
 				u.SetKind("CustomResourceDefinition")
 				return u
 			}(),
 			want: want{
 				kr: CustomResourceDefinition{
 					ID: ReferenceID{
-						APIVersion: schema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String(),
+						APIVersion: kschema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String(),
 						Kind:       "CustomResourceDefinition",
 					},
-					APIVersion: schema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String(),
+					APIVersion: kschema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String(),
 					Kind:       "CustomResourceDefinition",
 					Metadata:   &ObjectMeta{},
 					Spec: &CustomResourceDefinitionSpec{
@@ -685,7 +684,7 @@ func TestGetKubernetesResource(t *testing.T) {
 		"Secret": {
 			u: func() *kunstructured.Unstructured {
 				u := &kunstructured.Unstructured{}
-				u.SetAPIVersion(schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String())
+				u.SetAPIVersion(kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String())
 				u.SetKind("Secret")
 				return u
 			}(),
@@ -704,7 +703,7 @@ func TestGetKubernetesResource(t *testing.T) {
 		"ConfigMap": {
 			u: func() *kunstructured.Unstructured {
 				u := &kunstructured.Unstructured{}
-				u.SetAPIVersion(schema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String())
+				u.SetAPIVersion(kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String())
 				u.SetKind("ConfigMap")
 				return u
 			}(),
@@ -738,6 +737,82 @@ func TestGetKubernetesResource(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.kr, kr, ignore...); diff != "" {
 				t.Errorf("GetKubernetesResource(...): -want, +got:\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestGetObjectReference(t *testing.T) {
+	kind := "SomeKind"
+	namespace := "some-namespace"
+	name := "some-name"
+
+	cases := map[string]struct {
+		ref  *corev1.ObjectReference
+		want *ObjectReference
+	}{
+		"Nil": {
+			ref:  nil,
+			want: nil,
+		},
+		"JustKind": {
+			ref:  &corev1.ObjectReference{Kind: kind},
+			want: &ObjectReference{Kind: &kind},
+		},
+		"JustNamespace": {
+			ref:  &corev1.ObjectReference{Namespace: namespace},
+			want: &ObjectReference{Namespace: &namespace},
+		},
+		"JustName": {
+			ref:  &corev1.ObjectReference{Name: name},
+			want: &ObjectReference{Name: &name},
+		},
+		"KindAndNamespace": {
+			ref:  &corev1.ObjectReference{Kind: kind, Namespace: namespace},
+			want: &ObjectReference{Kind: &kind, Namespace: &namespace},
+		},
+		"KindAndName": {
+			ref:  &corev1.ObjectReference{Kind: kind, Name: name},
+			want: &ObjectReference{Kind: &kind, Name: &name},
+		},
+		"NamespaceAndName": {
+			ref:  &corev1.ObjectReference{Namespace: namespace, Name: name},
+			want: &ObjectReference{Namespace: &namespace, Name: &name},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			kr := GetObjectReference(tc.ref)
+
+			if diff := cmp.Diff(tc.want, kr); diff != "" {
+				t.Errorf("GetObjectReference(...): -want, +got:\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestGetSecretReference(t *testing.T) {
+	cases := map[string]struct {
+		ref  *xpv1.SecretReference
+		want *SecretReference
+	}{
+		"Nil": {
+			ref:  nil,
+			want: nil,
+		},
+		"NonNil": {
+			ref:  &xpv1.SecretReference{Name: "some-name", Namespace: "some-namespace"},
+			want: &SecretReference{Name: "some-name", Namespace: "some-namespace"},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			kr := GetSecretReference(tc.ref)
+
+			if diff := cmp.Diff(tc.want, kr); diff != "" {
+				t.Errorf("GetSecretReference(...): -want, +got:\n%s", diff)
 			}
 		})
 	}

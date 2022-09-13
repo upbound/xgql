@@ -94,7 +94,7 @@ type managedResourceSpec struct {
 }
 
 func (r *managedResourceSpec) ConnectionSecret(ctx context.Context, obj *model.ManagedResourceSpec) (*model.Secret, error) {
-	if obj.WritesConnectionSecretToReference == nil {
+	if obj.WriteConnectionSecretToReference == nil {
 		return nil, nil
 	}
 
@@ -110,8 +110,8 @@ func (r *managedResourceSpec) ConnectionSecret(ctx context.Context, obj *model.M
 
 	s := &corev1.Secret{}
 	nn := types.NamespacedName{
-		Namespace: obj.WritesConnectionSecretToReference.Namespace,
-		Name:      obj.WritesConnectionSecretToReference.Name,
+		Namespace: obj.WriteConnectionSecretToReference.Namespace,
+		Name:      obj.WriteConnectionSecretToReference.Name,
 	}
 	if err := c.Get(ctx, nn, s); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetSecret))

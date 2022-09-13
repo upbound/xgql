@@ -24,7 +24,6 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -97,7 +96,7 @@ func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string
 		return nil, nil
 	}
 
-	in := &kunstructured.UnstructuredList{}
+	in := &unstructured.UnstructuredList{}
 	in.SetAPIVersion(apiVersion)
 	in.SetKind(kind + "List")
 	if listKind != nil && *listKind != "" {
