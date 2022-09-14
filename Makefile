@@ -20,7 +20,6 @@ GO111MODULE = on
 -include build/makelib/golang.mk
 
 # Setup Node (for linting the schema)
-YARN_DIR = lint-schema
 -include build/makelib/yarnjs.mk
 
 # Setup Helm

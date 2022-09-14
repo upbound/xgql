@@ -14,6 +14,6 @@
     "types-have-descriptions"
   ],
   "schemaPaths": [
-    "../schema/*.gql"
+    "./schema/*.gql"
   ]
 }

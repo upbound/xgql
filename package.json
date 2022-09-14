@@ -1,0 +1,16 @@
+{
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@apollo/rover": "^0.8.2",
+    "graphql": "^16.6.0",
+    "graphql-schema-linter": "^3.0.1",
+    "prettier": "2.7.1"
+  },
+  "scripts": {
+    "format": "yarn run prettier --write schema/*",
+    "lint": "yarn run graphql-schema-linter",
+    "build": "true",
+    "test-ci": "true",
+    "push-schema": "cat schema/*.gql | rover graph publish --schema -"
+  }
+}
