@@ -642,6 +642,13 @@ type LabelSelector struct {
 	MatchLabels map[string]string `json:"matchLabels"`
 }
 
+// `LocalObjectReference` contains a name to to let you inspect or modify the
+// locally referred object.
+type LocalObjectReference struct {
+	// Name of the referent.
+	Name string `json:"name"`
+}
+
 // A ManagedResource is a Kubernetes API representation of a resource in an
 // external system, such as a cloud provider's API. Crossplane providers add
 // support for new kinds of managed resource.
@@ -676,6 +683,16 @@ type ManagedResourceStatus struct {
 }
 
 func (ManagedResourceStatus) IsConditionedStatus() {}
+
+// `ObjectReference` contains enough information to let you inspect or modify the referred object.
+type ObjectReference struct {
+	// Kind of the referent.
+	Kind *string `json:"kind"`
+	// Namespace of the referent.
+	Namespace *string `json:"namespace"`
+	// Name of the referent.
+	Name *string `json:"name"`
+}
 
 // An owner of a Kubernetes resource.
 type Owner struct {
@@ -909,6 +926,14 @@ type ProviderStatus struct {
 }
 
 func (ProviderStatus) IsConditionedStatus() {}
+
+// A `SecretReference` is a reference to a secret in an arbitrary namespace.
+type SecretReference struct {
+	// Name of the `Secret`.
+	Name string `json:"name"`
+	// Namespace of the `Secret`.
+	Namespace string `json:"namespace"`
+}
 
 // A TypeReference references a type of Kubernetes resource by API version and
 // kind.

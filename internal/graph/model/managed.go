@@ -27,7 +27,7 @@ type ManagedResourceSpec struct {
 	ProviderConfigRef *ProviderConfigReference `json:"providerConfigRef"`
 	DeletionPolicy    *DeletionPolicy          `json:"deletionPolicy"`
 
-	WritesConnectionSecretToReference *xpv1.SecretReference
+	WriteConnectionSecretToReference *xpv1.SecretReference
 }
 
 // GetDeletionPolicy from the supplied Crossplane policy.
@@ -75,9 +75,9 @@ func GetManagedResource(u *kunstructured.Unstructured) ManagedResource {
 		Kind:       mg.GetKind(),
 		Metadata:   GetObjectMeta(mg),
 		Spec: &ManagedResourceSpec{
-			WritesConnectionSecretToReference: mg.GetWriteConnectionSecretToReference(),
-			ProviderConfigRef:                 GetProviderConfigReference(mg.GetProviderConfigReference()),
-			DeletionPolicy:                    GetDeletionPolicy(mg.GetDeletionPolicy()),
+			WriteConnectionSecretToReference: mg.GetWriteConnectionSecretToReference(),
+			ProviderConfigRef:                GetProviderConfigReference(mg.GetProviderConfigReference()),
+			DeletionPolicy:                   GetDeletionPolicy(mg.GetDeletionPolicy()),
 		},
 		Status:       GetManagedResourceStatus(mg),
 		Unstructured: unstruct(mg),

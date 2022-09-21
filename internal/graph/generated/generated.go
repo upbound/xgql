@@ -101,10 +101,13 @@ type ComplexityRoot struct {
 	}
 
 	CompositeResourceClaimSpec struct {
-		Composition         func(childComplexity int) int
-		CompositionSelector func(childComplexity int) int
-		ConnectionSecret    func(childComplexity int) int
-		Resource            func(childComplexity int) int
+		Composition                      func(childComplexity int) int
+		CompositionRef                   func(childComplexity int) int
+		CompositionSelector              func(childComplexity int) int
+		ConnectionSecret                 func(childComplexity int) int
+		Resource                         func(childComplexity int) int
+		ResourceRef                      func(childComplexity int) int
+		WriteConnectionSecretToReference func(childComplexity int) int
 	}
 
 	CompositeResourceClaimStatus struct {
@@ -176,11 +179,14 @@ type ComplexityRoot struct {
 	}
 
 	CompositeResourceSpec struct {
-		Claim               func(childComplexity int) int
-		Composition         func(childComplexity int) int
-		CompositionSelector func(childComplexity int) int
-		ConnectionSecret    func(childComplexity int) int
-		Resources           func(childComplexity int) int
+		Claim                            func(childComplexity int) int
+		ClaimRef                         func(childComplexity int) int
+		Composition                      func(childComplexity int) int
+		CompositionRef                   func(childComplexity int) int
+		CompositionSelector              func(childComplexity int) int
+		ConnectionSecret                 func(childComplexity int) int
+		Resources                        func(childComplexity int) int
+		WriteConnectionSecretToReference func(childComplexity int) int
 	}
 
 	CompositeResourceStatus struct {
@@ -400,6 +406,10 @@ type ComplexityRoot struct {
 		MatchLabels func(childComplexity int) int
 	}
 
+	LocalObjectReference struct {
+		Name func(childComplexity int) int
+	}
+
 	ManagedResource struct {
 		APIVersion   func(childComplexity int) int
 		Definition   func(childComplexity int) int
@@ -441,6 +451,12 @@ type ComplexityRoot struct {
 		Owners          func(childComplexity int) int
 		ResourceVersion func(childComplexity int) int
 		UID             func(childComplexity int) int
+	}
+
+	ObjectReference struct {
+		Kind      func(childComplexity int) int
+		Name      func(childComplexity int) int
+		Namespace func(childComplexity int) int
 	}
 
 	Owner struct {
@@ -574,6 +590,11 @@ type ComplexityRoot struct {
 		Unstructured func(childComplexity int) int
 	}
 
+	SecretReference struct {
+		Name      func(childComplexity int) int
+		Namespace func(childComplexity int) int
+	}
+
 	TypeReference struct {
 		APIVersion func(childComplexity int) int
 		Kind       func(childComplexity int) int
@@ -594,9 +615,12 @@ type CompositeResourceClaimResolver interface {
 }
 type CompositeResourceClaimSpecResolver interface {
 	Composition(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.Composition, error)
+	CompositionRef(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.LocalObjectReference, error)
 
 	Resource(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.CompositeResource, error)
+	ResourceRef(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.ObjectReference, error)
 	ConnectionSecret(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.Secret, error)
+	WriteConnectionSecretToReference(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.SecretReference, error)
 }
 type CompositeResourceDefinitionResolver interface {
 	Events(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.EventConnection, error)
@@ -609,10 +633,13 @@ type CompositeResourceDefinitionSpecResolver interface {
 }
 type CompositeResourceSpecResolver interface {
 	Composition(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Composition, error)
+	CompositionRef(ctx context.Context, obj *model.CompositeResourceSpec) (*model.LocalObjectReference, error)
 
 	Claim(ctx context.Context, obj *model.CompositeResourceSpec) (*model.CompositeResourceClaim, error)
+	ClaimRef(ctx context.Context, obj *model.CompositeResourceSpec) (*model.ObjectReference, error)
 	ConnectionSecret(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error)
 	Resources(ctx context.Context, obj *model.CompositeResourceSpec) (*model.KubernetesResourceConnection, error)
+	WriteConnectionSecretToReference(ctx context.Context, obj *model.CompositeResourceSpec) (*model.SecretReference, error)
 }
 type CompositionResolver interface {
 	Events(ctx context.Context, obj *model.Composition) (*model.EventConnection, error)
@@ -859,6 +886,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResourceClaimSpec.Composition(childComplexity), true
 
+	case "CompositeResourceClaimSpec.compositionRef":
+		if e.complexity.CompositeResourceClaimSpec.CompositionRef == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceClaimSpec.CompositionRef(childComplexity), true
+
 	case "CompositeResourceClaimSpec.compositionSelector":
 		if e.complexity.CompositeResourceClaimSpec.CompositionSelector == nil {
 			break
@@ -879,6 +913,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CompositeResourceClaimSpec.Resource(childComplexity), true
+
+	case "CompositeResourceClaimSpec.resourceRef":
+		if e.complexity.CompositeResourceClaimSpec.ResourceRef == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceClaimSpec.ResourceRef(childComplexity), true
+
+	case "CompositeResourceClaimSpec.writeConnectionSecretToReference":
+		if e.complexity.CompositeResourceClaimSpec.WriteConnectionSecretToReference == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceClaimSpec.WriteConnectionSecretToReference(childComplexity), true
 
 	case "CompositeResourceClaimStatus.conditions":
 		if e.complexity.CompositeResourceClaimStatus.Conditions == nil {
@@ -1163,12 +1211,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResourceSpec.Claim(childComplexity), true
 
+	case "CompositeResourceSpec.claimRef":
+		if e.complexity.CompositeResourceSpec.ClaimRef == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceSpec.ClaimRef(childComplexity), true
+
 	case "CompositeResourceSpec.composition":
 		if e.complexity.CompositeResourceSpec.Composition == nil {
 			break
 		}
 
 		return e.complexity.CompositeResourceSpec.Composition(childComplexity), true
+
+	case "CompositeResourceSpec.compositionRef":
+		if e.complexity.CompositeResourceSpec.CompositionRef == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceSpec.CompositionRef(childComplexity), true
 
 	case "CompositeResourceSpec.compositionSelector":
 		if e.complexity.CompositeResourceSpec.CompositionSelector == nil {
@@ -1190,6 +1252,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CompositeResourceSpec.Resources(childComplexity), true
+
+	case "CompositeResourceSpec.writeConnectionSecretToReference":
+		if e.complexity.CompositeResourceSpec.WriteConnectionSecretToReference == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceSpec.WriteConnectionSecretToReference(childComplexity), true
 
 	case "CompositeResourceStatus.conditions":
 		if e.complexity.CompositeResourceStatus.Conditions == nil {
@@ -2069,6 +2138,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.LabelSelector.MatchLabels(childComplexity), true
 
+	case "LocalObjectReference.name":
+		if e.complexity.LocalObjectReference.Name == nil {
+			break
+		}
+
+		return e.complexity.LocalObjectReference.Name(childComplexity), true
+
 	case "ManagedResource.apiVersion":
 		if e.complexity.ManagedResource.APIVersion == nil {
 			break
@@ -2289,6 +2365,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ObjectMeta.UID(childComplexity), true
+
+	case "ObjectReference.kind":
+		if e.complexity.ObjectReference.Kind == nil {
+			break
+		}
+
+		return e.complexity.ObjectReference.Kind(childComplexity), true
+
+	case "ObjectReference.name":
+		if e.complexity.ObjectReference.Name == nil {
+			break
+		}
+
+		return e.complexity.ObjectReference.Name(childComplexity), true
+
+	case "ObjectReference.namespace":
+		if e.complexity.ObjectReference.Namespace == nil {
+			break
+		}
+
+		return e.complexity.ObjectReference.Namespace(childComplexity), true
 
 	case "Owner.controller":
 		if e.complexity.Owner.Controller == nil {
@@ -2925,6 +3022,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Secret.Unstructured(childComplexity), true
+
+	case "SecretReference.name":
+		if e.complexity.SecretReference.Name == nil {
+			break
+		}
+
+		return e.complexity.SecretReference.Name(childComplexity), true
+
+	case "SecretReference.namespace":
+		if e.complexity.SecretReference.Namespace == nil {
+			break
+		}
+
+		return e.complexity.SecretReference.Namespace(childComplexity), true
 
 	case "TypeReference.apiVersion":
 		if e.complexity.TypeReference.APIVersion == nil {
@@ -3813,6 +3924,36 @@ type ConfigMap implements Node & KubernetesResource {
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"` + "`" + `ObjectReference` + "`" + ` contains enough information to let you inspect or modify the referred object."
+type ObjectReference {
+  "Kind of the referent."
+  kind: String
+
+  "Namespace of the referent."
+  namespace: String
+
+  "Name of the referent."
+  name: String
+}
+
+"""
+` + "`" + `LocalObjectReference` + "`" + ` contains a name to to let you inspect or modify the
+locally referred object.
+"""
+type LocalObjectReference {
+  "Name of the referent."
+  name: String!
+}
+
+"A ` + "`" + `SecretReference` + "`" + ` is a reference to a secret in an arbitrary namespace."
+type SecretReference {
+  "Name of the ` + "`" + `Secret` + "`" + `."
+  name: String!
+
+  "Namespace of the ` + "`" + `Secret` + "`" + `."
+  namespace: String!
+}
+
 """
 A CustomResourceDefinition defines a type of custom resource that extends the
 set of resources supported by the Kubernetes API.
@@ -4028,6 +4169,11 @@ type CompositeResourceSpec {
   composition: Composition @goField(forceResolver: true)
 
   """
+  The compositionRef this composite resource uses to compose resources.
+  """
+  compositionRef: LocalObjectReference
+
+  """
   A composition selector is used to select this composite resource's composition
   by matching on labels.
   """
@@ -4038,6 +4184,9 @@ type CompositeResourceSpec {
   """
   claim: CompositeResourceClaim @goField(forceResolver: true)
 
+  "The ` + "`" + `ObjectReference` + "`" + ` for the composite resource claim that claims this composite resource"
+  claimRef: ObjectReference
+
   """
   The secret this composite resource writes its connection details to.
   """
@@ -4047,6 +4196,9 @@ type CompositeResourceSpec {
   The resources of which this composite resource is composed.
   """
   resources: KubernetesResourceConnection @goField(forceResolver: true)
+
+  "Reference to the secret this composite resource writes its connection details to"
+  writeConnectionSecretToReference: SecretReference
 }
 
 # TODO(negz): Do we need to support GenericResource here, just in case? We only
@@ -4115,9 +4267,14 @@ resource claim.
 """
 type CompositeResourceClaimSpec {
   """
-  The composition this composite resource uses to compose resources.
+  The composition this composite resource claim uses to compose resources.
   """
   composition: Composition @goField(forceResolver: true)
+
+  """
+  The compositionRef this composite resource claim uses to compose resources.
+  """
+  compositionRef: LocalObjectReference
 
   """
   A composition selector is used to select this composite resource claims's
@@ -4131,9 +4288,17 @@ type CompositeResourceClaimSpec {
   resource: CompositeResource @goField(forceResolver: true)
 
   """
+  A reference to the composite resource to which this composite resource claim is bound.
+  """
+  resourceRef: ObjectReference
+
+  """
   The secret this composite resource claim writes its connection details to.
   """
   connectionSecret: Secret @goField(forceResolver: true)
+
+  "Reference to the secret this composite resource writes its connection details to"
+  writeConnectionSecretToReference: SecretReference
 }
 
 """
@@ -5856,14 +6021,20 @@ func (ec *executionContext) fieldContext_CompositeResource_spec(ctx context.Cont
 			switch field.Name {
 			case "composition":
 				return ec.fieldContext_CompositeResourceSpec_composition(ctx, field)
+			case "compositionRef":
+				return ec.fieldContext_CompositeResourceSpec_compositionRef(ctx, field)
 			case "compositionSelector":
 				return ec.fieldContext_CompositeResourceSpec_compositionSelector(ctx, field)
 			case "claim":
 				return ec.fieldContext_CompositeResourceSpec_claim(ctx, field)
+			case "claimRef":
+				return ec.fieldContext_CompositeResourceSpec_claimRef(ctx, field)
 			case "connectionSecret":
 				return ec.fieldContext_CompositeResourceSpec_connectionSecret(ctx, field)
 			case "resources":
 				return ec.fieldContext_CompositeResourceSpec_resources(ctx, field)
+			case "writeConnectionSecretToReference":
+				return ec.fieldContext_CompositeResourceSpec_writeConnectionSecretToReference(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CompositeResourceSpec", field.Name)
 		},
@@ -6318,12 +6489,18 @@ func (ec *executionContext) fieldContext_CompositeResourceClaim_spec(ctx context
 			switch field.Name {
 			case "composition":
 				return ec.fieldContext_CompositeResourceClaimSpec_composition(ctx, field)
+			case "compositionRef":
+				return ec.fieldContext_CompositeResourceClaimSpec_compositionRef(ctx, field)
 			case "compositionSelector":
 				return ec.fieldContext_CompositeResourceClaimSpec_compositionSelector(ctx, field)
 			case "resource":
 				return ec.fieldContext_CompositeResourceClaimSpec_resource(ctx, field)
+			case "resourceRef":
+				return ec.fieldContext_CompositeResourceClaimSpec_resourceRef(ctx, field)
 			case "connectionSecret":
 				return ec.fieldContext_CompositeResourceClaimSpec_connectionSecret(ctx, field)
+			case "writeConnectionSecretToReference":
+				return ec.fieldContext_CompositeResourceClaimSpec_writeConnectionSecretToReference(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CompositeResourceClaimSpec", field.Name)
 		},
@@ -6740,6 +6917,51 @@ func (ec *executionContext) fieldContext_CompositeResourceClaimSpec_composition(
 	return fc, nil
 }
 
+func (ec *executionContext) _CompositeResourceClaimSpec_compositionRef(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimSpec) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CompositeResourceClaimSpec_compositionRef(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.CompositeResourceClaimSpec().CompositionRef(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.LocalObjectReference)
+	fc.Result = res
+	return ec.marshalOLocalObjectReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐLocalObjectReference(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CompositeResourceClaimSpec_compositionRef(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CompositeResourceClaimSpec",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_LocalObjectReference_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LocalObjectReference", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CompositeResourceClaimSpec_compositionSelector(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimSpec) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CompositeResourceClaimSpec_compositionSelector(ctx, field)
 	if err != nil {
@@ -6846,6 +7068,55 @@ func (ec *executionContext) fieldContext_CompositeResourceClaimSpec_resource(ctx
 	return fc, nil
 }
 
+func (ec *executionContext) _CompositeResourceClaimSpec_resourceRef(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimSpec) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CompositeResourceClaimSpec_resourceRef(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.CompositeResourceClaimSpec().ResourceRef(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ObjectReference)
+	fc.Result = res
+	return ec.marshalOObjectReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectReference(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CompositeResourceClaimSpec_resourceRef(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CompositeResourceClaimSpec",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "kind":
+				return ec.fieldContext_ObjectReference_kind(ctx, field)
+			case "namespace":
+				return ec.fieldContext_ObjectReference_namespace(ctx, field)
+			case "name":
+				return ec.fieldContext_ObjectReference_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ObjectReference", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CompositeResourceClaimSpec_connectionSecret(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimSpec) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CompositeResourceClaimSpec_connectionSecret(ctx, field)
 	if err != nil {
@@ -6900,6 +7171,53 @@ func (ec *executionContext) fieldContext_CompositeResourceClaimSpec_connectionSe
 				return ec.fieldContext_Secret_events(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Secret", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CompositeResourceClaimSpec_writeConnectionSecretToReference(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaimSpec) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CompositeResourceClaimSpec_writeConnectionSecretToReference(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.CompositeResourceClaimSpec().WriteConnectionSecretToReference(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.SecretReference)
+	fc.Result = res
+	return ec.marshalOSecretReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretReference(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CompositeResourceClaimSpec_writeConnectionSecretToReference(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CompositeResourceClaimSpec",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_SecretReference_name(ctx, field)
+			case "namespace":
+				return ec.fieldContext_SecretReference_namespace(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SecretReference", field.Name)
 		},
 	}
 	return fc, nil
@@ -8830,6 +9148,51 @@ func (ec *executionContext) fieldContext_CompositeResourceSpec_composition(ctx c
 	return fc, nil
 }
 
+func (ec *executionContext) _CompositeResourceSpec_compositionRef(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceSpec) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CompositeResourceSpec_compositionRef(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.CompositeResourceSpec().CompositionRef(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.LocalObjectReference)
+	fc.Result = res
+	return ec.marshalOLocalObjectReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐLocalObjectReference(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CompositeResourceSpec_compositionRef(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CompositeResourceSpec",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_LocalObjectReference_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LocalObjectReference", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CompositeResourceSpec_compositionSelector(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceSpec) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CompositeResourceSpec_compositionSelector(ctx, field)
 	if err != nil {
@@ -8936,6 +9299,55 @@ func (ec *executionContext) fieldContext_CompositeResourceSpec_claim(ctx context
 	return fc, nil
 }
 
+func (ec *executionContext) _CompositeResourceSpec_claimRef(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceSpec) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CompositeResourceSpec_claimRef(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.CompositeResourceSpec().ClaimRef(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ObjectReference)
+	fc.Result = res
+	return ec.marshalOObjectReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectReference(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CompositeResourceSpec_claimRef(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CompositeResourceSpec",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "kind":
+				return ec.fieldContext_ObjectReference_kind(ctx, field)
+			case "namespace":
+				return ec.fieldContext_ObjectReference_namespace(ctx, field)
+			case "name":
+				return ec.fieldContext_ObjectReference_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ObjectReference", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CompositeResourceSpec_connectionSecret(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceSpec) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CompositeResourceSpec_connectionSecret(ctx, field)
 	if err != nil {
@@ -9037,6 +9449,53 @@ func (ec *executionContext) fieldContext_CompositeResourceSpec_resources(ctx con
 				return ec.fieldContext_KubernetesResourceConnection_totalCount(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type KubernetesResourceConnection", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CompositeResourceSpec_writeConnectionSecretToReference(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceSpec) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CompositeResourceSpec_writeConnectionSecretToReference(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.CompositeResourceSpec().WriteConnectionSecretToReference(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.SecretReference)
+	fc.Result = res
+	return ec.marshalOSecretReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretReference(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CompositeResourceSpec_writeConnectionSecretToReference(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CompositeResourceSpec",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_SecretReference_name(ctx, field)
+			case "namespace":
+				return ec.fieldContext_SecretReference_namespace(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SecretReference", field.Name)
 		},
 	}
 	return fc, nil
@@ -14907,6 +15366,50 @@ func (ec *executionContext) fieldContext_LabelSelector_matchLabels(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _LocalObjectReference_name(ctx context.Context, field graphql.CollectedField, obj *model.LocalObjectReference) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LocalObjectReference_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LocalObjectReference_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LocalObjectReference",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ManagedResource_id(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ManagedResource_id(ctx, field)
 	if err != nil {
@@ -16249,6 +16752,129 @@ func (ec *executionContext) fieldContext_ObjectMeta_controller(ctx context.Conte
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("FieldContext.Child cannot be called on type INTERFACE")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ObjectReference_kind(ctx context.Context, field graphql.CollectedField, obj *model.ObjectReference) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ObjectReference_kind(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Kind, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ObjectReference_kind(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ObjectReference",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ObjectReference_namespace(ctx context.Context, field graphql.CollectedField, obj *model.ObjectReference) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ObjectReference_namespace(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Namespace, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ObjectReference_namespace(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ObjectReference",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ObjectReference_name(ctx context.Context, field graphql.CollectedField, obj *model.ObjectReference) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ObjectReference_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ObjectReference_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ObjectReference",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -20444,6 +21070,94 @@ func (ec *executionContext) fieldContext_Secret_events(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _SecretReference_name(ctx context.Context, field graphql.CollectedField, obj *model.SecretReference) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SecretReference_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SecretReference_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SecretReference",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SecretReference_namespace(ctx context.Context, field graphql.CollectedField, obj *model.SecretReference) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SecretReference_namespace(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Namespace, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SecretReference_namespace(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SecretReference",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _TypeReference_apiVersion(ctx context.Context, field graphql.CollectedField, obj *model.TypeReference) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_TypeReference_apiVersion(ctx, field)
 	if err != nil {
@@ -23093,6 +23807,23 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 				return innerFunc(ctx)
 
 			})
+		case "compositionRef":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceClaimSpec_compositionRef(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "compositionSelector":
 
 			out.Values[i] = ec._CompositeResourceClaimSpec_compositionSelector(ctx, field, obj)
@@ -23114,6 +23845,23 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 				return innerFunc(ctx)
 
 			})
+		case "resourceRef":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceClaimSpec_resourceRef(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "connectionSecret":
 			field := field
 
@@ -23124,6 +23872,23 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 					}
 				}()
 				res = ec._CompositeResourceClaimSpec_connectionSecret(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "writeConnectionSecretToReference":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceClaimSpec_writeConnectionSecretToReference(ctx, field, obj)
 				return res
 			}
 
@@ -23650,6 +24415,23 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 				return innerFunc(ctx)
 
 			})
+		case "compositionRef":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceSpec_compositionRef(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "compositionSelector":
 
 			out.Values[i] = ec._CompositeResourceSpec_compositionSelector(ctx, field, obj)
@@ -23664,6 +24446,23 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 					}
 				}()
 				res = ec._CompositeResourceSpec_claim(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "claimRef":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceSpec_claimRef(ctx, field, obj)
 				return res
 			}
 
@@ -23698,6 +24497,23 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 					}
 				}()
 				res = ec._CompositeResourceSpec_resources(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "writeConnectionSecretToReference":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceSpec_writeConnectionSecretToReference(ctx, field, obj)
 				return res
 			}
 
@@ -25219,6 +26035,34 @@ func (ec *executionContext) _LabelSelector(ctx context.Context, sel ast.Selectio
 	return out
 }
 
+var localObjectReferenceImplementors = []string{"LocalObjectReference"}
+
+func (ec *executionContext) _LocalObjectReference(ctx context.Context, sel ast.SelectionSet, obj *model.LocalObjectReference) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, localObjectReferenceImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LocalObjectReference")
+		case "name":
+
+			out.Values[i] = ec._LocalObjectReference_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var managedResourceImplementors = []string{"ManagedResource", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.SelectionSet, obj *model.ManagedResource) graphql.Marshaler {
@@ -25553,6 +26397,39 @@ func (ec *executionContext) _ObjectMeta(ctx context.Context, sel ast.SelectionSe
 				return innerFunc(ctx)
 
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var objectReferenceImplementors = []string{"ObjectReference"}
+
+func (ec *executionContext) _ObjectReference(ctx context.Context, sel ast.SelectionSet, obj *model.ObjectReference) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, objectReferenceImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ObjectReference")
+		case "kind":
+
+			out.Values[i] = ec._ObjectReference_kind(ctx, field, obj)
+
+		case "namespace":
+
+			out.Values[i] = ec._ObjectReference_namespace(ctx, field, obj)
+
+		case "name":
+
+			out.Values[i] = ec._ObjectReference_name(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -26679,6 +27556,41 @@ func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, o
 				return innerFunc(ctx)
 
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var secretReferenceImplementors = []string{"SecretReference"}
+
+func (ec *executionContext) _SecretReference(ctx context.Context, sel ast.SelectionSet, obj *model.SecretReference) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, secretReferenceImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SecretReference")
+		case "name":
+
+			out.Values[i] = ec._SecretReference_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "namespace":
+
+			out.Values[i] = ec._SecretReference_namespace(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -28740,6 +29652,13 @@ func (ec *executionContext) marshalOLabelSelector2ᚖgithubᚗcomᚋupboundᚋxg
 	return ec._LabelSelector(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOLocalObjectReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐLocalObjectReference(ctx context.Context, sel ast.SelectionSet, v *model.LocalObjectReference) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._LocalObjectReference(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOManagedResourceDefinition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceDefinition(ctx context.Context, sel ast.SelectionSet, v model.ManagedResourceDefinition) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -28752,6 +29671,13 @@ func (ec *executionContext) marshalOManagedResourceStatus2ᚖgithubᚗcomᚋupbo
 		return graphql.Null
 	}
 	return ec._ManagedResourceStatus(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOObjectReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectReference(ctx context.Context, sel ast.SelectionSet, v *model.ObjectReference) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ObjectReference(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOOwner2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Owner) graphql.Marshaler {
@@ -29041,6 +29967,13 @@ func (ec *executionContext) marshalOSecret2ᚖgithubᚗcomᚋupboundᚋxgqlᚋin
 		return graphql.Null
 	}
 	return ec._Secret(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOSecretReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐSecretReference(ctx context.Context, sel ast.SelectionSet, v *model.SecretReference) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._SecretReference(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {

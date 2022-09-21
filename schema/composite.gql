@@ -42,6 +42,11 @@ type CompositeResourceSpec {
   composition: Composition @goField(forceResolver: true)
 
   """
+  The compositionRef this composite resource uses to compose resources.
+  """
+  compositionRef: LocalObjectReference
+
+  """
   A composition selector is used to select this composite resource's composition
   by matching on labels.
   """
@@ -52,6 +57,9 @@ type CompositeResourceSpec {
   """
   claim: CompositeResourceClaim @goField(forceResolver: true)
 
+  "The `ObjectReference` for the composite resource claim that claims this composite resource"
+  claimRef: ObjectReference
+
   """
   The secret this composite resource writes its connection details to.
   """
@@ -61,6 +69,9 @@ type CompositeResourceSpec {
   The resources of which this composite resource is composed.
   """
   resources: KubernetesResourceConnection @goField(forceResolver: true)
+
+  "Reference to the secret this composite resource writes its connection details to"
+  writeConnectionSecretToReference: SecretReference
 }
 
 # TODO(negz): Do we need to support GenericResource here, just in case? We only
@@ -129,9 +140,14 @@ resource claim.
 """
 type CompositeResourceClaimSpec {
   """
-  The composition this composite resource uses to compose resources.
+  The composition this composite resource claim uses to compose resources.
   """
   composition: Composition @goField(forceResolver: true)
+
+  """
+  The compositionRef this composite resource claim uses to compose resources.
+  """
+  compositionRef: LocalObjectReference
 
   """
   A composition selector is used to select this composite resource claims's
@@ -145,9 +161,17 @@ type CompositeResourceClaimSpec {
   resource: CompositeResource @goField(forceResolver: true)
 
   """
+  A reference to the composite resource to which this composite resource claim is bound.
+  """
+  resourceRef: ObjectReference
+
+  """
   The secret this composite resource claim writes its connection details to.
   """
   connectionSecret: Secret @goField(forceResolver: true)
+
+  "Reference to the secret this composite resource writes its connection details to"
+  writeConnectionSecretToReference: SecretReference
 }
 
 """

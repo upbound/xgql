@@ -469,6 +469,36 @@ type ConfigMap implements Node & KubernetesResource {
   events: EventConnection! @goField(forceResolver: true)
 }
 
+"`ObjectReference` contains enough information to let you inspect or modify the referred object."
+type ObjectReference {
+  "Kind of the referent."
+  kind: String
+
+  "Namespace of the referent."
+  namespace: String
+
+  "Name of the referent."
+  name: String
+}
+
+"""
+`LocalObjectReference` contains a name to to let you inspect or modify the
+locally referred object.
+"""
+type LocalObjectReference {
+  "Name of the referent."
+  name: String!
+}
+
+"A `SecretReference` is a reference to a secret in an arbitrary namespace."
+type SecretReference {
+  "Name of the `Secret`."
+  name: String!
+
+  "Namespace of the `Secret`."
+  namespace: String!
+}
+
 """
 A CustomResourceDefinition defines a type of custom resource that extends the
 set of resources supported by the Kubernetes API.

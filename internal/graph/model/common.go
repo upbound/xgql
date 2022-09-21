@@ -462,3 +462,39 @@ func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, e
 		return GetGenericResource(u), nil
 	}
 }
+
+// GetObjectReference from the supplied corev1 ObjectReference
+func GetObjectReference(o *corev1.ObjectReference) *ObjectReference {
+
+	if o == nil {
+		return nil
+	}
+
+	ref := &ObjectReference{}
+
+	if o.Kind != "" {
+		ref.Kind = &o.Kind
+	}
+
+	if o.Namespace != "" {
+		ref.Namespace = &o.Namespace
+	}
+
+	if o.Name != "" {
+		ref.Name = &o.Name
+	}
+
+	return ref
+}
+
+// GetObjectReference from the supplied corev1 ObjectReference
+func GetSecretReference(u *xpv1.SecretReference) *SecretReference {
+	if u == nil {
+		return nil
+	}
+
+	return &SecretReference{
+		Name:      u.Name,
+		Namespace: u.Namespace,
+	}
+}

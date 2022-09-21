@@ -62,9 +62,9 @@ func TestGetManagedResource(t *testing.T) {
 					Name: "cool",
 				},
 				Spec: &ManagedResourceSpec{
-					ProviderConfigRef:                 &ProviderConfigReference{Name: "coolprov"},
-					DeletionPolicy:                    &orphan,
-					WritesConnectionSecretToReference: &xpv1.SecretReference{Name: "coolsecret"},
+					ProviderConfigRef:                &ProviderConfigReference{Name: "coolprov"},
+					DeletionPolicy:                   &orphan,
+					WriteConnectionSecretToReference: &xpv1.SecretReference{Name: "coolsecret"},
 				},
 				Status: &ManagedResourceStatus{
 					Conditions: []Condition{{}},
