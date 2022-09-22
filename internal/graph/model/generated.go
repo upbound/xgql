@@ -43,6 +43,12 @@ type ProviderConfigDefinition interface {
 	IsProviderConfigDefinition()
 }
 
+// A XRM Resource which is either a `CompositeResource`, `CompositeResourceClaim`
+// or `ManagedResource`
+type XRMResource interface {
+	IsXRMResource()
+}
+
 // A CompositeResource is a resource this is reconciled by composing other
 // composite or managed resources. Composite resources use a Composition to
 // determine which resources to compose, and how.
@@ -69,6 +75,7 @@ type CompositeResource struct {
 
 func (CompositeResource) IsNode()               {}
 func (CompositeResource) IsKubernetesResource() {}
+func (CompositeResource) IsXRMResource()        {}
 
 // A CompositeResourceClaim is a namespaced proxy for a composite resource.
 type CompositeResourceClaim struct {
@@ -94,6 +101,7 @@ type CompositeResourceClaim struct {
 
 func (CompositeResourceClaim) IsNode()               {}
 func (CompositeResourceClaim) IsKubernetesResource() {}
+func (CompositeResourceClaim) IsXRMResource()        {}
 
 // A CompositeResourceConnection represents a connection to composite resource
 // claims.
@@ -675,6 +683,7 @@ type ManagedResource struct {
 
 func (ManagedResource) IsNode()               {}
 func (ManagedResource) IsKubernetesResource() {}
+func (ManagedResource) IsXRMResource()        {}
 
 // A ManagedResourceStatus represents the observed state of a managed resource.
 type ManagedResourceStatus struct {
@@ -957,6 +966,25 @@ type UpdateKubernetesResourceInput struct {
 type UpdateKubernetesResourcePayload struct {
 	// The updated Kubernetes resource. Null if the update failed.
 	Resource KubernetesResource `json:"resource"`
+}
+
+// A `XRMResourceTreeConnection` reprsents a connection to `XRMDescendant`s
+type XRMResourceTreeConnection struct {
+	// Connected nodes.
+	Nodes []XRMResourceTreeNode `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
+}
+
+// An `XRMResourceTreeNode` is an `XRMResource` with a `ID` of its parent
+// `XRMResource`.
+//
+// Note: A `NULL` `parentId` represents the root of the descendant tree.
+type XRMResourceTreeNode struct {
+	// The `ID` of the parent `XRMResource` (`NULL` is the root of the tree)
+	ParentID *ReferenceID `json:"parentId"`
+	// The `XRMResource` object of this `XRMResourceTreeNode`
+	Resource XRMResource `json:"resource"`
 }
 
 // A ConditionStatus represensts the status of a condition.

@@ -32,6 +32,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
@@ -43,6 +44,193 @@ import (
 )
 
 var _ generated.QueryResolver = &query{}
+
+func TestXrmResourceTree(t *testing.T) {
+	errBoom := errors.New("boom")
+
+	type args struct {
+		ctx context.Context
+		id  model.ReferenceID
+	}
+	type want struct {
+		kr   *model.XRMResourceTreeConnection
+		err  error
+		errs gqlerror.List
+	}
+
+	namespace := "default"
+	deletionPolicyDelete := model.DeletionPolicyDelete
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"GetKubernetesResourceError": {
+			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{}, errBoom
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+				},
+			},
+		},
+		"getAllDecendentsNotXRMResourceError": {
+			reason: "If the passed resource ID is not for a XRMResource we error",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf("was not a `CompositeResource`, `CompositeResourceClaim`, or `ManagedResource` got: model.GenericResource"),
+				},
+			},
+		},
+		"SuccessWithNoComposite": {
+			reason: "It is a successful call",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: func(_ context.Context, key client.ObjectKey, obj client.Object) error {
+						switch key.Name {
+						case "root":
+							u := *obj.(*unstructured.Unstructured)
+							u.SetNamespace(namespace)
+							fieldpath.Pave(u.Object).SetValue("spec.compositionRef", &corev1.ObjectReference{
+								Name: "coolcomposition",
+							})
+						default:
+							t.Fatalf("unknown get with name: %s", key.Name)
+						}
+						return nil
+					},
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				id:  model.ReferenceID{Name: "root"},
+			},
+			want: want{
+				kr: &model.XRMResourceTreeConnection{TotalCount: 1, Nodes: []model.XRMResourceTreeNode{
+					{
+						Resource: model.CompositeResourceClaim{
+							ID:       model.ReferenceID{Namespace: namespace},
+							Metadata: &model.ObjectMeta{Namespace: &namespace},
+							Spec:     &model.CompositeResourceClaimSpec{CompositionReference: &corev1.ObjectReference{Name: "coolcomposition"}},
+						},
+					},
+				}},
+			},
+		},
+		"Success": {
+			reason: "It is a successful call",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: func(_ context.Context, key client.ObjectKey, obj client.Object) error {
+						u := *obj.(*unstructured.Unstructured)
+						u.SetName(key.Name)
+
+						switch key.Name {
+						case "root":
+							u.SetNamespace(namespace)
+							fieldpath.Pave(u.Object).SetValue("spec.resourceRef", &corev1.ObjectReference{Name: "composite"})
+						case "composite":
+							fieldpath.Pave(u.Object).SetValue("spec.resourceRefs", []corev1.ObjectReference{{Name: "managed1"}, {Name: "child-composite"}})
+						case "child-composite":
+							fieldpath.Pave(u.Object).SetValue("spec.resourceRefs", []corev1.ObjectReference{{Name: "managed2"}})
+						case "managed1":
+							fallthrough
+						case "managed2":
+							fieldpath.Pave(u.Object).SetValue("spec.providerConfigRef.name", "")
+						default:
+							t.Fatalf("unknown get with name: %s", key.Name)
+						}
+						return nil
+					},
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				id:  model.ReferenceID{Name: "root"},
+			},
+			want: want{
+				kr: &model.XRMResourceTreeConnection{TotalCount: 5, Nodes: []model.XRMResourceTreeNode{
+					{
+						Resource: model.CompositeResourceClaim{
+							ID:       model.ReferenceID{Namespace: namespace, Name: "root"},
+							Metadata: &model.ObjectMeta{Namespace: &namespace, Name: "root"},
+							Spec:     &model.CompositeResourceClaimSpec{ResourceReference: &corev1.ObjectReference{Name: "composite"}},
+						},
+					},
+					{
+						ParentID: &model.ReferenceID{Namespace: "default", Name: "root"},
+						Resource: model.CompositeResource{
+							ID:       model.ReferenceID{Name: "composite"},
+							Metadata: &model.ObjectMeta{Name: "composite"},
+							Spec:     &model.CompositeResourceSpec{ResourceReferences: []corev1.ObjectReference{{Name: "managed1"}, {Name: "child-composite"}}},
+						},
+					},
+					{
+						ParentID: &model.ReferenceID{Name: "composite"},
+						Resource: model.CompositeResource{
+							ID:       model.ReferenceID{Name: "child-composite"},
+							Metadata: &model.ObjectMeta{Name: "child-composite"},
+							Spec:     &model.CompositeResourceSpec{ResourceReferences: []corev1.ObjectReference{{Name: "managed2"}}},
+						},
+					},
+					{
+						ParentID: &model.ReferenceID{Name: "child-composite"},
+						Resource: model.ManagedResource{
+							ID:       model.ReferenceID{Name: "managed2"},
+							Metadata: &model.ObjectMeta{Name: "managed2"},
+							Spec:     &model.ManagedResourceSpec{ProviderConfigRef: &model.ProviderConfigReference{}, DeletionPolicy: &deletionPolicyDelete},
+						},
+					},
+					{
+						ParentID: &model.ReferenceID{Name: "composite"},
+						Resource: model.ManagedResource{
+							ID:       model.ReferenceID{Name: "managed1"},
+							Metadata: &model.ObjectMeta{Name: "managed1"},
+							Spec:     &model.ManagedResourceSpec{ProviderConfigRef: &model.ProviderConfigReference{}, DeletionPolicy: &deletionPolicyDelete},
+						},
+					},
+				}},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			q := &query{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := q.XrmResourceTree(tc.args.ctx, tc.args.id)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.KubernetesResource(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\ns.KubernetesResource(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+
+			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreFields(model.CompositeResourceClaim{}, "Unstructured"), cmpopts.IgnoreFields(model.CompositeResource{}, "Unstructured"), cmpopts.IgnoreFields(model.ManagedResource{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+				t.Errorf("\n%s\ns.KubernetesResource(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
 
 func TestQueryKubernetesResource(t *testing.T) {
 	errBoom := errors.New("boom")
@@ -96,7 +284,7 @@ func TestQueryKubernetesResource(t *testing.T) {
 			},
 		},
 		"Success": {
-			reason: "If we can get and model the resource  we should return it.",
+			reason: "If we can get and model the resource we should return it.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockGet: test.NewMockGetFn(nil),

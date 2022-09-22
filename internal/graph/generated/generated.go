@@ -577,6 +577,7 @@ type ComplexityRoot struct {
 		ProviderRevisions            func(childComplexity int, provider *model.ReferenceID, active *bool) int
 		Providers                    func(childComplexity int) int
 		Secret                       func(childComplexity int, namespace string, name string) int
+		XrmResourceTree              func(childComplexity int, id model.ReferenceID) int
 	}
 
 	Secret struct {
@@ -601,6 +602,16 @@ type ComplexityRoot struct {
 	}
 
 	UpdateKubernetesResourcePayload struct {
+		Resource func(childComplexity int) int
+	}
+
+	XRMResourceTreeConnection struct {
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	XRMResourceTreeNode struct {
+		ParentID func(childComplexity int) int
 		Resource func(childComplexity int) int
 	}
 }
@@ -712,6 +723,7 @@ type QueryResolver interface {
 	ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID, active *bool) (*model.ConfigurationRevisionConnection, error)
 	CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositeResourceDefinitionConnection, error)
 	Compositions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositionConnection, error)
+	XrmResourceTree(ctx context.Context, id model.ReferenceID) (*model.XRMResourceTreeConnection, error)
 }
 type SecretResolver interface {
 	Events(ctx context.Context, obj *model.Secret) (*model.EventConnection, error)
@@ -2962,6 +2974,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Secret(childComplexity, args["namespace"].(string), args["name"].(string)), true
 
+	case "Query.xrmResourceTree":
+		if e.complexity.Query.XrmResourceTree == nil {
+			break
+		}
+
+		args, err := ec.field_Query_xrmResourceTree_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.XrmResourceTree(childComplexity, args["id"].(model.ReferenceID)), true
+
 	case "Secret.apiVersion":
 		if e.complexity.Secret.APIVersion == nil {
 			break
@@ -3057,6 +3081,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdateKubernetesResourcePayload.Resource(childComplexity), true
+
+	case "XRMResourceTreeConnection.nodes":
+		if e.complexity.XRMResourceTreeConnection.Nodes == nil {
+			break
+		}
+
+		return e.complexity.XRMResourceTreeConnection.Nodes(childComplexity), true
+
+	case "XRMResourceTreeConnection.totalCount":
+		if e.complexity.XRMResourceTreeConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.XRMResourceTreeConnection.TotalCount(childComplexity), true
+
+	case "XRMResourceTreeNode.parentId":
+		if e.complexity.XRMResourceTreeNode.ParentID == nil {
+			break
+		}
+
+		return e.complexity.XRMResourceTreeNode.ParentID(childComplexity), true
+
+	case "XRMResourceTreeNode.resource":
+		if e.complexity.XRMResourceTreeNode.Resource == nil {
+			break
+		}
+
+		return e.complexity.XRMResourceTreeNode.Resource(childComplexity), true
 
 	}
 	return 0, false
@@ -5260,6 +5312,45 @@ type Query {
     """
     dangling: Boolean = false
   ): CompositionConnection!
+
+  """
+  Get an ` + "`" + `XRMResource` + "`" + ` and its descendants which form a tree.
+  """
+  xrmResourceTree(
+    "The ` + "`" + `ID` + "`" + ` of an ` + "`" + `XRMResource` + "`" + `"
+    id: ID!
+  ): XRMResourceTreeConnection!
+}
+
+"""
+A XRM Resource which is either a ` + "`" + `CompositeResource` + "`" + `, ` + "`" + `CompositeResourceClaim` + "`" + `
+or ` + "`" + `ManagedResource` + "`" + `
+"""
+union XRMResource = CompositeResource | CompositeResourceClaim | ManagedResource
+
+"""
+A ` + "`" + `XRMResourceTreeConnection` + "`" + ` reprsents a connection to ` + "`" + `XRMDescendant` + "`" + `s
+"""
+type XRMResourceTreeConnection {
+  "Connected nodes."
+  nodes: [XRMResourceTreeNode!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
+}
+
+"""
+An ` + "`" + `XRMResourceTreeNode` + "`" + ` is an ` + "`" + `XRMResource` + "`" + ` with a ` + "`" + `ID` + "`" + ` of its parent
+` + "`" + `XRMResource` + "`" + `.
+
+Note: A ` + "`" + `NULL` + "`" + ` ` + "`" + `parentId` + "`" + ` represents the root of the descendant tree.
+"""
+type XRMResourceTreeNode {
+  "The ` + "`" + `ID` + "`" + ` of the parent ` + "`" + `XRMResource` + "`" + ` (` + "`" + `NULL` + "`" + ` is the root of the tree)"
+  parentId: ID
+
+  "The ` + "`" + `XRMResource` + "`" + ` object of this ` + "`" + `XRMResourceTreeNode` + "`" + `"
+  resource: XRMResource!
 }
 
 """
@@ -5722,6 +5813,21 @@ func (ec *executionContext) field_Query_secret_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_xrmResourceTree_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -20552,6 +20658,67 @@ func (ec *executionContext) fieldContext_Query_compositions(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_xrmResourceTree(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_xrmResourceTree(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().XrmResourceTree(rctx, fc.Args["id"].(model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.XRMResourceTreeConnection)
+	fc.Result = res
+	return ec.marshalNXRMResourceTreeConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐXRMResourceTreeConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_xrmResourceTree(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "nodes":
+				return ec.fieldContext_XRMResourceTreeConnection_nodes(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_XRMResourceTreeConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type XRMResourceTreeConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_xrmResourceTree_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -21282,6 +21449,182 @@ func (ec *executionContext) fieldContext_UpdateKubernetesResourcePayload_resourc
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("FieldContext.Child cannot be called on type INTERFACE")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _XRMResourceTreeConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.XRMResourceTreeConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_XRMResourceTreeConnection_nodes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.XRMResourceTreeNode)
+	fc.Result = res
+	return ec.marshalOXRMResourceTreeNode2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐXRMResourceTreeNodeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_XRMResourceTreeConnection_nodes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "XRMResourceTreeConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "parentId":
+				return ec.fieldContext_XRMResourceTreeNode_parentId(ctx, field)
+			case "resource":
+				return ec.fieldContext_XRMResourceTreeNode_resource(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type XRMResourceTreeNode", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _XRMResourceTreeConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.XRMResourceTreeConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_XRMResourceTreeConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_XRMResourceTreeConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "XRMResourceTreeConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _XRMResourceTreeNode_parentId(ctx context.Context, field graphql.CollectedField, obj *model.XRMResourceTreeNode) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_XRMResourceTreeNode_parentId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ParentID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ReferenceID)
+	fc.Result = res
+	return ec.marshalOID2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_XRMResourceTreeNode_parentId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "XRMResourceTreeNode",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _XRMResourceTreeNode_resource(ctx context.Context, field graphql.CollectedField, obj *model.XRMResourceTreeNode) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_XRMResourceTreeNode_resource(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Resource, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.XRMResource)
+	fc.Result = res
+	return ec.marshalNXRMResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐXRMResource(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_XRMResourceTreeNode_resource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "XRMResourceTreeNode",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type XRMResource does not have child fields")
 		},
 	}
 	return fc, nil
@@ -23511,11 +23854,41 @@ func (ec *executionContext) _ProviderConfigDefinition(ctx context.Context, sel a
 	}
 }
 
+func (ec *executionContext) _XRMResource(ctx context.Context, sel ast.SelectionSet, obj model.XRMResource) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case model.CompositeResource:
+		return ec._CompositeResource(ctx, sel, &obj)
+	case *model.CompositeResource:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._CompositeResource(ctx, sel, obj)
+	case model.CompositeResourceClaim:
+		return ec._CompositeResourceClaim(ctx, sel, &obj)
+	case *model.CompositeResourceClaim:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._CompositeResourceClaim(ctx, sel, obj)
+	case model.ManagedResource:
+		return ec._ManagedResource(ctx, sel, &obj)
+	case *model.ManagedResource:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ManagedResource(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
 
-var compositeResourceImplementors = []string{"CompositeResource", "Node", "KubernetesResource"}
+var compositeResourceImplementors = []string{"CompositeResource", "Node", "KubernetesResource", "XRMResource"}
 
 func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceImplementors)
@@ -23619,7 +23992,7 @@ func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.Sele
 	return out
 }
 
-var compositeResourceClaimImplementors = []string{"CompositeResourceClaim", "Node", "KubernetesResource"}
+var compositeResourceClaimImplementors = []string{"CompositeResourceClaim", "Node", "KubernetesResource", "XRMResource"}
 
 func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceClaim) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceClaimImplementors)
@@ -26063,7 +26436,7 @@ func (ec *executionContext) _LocalObjectReference(ctx context.Context, sel ast.S
 	return out
 }
 
-var managedResourceImplementors = []string{"ManagedResource", "Node", "KubernetesResource"}
+var managedResourceImplementors = []string{"ManagedResource", "Node", "KubernetesResource", "XRMResource"}
 
 func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.SelectionSet, obj *model.ManagedResource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, managedResourceImplementors)
@@ -27460,6 +27833,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "xrmResourceTree":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_xrmResourceTree(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "__type":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -27651,6 +28047,70 @@ func (ec *executionContext) _UpdateKubernetesResourcePayload(ctx context.Context
 
 			out.Values[i] = ec._UpdateKubernetesResourcePayload_resource(ctx, field, obj)
 
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var xRMResourceTreeConnectionImplementors = []string{"XRMResourceTreeConnection"}
+
+func (ec *executionContext) _XRMResourceTreeConnection(ctx context.Context, sel ast.SelectionSet, obj *model.XRMResourceTreeConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, xRMResourceTreeConnectionImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("XRMResourceTreeConnection")
+		case "nodes":
+
+			out.Values[i] = ec._XRMResourceTreeConnection_nodes(ctx, field, obj)
+
+		case "totalCount":
+
+			out.Values[i] = ec._XRMResourceTreeConnection_totalCount(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var xRMResourceTreeNodeImplementors = []string{"XRMResourceTreeNode"}
+
+func (ec *executionContext) _XRMResourceTreeNode(ctx context.Context, sel ast.SelectionSet, obj *model.XRMResourceTreeNode) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, xRMResourceTreeNodeImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("XRMResourceTreeNode")
+		case "parentId":
+
+			out.Values[i] = ec._XRMResourceTreeNode_parentId(ctx, field, obj)
+
+		case "resource":
+
+			out.Values[i] = ec._XRMResourceTreeNode_resource(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -28566,6 +29026,34 @@ func (ec *executionContext) marshalNUpdateKubernetesResourcePayload2ᚖgithubᚗ
 		return graphql.Null
 	}
 	return ec._UpdateKubernetesResourcePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNXRMResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐXRMResource(ctx context.Context, sel ast.SelectionSet, v model.XRMResource) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._XRMResource(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNXRMResourceTreeConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐXRMResourceTreeConnection(ctx context.Context, sel ast.SelectionSet, v model.XRMResourceTreeConnection) graphql.Marshaler {
+	return ec._XRMResourceTreeConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNXRMResourceTreeConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐXRMResourceTreeConnection(ctx context.Context, sel ast.SelectionSet, v *model.XRMResourceTreeConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._XRMResourceTreeConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNXRMResourceTreeNode2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐXRMResourceTreeNode(ctx context.Context, sel ast.SelectionSet, v model.XRMResourceTreeNode) graphql.Marshaler {
+	return ec._XRMResourceTreeNode(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -30067,6 +30555,53 @@ func (ec *executionContext) marshalOTypeReference2ᚖgithubᚗcomᚋupboundᚋxg
 		return graphql.Null
 	}
 	return ec._TypeReference(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOXRMResourceTreeNode2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐXRMResourceTreeNodeᚄ(ctx context.Context, sel ast.SelectionSet, v []model.XRMResourceTreeNode) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNXRMResourceTreeNode2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐXRMResourceTreeNode(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

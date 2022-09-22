@@ -16,6 +16,7 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
 	"sort"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -48,6 +49,74 @@ const (
 
 type query struct {
 	clients ClientCache
+}
+
+// Recursively collect `XRMResourceTreeNode`s from the given KubernetesResource
+func (r *query) getAllDecedents(ctx context.Context, res model.KubernetesResource, parentID *model.ReferenceID) ([]model.XRMResourceTreeNode, error) { //nolint:gocyclo
+	// This isn't _really_ that complex; it's a long but simple switch.
+
+	switch typedRes := res.(type) {
+	case model.CompositeResource:
+		list := []model.XRMResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
+
+		compositeResolver := compositeResourceSpec{clients: r.clients}
+		resources, err := compositeResolver.Resources(ctx, typedRes.Spec)
+		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
+			return nil, err
+		}
+
+		for _, childRes := range resources.Nodes {
+			childList, err := r.getAllDecedents(ctx, childRes, &typedRes.ID)
+			if err != nil || len(graphql.GetErrors(ctx)) > 0 {
+				return nil, err
+			}
+
+			list = append(list, childList...)
+		}
+
+		return list, nil
+	case model.CompositeResourceClaim:
+		list := []model.XRMResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
+
+		claimResolver := compositeResourceClaimSpec{clients: r.clients}
+		composite, err := claimResolver.Resource(ctx, typedRes.Spec)
+		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
+			return nil, err
+		}
+
+		if composite == nil {
+			return list, nil
+		}
+
+		childList, err := r.getAllDecedents(ctx, *composite, &typedRes.ID)
+		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
+			return nil, err
+		}
+
+		return append(list, childList...), nil
+	case model.ManagedResource:
+		return []model.XRMResourceTreeNode{{ParentID: parentID, Resource: typedRes}}, nil
+	default:
+		graphql.AddError(ctx, fmt.Errorf("was not a `CompositeResource`, `CompositeResourceClaim`, or `ManagedResource` got: %T", res))
+		return nil, nil
+	}
+}
+
+func (r *query) XrmResourceTree(ctx context.Context, id model.ReferenceID) (*model.XRMResourceTreeConnection, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	rootRes, err := r.KubernetesResource(ctx, id)
+	if err != nil || len(graphql.GetErrors(ctx)) > 0 {
+		return nil, err
+	}
+
+	list, err := r.getAllDecedents(ctx, rootRes, nil)
+	if err != nil || len(graphql.GetErrors(ctx)) > 0 {
+		return nil, err
+	}
+
+	return &model.XRMResourceTreeConnection{Nodes: list, TotalCount: len(list)}, nil
 }
 
 func (r *query) KubernetesResource(ctx context.Context, id model.ReferenceID) (model.KubernetesResource, error) {

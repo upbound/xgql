@@ -155,6 +155,45 @@ type Query {
     """
     dangling: Boolean = false
   ): CompositionConnection!
+
+  """
+  Get an `XRMResource` and its descendants which form a tree.
+  """
+  xrmResourceTree(
+    "The `ID` of an `XRMResource`"
+    id: ID!
+  ): XRMResourceTreeConnection!
+}
+
+"""
+A XRM Resource which is either a `CompositeResource`, `CompositeResourceClaim`
+or `ManagedResource`
+"""
+union XRMResource = CompositeResource | CompositeResourceClaim | ManagedResource
+
+"""
+A `XRMResourceTreeConnection` reprsents a connection to `XRMDescendant`s
+"""
+type XRMResourceTreeConnection {
+  "Connected nodes."
+  nodes: [XRMResourceTreeNode!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
+}
+
+"""
+An `XRMResourceTreeNode` is an `XRMResource` with a `ID` of its parent
+`XRMResource`.
+
+Note: A `NULL` `parentId` represents the root of the descendant tree.
+"""
+type XRMResourceTreeNode {
+  "The `ID` of the parent `XRMResource` (`NULL` is the root of the tree)"
+  parentId: ID
+
+  "The `XRMResource` object of this `XRMResourceTreeNode`"
+  resource: XRMResource!
 }
 
 """
