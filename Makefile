@@ -25,7 +25,7 @@ GO111MODULE = on
 
 # Setup Helm
 USE_HELM3 = true
-HELM_BASE_URL = https://charts.upbound.io 
+HELM_BASE_URL = https://charts.upbound.io
 HELM_S3_BUCKET = public-upbound.charts
 HELM_CHARTS = xgql
 HELM_CHART_LINT_ARGS_xgql = --set nameOverride='',imagePullSecrets=''
