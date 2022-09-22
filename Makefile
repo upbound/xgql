@@ -6,6 +6,7 @@ PLATFORMS ?= linux_amd64 linux_arm64
 -include build/makelib/common.mk
 
 # Setup Output
+S3_BUCKET ?= public-upbound.releases/$(PROJECT_NAME)
 -include build/makelib/output.mk
 
 # Setup Go
@@ -25,7 +26,7 @@ GO111MODULE = on
 # Setup Helm
 USE_HELM3 = true
 HELM_BASE_URL = https://charts.upbound.io 
-HELM_S3_BUCKET = upbound.charts
+HELM_S3_BUCKET = public-upbound.charts
 HELM_CHARTS = xgql
 HELM_CHART_LINT_ARGS_xgql = --set nameOverride='',imagePullSecrets=''
 -include build/makelib/k8s_tools.mk
