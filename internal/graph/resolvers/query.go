@@ -51,13 +51,13 @@ type query struct {
 	clients ClientCache
 }
 
-// Recursively collect `XRMResourceTreeNode`s from the given KubernetesResource
-func (r *query) getAllDecedents(ctx context.Context, res model.KubernetesResource, parentID *model.ReferenceID) ([]model.XRMResourceTreeNode, error) { //nolint:gocyclo
+// Recursively collect `CrossplaneResourceTreeNode`s from the given KubernetesResource
+func (r *query) getAllDecedents(ctx context.Context, res model.KubernetesResource, parentID *model.ReferenceID) ([]model.CrossplaneResourceTreeNode, error) { //nolint:gocyclo
 	// This isn't _really_ that complex; it's a long but simple switch.
 
 	switch typedRes := res.(type) {
 	case model.CompositeResource:
-		list := []model.XRMResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
+		list := []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
 
 		compositeResolver := compositeResourceSpec{clients: r.clients}
 		resources, err := compositeResolver.Resources(ctx, typedRes.Spec)
@@ -76,7 +76,7 @@ func (r *query) getAllDecedents(ctx context.Context, res model.KubernetesResourc
 
 		return list, nil
 	case model.CompositeResourceClaim:
-		list := []model.XRMResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
+		list := []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
 
 		claimResolver := compositeResourceClaimSpec{clients: r.clients}
 		composite, err := claimResolver.Resource(ctx, typedRes.Spec)
@@ -94,15 +94,17 @@ func (r *query) getAllDecedents(ctx context.Context, res model.KubernetesResourc
 		}
 
 		return append(list, childList...), nil
+	case model.ProviderConfig:
+		return []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}, nil
 	case model.ManagedResource:
-		return []model.XRMResourceTreeNode{{ParentID: parentID, Resource: typedRes}}, nil
+		return []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}, nil
 	default:
 		graphql.AddError(ctx, fmt.Errorf("was not a `CompositeResource`, `CompositeResourceClaim`, or `ManagedResource` got: %T", res))
 		return nil, nil
 	}
 }
 
-func (r *query) XrmResourceTree(ctx context.Context, id model.ReferenceID) (*model.XRMResourceTreeConnection, error) {
+func (r *query) CrossplaneResourceTree(ctx context.Context, id model.ReferenceID) (*model.CrossplaneResourceTreeConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -116,7 +118,7 @@ func (r *query) XrmResourceTree(ctx context.Context, id model.ReferenceID) (*mod
 		return nil, err
 	}
 
-	return &model.XRMResourceTreeConnection{Nodes: list, TotalCount: len(list)}, nil
+	return &model.CrossplaneResourceTreeConnection{Nodes: list, TotalCount: len(list)}, nil
 }
 
 func (r *query) KubernetesResource(ctx context.Context, id model.ReferenceID) (model.KubernetesResource, error) {

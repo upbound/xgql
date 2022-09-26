@@ -45,7 +45,7 @@ import (
 
 var _ generated.QueryResolver = &query{}
 
-func TestXrmResourceTree(t *testing.T) {
+func TestCrossplaneResourceTree(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	type args struct {
@@ -53,7 +53,7 @@ func TestXrmResourceTree(t *testing.T) {
 		id  model.ReferenceID
 	}
 	type want struct {
-		kr   *model.XRMResourceTreeConnection
+		kr   *model.CrossplaneResourceTreeConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -81,8 +81,8 @@ func TestXrmResourceTree(t *testing.T) {
 				},
 			},
 		},
-		"getAllDecendentsNotXRMResourceError": {
-			reason: "If the passed resource ID is not for a XRMResource we error",
+		"getAllDecendentsNotCrossplaneResourceError": {
+			reason: "If the passed resource ID is not for a CrossplaneResource we error",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockGet: test.NewMockGetFn(nil),
@@ -121,7 +121,7 @@ func TestXrmResourceTree(t *testing.T) {
 				id:  model.ReferenceID{Name: "root"},
 			},
 			want: want{
-				kr: &model.XRMResourceTreeConnection{TotalCount: 1, Nodes: []model.XRMResourceTreeNode{
+				kr: &model.CrossplaneResourceTreeConnection{TotalCount: 1, Nodes: []model.CrossplaneResourceTreeNode{
 					{
 						Resource: model.CompositeResourceClaim{
 							ID:       model.ReferenceID{Namespace: namespace},
@@ -147,11 +147,13 @@ func TestXrmResourceTree(t *testing.T) {
 						case "composite":
 							fieldpath.Pave(u.Object).SetValue("spec.resourceRefs", []corev1.ObjectReference{{Name: "managed1"}, {Name: "child-composite"}})
 						case "child-composite":
-							fieldpath.Pave(u.Object).SetValue("spec.resourceRefs", []corev1.ObjectReference{{Name: "managed2"}})
+							fieldpath.Pave(u.Object).SetValue("spec.resourceRefs", []corev1.ObjectReference{{Name: "managed2"}, {Name: "provider-config"}})
 						case "managed1":
 							fallthrough
 						case "managed2":
 							fieldpath.Pave(u.Object).SetValue("spec.providerConfigRef.name", "")
+						case "provider-config":
+							u.SetKind("ProviderConfig")
 						default:
 							t.Fatalf("unknown get with name: %s", key.Name)
 						}
@@ -164,7 +166,7 @@ func TestXrmResourceTree(t *testing.T) {
 				id:  model.ReferenceID{Name: "root"},
 			},
 			want: want{
-				kr: &model.XRMResourceTreeConnection{TotalCount: 5, Nodes: []model.XRMResourceTreeNode{
+				kr: &model.CrossplaneResourceTreeConnection{TotalCount: 6, Nodes: []model.CrossplaneResourceTreeNode{
 					{
 						Resource: model.CompositeResourceClaim{
 							ID:       model.ReferenceID{Namespace: namespace, Name: "root"},
@@ -185,7 +187,15 @@ func TestXrmResourceTree(t *testing.T) {
 						Resource: model.CompositeResource{
 							ID:       model.ReferenceID{Name: "child-composite"},
 							Metadata: &model.ObjectMeta{Name: "child-composite"},
-							Spec:     &model.CompositeResourceSpec{ResourceReferences: []corev1.ObjectReference{{Name: "managed2"}}},
+							Spec:     &model.CompositeResourceSpec{ResourceReferences: []corev1.ObjectReference{{Name: "managed2"}, {Name: "provider-config"}}},
+						},
+					},
+					{
+						ParentID: &model.ReferenceID{Name: "child-composite"},
+						Resource: model.ProviderConfig{
+							ID:       model.ReferenceID{Kind: "ProviderConfig", Name: "provider-config"},
+							Kind:     "ProviderConfig",
+							Metadata: &model.ObjectMeta{Name: "provider-config"},
 						},
 					},
 					{
@@ -215,7 +225,7 @@ func TestXrmResourceTree(t *testing.T) {
 
 			// Our GraphQL resolvers never return errors. We instead add an
 			// error to the GraphQL context and return early.
-			got, err := q.XrmResourceTree(tc.args.ctx, tc.args.id)
+			got, err := q.CrossplaneResourceTree(tc.args.ctx, tc.args.id)
 			errs := graphql.GetErrors(tc.args.ctx)
 
 			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
@@ -225,7 +235,15 @@ func TestXrmResourceTree(t *testing.T) {
 				t.Errorf("\n%s\ns.KubernetesResource(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
 
-			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreFields(model.CompositeResourceClaim{}, "Unstructured"), cmpopts.IgnoreFields(model.CompositeResource{}, "Unstructured"), cmpopts.IgnoreFields(model.ManagedResource{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			diffOptions := []cmp.Option{
+				cmpopts.IgnoreFields(model.CompositeResourceClaim{}, "Unstructured"),
+				cmpopts.IgnoreFields(model.CompositeResource{}, "Unstructured"),
+				cmpopts.IgnoreFields(model.ManagedResource{}, "Unstructured"),
+				cmpopts.IgnoreFields(model.ProviderConfig{}, "Unstructured"),
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+			}
+
+			if diff := cmp.Diff(tc.want.kr, got, diffOptions...); diff != "" {
 				t.Errorf("\n%s\ns.KubernetesResource(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

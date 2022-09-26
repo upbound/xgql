@@ -157,43 +157,47 @@ type Query {
   ): CompositionConnection!
 
   """
-  Get an `XRMResource` and its descendants which form a tree.
+  Get an `CrossplaneResource` and its descendants which form a tree.
   """
-  xrmResourceTree(
-    "The `ID` of an `XRMResource`"
+  crossplaneResourceTree(
+    "The `ID` of an `CrossplaneResource`"
     id: ID!
-  ): XRMResourceTreeConnection!
+  ): CrossplaneResourceTreeConnection!
 }
 
 """
 A XRM Resource which is either a `CompositeResource`, `CompositeResourceClaim`
 or `ManagedResource`
 """
-union XRMResource = CompositeResource | CompositeResourceClaim | ManagedResource
+union CrossplaneResource =
+    CompositeResource
+  | CompositeResourceClaim
+  | ManagedResource
+  | ProviderConfig
 
 """
-A `XRMResourceTreeConnection` represents a connection to `XRMDescendant`s
+A `CrossplaneResourceTreeConnection` represents a connection to `XRMDescendant`s
 """
-type XRMResourceTreeConnection {
+type CrossplaneResourceTreeConnection {
   "Connected nodes."
-  nodes: [XRMResourceTreeNode!]
+  nodes: [CrossplaneResourceTreeNode!]
 
   "The total number of connected nodes."
   totalCount: Int!
 }
 
 """
-An `XRMResourceTreeNode` is an `XRMResource` with a `ID` of its parent
-`XRMResource`.
+An `CrossplaneResourceTreeNode` is an `CrossplaneResource` with a `ID` of its parent
+`CrossplaneResource`.
 
 Note: A `NULL` `parentId` represents the root of the descendant tree.
 """
-type XRMResourceTreeNode {
-  "The `ID` of the parent `XRMResource` (`NULL` is the root of the tree)"
+type CrossplaneResourceTreeNode {
+  "The `ID` of the parent `CrossplaneResource` (`NULL` is the root of the tree)"
   parentId: ID
 
-  "The `XRMResource` object of this `XRMResourceTreeNode`"
-  resource: XRMResource!
+  "The `CrossplaneResource` object of this `CrossplaneResourceTreeNode`"
+  resource: CrossplaneResource!
 }
 
 """
