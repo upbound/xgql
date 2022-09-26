@@ -172,7 +172,7 @@ or `ManagedResource`
 union XRMResource = CompositeResource | CompositeResourceClaim | ManagedResource
 
 """
-A `XRMResourceTreeConnection` reprsents a connection to `XRMDescendant`s
+A `XRMResourceTreeConnection` represents a connection to `XRMDescendant`s
 """
 type XRMResourceTreeConnection {
   "Connected nodes."
