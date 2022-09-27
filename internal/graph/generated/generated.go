@@ -5314,7 +5314,10 @@ type Query {
   ): CompositionConnection!
 
   """
-  Get an ` + "`" + `CrossplaneResource` + "`" + ` and its descendants which form a tree.
+  Get an ` + "`" + `KubernetesResource` + "`" + ` and its descendants which form a tree. The two
+  ` + "`" + `KubernetesResource` + "`" + `s that have descendants are ` + "`" + `CompositeResourceClaim` + "`" + ` (its
+  ` + "`" + `CompositeResource` + "`" + `) and ` + "`" + `CompositeResource` + "`" + ` (the ` + "`" + `KubernetesResource` + "`" + `s it
+  composes via a ` + "`" + `Composition` + "`" + `).
   """
   crossplaneResourceTree(
     "The ` + "`" + `ID` + "`" + ` of an ` + "`" + `CrossplaneResource` + "`" + `"
@@ -5323,17 +5326,7 @@ type Query {
 }
 
 """
-A XRM Resource which is either a ` + "`" + `CompositeResource` + "`" + `, ` + "`" + `CompositeResourceClaim` + "`" + `
-or ` + "`" + `ManagedResource` + "`" + `
-"""
-union CrossplaneResource =
-    CompositeResource
-  | CompositeResourceClaim
-  | ManagedResource
-  | ProviderConfig
-
-"""
-A ` + "`" + `CrossplaneResourceTreeConnection` + "`" + ` represents a connection to ` + "`" + `XRMDescendant` + "`" + `s
+A ` + "`" + `CrossplaneResourceTreeConnection` + "`" + ` represents a connection to ` + "`" + `CrossplaneResourceTreeNode` + "`" + `s
 """
 type CrossplaneResourceTreeConnection {
   "Connected nodes."
@@ -5344,17 +5337,17 @@ type CrossplaneResourceTreeConnection {
 }
 
 """
-An ` + "`" + `CrossplaneResourceTreeNode` + "`" + ` is an ` + "`" + `CrossplaneResource` + "`" + ` with a ` + "`" + `ID` + "`" + ` of its parent
+An ` + "`" + `CrossplaneResourceTreeNode` + "`" + ` is an ` + "`" + `KubernetesResource` + "`" + ` with a ` + "`" + `ID` + "`" + ` of its parent
 ` + "`" + `CrossplaneResource` + "`" + `.
 
 Note: A ` + "`" + `NULL` + "`" + ` ` + "`" + `parentId` + "`" + ` represents the root of the descendant tree.
 """
 type CrossplaneResourceTreeNode {
-  "The ` + "`" + `ID` + "`" + ` of the parent ` + "`" + `CrossplaneResource` + "`" + ` (` + "`" + `NULL` + "`" + ` is the root of the tree)"
+  "The ` + "`" + `ID` + "`" + ` of the parent ` + "`" + `KubernetesResource` + "`" + ` (` + "`" + `NULL` + "`" + ` is the root of the tree)"
   parentId: ID
 
-  "The ` + "`" + `CrossplaneResource` + "`" + ` object of this ` + "`" + `CrossplaneResourceTreeNode` + "`" + `"
-  resource: CrossplaneResource!
+  "The ` + "`" + `KubernetesResource` + "`" + ` object of this ` + "`" + `CrossplaneResourceTreeNode` + "`" + `"
+  resource: KubernetesResource!
 }
 
 """
@@ -13201,9 +13194,9 @@ func (ec *executionContext) _CrossplaneResourceTreeNode_resource(ctx context.Con
 		}
 		return graphql.Null
 	}
-	res := resTmp.(model.CrossplaneResource)
+	res := resTmp.(model.KubernetesResource)
 	fc.Result = res
-	return ec.marshalNCrossplaneResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResource(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CrossplaneResourceTreeNode_resource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13213,7 +13206,7 @@ func (ec *executionContext) fieldContext_CrossplaneResourceTreeNode_resource(ctx
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type CrossplaneResource does not have child fields")
+			return nil, errors.New("FieldContext.Child cannot be called on type INTERFACE")
 		},
 	}
 	return fc, nil
@@ -23605,43 +23598,6 @@ func (ec *executionContext) _ConditionedStatus(ctx context.Context, sel ast.Sele
 	}
 }
 
-func (ec *executionContext) _CrossplaneResource(ctx context.Context, sel ast.SelectionSet, obj model.CrossplaneResource) graphql.Marshaler {
-	switch obj := (obj).(type) {
-	case nil:
-		return graphql.Null
-	case model.CompositeResource:
-		return ec._CompositeResource(ctx, sel, &obj)
-	case *model.CompositeResource:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._CompositeResource(ctx, sel, obj)
-	case model.CompositeResourceClaim:
-		return ec._CompositeResourceClaim(ctx, sel, &obj)
-	case *model.CompositeResourceClaim:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._CompositeResourceClaim(ctx, sel, obj)
-	case model.ManagedResource:
-		return ec._ManagedResource(ctx, sel, &obj)
-	case *model.ManagedResource:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ManagedResource(ctx, sel, obj)
-	case model.ProviderConfig:
-		return ec._ProviderConfig(ctx, sel, &obj)
-	case *model.ProviderConfig:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ProviderConfig(ctx, sel, obj)
-	default:
-		panic(fmt.Errorf("unexpected type %T", obj))
-	}
-}
-
 func (ec *executionContext) _KubernetesResource(ctx context.Context, sel ast.SelectionSet, obj model.KubernetesResource) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -23899,7 +23855,7 @@ func (ec *executionContext) _ProviderConfigDefinition(ctx context.Context, sel a
 
 // region    **************************** object.gotpl ****************************
 
-var compositeResourceImplementors = []string{"CompositeResource", "Node", "KubernetesResource", "CrossplaneResource"}
+var compositeResourceImplementors = []string{"CompositeResource", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceImplementors)
@@ -24003,7 +23959,7 @@ func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.Sele
 	return out
 }
 
-var compositeResourceClaimImplementors = []string{"CompositeResourceClaim", "Node", "KubernetesResource", "CrossplaneResource"}
+var compositeResourceClaimImplementors = []string{"CompositeResourceClaim", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceClaim) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceClaimImplementors)
@@ -26511,7 +26467,7 @@ func (ec *executionContext) _LocalObjectReference(ctx context.Context, sel ast.S
 	return out
 }
 
-var managedResourceImplementors = []string{"ManagedResource", "Node", "KubernetesResource", "CrossplaneResource"}
+var managedResourceImplementors = []string{"ManagedResource", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.SelectionSet, obj *model.ManagedResource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, managedResourceImplementors)
@@ -27121,7 +27077,7 @@ func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
-var providerConfigImplementors = []string{"ProviderConfig", "Node", "KubernetesResource", "CrossplaneResource"}
+var providerConfigImplementors = []string{"ProviderConfig", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConfig) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerConfigImplementors)
@@ -28679,16 +28635,6 @@ func (ec *executionContext) marshalNCreateKubernetesResourcePayload2ᚖgithubᚗ
 		return graphql.Null
 	}
 	return ec._CreateKubernetesResourcePayload(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNCrossplaneResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResource(ctx context.Context, sel ast.SelectionSet, v model.CrossplaneResource) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CrossplaneResource(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNCrossplaneResourceTreeConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeConnection(ctx context.Context, sel ast.SelectionSet, v model.CrossplaneResourceTreeConnection) graphql.Marshaler {

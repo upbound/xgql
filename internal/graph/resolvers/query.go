@@ -16,7 +16,6 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 	"sort"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -94,13 +93,8 @@ func (r *query) getAllDecedents(ctx context.Context, res model.KubernetesResourc
 		}
 
 		return append(list, childList...), nil
-	case model.ProviderConfig:
-		return []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}, nil
-	case model.ManagedResource:
-		return []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}, nil
 	default:
-		graphql.AddError(ctx, fmt.Errorf("was not a `CompositeResource`, `CompositeResourceClaim`, or `ManagedResource` got: %T", res))
-		return nil, nil
+		return []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}, nil
 	}
 }
 

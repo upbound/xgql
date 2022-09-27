@@ -81,22 +81,6 @@ func TestCrossplaneResourceTree(t *testing.T) {
 				},
 			},
 		},
-		"getAllDecendentsNotCrossplaneResourceError": {
-			reason: "If the passed resource ID is not for a CrossplaneResource we error",
-			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
-				return &test.MockClient{
-					MockGet: test.NewMockGetFn(nil),
-				}, nil
-			}),
-			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-			},
-			want: want{
-				errs: gqlerror.List{
-					gqlerror.Errorf("was not a `CompositeResource`, `CompositeResourceClaim`, or `ManagedResource` got: model.GenericResource"),
-				},
-			},
-		},
 		"SuccessWithNoComposite": {
 			reason: "It is a successful call",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {

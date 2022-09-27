@@ -157,7 +157,10 @@ type Query {
   ): CompositionConnection!
 
   """
-  Get an `CrossplaneResource` and its descendants which form a tree.
+  Get an `KubernetesResource` and its descendants which form a tree. The two
+  `KubernetesResource`s that have descendants are `CompositeResourceClaim` (its
+  `CompositeResource`) and `CompositeResource` (the `KubernetesResource`s it
+  composes via a `Composition`).
   """
   crossplaneResourceTree(
     "The `ID` of an `CrossplaneResource`"
@@ -166,17 +169,7 @@ type Query {
 }
 
 """
-A XRM Resource which is either a `CompositeResource`, `CompositeResourceClaim`
-or `ManagedResource`
-"""
-union CrossplaneResource =
-    CompositeResource
-  | CompositeResourceClaim
-  | ManagedResource
-  | ProviderConfig
-
-"""
-A `CrossplaneResourceTreeConnection` represents a connection to `XRMDescendant`s
+A `CrossplaneResourceTreeConnection` represents a connection to `CrossplaneResourceTreeNode`s
 """
 type CrossplaneResourceTreeConnection {
   "Connected nodes."
@@ -187,17 +180,17 @@ type CrossplaneResourceTreeConnection {
 }
 
 """
-An `CrossplaneResourceTreeNode` is an `CrossplaneResource` with a `ID` of its parent
+An `CrossplaneResourceTreeNode` is an `KubernetesResource` with a `ID` of its parent
 `CrossplaneResource`.
 
 Note: A `NULL` `parentId` represents the root of the descendant tree.
 """
 type CrossplaneResourceTreeNode {
-  "The `ID` of the parent `CrossplaneResource` (`NULL` is the root of the tree)"
+  "The `ID` of the parent `KubernetesResource` (`NULL` is the root of the tree)"
   parentId: ID
 
-  "The `CrossplaneResource` object of this `CrossplaneResourceTreeNode`"
-  resource: CrossplaneResource!
+  "The `KubernetesResource` object of this `CrossplaneResourceTreeNode`"
+  resource: KubernetesResource!
 }
 
 """

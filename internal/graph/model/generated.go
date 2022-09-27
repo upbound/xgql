@@ -15,12 +15,6 @@ type ConditionedStatus interface {
 	IsConditionedStatus()
 }
 
-// A XRM Resource which is either a `CompositeResource`, `CompositeResourceClaim`
-// or `ManagedResource`
-type CrossplaneResource interface {
-	IsCrossplaneResource()
-}
-
 // An object that corresponds to a Kubernetes API resource.
 type KubernetesResource interface {
 	IsKubernetesResource()
@@ -75,7 +69,6 @@ type CompositeResource struct {
 
 func (CompositeResource) IsNode()               {}
 func (CompositeResource) IsKubernetesResource() {}
-func (CompositeResource) IsCrossplaneResource() {}
 
 // A CompositeResourceClaim is a namespaced proxy for a composite resource.
 type CompositeResourceClaim struct {
@@ -101,7 +94,6 @@ type CompositeResourceClaim struct {
 
 func (CompositeResourceClaim) IsNode()               {}
 func (CompositeResourceClaim) IsKubernetesResource() {}
-func (CompositeResourceClaim) IsCrossplaneResource() {}
 
 // A CompositeResourceConnection represents a connection to composite resource
 // claims.
@@ -483,7 +475,7 @@ type CreateKubernetesResourcePayload struct {
 	Resource KubernetesResource `json:"resource"`
 }
 
-// A `CrossplaneResourceTreeConnection` represents a connection to `XRMDescendant`s
+// A `CrossplaneResourceTreeConnection` represents a connection to `CrossplaneResourceTreeNode`s
 type CrossplaneResourceTreeConnection struct {
 	// Connected nodes.
 	Nodes []CrossplaneResourceTreeNode `json:"nodes"`
@@ -491,15 +483,15 @@ type CrossplaneResourceTreeConnection struct {
 	TotalCount int `json:"totalCount"`
 }
 
-// An `CrossplaneResourceTreeNode` is an `CrossplaneResource` with a `ID` of its parent
+// An `CrossplaneResourceTreeNode` is an `KubernetesResource` with a `ID` of its parent
 // `CrossplaneResource`.
 //
 // Note: A `NULL` `parentId` represents the root of the descendant tree.
 type CrossplaneResourceTreeNode struct {
-	// The `ID` of the parent `CrossplaneResource` (`NULL` is the root of the tree)
+	// The `ID` of the parent `KubernetesResource` (`NULL` is the root of the tree)
 	ParentID *ReferenceID `json:"parentId"`
-	// The `CrossplaneResource` object of this `CrossplaneResourceTreeNode`
-	Resource CrossplaneResource `json:"resource"`
+	// The `KubernetesResource` object of this `CrossplaneResourceTreeNode`
+	Resource KubernetesResource `json:"resource"`
 }
 
 // A CustomResourceDefinition defines a type of custom resource that extends the
@@ -702,7 +694,6 @@ type ManagedResource struct {
 
 func (ManagedResource) IsNode()               {}
 func (ManagedResource) IsKubernetesResource() {}
-func (ManagedResource) IsCrossplaneResource() {}
 
 // A ManagedResourceStatus represents the observed state of a managed resource.
 type ManagedResourceStatus struct {
@@ -842,7 +833,6 @@ type ProviderConfig struct {
 
 func (ProviderConfig) IsNode()               {}
 func (ProviderConfig) IsKubernetesResource() {}
-func (ProviderConfig) IsCrossplaneResource() {}
 
 // A reference to the ProviderConfig used by a particular managed resource.
 type ProviderConfigReference struct {
