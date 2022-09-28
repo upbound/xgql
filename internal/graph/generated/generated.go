@@ -126,6 +126,8 @@ type ComplexityRoot struct {
 
 	CompositeResourceDefinition struct {
 		APIVersion                     func(childComplexity int) int
+		CompositeResourceClaimCrd      func(childComplexity int) int
+		CompositeResourceCrd           func(childComplexity int) int
 		DefinedCompositeResourceClaims func(childComplexity int, version *string, namespace *string) int
 		DefinedCompositeResources      func(childComplexity int, version *string) int
 		Events                         func(childComplexity int) int
@@ -635,6 +637,8 @@ type CompositeResourceClaimSpecResolver interface {
 }
 type CompositeResourceDefinitionResolver interface {
 	Events(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.EventConnection, error)
+	CompositeResourceCrd(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.CustomResourceDefinition, error)
+	CompositeResourceClaimCrd(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.CustomResourceDefinition, error)
 	DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string) (*model.CompositeResourceConnection, error)
 	DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, namespace *string) (*model.CompositeResourceClaimConnection, error)
 }
@@ -981,6 +985,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CompositeResourceDefinition.APIVersion(childComplexity), true
+
+	case "CompositeResourceDefinition.compositeResourceClaimCRD":
+		if e.complexity.CompositeResourceDefinition.CompositeResourceClaimCrd == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceDefinition.CompositeResourceClaimCrd(childComplexity), true
+
+	case "CompositeResourceDefinition.compositeResourceCRD":
+		if e.complexity.CompositeResourceDefinition.CompositeResourceCrd == nil {
+			break
+		}
+
+		return e.complexity.CompositeResourceDefinition.CompositeResourceCrd(childComplexity), true
 
 	case "CompositeResourceDefinition.definedCompositeResourceClaims":
 		if e.complexity.CompositeResourceDefinition.DefinedCompositeResourceClaims == nil {
@@ -3209,6 +3227,13 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
+
+  "The generated ` + "`" + `CustomResourceDefinition` + "`" + ` for this XRD"
+  compositeResourceCRD: CustomResourceDefinition @goField(forceResolver: true)
+
+  "The generated ` + "`" + `CustomResourceDefinition` + "`" + ` of this XRDs ` + "`" + `CompositeClaim` + "`" + ` if defined"
+  compositeResourceClaimCRD: CustomResourceDefinition
+    @goField(forceResolver: true)
 
   "Composite resources (XRs) defined by this XRD."
   definedCompositeResources(
@@ -6338,6 +6363,10 @@ func (ec *executionContext) fieldContext_CompositeResource_definition(ctx contex
 				return ec.fieldContext_CompositeResourceDefinition_unstructured(ctx, field)
 			case "events":
 				return ec.fieldContext_CompositeResourceDefinition_events(ctx, field)
+			case "compositeResourceCRD":
+				return ec.fieldContext_CompositeResourceDefinition_compositeResourceCRD(ctx, field)
+			case "compositeResourceClaimCRD":
+				return ec.fieldContext_CompositeResourceDefinition_compositeResourceClaimCRD(ctx, field)
 			case "definedCompositeResources":
 				return ec.fieldContext_CompositeResourceDefinition_definedCompositeResources(ctx, field)
 			case "definedCompositeResourceClaims":
@@ -6804,6 +6833,10 @@ func (ec *executionContext) fieldContext_CompositeResourceClaim_definition(ctx c
 				return ec.fieldContext_CompositeResourceDefinition_unstructured(ctx, field)
 			case "events":
 				return ec.fieldContext_CompositeResourceDefinition_events(ctx, field)
+			case "compositeResourceCRD":
+				return ec.fieldContext_CompositeResourceDefinition_compositeResourceCRD(ctx, field)
+			case "compositeResourceClaimCRD":
+				return ec.fieldContext_CompositeResourceDefinition_compositeResourceClaimCRD(ctx, field)
 			case "definedCompositeResources":
 				return ec.fieldContext_CompositeResourceDefinition_definedCompositeResources(ctx, field)
 			case "definedCompositeResourceClaims":
@@ -7973,6 +8006,128 @@ func (ec *executionContext) fieldContext_CompositeResourceDefinition_events(ctx 
 	return fc, nil
 }
 
+func (ec *executionContext) _CompositeResourceDefinition_compositeResourceCRD(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CompositeResourceDefinition_compositeResourceCRD(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.CompositeResourceDefinition().CompositeResourceCrd(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.CustomResourceDefinition)
+	fc.Result = res
+	return ec.marshalOCustomResourceDefinition2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinition(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CompositeResourceDefinition_compositeResourceCRD(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CompositeResourceDefinition",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CustomResourceDefinition_id(ctx, field)
+			case "apiVersion":
+				return ec.fieldContext_CustomResourceDefinition_apiVersion(ctx, field)
+			case "kind":
+				return ec.fieldContext_CustomResourceDefinition_kind(ctx, field)
+			case "metadata":
+				return ec.fieldContext_CustomResourceDefinition_metadata(ctx, field)
+			case "spec":
+				return ec.fieldContext_CustomResourceDefinition_spec(ctx, field)
+			case "status":
+				return ec.fieldContext_CustomResourceDefinition_status(ctx, field)
+			case "unstructured":
+				return ec.fieldContext_CustomResourceDefinition_unstructured(ctx, field)
+			case "events":
+				return ec.fieldContext_CustomResourceDefinition_events(ctx, field)
+			case "definedResources":
+				return ec.fieldContext_CustomResourceDefinition_definedResources(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CustomResourceDefinition", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CompositeResourceDefinition_compositeResourceClaimCRD(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CompositeResourceDefinition_compositeResourceClaimCRD(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.CompositeResourceDefinition().CompositeResourceClaimCrd(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.CustomResourceDefinition)
+	fc.Result = res
+	return ec.marshalOCustomResourceDefinition2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinition(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CompositeResourceDefinition_compositeResourceClaimCRD(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CompositeResourceDefinition",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CustomResourceDefinition_id(ctx, field)
+			case "apiVersion":
+				return ec.fieldContext_CustomResourceDefinition_apiVersion(ctx, field)
+			case "kind":
+				return ec.fieldContext_CustomResourceDefinition_kind(ctx, field)
+			case "metadata":
+				return ec.fieldContext_CustomResourceDefinition_metadata(ctx, field)
+			case "spec":
+				return ec.fieldContext_CustomResourceDefinition_spec(ctx, field)
+			case "status":
+				return ec.fieldContext_CustomResourceDefinition_status(ctx, field)
+			case "unstructured":
+				return ec.fieldContext_CustomResourceDefinition_unstructured(ctx, field)
+			case "events":
+				return ec.fieldContext_CustomResourceDefinition_events(ctx, field)
+			case "definedResources":
+				return ec.fieldContext_CustomResourceDefinition_definedResources(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CustomResourceDefinition", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResources(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CompositeResourceDefinition_definedCompositeResources(ctx, field)
 	if err != nil {
@@ -8147,6 +8302,10 @@ func (ec *executionContext) fieldContext_CompositeResourceDefinitionConnection_n
 				return ec.fieldContext_CompositeResourceDefinition_unstructured(ctx, field)
 			case "events":
 				return ec.fieldContext_CompositeResourceDefinition_events(ctx, field)
+			case "compositeResourceCRD":
+				return ec.fieldContext_CompositeResourceDefinition_compositeResourceCRD(ctx, field)
+			case "compositeResourceClaimCRD":
+				return ec.fieldContext_CompositeResourceDefinition_compositeResourceClaimCRD(ctx, field)
 			case "definedCompositeResources":
 				return ec.fieldContext_CompositeResourceDefinition_definedCompositeResources(ctx, field)
 			case "definedCompositeResourceClaims":
@@ -24409,6 +24568,40 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 				return innerFunc(ctx)
 
 			})
+		case "compositeResourceCRD":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceDefinition_compositeResourceCRD(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "compositeResourceClaimCRD":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CompositeResourceDefinition_compositeResourceClaimCRD(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "definedCompositeResources":
 			field := field
 
@@ -29879,6 +30072,13 @@ func (ec *executionContext) marshalOCustomResourceDefinition2ᚕgithubᚗcomᚋu
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalOCustomResourceDefinition2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinition(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinition) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CustomResourceDefinition(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOCustomResourceDefinitionStatus2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionStatus(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionStatus) graphql.Marshaler {

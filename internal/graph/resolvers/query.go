@@ -51,7 +51,7 @@ type query struct {
 }
 
 // Recursively collect `CrossplaneResourceTreeNode`s from the given KubernetesResource
-func (r *query) getAllDecedents(ctx context.Context, res model.KubernetesResource, parentID *model.ReferenceID) ([]model.CrossplaneResourceTreeNode, error) { //nolint:gocyclo
+func (r *query) getAllDescendant(ctx context.Context, res model.KubernetesResource, parentID *model.ReferenceID) ([]model.CrossplaneResourceTreeNode, error) { //nolint:gocyclo
 	// This isn't _really_ that complex; it's a long but simple switch.
 
 	switch typedRes := res.(type) {
@@ -65,7 +65,7 @@ func (r *query) getAllDecedents(ctx context.Context, res model.KubernetesResourc
 		}
 
 		for _, childRes := range resources.Nodes {
-			childList, err := r.getAllDecedents(ctx, childRes, &typedRes.ID)
+			childList, err := r.getAllDescendant(ctx, childRes, &typedRes.ID)
 			if err != nil || len(graphql.GetErrors(ctx)) > 0 {
 				return nil, err
 			}
@@ -87,7 +87,7 @@ func (r *query) getAllDecedents(ctx context.Context, res model.KubernetesResourc
 			return list, nil
 		}
 
-		childList, err := r.getAllDecedents(ctx, *composite, &typedRes.ID)
+		childList, err := r.getAllDescendant(ctx, *composite, &typedRes.ID)
 		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
 			return nil, err
 		}
@@ -107,7 +107,7 @@ func (r *query) CrossplaneResourceTree(ctx context.Context, id model.ReferenceID
 		return nil, err
 	}
 
-	list, err := r.getAllDecedents(ctx, rootRes, nil)
+	list, err := r.getAllDescendant(ctx, rootRes, nil)
 	if err != nil || len(graphql.GetErrors(ctx)) > 0 {
 		return nil, err
 	}

@@ -16,11 +16,13 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
 	"sort"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
+	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
@@ -49,6 +51,51 @@ func (r *xrd) Events(ctx context.Context, obj *model.CompositeResourceDefinition
 		Name:       obj.Metadata.Name,
 		UID:        types.UID(obj.Metadata.UID),
 	})
+}
+
+func (r *xrd) getCrd(ctx context.Context, group string, names *model.CompositeResourceDefinitionNames) (*model.CustomResourceDefinition, error) {
+	if names == nil {
+		return nil, nil
+	}
+
+	creds, _ := auth.FromContext(ctx)
+	c, err := r.clients.Get(creds)
+	if err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
+		return nil, nil
+	}
+
+	nn := types.NamespacedName{Name: fmt.Sprintf("%s.%s", names.Plural, group)}
+	in := &kextv1.CustomResourceDefinition{}
+	if err := c.Get(ctx, nn, in); err != nil {
+		graphql.AddError(ctx, errors.Wrap(err, errGetCRD))
+		return nil, nil
+	}
+
+	out := model.GetCustomResourceDefinition(in)
+	return &out, nil
+}
+
+func (r *xrd) CompositeResourceCrd(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.CustomResourceDefinition, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	if obj.Spec == nil {
+		return nil, nil
+	}
+
+	return r.getCrd(ctx, obj.Spec.Group, obj.Spec.Names)
+}
+
+func (r *xrd) CompositeResourceClaimCrd(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.CustomResourceDefinition, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	if obj.Spec == nil {
+		return nil, nil
+	}
+
+	return r.getCrd(ctx, obj.Spec.Group, obj.Spec.ClaimNames)
 }
 
 func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string) (*model.CompositeResourceConnection, error) {

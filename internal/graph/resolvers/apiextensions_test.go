@@ -44,6 +44,254 @@ var (
 	_ generated.CompositionResolver                     = &composition{}
 )
 
+func TestCompositeResourceCrd(t *testing.T) {
+	errBoom := errors.New("boom")
+
+	type args struct {
+		ctx context.Context
+		obj *model.CompositeResourceDefinition
+	}
+	type want struct {
+		crd  *model.CustomResourceDefinition
+		err  error
+		errs gqlerror.List
+	}
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"NoSpec": {
+			reason: "If the XRD has no spec we return nil.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{},
+			},
+			want: want{},
+		},
+		"NoNames": {
+			reason: "If the XRD has no Names we return nil.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{}},
+			},
+			want: want{},
+		},
+		"GetClientError": {
+			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{}, errBoom
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{Names: &model.CompositeResourceDefinitionNames{}}},
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+				},
+			},
+		},
+		"GetError": {
+			reason: "If we can't get a CompositeResourceDefinition we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil, func(obj client.Object) error {
+						return errBoom
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{Names: &model.CompositeResourceDefinitionNames{}}},
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetCRD).Error()),
+				},
+			},
+		},
+		"Success": {
+			reason: "Successfully return a CompositeResourceDefinition",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: func(_ context.Context, key client.ObjectKey, obj client.Object) error {
+						if diff := cmp.Diff(client.ObjectKey{Name: "things.some.group"}, key); diff != "" {
+							t.Errorf("\n%s\nmock get key: -want error, +got error:\n%s\n", "Successfully return a CompositeResourceDefinition", diff)
+						}
+						obj.SetName("some.crd")
+						return nil
+					},
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{Group: "some.group", Names: &model.CompositeResourceDefinitionNames{Plural: "things"}}},
+			},
+			want: want{
+				crd: &model.CustomResourceDefinition{
+					ID:       model.ReferenceID{Name: "some.crd"},
+					Metadata: &model.ObjectMeta{Name: "some.crd"},
+					Spec:     &model.CustomResourceDefinitionSpec{Names: &model.CustomResourceDefinitionNames{}},
+				},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			x := &xrd{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := x.CompositeResourceCrd(tc.args.ctx, tc.args.obj)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\nq.CompositeResourceCrd(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\nq.CompositeResourceCrd(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.crd, got, cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+				t.Errorf("\n%s\nq.CompositeResourceCrd(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestCompositeResourceClaimCrd(t *testing.T) {
+	errBoom := errors.New("boom")
+
+	type args struct {
+		ctx context.Context
+		obj *model.CompositeResourceDefinition
+	}
+	type want struct {
+		crd  *model.CustomResourceDefinition
+		err  error
+		errs gqlerror.List
+	}
+
+	cases := map[string]struct {
+		reason  string
+		clients ClientCache
+		args    args
+		want    want
+	}{
+		"NoSpec": {
+			reason: "If the XRD has no spec we return nil.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{},
+			},
+			want: want{},
+		},
+		"NoClaimNames": {
+			reason: "If the XRD has no Names we return nil.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{}},
+			},
+			want: want{},
+		},
+		"GetClientError": {
+			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{}, errBoom
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{ClaimNames: &model.CompositeResourceDefinitionNames{}}},
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+				},
+			},
+		},
+		"GetError": {
+			reason: "If we can't get a CompositeResourceDefinition we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil, func(obj client.Object) error {
+						return errBoom
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{ClaimNames: &model.CompositeResourceDefinitionNames{}}},
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetCRD).Error()),
+				},
+			},
+		},
+		"Success": {
+			reason: "Successfully return a CompositeResourceDefinition",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: func(_ context.Context, key client.ObjectKey, obj client.Object) error {
+						if diff := cmp.Diff(client.ObjectKey{Name: "things.some.group"}, key); diff != "" {
+							t.Errorf("\n%s\nmock get key: -want error, +got error:\n%s\n", "Successfully return a CompositeResourceDefinition", diff)
+						}
+						obj.SetName("some.crd")
+						return nil
+					},
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{Group: "some.group", ClaimNames: &model.CompositeResourceDefinitionNames{Plural: "things"}}},
+			},
+			want: want{
+				crd: &model.CustomResourceDefinition{
+					ID:       model.ReferenceID{Name: "some.crd"},
+					Metadata: &model.ObjectMeta{Name: "some.crd"},
+					Spec:     &model.CustomResourceDefinitionSpec{Names: &model.CustomResourceDefinitionNames{}},
+				},
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			x := &xrd{clients: tc.clients}
+
+			// Our GraphQL resolvers never return errors. We instead add an
+			// error to the GraphQL context and return early.
+			got, err := x.CompositeResourceClaimCrd(tc.args.ctx, tc.args.obj)
+			errs := graphql.GetErrors(tc.args.ctx)
+
+			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\nq.CompositeResourceClaimCrd(...): -want error, +got error:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
+				t.Errorf("\n%s\nq.CompositeResourceClaimCrd(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.crd, got, cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+				t.Errorf("\n%s\nq.CompositeResourceClaimCrd(...): -want, +got:\n%s\n", tc.reason, diff)
+			}
+		})
+	}
+}
+
 func TestXRDDefinedCompositeResources(t *testing.T) {
 	errBoom := errors.New("boom")
 
