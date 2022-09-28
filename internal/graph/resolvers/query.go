@@ -50,6 +50,71 @@ type query struct {
 	clients ClientCache
 }
 
+// Recursively collect `CrossplaneResourceTreeNode`s from the given KubernetesResource
+func (r *query) getAllDecedents(ctx context.Context, res model.KubernetesResource, parentID *model.ReferenceID) ([]model.CrossplaneResourceTreeNode, error) { //nolint:gocyclo
+	// This isn't _really_ that complex; it's a long but simple switch.
+
+	switch typedRes := res.(type) {
+	case model.CompositeResource:
+		list := []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
+
+		compositeResolver := compositeResourceSpec{clients: r.clients}
+		resources, err := compositeResolver.Resources(ctx, typedRes.Spec)
+		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
+			return nil, err
+		}
+
+		for _, childRes := range resources.Nodes {
+			childList, err := r.getAllDecedents(ctx, childRes, &typedRes.ID)
+			if err != nil || len(graphql.GetErrors(ctx)) > 0 {
+				return nil, err
+			}
+
+			list = append(list, childList...)
+		}
+
+		return list, nil
+	case model.CompositeResourceClaim:
+		list := []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
+
+		claimResolver := compositeResourceClaimSpec{clients: r.clients}
+		composite, err := claimResolver.Resource(ctx, typedRes.Spec)
+		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
+			return nil, err
+		}
+
+		if composite == nil {
+			return list, nil
+		}
+
+		childList, err := r.getAllDecedents(ctx, *composite, &typedRes.ID)
+		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
+			return nil, err
+		}
+
+		return append(list, childList...), nil
+	default:
+		return []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}, nil
+	}
+}
+
+func (r *query) CrossplaneResourceTree(ctx context.Context, id model.ReferenceID) (*model.CrossplaneResourceTreeConnection, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	rootRes, err := r.KubernetesResource(ctx, id)
+	if err != nil || len(graphql.GetErrors(ctx)) > 0 {
+		return nil, err
+	}
+
+	list, err := r.getAllDecedents(ctx, rootRes, nil)
+	if err != nil || len(graphql.GetErrors(ctx)) > 0 {
+		return nil, err
+	}
+
+	return &model.CrossplaneResourceTreeConnection{Nodes: list, TotalCount: len(list)}, nil
+}
+
 func (r *query) KubernetesResource(ctx context.Context, id model.ReferenceID) (model.KubernetesResource, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()

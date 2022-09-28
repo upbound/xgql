@@ -312,6 +312,16 @@ type ComplexityRoot struct {
 		Resource func(childComplexity int) int
 	}
 
+	CrossplaneResourceTreeConnection struct {
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	CrossplaneResourceTreeNode struct {
+		ParentID func(childComplexity int) int
+		Resource func(childComplexity int) int
+	}
+
 	CustomResourceDefinition struct {
 		APIVersion       func(childComplexity int) int
 		DefinedResources func(childComplexity int, version *string) int
@@ -570,6 +580,7 @@ type ComplexityRoot struct {
 		ConfigMap                    func(childComplexity int, namespace string, name string) int
 		ConfigurationRevisions       func(childComplexity int, configuration *model.ReferenceID, active *bool) int
 		Configurations               func(childComplexity int) int
+		CrossplaneResourceTree       func(childComplexity int, id model.ReferenceID) int
 		CustomResourceDefinitions    func(childComplexity int, revision *model.ReferenceID) int
 		Events                       func(childComplexity int, involved *model.ReferenceID) int
 		KubernetesResource           func(childComplexity int, id model.ReferenceID) int
@@ -712,6 +723,7 @@ type QueryResolver interface {
 	ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID, active *bool) (*model.ConfigurationRevisionConnection, error)
 	CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositeResourceDefinitionConnection, error)
 	Compositions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositionConnection, error)
+	CrossplaneResourceTree(ctx context.Context, id model.ReferenceID) (*model.CrossplaneResourceTreeConnection, error)
 }
 type SecretResolver interface {
 	Events(ctx context.Context, obj *model.Secret) (*model.EventConnection, error)
@@ -1768,6 +1780,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CreateKubernetesResourcePayload.Resource(childComplexity), true
+
+	case "CrossplaneResourceTreeConnection.nodes":
+		if e.complexity.CrossplaneResourceTreeConnection.Nodes == nil {
+			break
+		}
+
+		return e.complexity.CrossplaneResourceTreeConnection.Nodes(childComplexity), true
+
+	case "CrossplaneResourceTreeConnection.totalCount":
+		if e.complexity.CrossplaneResourceTreeConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.CrossplaneResourceTreeConnection.TotalCount(childComplexity), true
+
+	case "CrossplaneResourceTreeNode.parentId":
+		if e.complexity.CrossplaneResourceTreeNode.ParentID == nil {
+			break
+		}
+
+		return e.complexity.CrossplaneResourceTreeNode.ParentID(childComplexity), true
+
+	case "CrossplaneResourceTreeNode.resource":
+		if e.complexity.CrossplaneResourceTreeNode.Resource == nil {
+			break
+		}
+
+		return e.complexity.CrossplaneResourceTreeNode.Resource(childComplexity), true
 
 	case "CustomResourceDefinition.apiVersion":
 		if e.complexity.CustomResourceDefinition.APIVersion == nil {
@@ -2882,6 +2922,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Configurations(childComplexity), true
+
+	case "Query.crossplaneResourceTree":
+		if e.complexity.Query.CrossplaneResourceTree == nil {
+			break
+		}
+
+		args, err := ec.field_Query_crossplaneResourceTree_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CrossplaneResourceTree(childComplexity, args["id"].(model.ReferenceID)), true
 
 	case "Query.customResourceDefinitions":
 		if e.complexity.Query.CustomResourceDefinitions == nil {
@@ -5260,6 +5312,42 @@ type Query {
     """
     dangling: Boolean = false
   ): CompositionConnection!
+
+  """
+  Get an ` + "`" + `KubernetesResource` + "`" + ` and its descendants which form a tree. The two
+  ` + "`" + `KubernetesResource` + "`" + `s that have descendants are ` + "`" + `CompositeResourceClaim` + "`" + ` (its
+  ` + "`" + `CompositeResource` + "`" + `) and ` + "`" + `CompositeResource` + "`" + ` (the ` + "`" + `KubernetesResource` + "`" + `s it
+  composes via a ` + "`" + `Composition` + "`" + `).
+  """
+  crossplaneResourceTree(
+    "The ` + "`" + `ID` + "`" + ` of an ` + "`" + `CrossplaneResource` + "`" + `"
+    id: ID!
+  ): CrossplaneResourceTreeConnection!
+}
+
+"""
+A ` + "`" + `CrossplaneResourceTreeConnection` + "`" + ` represents a connection to ` + "`" + `CrossplaneResourceTreeNode` + "`" + `s
+"""
+type CrossplaneResourceTreeConnection {
+  "Connected nodes."
+  nodes: [CrossplaneResourceTreeNode!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
+}
+
+"""
+An ` + "`" + `CrossplaneResourceTreeNode` + "`" + ` is an ` + "`" + `KubernetesResource` + "`" + ` with a ` + "`" + `ID` + "`" + ` of its parent
+` + "`" + `CrossplaneResource` + "`" + `.
+
+Note: A ` + "`" + `NULL` + "`" + ` ` + "`" + `parentId` + "`" + ` represents the root of the descendant tree.
+"""
+type CrossplaneResourceTreeNode {
+  "The ` + "`" + `ID` + "`" + ` of the parent ` + "`" + `KubernetesResource` + "`" + ` (` + "`" + `NULL` + "`" + ` is the root of the tree)"
+  parentId: ID
+
+  "The ` + "`" + `KubernetesResource` + "`" + ` object of this ` + "`" + `CrossplaneResourceTreeNode` + "`" + `"
+  resource: KubernetesResource!
 }
 
 """
@@ -5587,6 +5675,21 @@ func (ec *executionContext) field_Query_configurationRevisions_args(ctx context.
 		}
 	}
 	args["active"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_crossplaneResourceTree_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ReferenceID
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -12923,6 +13026,182 @@ func (ec *executionContext) _CreateKubernetesResourcePayload_resource(ctx contex
 func (ec *executionContext) fieldContext_CreateKubernetesResourcePayload_resource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "CreateKubernetesResourcePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("FieldContext.Child cannot be called on type INTERFACE")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CrossplaneResourceTreeConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *model.CrossplaneResourceTreeConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CrossplaneResourceTreeConnection_nodes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]model.CrossplaneResourceTreeNode)
+	fc.Result = res
+	return ec.marshalOCrossplaneResourceTreeNode2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeNodeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CrossplaneResourceTreeConnection_nodes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CrossplaneResourceTreeConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "parentId":
+				return ec.fieldContext_CrossplaneResourceTreeNode_parentId(ctx, field)
+			case "resource":
+				return ec.fieldContext_CrossplaneResourceTreeNode_resource(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CrossplaneResourceTreeNode", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CrossplaneResourceTreeConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.CrossplaneResourceTreeConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CrossplaneResourceTreeConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CrossplaneResourceTreeConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CrossplaneResourceTreeConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CrossplaneResourceTreeNode_parentId(ctx context.Context, field graphql.CollectedField, obj *model.CrossplaneResourceTreeNode) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CrossplaneResourceTreeNode_parentId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ParentID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ReferenceID)
+	fc.Result = res
+	return ec.marshalOID2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CrossplaneResourceTreeNode_parentId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CrossplaneResourceTreeNode",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CrossplaneResourceTreeNode_resource(ctx context.Context, field graphql.CollectedField, obj *model.CrossplaneResourceTreeNode) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CrossplaneResourceTreeNode_resource(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Resource, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.KubernetesResource)
+	fc.Result = res
+	return ec.marshalNKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CrossplaneResourceTreeNode_resource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CrossplaneResourceTreeNode",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -20552,6 +20831,67 @@ func (ec *executionContext) fieldContext_Query_compositions(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_crossplaneResourceTree(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_crossplaneResourceTree(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CrossplaneResourceTree(rctx, fc.Args["id"].(model.ReferenceID))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.CrossplaneResourceTreeConnection)
+	fc.Result = res
+	return ec.marshalNCrossplaneResourceTreeConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_crossplaneResourceTree(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "nodes":
+				return ec.fieldContext_CrossplaneResourceTreeConnection_nodes(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_CrossplaneResourceTreeConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CrossplaneResourceTreeConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_crossplaneResourceTree_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -25391,6 +25731,70 @@ func (ec *executionContext) _CreateKubernetesResourcePayload(ctx context.Context
 	return out
 }
 
+var crossplaneResourceTreeConnectionImplementors = []string{"CrossplaneResourceTreeConnection"}
+
+func (ec *executionContext) _CrossplaneResourceTreeConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CrossplaneResourceTreeConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, crossplaneResourceTreeConnectionImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CrossplaneResourceTreeConnection")
+		case "nodes":
+
+			out.Values[i] = ec._CrossplaneResourceTreeConnection_nodes(ctx, field, obj)
+
+		case "totalCount":
+
+			out.Values[i] = ec._CrossplaneResourceTreeConnection_totalCount(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var crossplaneResourceTreeNodeImplementors = []string{"CrossplaneResourceTreeNode"}
+
+func (ec *executionContext) _CrossplaneResourceTreeNode(ctx context.Context, sel ast.SelectionSet, obj *model.CrossplaneResourceTreeNode) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, crossplaneResourceTreeNodeImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CrossplaneResourceTreeNode")
+		case "parentId":
+
+			out.Values[i] = ec._CrossplaneResourceTreeNode_parentId(ctx, field, obj)
+
+		case "resource":
+
+			out.Values[i] = ec._CrossplaneResourceTreeNode_resource(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var customResourceDefinitionImplementors = []string{"CustomResourceDefinition", "Node", "KubernetesResource", "ManagedResourceDefinition", "ProviderConfigDefinition"}
 
 func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinition) graphql.Marshaler {
@@ -27460,6 +27864,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "crossplaneResourceTree":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_crossplaneResourceTree(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "__type":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -28208,6 +28635,24 @@ func (ec *executionContext) marshalNCreateKubernetesResourcePayload2ᚖgithubᚗ
 		return graphql.Null
 	}
 	return ec._CreateKubernetesResourcePayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNCrossplaneResourceTreeConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeConnection(ctx context.Context, sel ast.SelectionSet, v model.CrossplaneResourceTreeConnection) graphql.Marshaler {
+	return ec._CrossplaneResourceTreeConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCrossplaneResourceTreeConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeConnection(ctx context.Context, sel ast.SelectionSet, v *model.CrossplaneResourceTreeConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CrossplaneResourceTreeConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNCrossplaneResourceTreeNode2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeNode(ctx context.Context, sel ast.SelectionSet, v model.CrossplaneResourceTreeNode) graphql.Marshaler {
+	return ec._CrossplaneResourceTreeNode(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNCustomResourceDefinition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinition(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinition) graphql.Marshaler {
@@ -29340,6 +29785,53 @@ func (ec *executionContext) marshalOConfigurationStatus2ᚖgithubᚗcomᚋupboun
 		return graphql.Null
 	}
 	return ec._ConfigurationStatus(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOCrossplaneResourceTreeNode2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeNodeᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CrossplaneResourceTreeNode) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCrossplaneResourceTreeNode2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeNode(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalOCustomResourceDefinition2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionᚄ(ctx context.Context, sel ast.SelectionSet, v []model.CustomResourceDefinition) graphql.Marshaler {

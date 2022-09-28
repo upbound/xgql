@@ -155,6 +155,42 @@ type Query {
     """
     dangling: Boolean = false
   ): CompositionConnection!
+
+  """
+  Get an `KubernetesResource` and its descendants which form a tree. The two
+  `KubernetesResource`s that have descendants are `CompositeResourceClaim` (its
+  `CompositeResource`) and `CompositeResource` (the `KubernetesResource`s it
+  composes via a `Composition`).
+  """
+  crossplaneResourceTree(
+    "The `ID` of an `CrossplaneResource`"
+    id: ID!
+  ): CrossplaneResourceTreeConnection!
+}
+
+"""
+A `CrossplaneResourceTreeConnection` represents a connection to `CrossplaneResourceTreeNode`s
+"""
+type CrossplaneResourceTreeConnection {
+  "Connected nodes."
+  nodes: [CrossplaneResourceTreeNode!]
+
+  "The total number of connected nodes."
+  totalCount: Int!
+}
+
+"""
+An `CrossplaneResourceTreeNode` is an `KubernetesResource` with a `ID` of its parent
+`CrossplaneResource`.
+
+Note: A `NULL` `parentId` represents the root of the descendant tree.
+"""
+type CrossplaneResourceTreeNode {
+  "The `ID` of the parent `KubernetesResource` (`NULL` is the root of the tree)"
+  parentId: ID
+
+  "The `KubernetesResource` object of this `CrossplaneResourceTreeNode`"
+  resource: KubernetesResource!
 }
 
 """

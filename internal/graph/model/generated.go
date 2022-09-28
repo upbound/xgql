@@ -475,6 +475,25 @@ type CreateKubernetesResourcePayload struct {
 	Resource KubernetesResource `json:"resource"`
 }
 
+// A `CrossplaneResourceTreeConnection` represents a connection to `CrossplaneResourceTreeNode`s
+type CrossplaneResourceTreeConnection struct {
+	// Connected nodes.
+	Nodes []CrossplaneResourceTreeNode `json:"nodes"`
+	// The total number of connected nodes.
+	TotalCount int `json:"totalCount"`
+}
+
+// An `CrossplaneResourceTreeNode` is an `KubernetesResource` with a `ID` of its parent
+// `CrossplaneResource`.
+//
+// Note: A `NULL` `parentId` represents the root of the descendant tree.
+type CrossplaneResourceTreeNode struct {
+	// The `ID` of the parent `KubernetesResource` (`NULL` is the root of the tree)
+	ParentID *ReferenceID `json:"parentId"`
+	// The `KubernetesResource` object of this `CrossplaneResourceTreeNode`
+	Resource KubernetesResource `json:"resource"`
+}
+
 // A CustomResourceDefinition defines a type of custom resource that extends the
 // set of resources supported by the Kubernetes API.
 type CustomResourceDefinition struct {
