@@ -158,6 +158,10 @@ type CompositeResourceDefinition struct {
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
 	Events *EventConnection `json:"events"`
+	// The generated `CustomResourceDefinition` for this XRD
+	CompositeResourceCrd *CustomResourceDefinition `json:"compositeResourceCRD"`
+	// The generated `CustomResourceDefinition` of this XRDs `CompositeClaim` if defined
+	CompositeResourceClaimCrd *CustomResourceDefinition `json:"compositeResourceClaimCRD"`
 	// Composite resources (XRs) defined by this XRD.
 	DefinedCompositeResources *CompositeResourceConnection `json:"definedCompositeResources"`
 	// Composite resource claims (XRCs) defined by this XRD.

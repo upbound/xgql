@@ -27,6 +27,13 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
 
+  "The generated `CustomResourceDefinition` for this XRD"
+  compositeResourceCRD: CustomResourceDefinition @goField(forceResolver: true)
+
+  "The generated `CustomResourceDefinition` of this XRDs `CompositeClaim` if defined"
+  compositeResourceClaimCRD: CustomResourceDefinition
+    @goField(forceResolver: true)
+
   "Composite resources (XRs) defined by this XRD."
   definedCompositeResources(
     "Return resources of this version."
