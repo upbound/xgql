@@ -38,16 +38,60 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
   definedCompositeResources(
     "Return resources of this version."
     version: String
+      @deprecated(
+        reason: "Use `DefinedCompositeResourceOptions`.version instead"
+      )
+
+    "Options to filter or limit the resources"
+    options: DefinedCompositeResourceOptionsInput
   ): CompositeResourceConnection! @goField(forceResolver: true)
 
   "Composite resource claims (XRCs) defined by this XRD."
   definedCompositeResourceClaims(
     "Return resources of this version."
     version: String
+      @deprecated(
+        reason: "Use `DefinedCompositeResourceClaimOptions`.version instead"
+      )
 
     "Return resources in this namespace."
     namespace: String
+      @deprecated(
+        reason: "Use `DefinedCompositeResourceClaimOptions`.namespace instead"
+      )
+
+    "Options to filter or limit the resources"
+    options: DefinedCompositeResourceClaimOptionsInput
   ): CompositeResourceClaimConnection! @goField(forceResolver: true)
+}
+
+"Options to filter or limit the defined composite resources"
+input DefinedCompositeResourceOptionsInput {
+  "Return resources of this version."
+  version: String
+
+  """
+  Optionally limit the results to XRCs.
+  If `true` return resources that have `Condition` `Ready` `True`.
+  If `false` return resources that have `Condition` `Ready` `False` or `Condition` `Ready` not present
+  """
+  ready: Boolean
+}
+
+"Options to filter or limit the defined composite claim resources"
+input DefinedCompositeResourceClaimOptionsInput {
+  "Return resources of this version."
+  version: String
+
+  "Return resources in this namespace."
+  namespace: String
+
+  """
+  Optionally limit the results to XRCs.
+  If `true` return resources that have `Condition` `Ready` `True`.
+  If `false` return resources that have `Condition` `Ready` `False` or `Condition` `Ready` not present
+  """
+  ready: Boolean
 }
 
 """

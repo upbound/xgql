@@ -248,3 +248,150 @@ func TestGetComposition(t *testing.T) {
 		})
 	}
 }
+
+func TestDefinedCompositeResourceOptionsInputDeprecation(t *testing.T) {
+	version1 := "v1"
+	version2 := "v2"
+	type args struct {
+		options *DefinedCompositeResourceOptionsInput
+		version *string
+	}
+	cases := map[string]struct {
+		reason string
+		args   args
+		want   *DefinedCompositeResourceOptionsInput
+	}{
+		"VersionNone": {
+			reason: "All supported fields should be converted to our model",
+			args: args{
+				options: &DefinedCompositeResourceOptionsInput{Version: nil},
+				version: nil,
+			},
+			want: &DefinedCompositeResourceOptionsInput{},
+		},
+		"VersionNonDeprecated": {
+			reason: "Absent optional fields should be absent in our model",
+			args: args{
+				options: &DefinedCompositeResourceOptionsInput{Version: &version1},
+				version: nil,
+			},
+			want: &DefinedCompositeResourceOptionsInput{Version: &version1},
+		},
+		"VersionDeprecated": {
+			reason: "Absent optional fields should be absent in our model",
+			args: args{
+				options: &DefinedCompositeResourceOptionsInput{Version: nil},
+				version: &version1,
+			},
+			want: &DefinedCompositeResourceOptionsInput{Version: &version1},
+		},
+		"VersionBoth": {
+			reason: "Absent optional fields should be absent in our model",
+			args: args{
+				options: &DefinedCompositeResourceOptionsInput{Version: &version1},
+				version: &version2,
+			},
+			want: &DefinedCompositeResourceOptionsInput{Version: &version1},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			tc.args.options.DeprecationPatch(tc.args.version)
+			if diff := cmp.Diff(tc.want, tc.args.options); diff != "" {
+				t.Errorf("\n%s\nDeprecationPatch(...): -want, +got\n:%s", tc.reason, diff)
+			}
+		})
+	}
+}
+
+func TestDefinedCompositeResourceClaimOptionsInputDeprecation(t *testing.T) {
+	version1 := "v1"
+	version2 := "v2"
+	namespace1 := "namespace1"
+	namespace2 := "namespace2"
+	type args struct {
+		options   *DefinedCompositeResourceClaimOptionsInput
+		version   *string
+		namespace *string
+	}
+	cases := map[string]struct {
+		reason string
+		args   args
+		want   *DefinedCompositeResourceClaimOptionsInput
+	}{
+		"VersionNone": {
+			reason: "All supported fields should be converted to our model",
+			args: args{
+				options: &DefinedCompositeResourceClaimOptionsInput{Version: nil},
+				version: nil,
+			},
+			want: &DefinedCompositeResourceClaimOptionsInput{},
+		},
+		"VersionNonDeprecated": {
+			reason: "Absent optional fields should be absent in our model",
+			args: args{
+				options: &DefinedCompositeResourceClaimOptionsInput{Version: &version1},
+				version: nil,
+			},
+			want: &DefinedCompositeResourceClaimOptionsInput{Version: &version1},
+		},
+		"VersionDeprecated": {
+			reason: "Absent optional fields should be absent in our model",
+			args: args{
+				options: &DefinedCompositeResourceClaimOptionsInput{Version: nil},
+				version: &version1,
+			},
+			want: &DefinedCompositeResourceClaimOptionsInput{Version: &version1},
+		},
+		"VersionBoth": {
+			reason: "Absent optional fields should be absent in our model",
+			args: args{
+				options: &DefinedCompositeResourceClaimOptionsInput{Version: &version1},
+				version: &version2,
+			},
+			want: &DefinedCompositeResourceClaimOptionsInput{Version: &version1},
+		},
+		"NamespaceNone": {
+			reason: "All supported fields should be converted to our model",
+			args: args{
+				options:   &DefinedCompositeResourceClaimOptionsInput{Namespace: nil},
+				namespace: nil,
+			},
+			want: &DefinedCompositeResourceClaimOptionsInput{},
+		},
+		"NamespaceNonDeprecated": {
+			reason: "Absent optional fields should be absent in our model",
+			args: args{
+				options:   &DefinedCompositeResourceClaimOptionsInput{Namespace: &namespace1},
+				namespace: nil,
+			},
+			want: &DefinedCompositeResourceClaimOptionsInput{Namespace: &namespace1},
+		},
+		"NamespaceDeprecated": {
+			reason: "Absent optional fields should be absent in our model",
+			args: args{
+				options:   &DefinedCompositeResourceClaimOptionsInput{Namespace: nil},
+				namespace: &namespace1,
+			},
+			want: &DefinedCompositeResourceClaimOptionsInput{Namespace: &namespace1},
+		},
+		"NamespaceBoth": {
+			reason: "Absent optional fields should be absent in our model",
+			args: args{
+				options:   &DefinedCompositeResourceClaimOptionsInput{Namespace: &namespace1},
+				namespace: &namespace2,
+			},
+			want: &DefinedCompositeResourceClaimOptionsInput{Namespace: &namespace1},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			tc.args.options.DeprecationPatch(tc.args.version, tc.args.namespace)
+			if diff := cmp.Diff(tc.want, tc.args.options); diff != "" {
+				t.Errorf("\n%s\nDeprecationPatch(...): -want, +got\n:%s", tc.reason, diff)
+			}
+		})
+	}
+}

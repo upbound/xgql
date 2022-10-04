@@ -98,9 +98,15 @@ func (r *xrd) CompositeResourceClaimCrd(ctx context.Context, obj *model.Composit
 	return r.getCrd(ctx, obj.Spec.Group, obj.Spec.ClaimNames)
 }
 
-func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string) (*model.CompositeResourceConnection, error) {
+func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, options *model.DefinedCompositeResourceOptionsInput) (*model.CompositeResourceConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
+
+	if options == nil {
+		options = &model.DefinedCompositeResourceOptionsInput{}
+	}
+
+	options.DeprecationPatch(version)
 
 	creds, _ := auth.FromContext(ctx)
 	c, err := r.clients.Get(creds)
@@ -111,8 +117,8 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 
 	gv := schema.GroupVersion{Group: obj.Spec.Group}
 	switch {
-	case version != nil:
-		gv.Version = *version
+	case options.Version != nil:
+		gv.Version = *options.Version
 	default:
 		gv.Version = pickXRDVersion(obj.Spec.Versions)
 	}
@@ -129,33 +135,51 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 		return nil, nil
 	}
 
-	out := &model.CompositeResourceConnection{
-		Nodes:      make([]model.CompositeResource, 0, len(in.Items)),
-		TotalCount: len(in.Items),
-	}
+	return getCompositeResourceConnection(in, options), nil
+}
+
+/*
+Produce a CompositeResourceClaimConnection from the raw k8s UnstructuredList
+that is filtered and sorted
+*/
+func getCompositeResourceConnection(in *kunstructured.UnstructuredList, options *model.DefinedCompositeResourceOptionsInput) *model.CompositeResourceConnection {
+	xrs := []model.CompositeResource{}
 
 	for i := range in.Items {
-		out.Nodes = append(out.Nodes, model.GetCompositeResource(&in.Items[i]))
+		xr := model.GetCompositeResource(&in.Items[i])
+		if readyMatches(options.Ready, &xr) {
+			xrs = append(xrs, xr)
+		}
+	}
+	out := &model.CompositeResourceConnection{
+		Nodes:      xrs,
+		TotalCount: len(xrs),
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return out
 }
 
-func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version, namespace *string) (*model.CompositeResourceClaimConnection, error) {
+func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, namespace *string, options *model.DefinedCompositeResourceClaimOptionsInput) (*model.CompositeResourceClaimConnection, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
 	// Return early if this XRD doesn't offer a claim.
 	if obj.Spec.ClaimNames == nil {
 		return &model.CompositeResourceClaimConnection{}, nil
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
+	if options == nil {
+		options = &model.DefinedCompositeResourceClaimOptionsInput{}
+	}
+
+	options.DeprecationPatch(version, namespace)
 
 	gopts := []clients.GetOption{}
 	lopts := []client.ListOption{}
-	if namespace != nil {
-		gopts = []clients.GetOption{clients.ForNamespace(*namespace)}
-		lopts = []client.ListOption{client.InNamespace(*namespace)}
+	if options.Namespace != nil {
+		gopts = []clients.GetOption{clients.ForNamespace(*options.Namespace)}
+		lopts = []client.ListOption{client.InNamespace(*options.Namespace)}
 	}
 
 	creds, _ := auth.FromContext(ctx)
@@ -167,8 +191,8 @@ func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.Com
 
 	gv := schema.GroupVersion{Group: obj.Spec.Group}
 	switch {
-	case version != nil:
-		gv.Version = *version
+	case options.Version != nil:
+		gv.Version = *options.Version
 	default:
 		gv.Version = pickXRDVersion(obj.Spec.Versions)
 	}
@@ -185,17 +209,49 @@ func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.Com
 		return nil, nil
 	}
 
-	out := &model.CompositeResourceClaimConnection{
-		Nodes:      make([]model.CompositeResourceClaim, 0, len(in.Items)),
-		TotalCount: len(in.Items),
-	}
+	return getCompositeResourceClaimConnection(in, options), nil
+}
+
+/*
+Produce a CompositeResourceClaimConnection from the raw k8s UnstructuredList
+that is filtered and sorted
+*/
+func getCompositeResourceClaimConnection(in *kunstructured.UnstructuredList, options *model.DefinedCompositeResourceClaimOptionsInput) *model.CompositeResourceClaimConnection {
+	claims := []model.CompositeResourceClaim{}
 
 	for i := range in.Items {
-		out.Nodes = append(out.Nodes, model.GetCompositeResourceClaim(&in.Items[i]))
+		claim := model.GetCompositeResourceClaim(&in.Items[i])
+		if readyMatches(options.Ready, &claim) {
+			claims = append(claims, claim)
+		}
+	}
+
+	out := &model.CompositeResourceClaimConnection{
+		Nodes:      claims,
+		TotalCount: len(claims),
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return out
+}
+
+/* Check that ready matches filter
+ * If nil is passed then any ready state is allowed
+ * If true is passed then only ready state `True` is required
+ * If false is passed then ready state `True` is excluded
+ */
+func readyMatches(ready *bool, m model.ConditionedModel) bool {
+	if ready == nil {
+		return true
+	}
+
+	for _, c := range m.GetConditions() {
+		if c.Type == "Ready" {
+			return (c.Status == model.ConditionStatusTrue) == *ready
+		}
+	}
+	return !*ready
+
 }
 
 // TODO(negz): Try to pick the 'highest' version (e.g. v2 > v1 > v1beta1),
