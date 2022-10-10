@@ -172,3 +172,39 @@ func GetComposition(cmp *extv1.Composition) Composition {
 		Unstructured: unstruct(cmp),
 	}
 }
+
+/* Handle deprecated items preferring non-deprecated */
+func (options *DefinedCompositeResourceOptionsInput) DeprecationPatch(version *string) {
+	if version != nil && options.Version == nil {
+		options.Version = version
+	}
+}
+
+/* Handle deprecated items preferring non-deprecated */
+func (options *DefinedCompositeResourceClaimOptionsInput) DeprecationPatch(version *string, namespace *string) {
+	if version != nil && options.Version == nil {
+		options.Version = version
+	}
+	if namespace != nil && options.Namespace == nil {
+		options.Namespace = namespace
+	}
+}
+
+/* A model that has conditions */
+type ConditionedModel interface {
+	GetConditions() []Condition
+}
+
+func (m *CompositeResourceClaim) GetConditions() []Condition {
+	if m.Status != nil {
+		return m.Status.Conditions
+	}
+	return nil
+}
+
+func (m *CompositeResource) GetConditions() []Condition {
+	if m.Status != nil {
+		return m.Status.Conditions
+	}
+	return nil
+}

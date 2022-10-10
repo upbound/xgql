@@ -128,8 +128,8 @@ type ComplexityRoot struct {
 		APIVersion                     func(childComplexity int) int
 		CompositeResourceClaimCrd      func(childComplexity int) int
 		CompositeResourceCrd           func(childComplexity int) int
-		DefinedCompositeResourceClaims func(childComplexity int, version *string, namespace *string) int
-		DefinedCompositeResources      func(childComplexity int, version *string) int
+		DefinedCompositeResourceClaims func(childComplexity int, version *string, namespace *string, options *model.DefinedCompositeResourceClaimOptionsInput) int
+		DefinedCompositeResources      func(childComplexity int, version *string, options *model.DefinedCompositeResourceOptionsInput) int
 		Events                         func(childComplexity int) int
 		ID                             func(childComplexity int) int
 		Kind                           func(childComplexity int) int
@@ -639,8 +639,8 @@ type CompositeResourceDefinitionResolver interface {
 	Events(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.EventConnection, error)
 	CompositeResourceCrd(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.CustomResourceDefinition, error)
 	CompositeResourceClaimCrd(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.CustomResourceDefinition, error)
-	DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string) (*model.CompositeResourceConnection, error)
-	DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, namespace *string) (*model.CompositeResourceClaimConnection, error)
+	DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, options *model.DefinedCompositeResourceOptionsInput) (*model.CompositeResourceConnection, error)
+	DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, namespace *string, options *model.DefinedCompositeResourceClaimOptionsInput) (*model.CompositeResourceClaimConnection, error)
 }
 type CompositeResourceDefinitionSpecResolver interface {
 	DefaultComposition(ctx context.Context, obj *model.CompositeResourceDefinitionSpec) (*model.Composition, error)
@@ -1010,7 +1010,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.CompositeResourceDefinition.DefinedCompositeResourceClaims(childComplexity, args["version"].(*string), args["namespace"].(*string)), true
+		return e.complexity.CompositeResourceDefinition.DefinedCompositeResourceClaims(childComplexity, args["version"].(*string), args["namespace"].(*string), args["options"].(*model.DefinedCompositeResourceClaimOptionsInput)), true
 
 	case "CompositeResourceDefinition.definedCompositeResources":
 		if e.complexity.CompositeResourceDefinition.DefinedCompositeResources == nil {
@@ -1022,7 +1022,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.CompositeResourceDefinition.DefinedCompositeResources(childComplexity, args["version"].(*string)), true
+		return e.complexity.CompositeResourceDefinition.DefinedCompositeResources(childComplexity, args["version"].(*string), args["options"].(*model.DefinedCompositeResourceOptionsInput)), true
 
 	case "CompositeResourceDefinition.events":
 		if e.complexity.CompositeResourceDefinition.Events == nil {
@@ -3137,6 +3137,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateKubernetesResourceInput,
+		ec.unmarshalInputDefinedCompositeResourceClaimOptionsInput,
+		ec.unmarshalInputDefinedCompositeResourceOptionsInput,
 		ec.unmarshalInputPatch,
 		ec.unmarshalInputUpdateKubernetesResourceInput,
 	)
@@ -3239,16 +3241,60 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
   definedCompositeResources(
     "Return resources of this version."
     version: String
+      @deprecated(
+        reason: "Use ` + "`" + `DefinedCompositeResourceOptions` + "`" + `.version instead"
+      )
+
+    "Options to filter or limit the resources"
+    options: DefinedCompositeResourceOptionsInput
   ): CompositeResourceConnection! @goField(forceResolver: true)
 
   "Composite resource claims (XRCs) defined by this XRD."
   definedCompositeResourceClaims(
     "Return resources of this version."
     version: String
+      @deprecated(
+        reason: "Use ` + "`" + `DefinedCompositeResourceClaimOptions` + "`" + `.version instead"
+      )
 
     "Return resources in this namespace."
     namespace: String
+      @deprecated(
+        reason: "Use ` + "`" + `DefinedCompositeResourceClaimOptions` + "`" + `.namespace instead"
+      )
+
+    "Options to filter or limit the resources"
+    options: DefinedCompositeResourceClaimOptionsInput
   ): CompositeResourceClaimConnection! @goField(forceResolver: true)
+}
+
+"Options to filter or limit the defined composite resources"
+input DefinedCompositeResourceOptionsInput {
+  "Return resources of this version."
+  version: String
+
+  """
+  Optionally limit the results to XRCs.
+  If ` + "`" + `true` + "`" + ` return resources that have ` + "`" + `Condition` + "`" + ` ` + "`" + `Ready` + "`" + ` ` + "`" + `True` + "`" + `.
+  If ` + "`" + `false` + "`" + ` return resources that have ` + "`" + `Condition` + "`" + ` ` + "`" + `Ready` + "`" + ` ` + "`" + `False` + "`" + ` or ` + "`" + `Condition` + "`" + ` ` + "`" + `Ready` + "`" + ` not present
+  """
+  ready: Boolean
+}
+
+"Options to filter or limit the defined composite claim resources"
+input DefinedCompositeResourceClaimOptionsInput {
+  "Return resources of this version."
+  version: String
+
+  "Return resources in this namespace."
+  namespace: String
+
+  """
+  Optionally limit the results to XRCs.
+  If ` + "`" + `true` + "`" + ` return resources that have ` + "`" + `Condition` + "`" + ` ` + "`" + `Ready` + "`" + ` ` + "`" + `True` + "`" + `.
+  If ` + "`" + `false` + "`" + ` return resources that have ` + "`" + `Condition` + "`" + ` ` + "`" + `Ready` + "`" + ` ` + "`" + `False` + "`" + ` or ` + "`" + `Condition` + "`" + ` ` + "`" + `Ready` + "`" + ` not present
+  """
+  ready: Boolean
 }
 
 """
@@ -5460,6 +5506,15 @@ func (ec *executionContext) field_CompositeResourceDefinition_definedCompositeRe
 		}
 	}
 	args["namespace"] = arg1
+	var arg2 *model.DefinedCompositeResourceClaimOptionsInput
+	if tmp, ok := rawArgs["options"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
+		arg2, err = ec.unmarshalODefinedCompositeResourceClaimOptionsInput2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDefinedCompositeResourceClaimOptionsInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["options"] = arg2
 	return args, nil
 }
 
@@ -5475,6 +5530,15 @@ func (ec *executionContext) field_CompositeResourceDefinition_definedCompositeRe
 		}
 	}
 	args["version"] = arg0
+	var arg1 *model.DefinedCompositeResourceOptionsInput
+	if tmp, ok := rawArgs["options"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("options"))
+		arg1, err = ec.unmarshalODefinedCompositeResourceOptionsInput2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDefinedCompositeResourceOptionsInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["options"] = arg1
 	return args, nil
 }
 
@@ -8142,7 +8206,7 @@ func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResourc
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.CompositeResourceDefinition().DefinedCompositeResources(rctx, obj, fc.Args["version"].(*string))
+		return ec.resolvers.CompositeResourceDefinition().DefinedCompositeResources(rctx, obj, fc.Args["version"].(*string), fc.Args["options"].(*model.DefinedCompositeResourceOptionsInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8203,7 +8267,7 @@ func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResourc
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.CompositeResourceDefinition().DefinedCompositeResourceClaims(rctx, obj, fc.Args["version"].(*string), fc.Args["namespace"].(*string))
+		return ec.resolvers.CompositeResourceDefinition().DefinedCompositeResourceClaims(rctx, obj, fc.Args["version"].(*string), fc.Args["namespace"].(*string), fc.Args["options"].(*model.DefinedCompositeResourceClaimOptionsInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -23595,6 +23659,86 @@ func (ec *executionContext) unmarshalInputCreateKubernetesResourceInput(ctx cont
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDefinedCompositeResourceClaimOptionsInput(ctx context.Context, obj interface{}) (model.DefinedCompositeResourceClaimOptionsInput, error) {
+	var it model.DefinedCompositeResourceClaimOptionsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"version", "namespace", "ready"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "version":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("version"))
+			it.Version, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "namespace":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
+			it.Namespace, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "ready":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ready"))
+			it.Ready, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputDefinedCompositeResourceOptionsInput(ctx context.Context, obj interface{}) (model.DefinedCompositeResourceOptionsInput, error) {
+	var it model.DefinedCompositeResourceOptionsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"version", "ready"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "version":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("version"))
+			it.Version, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "ready":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ready"))
+			it.Ready, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputPatch(ctx context.Context, obj interface{}) (model.Patch, error) {
 	var it model.Patch
 	asMap := map[string]interface{}{}
@@ -30140,6 +30284,22 @@ func (ec *executionContext) marshalOCustomResourceValidation2ᚖgithubᚗcomᚋu
 		return graphql.Null
 	}
 	return ec._CustomResourceValidation(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalODefinedCompositeResourceClaimOptionsInput2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDefinedCompositeResourceClaimOptionsInput(ctx context.Context, v interface{}) (*model.DefinedCompositeResourceClaimOptionsInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputDefinedCompositeResourceClaimOptionsInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalODefinedCompositeResourceOptionsInput2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDefinedCompositeResourceOptionsInput(ctx context.Context, v interface{}) (*model.DefinedCompositeResourceOptionsInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputDefinedCompositeResourceOptionsInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalODeletionPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeletionPolicy(ctx context.Context, v interface{}) (*model.DeletionPolicy, error) {

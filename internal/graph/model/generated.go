@@ -608,6 +608,28 @@ type CustomResourceValidation struct {
 	OpenAPIV3Schema []byte `json:"openAPIV3Schema"`
 }
 
+// Options to filter or limit the defined composite claim resources
+type DefinedCompositeResourceClaimOptionsInput struct {
+	// Return resources of this version.
+	Version *string `json:"version"`
+	// Return resources in this namespace.
+	Namespace *string `json:"namespace"`
+	// Optionally limit the results to XRCs.
+	// If `true` return resources that have `Condition` `Ready` `True`.
+	// If `false` return resources that have `Condition` `Ready` `False` or `Condition` `Ready` not present
+	Ready *bool `json:"ready"`
+}
+
+// Options to filter or limit the defined composite resources
+type DefinedCompositeResourceOptionsInput struct {
+	// Return resources of this version.
+	Version *string `json:"version"`
+	// Optionally limit the results to XRCs.
+	// If `true` return resources that have `Condition` `Ready` `True`.
+	// If `false` return resources that have `Condition` `Ready` `False` or `Condition` `Ready` not present
+	Ready *bool `json:"ready"`
+}
+
 // DeleteKubernetesResourcePayload is the result of deleting a Kubernetes resource.
 type DeleteKubernetesResourcePayload struct {
 	// The deleted Kubernetes resource. Null if the delete failed.

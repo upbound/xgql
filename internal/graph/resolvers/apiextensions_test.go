@@ -23,12 +23,14 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 
@@ -297,6 +299,15 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 
 	xr := unstructured.Unstructured{}
 	gxr := model.GetCompositeResource(&xr)
+	xrReady := unstructured.Unstructured{Object: map[string]interface{}{}}
+	fieldpath.Pave(xrReady.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionTrue}})
+	gxrReady := model.GetCompositeResource(&xrReady)
+	xrNotReady := unstructured.Unstructured{Object: map[string]interface{}{}}
+	fieldpath.Pave(xrNotReady.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionFalse}})
+	gxrNotReady := model.GetCompositeResource(&xrNotReady)
+	xrReadyUnknown := unstructured.Unstructured{Object: map[string]interface{}{}}
+	fieldpath.Pave(xrReadyUnknown.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionUnknown}})
+	gxrReadyUnknown := model.GetCompositeResource(&xrReadyUnknown)
 
 	group := "example.org"
 	version := "v1"
@@ -310,6 +321,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 		ctx     context.Context
 		obj     *model.CompositeResourceDefinition
 		version *string
+		options *model.DefinedCompositeResourceOptionsInput
 	}
 	type want struct {
 		crc  *model.CompositeResourceConnection
@@ -501,11 +513,245 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						},
 					},
 				},
+				options: &model.DefinedCompositeResourceOptionsInput{Version: pointer.StringPtr(version)},
+			},
+			want: want{
+				crc: &model.CompositeResourceConnection{
+					Nodes:      []model.CompositeResource{gxr},
+					TotalCount: 1,
+				},
+			},
+		},
+		"SpecificVersionDeprecated": {
+			reason: "We should successfully return any defined resources of the requested version that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						u := *obj.(*unstructured.UnstructuredList)
+
+						// Ensure we're being asked to list the expected GVK.
+						got := u.GetObjectKind().GroupVersionKind()
+						want := schema.GroupVersionKind{Group: group, Version: version, Kind: listKind}
+						if diff := cmp.Diff(want, got); diff != "" {
+							t.Errorf("-want GVK, +got GVK:\n%s", diff)
+						}
+
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xr}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						Names: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
 				version: pointer.StringPtr(version),
 			},
 			want: want{
 				crc: &model.CompositeResourceConnection{
 					Nodes:      []model.CompositeResource{gxr},
+					TotalCount: 1,
+				},
+			},
+		},
+		"SpecificVersionPerferNonDeprecated": {
+			reason: "We should successfully return any defined resources of the requested version that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						u := *obj.(*unstructured.UnstructuredList)
+
+						// Ensure we're being asked to list the expected GVK.
+						got := u.GetObjectKind().GroupVersionKind()
+						want := schema.GroupVersionKind{Group: group, Version: version, Kind: listKind}
+						if diff := cmp.Diff(want, got); diff != "" {
+							t.Errorf("-want GVK, +got GVK:\n%s", diff)
+						}
+
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xr}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						Names: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+				options: &model.DefinedCompositeResourceOptionsInput{Version: pointer.StringPtr(version)},
+				version: pointer.StringPtr("v2"),
+			},
+			want: want{
+				crc: &model.CompositeResourceConnection{
+					Nodes:      []model.CompositeResource{gxr},
+					TotalCount: 1,
+				},
+			},
+		},
+		"ReadyNull": {
+			reason: "We should successfully return any defined claims of any ready status",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xr, xrNotReady, xrReady, xrReadyUnknown}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						Names: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+				options: &model.DefinedCompositeResourceOptionsInput{Ready: nil},
+			},
+			want: want{
+				crc: &model.CompositeResourceConnection{
+					Nodes:      []model.CompositeResource{gxr, gxrNotReady, gxrReady, gxrReadyUnknown},
+					TotalCount: 4,
+				},
+			},
+		},
+		"ReadyFalse": {
+			reason: "We should successfully return any defined claims that are not ready",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xr, xrNotReady, xrReady, xrReadyUnknown}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						Names: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+				options: &model.DefinedCompositeResourceOptionsInput{Ready: pointer.BoolPtr(false)},
+			},
+			want: want{
+				crc: &model.CompositeResourceConnection{
+					Nodes:      []model.CompositeResource{gxr, gxrNotReady, gxrReadyUnknown},
+					TotalCount: 3,
+				},
+			},
+		},
+		"ReadyTrue": {
+			reason: "We should successfully return any defined claims that are ready",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xr, xrNotReady, xrReady, xrReadyUnknown}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						Names: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+				options: &model.DefinedCompositeResourceOptionsInput{Ready: pointer.BoolPtr(true)},
+			},
+			want: want{
+				crc: &model.CompositeResourceConnection{
+					Nodes:      []model.CompositeResource{gxrReady},
 					TotalCount: 1,
 				},
 			},
@@ -518,7 +764,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 
 			// Our GraphQL resolvers never return errors. We instead add an
 			// error to the GraphQL context and return early.
-			got, err := x.DefinedCompositeResources(tc.args.ctx, tc.args.obj, tc.args.version)
+			got, err := x.DefinedCompositeResources(tc.args.ctx, tc.args.obj, tc.args.version, tc.args.options)
 			errs := graphql.GetErrors(tc.args.ctx)
 
 			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
@@ -539,6 +785,15 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 
 	xrc := unstructured.Unstructured{}
 	gxrc := model.GetCompositeResourceClaim(&xrc)
+	xrcReady := unstructured.Unstructured{Object: map[string]interface{}{}}
+	fieldpath.Pave(xrcReady.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionTrue}})
+	gxrcReady := model.GetCompositeResourceClaim(&xrcReady)
+	xrcNotReady := unstructured.Unstructured{Object: map[string]interface{}{}}
+	fieldpath.Pave(xrcNotReady.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionFalse}})
+	gxrcNotReady := model.GetCompositeResourceClaim(&xrcNotReady)
+	xrcReadyUnknown := unstructured.Unstructured{Object: map[string]interface{}{}}
+	fieldpath.Pave(xrcReadyUnknown.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionUnknown}})
+	gxrcReadyUnknown := model.GetCompositeResourceClaim(&xrcReadyUnknown)
 
 	group := "example.org"
 	version := "v1"
@@ -553,6 +808,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 		obj       *model.CompositeResourceDefinition
 		version   *string
 		namespace *string
+		options   *model.DefinedCompositeResourceClaimOptionsInput
 	}
 	type want struct {
 		crcc *model.CompositeResourceClaimConnection
@@ -761,11 +1017,415 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						},
 					},
 				},
+				options: &model.DefinedCompositeResourceClaimOptionsInput{Version: pointer.StringPtr(version)},
+			},
+			want: want{
+				crcc: &model.CompositeResourceClaimConnection{
+					Nodes:      []model.CompositeResourceClaim{gxrc},
+					TotalCount: 1,
+				},
+			},
+		},
+		"SpecificVersionDeprecated": {
+			reason: "We should successfully return any defined claims of the requested deprecated version that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						u := *obj.(*unstructured.UnstructuredList)
+
+						// Ensure we're being asked to list the expected GVK.
+						got := u.GetObjectKind().GroupVersionKind()
+						want := schema.GroupVersionKind{Group: group, Version: version, Kind: listKind}
+						if diff := cmp.Diff(want, got); diff != "" {
+							t.Errorf("-want GVK, +got GVK:\n%s", diff)
+						}
+
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xrc}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						ClaimNames: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
 				version: pointer.StringPtr(version),
 			},
 			want: want{
 				crcc: &model.CompositeResourceClaimConnection{
 					Nodes:      []model.CompositeResourceClaim{gxrc},
+					TotalCount: 1,
+				},
+			},
+		},
+		"SpecificVersionPreferNonDeprecated": {
+			reason: "We should successfully return any defined claims of the requested version ignoring deprecated version that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						u := *obj.(*unstructured.UnstructuredList)
+
+						// Ensure we're being asked to list the expected GVK.
+						got := u.GetObjectKind().GroupVersionKind()
+						want := schema.GroupVersionKind{Group: group, Version: version, Kind: listKind}
+						if diff := cmp.Diff(want, got); diff != "" {
+							t.Errorf("-want GVK, +got GVK:\n%s", diff)
+						}
+
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xrc}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						ClaimNames: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+				options: &model.DefinedCompositeResourceClaimOptionsInput{Version: pointer.StringPtr(version)},
+				version: pointer.StringPtr("v2"),
+			},
+			want: want{
+				crcc: &model.CompositeResourceClaimConnection{
+					Nodes:      []model.CompositeResourceClaim{gxrc},
+					TotalCount: 1,
+				},
+			},
+		},
+		"Namespace": {
+			reason: "We should successfully return any defined claims in namespace that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: func(_ context.Context, list client.ObjectList, opts ...client.ListOption) error {
+						u := *list.(*unstructured.UnstructuredList)
+
+						if diff := cmp.Diff(client.InNamespace("some-namespace"), opts[0]); diff != "" {
+							t.Errorf("-want, +got Namespace:\n%s", diff)
+						}
+
+						// Ensure we're being asked to list the expected GVK.
+						got := u.GetObjectKind().GroupVersionKind()
+						want := schema.GroupVersionKind{Group: group, Version: version, Kind: listKind}
+						if diff := cmp.Diff(want, got); diff != "" {
+							t.Errorf("-want GVK, +got GVK:\n%s", diff)
+						}
+
+						*list.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xrc}}
+						return nil
+					},
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						ClaimNames: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+				options: &model.DefinedCompositeResourceClaimOptionsInput{Version: pointer.StringPtr(version), Namespace: pointer.StringPtr("some-namespace")},
+			},
+			want: want{
+				crcc: &model.CompositeResourceClaimConnection{
+					Nodes:      []model.CompositeResourceClaim{gxrc},
+					TotalCount: 1,
+				},
+			},
+		},
+		"NamespaceDeprecated": {
+			reason: "We should successfully return any defined claims in deprecated namespace that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: func(_ context.Context, list client.ObjectList, opts ...client.ListOption) error {
+						u := *list.(*unstructured.UnstructuredList)
+
+						if diff := cmp.Diff(client.InNamespace("some-namespace"), opts[0]); diff != "" {
+							t.Errorf("-want, +got Namespace:\n%s", diff)
+						}
+
+						// Ensure we're being asked to list the expected GVK.
+						got := u.GetObjectKind().GroupVersionKind()
+						want := schema.GroupVersionKind{Group: group, Version: version, Kind: listKind}
+						if diff := cmp.Diff(want, got); diff != "" {
+							t.Errorf("-want GVK, +got GVK:\n%s", diff)
+						}
+
+						*list.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xrc}}
+						return nil
+					},
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						ClaimNames: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+				options:   &model.DefinedCompositeResourceClaimOptionsInput{Version: pointer.StringPtr(version)},
+				namespace: pointer.StringPtr("some-namespace"),
+			},
+			want: want{
+				crcc: &model.CompositeResourceClaimConnection{
+					Nodes:      []model.CompositeResourceClaim{gxrc},
+					TotalCount: 1,
+				},
+			},
+		},
+		"NamespacePreferNonDeprecated": {
+			reason: "We should successfully return any defined claims in namespace ignoring deprecated namespace that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: func(_ context.Context, list client.ObjectList, opts ...client.ListOption) error {
+						u := *list.(*unstructured.UnstructuredList)
+
+						if diff := cmp.Diff(client.InNamespace("some-namespace"), opts[0]); diff != "" {
+							t.Errorf("-want, +got Namespace:\n%s", diff)
+						}
+
+						// Ensure we're being asked to list the expected GVK.
+						got := u.GetObjectKind().GroupVersionKind()
+						want := schema.GroupVersionKind{Group: group, Version: version, Kind: listKind}
+						if diff := cmp.Diff(want, got); diff != "" {
+							t.Errorf("-want GVK, +got GVK:\n%s", diff)
+						}
+
+						*list.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xrc}}
+						return nil
+					},
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						ClaimNames: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+				options:   &model.DefinedCompositeResourceClaimOptionsInput{Version: pointer.StringPtr(version), Namespace: pointer.StringPtr("some-namespace")},
+				namespace: pointer.StringPtr("some-other-namespace"),
+			},
+			want: want{
+				crcc: &model.CompositeResourceClaimConnection{
+					Nodes:      []model.CompositeResourceClaim{gxrc},
+					TotalCount: 1,
+				},
+			},
+		},
+		"ReadyNull": {
+			reason: "We should successfully return any defined claims of any ready status",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xrc, xrcNotReady, xrcReady, xrcReadyUnknown}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						ClaimNames: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+				options: &model.DefinedCompositeResourceClaimOptionsInput{Ready: nil},
+			},
+			want: want{
+				crcc: &model.CompositeResourceClaimConnection{
+					Nodes:      []model.CompositeResourceClaim{gxrc, gxrcNotReady, gxrcReady, gxrcReadyUnknown},
+					TotalCount: 4,
+				},
+			},
+		},
+		"ReadyFalse": {
+			reason: "We should successfully return any defined claims that are not ready",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xrc, xrcNotReady, xrcReady, xrcReadyUnknown}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						ClaimNames: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+				options: &model.DefinedCompositeResourceClaimOptionsInput{Ready: pointer.BoolPtr(false)},
+			},
+			want: want{
+				crcc: &model.CompositeResourceClaimConnection{
+					Nodes:      []model.CompositeResourceClaim{gxrc, gxrcNotReady, gxrcReadyUnknown},
+					TotalCount: 3,
+				},
+			},
+		},
+		"ReadyTrue": {
+			reason: "We should successfully return any defined claims that are ready",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{xrc, xrcNotReady, xrcReady, xrcReadyUnknown}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinition{
+					Spec: &model.CompositeResourceDefinitionSpec{
+						Group: group,
+						ClaimNames: &model.CompositeResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.StringPtr(listKind),
+						},
+						Versions: []model.CompositeResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+				options: &model.DefinedCompositeResourceClaimOptionsInput{Ready: pointer.BoolPtr(true)},
+			},
+			want: want{
+				crcc: &model.CompositeResourceClaimConnection{
+					Nodes:      []model.CompositeResourceClaim{gxrcReady},
 					TotalCount: 1,
 				},
 			},
@@ -778,7 +1438,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 
 			// Our GraphQL resolvers never return errors. We instead add an
 			// error to the GraphQL context and return early.
-			got, err := x.DefinedCompositeResourceClaims(tc.args.ctx, tc.args.obj, tc.args.version, tc.args.namespace)
+			got, err := x.DefinedCompositeResourceClaims(tc.args.ctx, tc.args.obj, tc.args.version, tc.args.namespace, tc.args.options)
 			errs := graphql.GetErrors(tc.args.ctx)
 
 			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
