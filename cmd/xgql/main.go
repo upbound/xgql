@@ -218,9 +218,7 @@ func main() {
 	}
 
 	// start health endpoints to aid in routing traffic to the pod
-	if err := startHealth(internal.HealthOptions{Health: *health, HealthPort: *healthPort}, log); err != nil {
-		kingpin.FatalIfError(err, "cannot start health endpoints")
-	}
+	kingpin.FatalIfError(startHealth(internal.HealthOptions{Health: *health, HealthPort: *healthPort}, log), "cannot start health endpoints")
 
 	h := &http.Server{
 		Handler:           rt,
@@ -254,8 +252,7 @@ func startHealth(opts internal.HealthOptions, log logging.Logger) error {
 	go func() {
 		log.Debug("Listening for Health connections", "address", fmt.Sprintf(":%d", opts.HealthPort))
 		if err := p.ListenAndServe(); !errors.As(err, http.ErrServerClosed) {
-			err = errors.Wrap(err, "service stopped unexpectedly")
-			log.Info(err.Error())
+			log.Info(errors.Wrap(err, "service stopped unexpectedly").Error())
 			os.Exit(-1)
 		}
 	}()
