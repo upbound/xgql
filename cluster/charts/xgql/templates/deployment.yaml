@@ -41,10 +41,22 @@ spec:
         name: {{ .Chart.Name }}
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
-        {{- if .Values.metrics.enabled }}
         ports:
+        {{- if .Values.metrics.enabled }}
         - name: metrics
           containerPort: 8080
+        {{- end }}
+        {{- if .Values.health.enabled }}
+        - name: health
+          containerPort: 8088
+        livenessProbe:
+          httpGet:
+            path: /livez
+            port: health
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: health
         {{- end }}
         securityContext:
           {{- toYaml .Values.securityContext | nindent 12 }}

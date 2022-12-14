@@ -16,6 +16,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	stdlog "log"
 	"net/http"
@@ -30,6 +31,7 @@ import (
 	google "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/pkg/errors"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	otelruntime "go.opentelemetry.io/contrib/instrumentation/runtime"
 	"go.opentelemetry.io/otel"
@@ -57,12 +59,15 @@ import (
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
+	"github.com/upbound/xgql/internal"
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/present"
 	"github.com/upbound/xgql/internal/graph/resolvers"
 	"github.com/upbound/xgql/internal/opentelemetry"
+	"github.com/upbound/xgql/internal/request"
+	hprobe "github.com/upbound/xgql/internal/server/health"
 	"github.com/upbound/xgql/internal/version"
 )
 
@@ -95,16 +100,18 @@ var noCache = []client.Object{
 
 func main() {
 	var (
-		app      = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
-		debug    = app.Flag("debug", "Enable debug logging.").Short('d').Bool()
-		listen   = app.Flag("listen", "Address at which to listen for TLS connections. Requires TLS cert and key.").Default(":8443").String()
-		tlsCert  = app.Flag("tls-cert", "Path to the TLS certificate file used to serve TLS connections.").ExistingFile()
-		tlsKey   = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
-		insecure = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
-		play     = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
-		tracer   = app.Flag("trace-backend", "Tracer to use.").Default("jaeger").Enum("jaeger", "gcp")
-		ratio    = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
-		agent    = app.Flag("trace-agent", "Address of the Jaeger trace agent as [host]:[port]").TCP()
+		app        = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
+		debug      = app.Flag("debug", "Enable debug logging.").Short('d').Bool()
+		listen     = app.Flag("listen", "Address at which to listen for TLS connections. Requires TLS cert and key.").Default(":8443").String()
+		tlsCert    = app.Flag("tls-cert", "Path to the TLS certificate file used to serve TLS connections.").ExistingFile()
+		tlsKey     = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
+		insecure   = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
+		play       = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
+		tracer     = app.Flag("trace-backend", "Tracer to use.").Default("jaeger").Enum("jaeger", "gcp")
+		ratio      = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
+		agent      = app.Flag("trace-agent", "Address of the Jaeger trace agent as [host]:[port]").TCP()
+		health     = app.Flag("health", "Enable health endpoints.").Default("true").Bool()
+		healthPort = app.Flag("health-port", "Port used for readyz and livez requests.").Default("8088").Int()
 	)
 	app.Version(version.Version)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
@@ -165,7 +172,7 @@ func main() {
 	utilruntime.ErrorHandlers = []func(error){func(err error) { log.Debug("Kubernetes runtime error", "err", err) }}
 
 	rt := chi.NewRouter()
-	rt.Use(middleware.RequestLogger(&formatter{log}))
+	rt.Use(middleware.RequestLogger(&request.Formatter{Log: log}))
 	rt.Use(middleware.Compress(5)) // Chi recommends compression level 5.
 	rt.Use(auth.Middleware)
 	rt.Use(version.Middleware)
@@ -210,7 +217,12 @@ func main() {
 		rt.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	}
 
-	h := http.Server{
+	// start health endpoints to aid in routing traffic to the pod
+	if err := startHealth(internal.HealthOptions{Health: *health, HealthPort: *healthPort}, log); err != nil {
+		kingpin.FatalIfError(err, "cannot start health endpoints")
+	}
+
+	h := &http.Server{
 		Handler:           rt,
 		WriteTimeout:      10 * time.Second,
 		ReadTimeout:       5 * time.Second,
@@ -231,30 +243,22 @@ func main() {
 	kingpin.FatalIfError(h.ListenAndServe(), "cannot serve insecure HTTP")
 }
 
-type formatter struct{ log logging.Logger }
+// startHealth starts the readyz and livez endpoints for this service.
+func startHealth(opts internal.HealthOptions, log logging.Logger) error {
+	p, err := hprobe.Server(opts, log)
 
-func (f *formatter) NewLogEntry(r *http.Request) middleware.LogEntry {
-	return &entry{log: f.log.WithValues(
-		"id", middleware.GetReqID(r.Context()),
-		"method", r.Method,
-		"tls", r.TLS != nil,
-		"host", r.Host,
-		"uri", r.RequestURI,
-		"protocol", r.Proto,
-		"remote", r.RemoteAddr,
-	)}
-}
+	if err != nil {
+		return err
+	}
 
-type entry struct{ log logging.Logger }
+	go func() {
+		log.Debug("Listening for Health connections", "address", fmt.Sprintf(":%d", opts.HealthPort))
+		if err := p.ListenAndServe(); !errors.As(err, http.ErrServerClosed) {
+			err = errors.Wrap(err, "service stopped unexpectedly")
+			log.Info(err.Error())
+			os.Exit(-1)
+		}
+	}()
 
-func (e *entry) Write(status, bytes int, _ http.Header, elapsed time.Duration, _ interface{}) {
-	e.log.Debug("Handled request",
-		"status", status,
-		"bytes", bytes,
-		"duration", elapsed,
-	)
-}
-
-func (e *entry) Panic(v interface{}, stack []byte) {
-	e.log.Debug("Paniced while handling request", "stack", stack, "panic", v)
+	return nil
 }
