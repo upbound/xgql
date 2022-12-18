@@ -24,6 +24,7 @@ GO111MODULE = on
 -include build/makelib/yarnjs.mk
 
 # Setup Helm
+KIND_VERSION = v0.16.0
 USE_HELM3 = true
 HELM_BASE_URL = https://charts.upbound.io
 HELM_S3_BUCKET = public-upbound.charts
