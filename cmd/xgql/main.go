@@ -203,6 +203,7 @@ func main() {
 		clients.WithRESTMapper(rm),
 		clients.DoNotCache(noCache),
 		clients.WithLogger(log),
+		clients.WithExpiry(14*24*time.Hour), // Set the cache expire at 2 weeks for now
 	)
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
 	srv.SetErrorPresenter(present.Error)
