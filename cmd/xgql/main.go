@@ -100,18 +100,19 @@ var noCache = []client.Object{
 
 func main() {
 	var (
-		app        = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
-		debug      = app.Flag("debug", "Enable debug logging.").Short('d').Bool()
-		listen     = app.Flag("listen", "Address at which to listen for TLS connections. Requires TLS cert and key.").Default(":8443").String()
-		tlsCert    = app.Flag("tls-cert", "Path to the TLS certificate file used to serve TLS connections.").ExistingFile()
-		tlsKey     = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
-		insecure   = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
-		play       = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
-		tracer     = app.Flag("trace-backend", "Tracer to use.").Default("jaeger").Enum("jaeger", "gcp")
-		ratio      = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
-		agent      = app.Flag("trace-agent", "Address of the Jaeger trace agent as [host]:[port]").TCP()
-		health     = app.Flag("health", "Enable health endpoints.").Default("true").Bool()
-		healthPort = app.Flag("health-port", "Port used for readyz and livez requests.").Default("8088").Int()
+		app         = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
+		debug       = app.Flag("debug", "Enable debug logging.").Short('d').Bool()
+		listen      = app.Flag("listen", "Address at which to listen for TLS connections. Requires TLS cert and key.").Default(":8443").String()
+		tlsCert     = app.Flag("tls-cert", "Path to the TLS certificate file used to serve TLS connections.").ExistingFile()
+		tlsKey      = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
+		insecure    = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
+		play        = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
+		tracer      = app.Flag("trace-backend", "Tracer to use.").Default("jaeger").Enum("jaeger", "gcp")
+		ratio       = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
+		agent       = app.Flag("trace-agent", "Address of the Jaeger trace agent as [host]:[port]").TCP()
+		health      = app.Flag("health", "Enable health endpoints.").Default("true").Bool()
+		healthPort  = app.Flag("health-port", "Port used for readyz and livez requests.").Default("8088").Int()
+		cacheExpiry = app.Flag("cache-expiry", "The duration since last activity by a user until that users client expires.").Default("336h").Duration()
 	)
 	app.Version(version.Version)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
@@ -203,6 +204,7 @@ func main() {
 		clients.WithRESTMapper(rm),
 		clients.DoNotCache(noCache),
 		clients.WithLogger(log),
+		clients.WithExpiry(*cacheExpiry),
 	)
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
 	srv.SetErrorPresenter(present.Error)
