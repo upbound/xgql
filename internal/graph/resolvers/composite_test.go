@@ -577,6 +577,9 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 	krb.SetKind("B")
 	gkrb, _ := model.GetKubernetesResource(krb)
 
+	krc := &unstructured.Unstructured{}
+	krc.SetKind("C")
+
 	type args struct {
 		ctx context.Context
 		obj *model.CompositeResourceSpec
@@ -624,8 +627,8 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
 					ResourceReferences: []corev1.ObjectReference{
-						{Kind: kra.GetKind()},
-						{Kind: krb.GetKind()},
+						{Kind: kra.GetKind(), Name: "an-a"},
+						{Kind: krb.GetKind(), Name: "a-b"},
 					},
 				},
 			},
@@ -640,6 +643,30 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 				},
 			},
 		},
+		"IgnoreEmptyName": {
+			reason: "If we can get and model composed resources we should return them.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceSpec{
+					ResourceReferences: []corev1.ObjectReference{
+						{Kind: kra.GetKind(), Name: "an-a"},
+						{Kind: krc.GetKind()}, // No name
+						{Kind: krb.GetKind(), Name: "a-b"},
+					},
+				},
+			},
+			want: want{
+				krc: &model.KubernetesResourceConnection{
+					TotalCount: 2,
+					Nodes:      []model.KubernetesResource{gkra, gkrb},
+				},
+			},
+		},
 		"Success": {
 			reason: "If we can get and model composed resources we should return them.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
@@ -651,8 +678,8 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
 					ResourceReferences: []corev1.ObjectReference{
-						{Kind: kra.GetKind()},
-						{Kind: krb.GetKind()},
+						{Kind: kra.GetKind(), Name: "an-a"},
+						{Kind: krb.GetKind(), Name: "a-b"},
 					},
 				},
 			},
