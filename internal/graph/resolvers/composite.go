@@ -218,7 +218,6 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 		out.Nodes = append(out.Nodes, kr)
 		out.TotalCount++
 	}
-	out.Nodes = out.Nodes[:out.TotalCount]
 
 	sort.Stable(out)
 	return out, nil
