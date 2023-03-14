@@ -1,4 +1,4 @@
-# xgql [![CI](https://github.com/upbound/xgql/actions/workflows/ci.yml/badge.svg)](https://github.com/upbound/xgql/actions/workflows/ci.yml) [![Codecov](https://codecov.io/gh/upbound/xgql/branch/main/graph/badge.svg?token=QCRHAiqe1T)](https://codecov.io/gh/upbound/xgql)
+# xgql [![CI](https://github.com/upbound/xgql/actions/workflows/ci.yml/badge.svg)](https://github.com/upbound/xgql/actions/workflows/ci.yml) [![Codecov](https://codecov.io/gh/upbound/xgql/branch/main/graph/badge.svg?token=QCRHAiqe1T)](https://codecov.io/gh/upbound/xgql) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/upbound/xgql)
 
 A GraphQL API for [Crossplane].
 
