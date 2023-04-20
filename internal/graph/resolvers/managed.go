@@ -16,11 +16,14 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -57,12 +60,6 @@ func (r *managedResource) Definition(ctx context.Context, obj *model.ManagedReso
 		return nil, nil
 	}
 
-	in := &kextv1.CustomResourceDefinitionList{}
-	if err := c.List(ctx, in); err != nil {
-		graphql.AddError(ctx, errors.Wrap(err, errListCRDs))
-		return nil, nil
-	}
-
 	gv, err := schema.ParseGroupVersion(obj.APIVersion)
 	if err != nil {
 		// This should be pretty much impossible - the API server should not
@@ -71,18 +68,46 @@ func (r *managedResource) Definition(ctx context.Context, obj *model.ManagedReso
 		return nil, nil
 	}
 
-	for i := range in.Items {
-		crd := in.Items[i] // So we don't take the address of a range variable.
+	name := pluralForm(strings.ToLower(obj.Kind))
 
-		if crd.Spec.Group != gv.Group {
-			continue
+	nn := types.NamespacedName{Name: fmt.Sprintf("%s.%s", name, gv.Group)}
+	in := &kextv1.CustomResourceDefinition{}
+	err = c.Get(ctx, nn, in)
+
+	if err != nil && !kerrors.IsNotFound(err) {
+		graphql.AddError(ctx, errors.Wrap(err, errGetCRD))
+		return nil, nil
+	}
+
+	// We didn't find the CRD we were looking for, list all CRDs and see if we
+	// can find the matching one.
+	if kerrors.IsNotFound(err) {
+		lin := &kextv1.CustomResourceDefinitionList{}
+		if err := c.List(ctx, lin); err != nil {
+			graphql.AddError(ctx, errors.Wrap(err, errListCRDs))
+			return nil, nil
 		}
 
-		if crd.Spec.Names.Kind != obj.Kind {
-			continue
-		}
+		for i := range lin.Items {
+			crd := lin.Items[i] // So we don't take the address of a range variable.
 
-		out := model.GetCustomResourceDefinition(&crd)
+			if crd.Spec.Group != gv.Group {
+				continue
+			}
+
+			if crd.Spec.Names.Kind != obj.Kind {
+				continue
+			}
+
+			out := model.GetCustomResourceDefinition(&crd)
+			return &out, nil
+		}
+	}
+
+	// We found a CRD, let's double check the Group and Kind match our
+	// expectations.
+	if in.Spec.Group == gv.Group && in.Spec.Names.Kind == obj.Kind {
+		out := model.GetCustomResourceDefinition(in)
 		return &out, nil
 	}
 

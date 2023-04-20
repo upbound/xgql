@@ -487,7 +487,7 @@ func GetObjectReference(o *corev1.ObjectReference) *ObjectReference {
 	return ref
 }
 
-// GetObjectReference from the supplied corev1 ObjectReference
+// GetSecretReference from the supplied corev1 ObjectReference
 func GetSecretReference(u *xpv1.SecretReference) *SecretReference {
 	if u == nil {
 		return nil

@@ -583,7 +583,7 @@ func TestSessionStatus(t *testing.T) {
 				log:        logging.NewNopLogger(),
 			},
 			want: want{
-				status: &test.MockStatusWriter{},
+				status: &test.MockSubResourceClient{},
 				expiry: expiry,
 			},
 		},
@@ -634,7 +634,7 @@ func TestSessionScheme(t *testing.T) {
 		"Success": {
 			reason: "We should reset our expiration when our underlying client is called.",
 			fields: fields{
-				client:     &test.MockClient{},
+				client:     test.NewMockClient(),
 				expiry:     expiry,
 				expiration: &mockExpiration{},
 				log:        logging.NewNopLogger(),

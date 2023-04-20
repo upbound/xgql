@@ -131,3 +131,17 @@ func (u *Managed) GetConditions() []xpv1.Condition {
 	}
 	return conditioned.Conditions
 }
+
+// GetPublishConnectionDetailsTo of this managed resource.
+func (u *Managed) GetPublishConnectionDetailsTo() *xpv1.PublishConnectionDetailsTo {
+	out := &xpv1.PublishConnectionDetailsTo{}
+	if err := fieldpath.Pave(u.Object).GetValueInto("spec.publishConnectionDetailsTo", out); err != nil {
+		return nil
+	}
+	return out
+}
+
+// SetPublishConnectionDetailsTo of this managed resource.
+func (u *Managed) SetPublishConnectionDetailsTo(ref *xpv1.PublishConnectionDetailsTo) {
+	_ = fieldpath.Pave(u.Object).SetValue("spec.publishConnectionDetailsTo", ref)
+}
