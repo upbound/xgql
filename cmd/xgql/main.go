@@ -120,7 +120,7 @@ func main() {
 	zl := zap.New(zap.UseDevMode(*debug))
 	log := logging.NewLogrLogger(zl.WithName("xgql"))
 
-	// Start a pprof endpoint to ensure we can gather pprofs we needed.
+	// Start a pprof endpoint to ensure we can gather pprofs when needed.
 	if *profiling {
 		go func() {
 			log.Info("pprof", "error", http.ListenAndServe("localhost:6060", nil)) //nolint:gosec
