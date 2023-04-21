@@ -25,6 +25,10 @@ import (
 	"strconv"
 	"time"
 
+	// NOTE(tnthornton) we are making an active choice to have a pprof endpoint
+	// available.
+	_ "net/http/pprof" //nolint:gosec
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/apollotracing"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -32,17 +36,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	otelruntime "go.opentelemetry.io/contrib/instrumentation/runtime"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
-	"go.opentelemetry.io/otel/exporters/prometheus"
-	"go.opentelemetry.io/otel/metric/global"
-	export "go.opentelemetry.io/otel/sdk/export/metric"
-	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
-	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
-	selector "go.opentelemetry.io/otel/sdk/metric/selector/simple"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -113,6 +112,7 @@ func main() {
 		health      = app.Flag("health", "Enable health endpoints.").Default("true").Bool()
 		healthPort  = app.Flag("health-port", "Port used for readyz and livez requests.").Default("8088").Int()
 		cacheExpiry = app.Flag("cache-expiry", "The duration since last activity by a user until that users client expires.").Default("336h").Duration()
+		profiling   = app.Flag("profiling", "Enable profiling via web interface host:port/debug/pprof/.").Default("true").Bool()
 	)
 	app.Version(version.Version)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
@@ -120,19 +120,16 @@ func main() {
 	zl := zap.New(zap.UseDevMode(*debug))
 	log := logging.NewLogrLogger(zl.WithName("xgql"))
 
+	// Start a pprof endpoint to ensure we can gather pprofs when needed.
+	if *profiling {
+		go func() {
+			log.Info("pprof", "error", http.ListenAndServe("localhost:6060", nil)) //nolint:gosec
+		}()
+	}
+
 	kingpin.FatalIfError(otelruntime.Start(), "cannot add OpenTelemetry runtime instrumentation")
 
 	res := resource.NewSchemaless(attribute.String("service.name", "crossplane.io/xgql"))
-
-	// OpenTelemetry metrics.
-	prom, err := prometheus.New(prometheus.Config{}, controller.New(processor.NewFactory(
-		selector.NewWithHistogramDistribution(),
-		export.CumulativeExportKindSelector(),
-		processor.WithMemory(true))))
-	kingpin.FatalIfError(err, "cannot create OpenTelemetry Prometheus exporter")
-
-	// TODO(negz): Can we avoid this global? Should we?
-	global.SetMeterProvider(prom.MeterProvider())
 
 	switch *tracer {
 	case "jaeger":
@@ -213,7 +210,7 @@ func main() {
 	srv.Use(apollotracing.Tracer{})
 
 	rt.Handle("/query", otelhttp.NewHandler(srv, "/query"))
-	rt.Handle("/metrics", prom)
+	rt.Handle("/metrics", promhttp.Handler())
 	rt.Handle("/version", version.Handler())
 	if *play {
 		rt.Handle("/", playground.Handler("GraphQL playground", "/query"))

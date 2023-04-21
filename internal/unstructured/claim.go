@@ -164,3 +164,75 @@ func (c *Claim) GetConditions() []xpv1.Condition {
 	}
 	return conditioned.Conditions
 }
+
+// SetCompositeDeletePolicy of this resource claim.
+func (c *Claim) SetCompositeDeletePolicy(p *xpv1.CompositeDeletePolicy) {
+	_ = fieldpath.Pave(c.Object).SetValue("spec.compositeDeletePolicy", p)
+}
+
+// GetCompositeDeletePolicy of this resource claim.
+func (c *Claim) GetCompositeDeletePolicy() *xpv1.CompositeDeletePolicy {
+	p, err := fieldpath.Pave(c.Object).GetString("spec.compositeDeletePolicy")
+	if err != nil {
+		return nil
+	}
+	out := xpv1.CompositeDeletePolicy(p)
+	return &out
+}
+
+// GetPublishConnectionDetailsTo of this Composite resource.
+func (c *Claim) GetPublishConnectionDetailsTo() *xpv1.PublishConnectionDetailsTo {
+	out := &xpv1.PublishConnectionDetailsTo{}
+	if err := fieldpath.Pave(c.Object).GetValueInto("spec.publishConnectionDetailsTo", out); err != nil {
+		return nil
+	}
+	return out
+}
+
+// SetPublishConnectionDetailsTo of this Composite resource.
+func (c *Claim) SetPublishConnectionDetailsTo(ref *xpv1.PublishConnectionDetailsTo) {
+	_ = fieldpath.Pave(c.Object).SetValue("spec.publishConnectionDetailsTo", ref)
+}
+
+// GetCompositionRevisionReference of this resource claim.
+func (c *Claim) GetCompositionRevisionReference() *corev1.ObjectReference {
+	out := &corev1.ObjectReference{}
+	if err := fieldpath.Pave(c.Object).GetValueInto("spec.compositionRevisionRef", out); err != nil {
+		return nil
+	}
+	return out
+}
+
+// SetCompositionRevisionReference of this resource claim.
+func (c *Claim) SetCompositionRevisionReference(ref *corev1.ObjectReference) {
+	_ = fieldpath.Pave(c.Object).SetValue("spec.compositionRevisionRef", ref)
+}
+
+// GetCompositionRevisionSelector of this resource claim.
+func (c *Claim) GetCompositionRevisionSelector() *metav1.LabelSelector {
+	out := &metav1.LabelSelector{}
+	if err := fieldpath.Pave(c.Object).GetValueInto("spec.compositionRevisionSelector", out); err != nil {
+		return nil
+	}
+	return out
+}
+
+// SetCompositionRevisionSelector of this resource claim.
+func (c *Claim) SetCompositionRevisionSelector(ref *metav1.LabelSelector) {
+	_ = fieldpath.Pave(c.Object).SetValue("spec.compositionRevisionSelector", ref)
+}
+
+// SetCompositionUpdatePolicy of this resource claim.
+func (c *Claim) SetCompositionUpdatePolicy(p *xpv1.UpdatePolicy) {
+	_ = fieldpath.Pave(c.Object).SetValue("spec.compositionUpdatePolicy", p)
+}
+
+// GetCompositionUpdatePolicy of this resource claim.
+func (c *Claim) GetCompositionUpdatePolicy() *xpv1.UpdatePolicy {
+	p, err := fieldpath.Pave(c.Object).GetString("spec.compositionUpdatePolicy")
+	if err != nil {
+		return nil
+	}
+	out := xpv1.UpdatePolicy(p)
+	return &out
+}

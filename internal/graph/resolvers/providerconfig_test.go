@@ -24,6 +24,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/crossplane/crossplane-runtime/pkg/test"
@@ -38,6 +40,11 @@ var _ generated.ProviderConfigResolver = &providerConfig{}
 
 func TestProviderConfigDefinition(t *testing.T) {
 	errBoom := errors.New("boom")
+	errNotFound := &kerrors.StatusError{
+		ErrStatus: metav1.Status{
+			Reason: metav1.StatusReasonNotFound,
+		},
+	}
 
 	crd := kextv1.CustomResourceDefinition{
 		Spec: kextv1.CustomResourceDefinitionSpec{
@@ -45,7 +52,14 @@ func TestProviderConfigDefinition(t *testing.T) {
 			Names: kextv1.CustomResourceDefinitionNames{Kind: "Example"},
 		},
 	}
+	crdDifferingPlural := kextv1.CustomResourceDefinition{
+		Spec: kextv1.CustomResourceDefinitionSpec{
+			Group: "example.org",
+			Names: kextv1.CustomResourceDefinitionNames{Kind: "Example", Plural: "Examplii"},
+		},
+	}
 	gcrd := model.GetCustomResourceDefinition(&crd)
+	dcrd := model.GetCustomResourceDefinition((&crdDifferingPlural))
 
 	otherGroup := kextv1.CustomResourceDefinition{
 		Spec: kextv1.CustomResourceDefinitionSpec{
@@ -92,10 +106,30 @@ func TestProviderConfigDefinition(t *testing.T) {
 				},
 			},
 		},
+		"GetCRDError": {
+			reason: "If we can't get the CRD we should add the error to the GraphQL context and return early.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(errBoom),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.ProviderConfig{},
+			},
+			want: want{
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetCRD).Error()),
+				},
+			},
+		},
 		"ListCRDsError": {
 			reason: "If we can't list CRDs we should add the error to the GraphQL context and return early.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil, func(obj client.Object) error {
+						return errNotFound
+					}),
 					MockList: test.NewMockListFn(errBoom),
 				}, nil
 			}),
@@ -113,10 +147,8 @@ func TestProviderConfigDefinition(t *testing.T) {
 			reason: "If we can get and model the CRD that defines this provider config we should return it.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
-					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*kextv1.CustomResourceDefinitionList) = kextv1.CustomResourceDefinitionList{
-							Items: []kextv1.CustomResourceDefinition{otherGroup, otherKind, crd},
-						}
+					MockGet: test.NewMockGetFn(nil, func(obj client.Object) error {
+						*obj.(*kextv1.CustomResourceDefinition) = crd
 						return nil
 					}),
 				}, nil
@@ -132,14 +164,40 @@ func TestProviderConfigDefinition(t *testing.T) {
 				mrd: &gcrd,
 			},
 		},
+		"DifferentPlural": {
+			reason: `In the event we get a request for an object whose CRD has 
+			a non-predictable plural form, ensure the CRD list contains the 
+			expected resource.`,
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil, func(obj client.Object) error {
+						return errNotFound
+					}),
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*kextv1.CustomResourceDefinitionList) = kextv1.CustomResourceDefinitionList{
+							Items: []kextv1.CustomResourceDefinition{otherGroup, otherKind, crdDifferingPlural},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.ProviderConfig{
+					APIVersion: crd.Spec.Group + "/v1",
+					Kind:       crd.Spec.Names.Kind,
+				},
+			},
+			want: want{
+				mrd: &dcrd,
+			},
+		},
 		"NoCRD": {
 			reason: "If we can't get and model the CRD that defines this provider config we should return nil.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
-					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*kextv1.CustomResourceDefinitionList) = kextv1.CustomResourceDefinitionList{
-							Items: []kextv1.CustomResourceDefinition{otherGroup, otherKind},
-						}
+					MockGet: test.NewMockGetFn(nil, func(obj client.Object) error {
+						*obj.(*kextv1.CustomResourceDefinition) = otherGroup
 						return nil
 					}),
 				}, nil

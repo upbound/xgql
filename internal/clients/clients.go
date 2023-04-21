@@ -350,7 +350,7 @@ type session struct {
 	log logging.Logger
 }
 
-func (s *session) Get(ctx context.Context, key client.ObjectKey, obj client.Object) error {
+func (s *session) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
 	t := time.Now()
 	s.expiration.Reset(s.expiry)
 	err := s.client.Get(ctx, key, obj)
@@ -468,4 +468,9 @@ func (s *session) RESTMapper() meta.RESTMapper {
 		"new-expiry", t.Add(s.expiry),
 	)
 	return rm
+}
+
+// SubResource returns the underlying client's SubResource client, unwrapped.
+func (s *session) SubResource(subResource string) client.SubResourceClient {
+	return s.client.SubResource(subResource)
 }

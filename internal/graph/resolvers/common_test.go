@@ -136,7 +136,7 @@ func TestCRDDefinedResources(t *testing.T) {
 						Group: group,
 						Names: &model.CustomResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.StringPtr(listKind),
+							ListKind: pointer.String(listKind),
 						},
 						Versions: []model.CustomResourceDefinitionVersion{
 							// This version should be ignored because it is
@@ -185,7 +185,7 @@ func TestCRDDefinedResources(t *testing.T) {
 						Group: group,
 						Names: &model.CustomResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.StringPtr(listKind),
+							ListKind: pointer.String(listKind),
 						},
 						Versions: []model.CustomResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -202,7 +202,7 @@ func TestCRDDefinedResources(t *testing.T) {
 						},
 					},
 				},
-				version: pointer.StringPtr(version),
+				version: pointer.String(version),
 			},
 			want: want{
 				krc: &model.KubernetesResourceConnection{

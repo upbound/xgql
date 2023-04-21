@@ -942,7 +942,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 			}),
 			args: args{
 				ctx:    graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				active: pointer.BoolPtr(true),
+				active: pointer.Bool(true),
 			},
 			want: want{
 				pc: &model.ProviderRevisionConnection{
@@ -1391,7 +1391,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 			}),
 			args: args{
 				ctx:    graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				active: pointer.BoolPtr(true),
+				active: pointer.Bool(true),
 			},
 			want: want{
 				pc: &model.ConfigurationRevisionConnection{
@@ -1555,7 +1555,7 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 			}),
 			args: args{
 				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				dangling: pointer.BoolPtr(true),
+				dangling: pointer.Bool(true),
 			},
 			want: want{
 				xrdc: &model.CompositeResourceDefinitionConnection{
@@ -1750,7 +1750,7 @@ func TestQueryCompositions(t *testing.T) {
 			}),
 			args: args{
 				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				dangling: pointer.BoolPtr(true),
+				dangling: pointer.Bool(true),
 			},
 			want: want{
 				cc: &model.CompositionConnection{

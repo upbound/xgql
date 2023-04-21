@@ -51,7 +51,7 @@ func TestGetConditions(t *testing.T) {
 				Status:             ConditionStatusTrue,
 				Reason:             string(xpv1.ReasonAvailable),
 				LastTransitionTime: c.LastTransitionTime.Time,
-				Message:            pointer.StringPtr("I'm here!"),
+				Message:            pointer.String("I'm here!"),
 			}},
 		},
 		"Empty": {
@@ -190,7 +190,7 @@ func TestGetSecret(t *testing.T) {
 				Metadata: &ObjectMeta{
 					Name: "cool",
 				},
-				Type: pointer.StringPtr("cool"),
+				Type: pointer.String("cool"),
 				data: map[string]string{"cool": "secret"},
 			},
 		},
@@ -380,10 +380,10 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 					Group: "group",
 					Names: &CustomResourceDefinitionNames{
 						Plural:     "clusterexamples",
-						Singular:   pointer.StringPtr("clusterexample"),
+						Singular:   pointer.String("clusterexample"),
 						ShortNames: []string{"cex"},
 						Kind:       "ClusterExample",
-						ListKind:   pointer.StringPtr("ClusterExampleList"),
+						ListKind:   pointer.String("ClusterExampleList"),
 						Categories: []string{"example"},
 					},
 					Scope: ResourceScopeNamespaceScoped,
@@ -397,7 +397,7 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 					Conditions: []Condition{{
 						Type:               string(kextv1.Established),
 						Reason:             "VeryCoolCRD",
-						Message:            pointer.StringPtr("So cool"),
+						Message:            pointer.String("So cool"),
 						LastTransitionTime: transition,
 					}},
 				},
@@ -525,7 +525,7 @@ func TestGetKubernetesResource(t *testing.T) {
 						Name:      "cool",
 					},
 					Metadata: &ObjectMeta{
-						Namespace: pointer.StringPtr("default"),
+						Namespace: pointer.String("default"),
 						Name:      "cool",
 					},
 					Spec: &CompositeResourceClaimSpec{

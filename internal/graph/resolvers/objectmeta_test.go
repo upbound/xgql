@@ -107,7 +107,7 @@ func TestObjectMetaOwners(t *testing.T) {
 						{
 							APIVersion: ctrl.GetAPIVersion(),
 							Kind:       ctrl.GetKind(),
-							Controller: pointer.BoolPtr(true),
+							Controller: pointer.Bool(true),
 						},
 					},
 				},
@@ -204,7 +204,7 @@ func TestObjectMetaController(t *testing.T) {
 						{
 							APIVersion: ctrl.GetAPIVersion(),
 							Kind:       ctrl.GetKind(),
-							Controller: pointer.BoolPtr(true),
+							Controller: pointer.Bool(true),
 						},
 					},
 				},
@@ -233,7 +233,7 @@ func TestObjectMetaController(t *testing.T) {
 						{
 							APIVersion: ctrl.GetAPIVersion(),
 							Kind:       ctrl.GetKind(),
-							Controller: pointer.BoolPtr(true),
+							Controller: pointer.Bool(true),
 						},
 					},
 				},

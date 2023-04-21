@@ -185,3 +185,82 @@ func (c *Composite) GetConditions() []xpv1.Condition {
 	}
 	return conditioned.Conditions
 }
+
+// GetPublishConnectionDetailsTo of this Composite resource.
+func (c *Composite) GetPublishConnectionDetailsTo() *xpv1.PublishConnectionDetailsTo {
+	out := &xpv1.PublishConnectionDetailsTo{}
+	if err := fieldpath.Pave(c.Object).GetValueInto("spec.publishConnectionDetailsTo", out); err != nil {
+		return nil
+	}
+	return out
+}
+
+// SetPublishConnectionDetailsTo of this Composite resource.
+func (c *Composite) SetPublishConnectionDetailsTo(ref *xpv1.PublishConnectionDetailsTo) {
+	_ = fieldpath.Pave(c.Object).SetValue("spec.publishConnectionDetailsTo", ref)
+}
+
+// GetCompositionRevisionReference of this resource claim.
+func (c *Composite) GetCompositionRevisionReference() *corev1.ObjectReference {
+	out := &corev1.ObjectReference{}
+	if err := fieldpath.Pave(c.Object).GetValueInto("spec.compositionRevisionRef", out); err != nil {
+		return nil
+	}
+	return out
+}
+
+// SetCompositionRevisionReference of this resource claim.
+func (c *Composite) SetCompositionRevisionReference(ref *corev1.ObjectReference) {
+	_ = fieldpath.Pave(c.Object).SetValue("spec.compositionRevisionRef", ref)
+}
+
+// GetCompositionRevisionSelector of this resource claim.
+func (c *Composite) GetCompositionRevisionSelector() *metav1.LabelSelector {
+	out := &metav1.LabelSelector{}
+	if err := fieldpath.Pave(c.Object).GetValueInto("spec.compositionRevisionSelector", out); err != nil {
+		return nil
+	}
+	return out
+}
+
+// SetCompositionRevisionSelector of this resource claim.
+func (c *Composite) SetCompositionRevisionSelector(ref *metav1.LabelSelector) {
+	_ = fieldpath.Pave(c.Object).SetValue("spec.compositionRevisionSelector", ref)
+}
+
+// SetCompositionUpdatePolicy of this resource claim.
+func (c *Composite) SetCompositionUpdatePolicy(p *xpv1.UpdatePolicy) {
+	_ = fieldpath.Pave(c.Object).SetValue("spec.compositionUpdatePolicy", p)
+}
+
+// GetCompositionUpdatePolicy of this resource claim.
+func (c *Composite) GetCompositionUpdatePolicy() *xpv1.UpdatePolicy {
+	p, err := fieldpath.Pave(c.Object).GetString("spec.compositionUpdatePolicy")
+	if err != nil {
+		return nil
+	}
+	out := xpv1.UpdatePolicy(p)
+	return &out
+}
+
+// GetEnvironmentConfigReferences of this Composite resource.
+func (c *Composite) GetEnvironmentConfigReferences() []corev1.ObjectReference {
+	out := &[]corev1.ObjectReference{}
+	_ = fieldpath.Pave(c.Object).GetValueInto("spec.environmentConfigRefs", out)
+	return *out
+}
+
+// SetEnvironmentConfigReferences of this Composite resource.
+func (c *Composite) SetEnvironmentConfigReferences(refs []corev1.ObjectReference) {
+	empty := corev1.ObjectReference{}
+	filtered := make([]corev1.ObjectReference, 0, len(refs))
+	for _, ref := range refs {
+		// TODO(negz): Ask muvaf to explain what this is working around. :)
+		// TODO(muvaf): temporary workaround.
+		if ref.String() == empty.String() {
+			continue
+		}
+		filtered = append(filtered, ref)
+	}
+	_ = fieldpath.Pave(c.Object).SetValue("spec.environmentConfigRefs", filtered)
+}

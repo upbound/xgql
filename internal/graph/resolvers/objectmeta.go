@@ -53,7 +53,7 @@ func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta) (*model.
 		u.SetAPIVersion(ref.APIVersion)
 		u.SetKind(ref.Kind)
 
-		nn := types.NamespacedName{Namespace: pointer.StringPtrDerefOr(obj.Namespace, ""), Name: ref.Name}
+		nn := types.NamespacedName{Namespace: pointer.StringDeref(obj.Namespace, ""), Name: ref.Name}
 		if err := c.Get(ctx, nn, u); err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errGetOwner))
 			continue
@@ -83,7 +83,7 @@ func (r *objectMeta) Controller(ctx context.Context, obj *model.ObjectMeta) (mod
 	}
 
 	for _, ref := range obj.OwnerReferences {
-		if !pointer.BoolPtrDerefOr(ref.Controller, false) {
+		if !pointer.BoolDeref(ref.Controller, false) {
 			continue
 		}
 
@@ -91,7 +91,7 @@ func (r *objectMeta) Controller(ctx context.Context, obj *model.ObjectMeta) (mod
 		u.SetAPIVersion(ref.APIVersion)
 		u.SetKind(ref.Kind)
 
-		nn := types.NamespacedName{Namespace: pointer.StringPtrDerefOr(obj.Namespace, ""), Name: ref.Name}
+		nn := types.NamespacedName{Namespace: pointer.StringDeref(obj.Namespace, ""), Name: ref.Name}
 		if err := c.Get(ctx, nn, u); err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errGetOwner))
 			return nil, nil

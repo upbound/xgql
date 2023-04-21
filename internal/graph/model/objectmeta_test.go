@@ -56,9 +56,9 @@ func TestGetObjectMeta(t *testing.T) {
 				return u
 			}(),
 			want: &ObjectMeta{
-				Namespace:       pointer.StringPtr("default"),
+				Namespace:       pointer.String("default"),
 				Name:            "cool-rando",
-				GenerateName:    pointer.StringPtr("cool-"),
+				GenerateName:    pointer.String("cool-"),
 				UID:             "no-you-id",
 				ResourceVersion: "42",
 				Generation:      42,
