@@ -97,17 +97,17 @@ func GetEvent(e *corev1.Event) Event {
 	}
 
 	if e.Reason != "" {
-		out.Reason = pointer.StringPtr(e.Reason)
+		out.Reason = pointer.String(e.Reason)
 	}
 	if e.Message != "" {
-		out.Message = pointer.StringPtr(e.Message)
+		out.Message = pointer.String(e.Message)
 	}
 	if e.Count != 0 {
 		c := int(e.Count)
 		out.Count = &c
 	}
 	if e.Source.Component != "" {
-		out.Source = &EventSource{Component: pointer.StringPtr(e.Source.Component)}
+		out.Source = &EventSource{Component: pointer.String(e.Source.Component)}
 	}
 	ft := e.FirstTimestamp.Time
 	out.FirstTime = &ft

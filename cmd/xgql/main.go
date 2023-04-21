@@ -25,7 +25,9 @@ import (
 	"strconv"
 	"time"
 
-	_ "net/http/pprof"
+	// NOTE(tnthornton) we are making an active choice to have a pprof endpoint
+	// available.
+	_ "net/http/pprof" //nolint:gosec
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/apollotracing"
@@ -121,7 +123,7 @@ func main() {
 	// Start a pprof endpoint to ensure we can gather pprofs we needed.
 	if *profiling {
 		go func() {
-			log.Info("pprof", "error", http.ListenAndServe("localhost:6060", nil))
+			log.Info("pprof", "error", http.ListenAndServe("localhost:6060", nil)) //nolint:gosec
 		}()
 	}
 

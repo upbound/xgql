@@ -49,7 +49,10 @@ func (r *managedResource) Events(ctx context.Context, obj *model.ManagedResource
 	})
 }
 
-func (r *managedResource) Definition(ctx context.Context, obj *model.ManagedResource) (model.ManagedResourceDefinition, error) {
+func (r *managedResource) Definition(ctx context.Context, obj *model.ManagedResource) (model.ManagedResourceDefinition, error) { //nolint:gocyclo
+	// NOTE(tnthornton) this function is not really all that complex at the
+	// moment, however we should be wary of future addtions as we are already
+	// running into cyclomatic complexity errors.
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 

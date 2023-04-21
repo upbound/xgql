@@ -46,7 +46,11 @@ func (r *providerConfig) Events(ctx context.Context, obj *model.ProviderConfig) 
 	})
 }
 
-func (r *providerConfig) Definition(ctx context.Context, obj *model.ProviderConfig) (model.ProviderConfigDefinition, error) {
+func (r *providerConfig) Definition(ctx context.Context, obj *model.ProviderConfig) (model.ProviderConfigDefinition, error) { //nolint:gocyclo
+	// NOTE(tnthornton) this function is not really all that complex at the
+	// moment, however we should be wary of future addtions as we are already
+	// running into cyclomatic complexity errors.
+
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 

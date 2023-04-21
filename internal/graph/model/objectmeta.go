@@ -51,10 +51,10 @@ func GetObjectMeta(m metav1.Object) *ObjectMeta {
 	}
 
 	if n := m.GetGenerateName(); n != "" {
-		om.GenerateName = pointer.StringPtr(n)
+		om.GenerateName = pointer.String(n)
 	}
 	if n := m.GetNamespace(); n != "" {
-		om.Namespace = pointer.StringPtr(n)
+		om.Namespace = pointer.String(n)
 	}
 	if t := m.GetDeletionTimestamp(); t != nil {
 		om.DeletionTime = &t.Time

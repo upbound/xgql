@@ -151,7 +151,7 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 				APIVersion: "example.org/v1",
 				Kind:       "CompositeResource",
 				Metadata: &ObjectMeta{
-					Namespace: pointer.StringPtr("default"),
+					Namespace: pointer.String("default"),
 					Name:      "cool",
 				},
 				Spec: &CompositeResourceClaimSpec{

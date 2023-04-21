@@ -237,7 +237,7 @@ func GetSecret(s *corev1.Secret) Secret {
 	}
 
 	if s.Type != "" {
-		out.Type = pointer.StringPtr(string(s.Type))
+		out.Type = pointer.String(string(s.Type))
 	}
 
 	return out

@@ -110,18 +110,18 @@ func TestGetCompositeResourceDefinition(t *testing.T) {
 					Group: "group",
 					Names: &CompositeResourceDefinitionNames{
 						Plural:     "clusterexamples",
-						Singular:   pointer.StringPtr("clusterexample"),
+						Singular:   pointer.String("clusterexample"),
 						ShortNames: []string{"cex"},
 						Kind:       "ClusterExample",
-						ListKind:   pointer.StringPtr("ClusterExampleList"),
+						ListKind:   pointer.String("ClusterExampleList"),
 						Categories: []string{"example"},
 					},
 					ClaimNames: &CompositeResourceDefinitionNames{
 						Plural:     "examples",
-						Singular:   pointer.StringPtr("example"),
+						Singular:   pointer.String("example"),
 						ShortNames: []string{"ex"},
 						Kind:       "Example",
-						ListKind:   pointer.StringPtr("ExampleList"),
+						ListKind:   pointer.String("ExampleList"),
 						Categories: []string{"example"},
 					},
 					Versions: []CompositeResourceDefinitionVersion{{
@@ -196,7 +196,7 @@ func TestGetComposition(t *testing.T) {
 						APIVersion: "group/v1",
 						Kind:       "ClusterExample",
 					},
-					WriteConnectionSecretsToNamespace: pointer.StringPtr("ns"),
+					WriteConnectionSecretsToNamespace: pointer.String("ns"),
 				},
 				Status: extv1.CompositionStatus{
 					ConditionedStatus: xpv1.ConditionedStatus{
@@ -220,7 +220,7 @@ func TestGetComposition(t *testing.T) {
 						APIVersion: "group/v1",
 						Kind:       "ClusterExample",
 					},
-					WriteConnectionSecretsToNamespace: pointer.StringPtr("ns"),
+					WriteConnectionSecretsToNamespace: pointer.String("ns"),
 				},
 				Status: &CompositionStatus{
 					Conditions: []Condition{{}},

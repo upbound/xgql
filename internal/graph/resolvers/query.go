@@ -311,7 +311,7 @@ func (r *query) ProviderRevisions(ctx context.Context, provider *model.Reference
 		}
 
 		// We only want the active PackageRevision, and this isn't it.
-		if pointer.BoolPtrDerefOr(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
+		if pointer.BoolDeref(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
 			continue
 		}
 
@@ -420,7 +420,7 @@ func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model
 		}
 
 		// We only want the active PackageRevision, and this isn't it.
-		if pointer.BoolPtrDerefOr(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
+		if pointer.BoolDeref(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
 			continue
 		}
 
@@ -457,7 +457,7 @@ func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *mode
 		xrd := &in.Items[i]
 
 		// We only want dangling XRDs but this one is owned by a config revision.
-		if pointer.BoolPtrDerefOr(dangling, false) && containsCR(xrd.GetOwnerReferences()) {
+		if pointer.BoolDeref(dangling, false) && containsCR(xrd.GetOwnerReferences()) {
 			continue
 		}
 
@@ -499,7 +499,7 @@ func (r *query) Compositions(ctx context.Context, revision *model.ReferenceID, d
 		cmp := &in.Items[i]
 
 		// We only want dangling XRs but this one is owned by a config revision.
-		if pointer.BoolPtrDerefOr(dangling, false) && containsCR(cmp.GetOwnerReferences()) {
+		if pointer.BoolDeref(dangling, false) && containsCR(cmp.GetOwnerReferences()) {
 			continue
 		}
 

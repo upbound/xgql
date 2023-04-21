@@ -44,7 +44,7 @@ func (r *genericResource) Events(ctx context.Context, obj *model.GenericResource
 		APIVersion: obj.APIVersion,
 		Kind:       obj.Kind,
 		Name:       obj.Metadata.Name,
-		Namespace:  pointer.StringPtrDerefOr(obj.Metadata.Namespace, ""),
+		Namespace:  pointer.StringDeref(obj.Metadata.Namespace, ""),
 		UID:        types.UID(obj.Metadata.UID),
 	})
 }
@@ -59,7 +59,7 @@ func (r *secret) Events(ctx context.Context, obj *model.Secret) (*model.EventCon
 		APIVersion: obj.APIVersion,
 		Kind:       obj.Kind,
 		Name:       obj.Metadata.Name,
-		Namespace:  pointer.StringPtrDerefOr(obj.Metadata.Namespace, ""),
+		Namespace:  pointer.StringDeref(obj.Metadata.Namespace, ""),
 		UID:        types.UID(obj.Metadata.UID),
 	})
 }
@@ -74,7 +74,7 @@ func (r *configMap) Events(ctx context.Context, obj *model.ConfigMap) (*model.Ev
 		APIVersion: obj.APIVersion,
 		Kind:       obj.Kind,
 		Name:       obj.Metadata.Name,
-		Namespace:  pointer.StringPtrDerefOr(obj.Metadata.Namespace, ""),
+		Namespace:  pointer.StringDeref(obj.Metadata.Namespace, ""),
 		UID:        types.UID(obj.Metadata.UID),
 	})
 }
