@@ -15,8 +15,9 @@
 package model
 
 import (
+	"encoding/json"
+
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	"k8s.io/apimachinery/pkg/util/json"
 
 	"github.com/google/go-cmp/cmp"
 

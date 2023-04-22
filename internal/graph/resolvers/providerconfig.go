@@ -20,7 +20,6 @@ import (
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
-	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
@@ -30,6 +29,7 @@ import (
 
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/graph/model"
+	"github.com/upbound/xgql/internal/unstructured"
 )
 
 type providerConfig struct {
@@ -73,7 +73,7 @@ func (r *providerConfig) Definition(ctx context.Context, obj *model.ProviderConf
 
 	nn := types.NamespacedName{Name: fmt.Sprintf("%s.%s", name, gv.Group)}
 
-	in := &kextv1.CustomResourceDefinition{}
+	in := unstructured.NewCRD()
 	err = c.Get(ctx, nn, in)
 
 	if err != nil && !kerrors.IsNotFound(err) {
@@ -84,20 +84,20 @@ func (r *providerConfig) Definition(ctx context.Context, obj *model.ProviderConf
 	// We didn't find the CRD we were looking for, list all CRDs and see if we
 	// can find the matching one.
 	if kerrors.IsNotFound(err) {
-		lin := &kextv1.CustomResourceDefinitionList{}
+		lin := unstructured.NewCRDList()
 		if err := c.List(ctx, lin); err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errListCRDs))
 			return nil, nil
 		}
 
 		for i := range lin.Items {
-			crd := lin.Items[i] // So we don't take the address of a range variable.
+			crd := unstructured.CustomResourceDefinition{Unstructured: lin.Items[i]} // So we don't take the address of a range variable.
 
-			if crd.Spec.Group != gv.Group {
+			if crd.GetSpecGroup() != gv.Group {
 				continue
 			}
 
-			if crd.Spec.Names.Kind != obj.Kind {
+			if crd.GetSpecNames().Kind != obj.Kind {
 				continue
 			}
 
@@ -108,7 +108,7 @@ func (r *providerConfig) Definition(ctx context.Context, obj *model.ProviderConf
 
 	// We found a CRD, let's double check the Group and Kind match our
 	// expectations.
-	if in.Spec.Group == gv.Group && in.Spec.Names.Kind == obj.Kind {
+	if in.GetSpecGroup() == gv.Group && in.GetSpecNames().Kind == obj.Kind {
 		out := model.GetCustomResourceDefinition(in)
 		return &out, nil
 	}

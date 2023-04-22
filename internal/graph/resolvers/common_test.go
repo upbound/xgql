@@ -41,6 +41,9 @@ var (
 	_ generated.SecretResolver                   = &secret{}
 	_ generated.ConfigMapResolver                = &configMap{}
 	_ generated.CustomResourceDefinitionResolver = &crd{}
+
+	crdAPIVersion = "apiextensions.k8s.io/v1"
+	crdKind       = "CustomResourceDefinition"
 )
 
 func TestCRDDefinedResources(t *testing.T) {

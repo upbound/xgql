@@ -51,6 +51,6 @@ func GetProviderConfig(u *kunstructured.Unstructured) ProviderConfig {
 		Kind:         pc.GetKind(),
 		Metadata:     GetObjectMeta(pc),
 		Status:       GetProviderConfigStatus(pc),
-		Unstructured: unstruct(pc),
+		Unstructured: bytesForUnstructured(u),
 	}
 }

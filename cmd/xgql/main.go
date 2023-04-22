@@ -91,6 +91,7 @@ var noCache = []client.Object{
 	&appsv1.DaemonSet{},
 	&rbacv1.RoleBinding{},
 	&rbacv1.ClusterRoleBinding{},
+	&kextv1.CustomResourceDefinition{},
 
 	// We don't cache secrets because there's a high risk that the caller won't
 	// have access to list and watch secrets across all namespaces.

@@ -80,6 +80,6 @@ func GetManagedResource(u *kunstructured.Unstructured) ManagedResource {
 			DeletionPolicy:                   GetDeletionPolicy(mg.GetDeletionPolicy()),
 		},
 		Status:       GetManagedResourceStatus(mg),
-		Unstructured: unstruct(mg),
+		Unstructured: bytesForUnstructured(u),
 	}
 }

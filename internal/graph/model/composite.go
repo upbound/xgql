@@ -75,7 +75,7 @@ func GetCompositeResource(u *kunstructured.Unstructured) CompositeResource {
 			WriteConnectionSecretToReference: xr.GetWriteConnectionSecretToReference(),
 		},
 		Status:       GetCompositeResourceStatus(xr),
-		Unstructured: unstruct(xr),
+		Unstructured: bytesForUnstructured(u),
 	}
 }
 
@@ -141,6 +141,6 @@ func GetCompositeResourceClaim(u *kunstructured.Unstructured) CompositeResourceC
 			WriteConnectionSecretToReference: delocalize(xrc.GetWriteConnectionSecretToReference(), xrc.GetNamespace()),
 		},
 		Status:       GetCompositeResourceClaimStatus(xrc),
-		Unstructured: unstruct(xrc),
+		Unstructured: bytesForUnstructured(u),
 	}
 }

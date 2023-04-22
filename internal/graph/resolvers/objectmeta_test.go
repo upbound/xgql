@@ -139,7 +139,10 @@ func TestObjectMetaOwners(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.Owners(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.oc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.oc, got,
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"),
+			); diff != "" {
 				t.Errorf("\n%s\nq.Owners(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -281,7 +284,10 @@ func TestObjectMetaController(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.Controller(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.kr, got,
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"),
+			); diff != "" {
 				t.Errorf("\n%s\nq.Controller(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
