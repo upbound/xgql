@@ -21,9 +21,8 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
-	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -34,6 +33,7 @@ import (
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/model"
+	xunstructured "github.com/upbound/xgql/internal/unstructured"
 )
 
 const (
@@ -126,7 +126,7 @@ func (r *query) KubernetesResource(ctx context.Context, id model.ReferenceID) (m
 		return nil, nil
 	}
 
-	u := &unstructured.Unstructured{}
+	u := &kunstructured.Unstructured{}
 	u.SetAPIVersion(id.APIVersion)
 	u.SetKind(id.Kind)
 	nn := types.NamespacedName{Namespace: id.Namespace, Name: id.Name}
@@ -161,7 +161,7 @@ func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string
 		return nil, nil
 	}
 
-	in := &unstructured.UnstructuredList{}
+	in := &kunstructured.UnstructuredList{}
 	in.SetAPIVersion(apiVersion)
 	in.SetKind(kind + "List")
 	if listKind != nil && *listKind != "" {
@@ -334,7 +334,7 @@ func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.R
 		return nil, nil
 	}
 
-	in := &kextv1.CustomResourceDefinitionList{}
+	in := xunstructured.NewCRDList()
 	if err := c.List(ctx, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListConfigs))
 		return nil, nil
@@ -345,7 +345,7 @@ func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.R
 	}
 
 	for i := range in.Items {
-		xrd := &in.Items[i]
+		xrd := &xunstructured.CustomResourceDefinition{Unstructured: in.Items[i]}
 
 		// We only want CRDs owned by this config revision, but this one isn't.
 		if revision != nil && !containsID(xrd.GetOwnerReferences(), *revision) {

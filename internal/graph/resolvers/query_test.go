@@ -22,7 +22,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	corev1 "k8s.io/api/core/v1"
-	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -41,6 +40,7 @@ import (
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/model"
+	xunstructured "github.com/upbound/xgql/internal/unstructured"
 )
 
 var _ generated.QueryResolver = &query{}
@@ -984,35 +984,37 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 		Name:       "example",
 	}
 
-	owned := kextv1.CustomResourceDefinition{ObjectMeta: metav1.ObjectMeta{
-		Name: "coolconfig",
-		OwnerReferences: []metav1.OwnerReference{
-			// Some spurious owner references that we should ignore.
-			{
-				APIVersion: "wat",
-			},
-			{
-				APIVersion: id.APIVersion,
-				Kind:       "wat",
-			},
-			{
-				APIVersion: id.APIVersion,
-				Kind:       id.Kind,
-				Name:       "wat",
-			},
-			// The reference that indicates this XRD is owned by our desired
-			// ConfigurationRevision (or a ConfigurationRevision generally).
-			{
-				APIVersion: id.APIVersion,
-				Kind:       id.Kind,
-				Name:       id.Name,
-			},
+	owned := xunstructured.NewCRD()
+	owned.SetName("coolconfig")
+	owned.SetOwnerReferences([]metav1.OwnerReference{
+		// Some spurious owner references that we should ignore.
+		{
+			APIVersion: "wat",
 		},
-	}}
-	gowned := model.GetCustomResourceDefinition(&owned)
+		{
+			APIVersion: id.APIVersion,
+			Kind:       "wat",
+		},
+		{
+			APIVersion: id.APIVersion,
+			Kind:       id.Kind,
+			Name:       "wat",
+		},
+		// The reference that indicates this XRD is owned by our desired
+		// ConfigurationRevision (or a ConfigurationRevision generally).
+		{
+			APIVersion: id.APIVersion,
+			Kind:       id.Kind,
+			Name:       id.Name,
+		},
+	})
 
-	dangler := kextv1.CustomResourceDefinition{ObjectMeta: metav1.ObjectMeta{Name: "coolconfig"}}
-	gdangler := model.GetCustomResourceDefinition(&dangler)
+	gowned := model.GetCustomResourceDefinition(owned)
+
+	dangler := xunstructured.NewCRD()
+	dangler.SetName("coolconfig")
+
+	gdangler := model.GetCustomResourceDefinition(dangler)
 
 	type args struct {
 		ctx      context.Context
@@ -1065,10 +1067,12 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*kextv1.CustomResourceDefinitionList) = kextv1.CustomResourceDefinitionList{
-							Items: []kextv1.CustomResourceDefinition{
-								dangler,
-								owned,
+						*obj.(*xunstructured.CustomResourceDefinitionList) = xunstructured.CustomResourceDefinitionList{
+							UnstructuredList: unstructured.UnstructuredList{
+								Items: []unstructured.Unstructured{
+									dangler.Unstructured,
+									owned.Unstructured,
+								},
 							},
 						}
 						return nil
@@ -1093,10 +1097,12 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*kextv1.CustomResourceDefinitionList) = kextv1.CustomResourceDefinitionList{
-							Items: []kextv1.CustomResourceDefinition{
-								dangler,
-								owned,
+						*obj.(*xunstructured.CustomResourceDefinitionList) = xunstructured.CustomResourceDefinitionList{
+							UnstructuredList: unstructured.UnstructuredList{
+								Items: []unstructured.Unstructured{
+									dangler.Unstructured,
+									owned.Unstructured,
+								},
 							},
 						}
 						return nil
@@ -1133,7 +1139,10 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.Configurations(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.xrdc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.xrdc, got,
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "Unstructured"),
+			); diff != "" {
 				t.Errorf("\n%s\nq.Configurations(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

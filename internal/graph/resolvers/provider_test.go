@@ -38,6 +38,7 @@ import (
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/model"
+	"github.com/upbound/xgql/internal/unstructured"
 )
 
 var (
@@ -316,7 +317,7 @@ func TestProviderActiveRevision(t *testing.T) {
 func TestProviderRevisionStatusObjects(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gcrd := model.GetCustomResourceDefinition(&kextv1.CustomResourceDefinition{})
+	gcrd := model.GetCustomResourceDefinition(&unstructured.CustomResourceDefinition{})
 
 	type args struct {
 		ctx context.Context
@@ -444,7 +445,10 @@ func TestProviderRevisionStatusObjects(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Objects(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.krc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.krc, got,
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "Unstructured"),
+			); diff != "" {
 				t.Errorf("\n%s\ns.Objects(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

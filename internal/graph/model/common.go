@@ -15,6 +15,7 @@
 package model
 
 import (
+	"encoding/json"
 	"io"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -24,7 +25,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/json"
 	"k8s.io/utils/pointer"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -120,7 +120,7 @@ func GetGenericResource(u *kunstructured.Unstructured) GenericResource {
 		APIVersion:   u.GetAPIVersion(),
 		Kind:         u.GetKind(),
 		Metadata:     GetObjectMeta(u),
-		Unstructured: unstruct(u),
+		Unstructured: bytesForUnstructured(u),
 	}
 }
 
@@ -346,25 +346,25 @@ func GetCustomResourceDefinitionStatus(in kextv1.CustomResourceDefinitionStatus)
 }
 
 // GetCustomResourceDefinition from the suppled Kubernetes CRD.
-func GetCustomResourceDefinition(crd *kextv1.CustomResourceDefinition) CustomResourceDefinition {
+func GetCustomResourceDefinition(crd *unstructured.CustomResourceDefinition) CustomResourceDefinition {
 	return CustomResourceDefinition{
 		ID: ReferenceID{
-			APIVersion: crd.APIVersion,
-			Kind:       crd.Kind,
+			APIVersion: crd.GetAPIVersion(),
+			Kind:       crd.GetKind(),
 			Name:       crd.GetName(),
 		},
 
-		APIVersion: crd.APIVersion,
-		Kind:       crd.Kind,
+		APIVersion: crd.GetAPIVersion(),
+		Kind:       crd.GetKind(),
 		Metadata:   GetObjectMeta(crd),
 		Spec: &CustomResourceDefinitionSpec{
-			Group:    crd.Spec.Group,
-			Names:    GetCustomResourceDefinitionNames(crd.Spec.Names),
-			Scope:    GetResourceScope(crd.Spec.Scope),
-			Versions: GetCustomResourceDefinitionVersions(crd.Spec.Versions),
+			Group:    crd.GetSpecGroup(),
+			Names:    GetCustomResourceDefinitionNames(crd.GetSpecNames()),
+			Scope:    GetResourceScope(crd.GetSpecScope()),
+			Versions: GetCustomResourceDefinitionVersions(crd.GetSpecVersions()),
 		},
-		Status:       GetCustomResourceDefinitionStatus(crd.Status),
-		Unstructured: unstruct(crd),
+		Status:       GetCustomResourceDefinitionStatus(crd.GetStatus()),
+		Unstructured: bytesForUnstructured(&crd.Unstructured),
 	}
 }
 
@@ -438,7 +438,9 @@ func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, e
 		return GetComposition(cmp), nil
 
 	case u.GroupVersionKind() == schema.GroupVersionKind{Group: kextv1.GroupName, Version: "v1", Kind: "CustomResourceDefinition"}:
-		crd := &kextv1.CustomResourceDefinition{}
+		crd := &unstructured.CustomResourceDefinition{}
+		crd.SetAPIVersion("apiextensions.k8s.io/v1")
+		crd.SetKind("CustomResourceDefinition")
 		if err := convert(u, crd); err != nil {
 			return nil, errors.Wrap(err, "cannot convert custom resource definition")
 		}

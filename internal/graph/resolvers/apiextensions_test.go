@@ -140,9 +140,11 @@ func TestCompositeResourceCrd(t *testing.T) {
 			},
 			want: want{
 				crd: &model.CustomResourceDefinition{
-					ID:       model.ReferenceID{Name: "some.crd"},
-					Metadata: &model.ObjectMeta{Name: "some.crd"},
-					Spec:     &model.CustomResourceDefinitionSpec{Names: &model.CustomResourceDefinitionNames{}},
+					APIVersion: crdAPIVersion,
+					Kind:       crdKind,
+					ID:         model.ReferenceID{Name: "some.crd", APIVersion: crdAPIVersion, Kind: crdKind},
+					Metadata:   &model.ObjectMeta{Name: "some.crd"},
+					Spec:       &model.CustomResourceDefinitionSpec{Names: &model.CustomResourceDefinitionNames{}, Versions: []model.CustomResourceDefinitionVersion{}},
 				},
 			},
 		},
@@ -264,9 +266,11 @@ func TestCompositeResourceClaimCrd(t *testing.T) {
 			},
 			want: want{
 				crd: &model.CustomResourceDefinition{
-					ID:       model.ReferenceID{Name: "some.crd"},
-					Metadata: &model.ObjectMeta{Name: "some.crd"},
-					Spec:     &model.CustomResourceDefinitionSpec{Names: &model.CustomResourceDefinitionNames{}},
+					APIVersion: crdAPIVersion,
+					Kind:       crdKind,
+					ID:         model.ReferenceID{Name: "some.crd", APIVersion: crdAPIVersion, Kind: crdKind},
+					Metadata:   &model.ObjectMeta{Name: "some.crd"},
+					Spec:       &model.CustomResourceDefinitionSpec{Names: &model.CustomResourceDefinitionNames{}, Versions: []model.CustomResourceDefinitionVersion{}},
 				},
 			},
 		},
@@ -773,7 +777,10 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.DefinedCompositeResources(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.crc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.crc, got,
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreFields(model.CompositeResource{}, "Unstructured"),
+			); diff != "" {
 				t.Errorf("\n%s\nq.DefinedCompositeResources(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1447,7 +1454,10 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.DefinedCompositeResourceClaims(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.crcc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.crcc, got,
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreFields(model.CompositeResourceClaim{}, "Unstructured"),
+			); diff != "" {
 				t.Errorf("\n%s\nq.DefinedCompositeResourceClaims(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

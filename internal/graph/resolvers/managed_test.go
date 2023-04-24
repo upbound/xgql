@@ -27,6 +27,7 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -36,6 +37,7 @@ import (
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/model"
+	"github.com/upbound/xgql/internal/unstructured"
 )
 
 var _ generated.ManagedResourceSpecResolver = &managedResourceSpec{}
@@ -48,34 +50,24 @@ func TestManagedResourceDefinition(t *testing.T) {
 		},
 	}
 
-	crd := kextv1.CustomResourceDefinition{
-		Spec: kextv1.CustomResourceDefinitionSpec{
-			Group: "example.org",
-			Names: kextv1.CustomResourceDefinitionNames{Kind: "Example"},
-		},
-	}
-	crdDifferingPlural := kextv1.CustomResourceDefinition{
-		Spec: kextv1.CustomResourceDefinitionSpec{
-			Group: "example.org",
-			Names: kextv1.CustomResourceDefinitionNames{Kind: "Example", Plural: "Examplii"},
-		},
-	}
-	gcrd := model.GetCustomResourceDefinition(&crd)
-	dcrd := model.GetCustomResourceDefinition((&crdDifferingPlural))
+	crd := unstructured.NewCRD()
+	crd.SetSpecGroup("example.org")
+	crd.SetSpecNames(kextv1.CustomResourceDefinitionNames{Kind: "Example"})
 
-	otherGroup := kextv1.CustomResourceDefinition{
-		Spec: kextv1.CustomResourceDefinitionSpec{
-			Group: "example.net",
-			Names: kextv1.CustomResourceDefinitionNames{Kind: "Example"},
-		},
-	}
+	crdDifferingPlural := unstructured.NewCRD()
+	crdDifferingPlural.SetSpecGroup("example.org")
+	crdDifferingPlural.SetSpecNames(kextv1.CustomResourceDefinitionNames{Kind: "Example", Plural: "Examplii"})
 
-	otherKind := kextv1.CustomResourceDefinition{
-		Spec: kextv1.CustomResourceDefinitionSpec{
-			Group: "example.org",
-			Names: kextv1.CustomResourceDefinitionNames{Kind: "Illustration"},
-		},
-	}
+	gcrd := model.GetCustomResourceDefinition(crd)
+	dcrd := model.GetCustomResourceDefinition((crdDifferingPlural))
+
+	otherGroup := unstructured.NewCRD()
+	otherGroup.SetSpecGroup("example.net")
+	otherGroup.SetSpecNames(kextv1.CustomResourceDefinitionNames{Kind: "Example"})
+
+	otherKind := unstructured.NewCRD()
+	otherKind.SetSpecGroup("example.org")
+	otherKind.SetSpecNames(kextv1.CustomResourceDefinitionNames{Kind: "Illustration"})
 
 	type args struct {
 		ctx context.Context
@@ -150,7 +142,7 @@ func TestManagedResourceDefinition(t *testing.T) {
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockGet: test.NewMockGetFn(nil, func(obj client.Object) error {
-						*obj.(*kextv1.CustomResourceDefinition) = crd
+						*obj.(*unstructured.CustomResourceDefinition) = *crd
 						return nil
 					}),
 				}, nil
@@ -158,8 +150,8 @@ func TestManagedResourceDefinition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.ManagedResource{
-					APIVersion: crd.Spec.Group + "/v1",
-					Kind:       crd.Spec.Names.Kind,
+					APIVersion: crd.GetSpecGroup() + "/v1",
+					Kind:       crd.GetSpecNames().Kind,
 				},
 			},
 			want: want{
@@ -167,8 +159,8 @@ func TestManagedResourceDefinition(t *testing.T) {
 			},
 		},
 		"DifferentPlural": {
-			reason: `In the event we get a request for an object whose CRD has 
-			a non-predictable plural form, ensure the CRD list contains the 
+			reason: `In the event we get a request for an object whose CRD has
+			a non-predictable plural form, ensure the CRD list contains the
 			expected resource.`,
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
@@ -176,8 +168,10 @@ func TestManagedResourceDefinition(t *testing.T) {
 						return errNotFound
 					}),
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*kextv1.CustomResourceDefinitionList) = kextv1.CustomResourceDefinitionList{
-							Items: []kextv1.CustomResourceDefinition{otherGroup, otherKind, crdDifferingPlural},
+						*obj.(*unstructured.CustomResourceDefinitionList) = unstructured.CustomResourceDefinitionList{
+							UnstructuredList: kunstructured.UnstructuredList{
+								Items: []kunstructured.Unstructured{otherGroup.Unstructured, otherKind.Unstructured, crdDifferingPlural.Unstructured},
+							},
 						}
 						return nil
 					}),
@@ -186,8 +180,8 @@ func TestManagedResourceDefinition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.ManagedResource{
-					APIVersion: crd.Spec.Group + "/v1",
-					Kind:       crd.Spec.Names.Kind,
+					APIVersion: crdDifferingPlural.GetSpecGroup() + "/v1",
+					Kind:       crdDifferingPlural.GetSpecNames().Kind,
 				},
 			},
 			want: want{
@@ -202,8 +196,10 @@ func TestManagedResourceDefinition(t *testing.T) {
 						return errNotFound
 					}),
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*kextv1.CustomResourceDefinitionList) = kextv1.CustomResourceDefinitionList{
-							Items: []kextv1.CustomResourceDefinition{otherGroup, otherKind},
+						*obj.(*unstructured.CustomResourceDefinitionList) = unstructured.CustomResourceDefinitionList{
+							UnstructuredList: kunstructured.UnstructuredList{
+								Items: []kunstructured.Unstructured{otherGroup.Unstructured, otherKind.Unstructured},
+							},
 						}
 						return nil
 					}),
@@ -212,8 +208,8 @@ func TestManagedResourceDefinition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.ManagedResource{
-					APIVersion: crd.Spec.Group + "/v1",
-					Kind:       crd.Spec.Names.Kind,
+					APIVersion: crd.GetSpecGroup() + "/v1",
+					Kind:       crd.GetSpecNames().Kind,
 				},
 			},
 			want: want{
@@ -237,7 +233,10 @@ func TestManagedResourceDefinition(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Definition(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.mrd, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.mrd, got,
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "Unstructured"),
+			); diff != "" {
 				t.Errorf("\n%s\ns.Definition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

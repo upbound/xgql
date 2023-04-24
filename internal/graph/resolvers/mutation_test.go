@@ -16,6 +16,7 @@ package resolvers
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -27,7 +28,6 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/json"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
@@ -89,7 +89,7 @@ func TestIsRetriable(t *testing.T) {
 func TestCreateKubernetesResource(t *testing.T) {
 	errBoom := errors.New("boom")
 	errFieldPath := fieldpath.Pave(map[string]interface{}{}).SetValue("..", nil)
-	errUnmarshal := json.Unmarshal([]byte("\""), nil)
+	errUnmarshal := json.Unmarshal([]byte("\""), nil) //nolint:govet
 
 	// Unmarshalling to an *interface{} results in a slightly different error.
 	var v interface{}
@@ -256,7 +256,7 @@ func TestCreateKubernetesResource(t *testing.T) {
 func TestUpdateKubernetesResource(t *testing.T) {
 	errBoom := errors.New("boom")
 	errFieldPath := fieldpath.Pave(map[string]interface{}{}).SetValue("..", nil)
-	errUnmarshal := json.Unmarshal([]byte("\""), nil)
+	errUnmarshal := json.Unmarshal([]byte("\""), nil) //nolint:govet
 
 	// Unmarshalling to an *interface{} results in a slightly different error.
 	var v interface{}

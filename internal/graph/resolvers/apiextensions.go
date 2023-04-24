@@ -22,7 +22,6 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
-	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
@@ -33,6 +32,7 @@ import (
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/model"
+	"github.com/upbound/xgql/internal/unstructured"
 )
 
 const (
@@ -66,7 +66,9 @@ func (r *xrd) getCrd(ctx context.Context, group string, names *model.CompositeRe
 	}
 
 	nn := types.NamespacedName{Name: fmt.Sprintf("%s.%s", names.Plural, group)}
-	in := &kextv1.CustomResourceDefinition{}
+	in := &unstructured.CustomResourceDefinition{}
+	in.SetAPIVersion("apiextensions.k8s.io/v1")
+	in.SetKind("CustomResourceDefinition")
 	if err := c.Get(ctx, nn, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetCRD))
 		return nil, nil

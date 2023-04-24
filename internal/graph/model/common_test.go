@@ -15,6 +15,7 @@
 package model
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -25,7 +26,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	kschema "k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/json"
 	"k8s.io/utils/pointer"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -324,47 +324,41 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 
 	cases := map[string]struct {
 		reason string
-		crd    *kextv1.CustomResourceDefinition
+		crd    *unstructured.CustomResourceDefinition
 		want   CustomResourceDefinition
 	}{
 		"Full": {
 			reason: "All supported fields should be converted to our model",
-			crd: &kextv1.CustomResourceDefinition{
-				TypeMeta: metav1.TypeMeta{
-					APIVersion: kschema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String(),
-					Kind:       "CustomResourceDefinition",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "cool",
-				},
-				Spec: kextv1.CustomResourceDefinitionSpec{
-					Group: "group",
-					Names: kextv1.CustomResourceDefinitionNames{
-						Plural:     "clusterexamples",
-						Singular:   "clusterexample",
-						ShortNames: []string{"cex"},
-						Kind:       "ClusterExample",
-						ListKind:   "ClusterExampleList",
-						Categories: []string{"example"},
+			crd: func() *unstructured.CustomResourceDefinition {
+				crd := unstructured.NewCRD()
+				crd.SetName("cool")
+				crd.SetSpecGroup("group")
+				crd.SetSpecNames(kextv1.CustomResourceDefinitionNames{
+					Plural:     "clusterexamples",
+					Singular:   "clusterexample",
+					ShortNames: []string{"cex"},
+					Kind:       "ClusterExample",
+					ListKind:   "ClusterExampleList",
+					Categories: []string{"example"},
+				})
+				crd.SetSpecScope(kextv1.NamespaceScoped)
+				crd.SetSpecVersions([]kextv1.CustomResourceDefinitionVersion{{
+					Name:   "v1",
+					Served: true,
+					Schema: &kextv1.CustomResourceValidation{
+						OpenAPIV3Schema: &kextv1.JSONSchemaProps{},
 					},
-					Scope: kextv1.NamespaceScoped,
-					Versions: []kextv1.CustomResourceDefinitionVersion{{
-						Name:   "v1",
-						Served: true,
-						Schema: &kextv1.CustomResourceValidation{
-							OpenAPIV3Schema: &kextv1.JSONSchemaProps{},
-						},
-					}},
-				},
-				Status: kextv1.CustomResourceDefinitionStatus{
+				}})
+				crd.SetStatus(kextv1.CustomResourceDefinitionStatus{
 					Conditions: []kextv1.CustomResourceDefinitionCondition{{
 						Type:               kextv1.Established,
 						Reason:             "VeryCoolCRD",
 						Message:            "So cool",
 						LastTransitionTime: metav1.NewTime(transition),
 					}},
-				},
-			},
+				})
+				return crd
+			}(),
 			want: CustomResourceDefinition{
 				ID: ReferenceID{
 					APIVersion: kschema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String(),
@@ -395,21 +389,30 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 				},
 				Status: &CustomResourceDefinitionStatus{
 					Conditions: []Condition{{
-						Type:               string(kextv1.Established),
-						Reason:             "VeryCoolCRD",
-						Message:            pointer.String("So cool"),
-						LastTransitionTime: transition,
+						Type:    string(kextv1.Established),
+						Reason:  "VeryCoolCRD",
+						Message: pointer.String("So cool"),
+						// NOTE(tnthornton) transition is being truncated
+						// during marshaling.
+						LastTransitionTime: transition.Truncate(time.Second),
 					}},
 				},
 			},
 		},
 		"Empty": {
 			reason: "Absent optional fields should be absent in our model",
-			crd:    &kextv1.CustomResourceDefinition{},
+			crd:    &unstructured.CustomResourceDefinition{},
 			want: CustomResourceDefinition{
-				Metadata: &ObjectMeta{},
+				ID: ReferenceID{
+					APIVersion: "apiextensions.k8s.io/v1",
+					Kind:       "CustomResourceDefinition",
+				},
+				APIVersion: "apiextensions.k8s.io/v1",
+				Kind:       "CustomResourceDefinition",
+				Metadata:   &ObjectMeta{},
 				Spec: &CustomResourceDefinitionSpec{
-					Names: &CustomResourceDefinitionNames{},
+					Names:    &CustomResourceDefinitionNames{},
+					Versions: []CustomResourceDefinitionVersion{},
 				},
 			},
 		},
@@ -676,7 +679,8 @@ func TestGetKubernetesResource(t *testing.T) {
 					Kind:       "CustomResourceDefinition",
 					Metadata:   &ObjectMeta{},
 					Spec: &CustomResourceDefinitionSpec{
-						Names: &CustomResourceDefinitionNames{},
+						Names:    &CustomResourceDefinitionNames{},
+						Versions: []CustomResourceDefinitionVersion{},
 					},
 				},
 			},
