@@ -74,13 +74,6 @@ func (r *managedResource) Definition(ctx context.Context, obj *model.ManagedReso
 	name := pluralForm(strings.ToLower(obj.Kind))
 
 	nn := types.NamespacedName{Name: fmt.Sprintf("%s.%s", name, gv.Group)}
-	// in := &unstructured.CustomResourceDefinition{}
-	// xrc.SetAPIVersion(obj.ClaimReference.APIVersion)
-	// xrc.SetKind(obj.ClaimReference.Kind)
-	// apiVersion: apiextensions.k8s.io/v1
-	// kind: CustomResourceDefinition
-	// in.SetAPIVersion(crdAPIVersion)
-	// in.SetKind(crdKind)
 	in := unstructured.NewCRD()
 	err = c.Get(ctx, nn, in)
 
@@ -92,9 +85,6 @@ func (r *managedResource) Definition(ctx context.Context, obj *model.ManagedReso
 	// We didn't find the CRD we were looking for, list all CRDs and see if we
 	// can find the matching one.
 	if kerrors.IsNotFound(err) {
-		// lin := &kunstructured.UnstructuredList{}
-		// lin.SetAPIVersion(crdAPIVersion)
-		// lin.SetKind(crdKindList)
 		lin := unstructured.NewCRDList()
 		if err := c.List(ctx, lin); err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errListCRDs))

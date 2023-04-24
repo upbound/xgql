@@ -174,9 +174,6 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 			continue
 		}
 
-		// crd := &unstructured.CustomResourceDefinition{}
-		// crd.SetAPIVersion(crdAPIVersion)
-		// crd.SetKind(crdKind)
 		crd := unstructured.NewCRD()
 		if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, crd); err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errGetCRD))
