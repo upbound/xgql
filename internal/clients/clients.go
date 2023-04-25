@@ -64,11 +64,8 @@ func Config() (*rest.Config, error) {
 		return nil, errors.Wrap(err, "cannot create in-cluster configuration")
 	}
 
-	// ctrl.GetConfig tunes QPS and burst for Kubernetes controllers. We're not
-	// a controller and we expect to be creating many clients, so we tune these
-	// back down to the client-go defaults.
-	cfg.QPS = 5
-	cfg.Burst = 20
+	cfg.QPS = 50
+	cfg.Burst = 300
 
 	cfg.UserAgent = "xgql/" + version.Version
 
@@ -84,8 +81,8 @@ func Config() (*rest.Config, error) {
 // than once every 20 seconds.
 func RESTMapper(cfg *rest.Config) (meta.RESTMapper, error) {
 	dcfg := rest.CopyConfig(cfg)
-	dcfg.QPS = 20
-	dcfg.Burst = 100
+	dcfg.QPS = 50
+	dcfg.Burst = 300
 
 	return apiutil.NewDynamicRESTMapper(dcfg, apiutil.WithLimiter(rate.NewLimiter(rate.Limit(0.05), 1)))
 }
