@@ -74,7 +74,7 @@ func (r *providerConfig) Definition(ctx context.Context, obj *model.ProviderConf
 	nn := types.NamespacedName{Name: fmt.Sprintf("%s.%s", name, gv.Group)}
 
 	in := unstructured.NewCRD()
-	err = c.Get(ctx, nn, in)
+	err = c.Get(ctx, nn, in.GetUnstructured())
 
 	if err != nil && !kerrors.IsNotFound(err) {
 		graphql.AddError(ctx, errors.Wrap(err, errGetCRD))
@@ -85,7 +85,7 @@ func (r *providerConfig) Definition(ctx context.Context, obj *model.ProviderConf
 	// can find the matching one.
 	if kerrors.IsNotFound(err) {
 		lin := unstructured.NewCRDList()
-		if err := c.List(ctx, lin); err != nil {
+		if err := c.List(ctx, lin.GetUnstructuredList()); err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errListCRDs))
 			return nil, nil
 		}

@@ -335,7 +335,7 @@ func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.R
 	}
 
 	in := xunstructured.NewCRDList()
-	if err := c.List(ctx, in); err != nil {
+	if err := c.List(ctx, in.GetUnstructuredList()); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListConfigs))
 		return nil, nil
 	}

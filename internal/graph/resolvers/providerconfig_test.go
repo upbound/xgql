@@ -140,7 +140,7 @@ func TestProviderConfigDefinition(t *testing.T) {
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockGet: test.NewMockGetFn(nil, func(obj client.Object) error {
-						*obj.(*unstructured.CustomResourceDefinition) = *crd
+						*obj.(*kunstructured.Unstructured) = *crd.GetUnstructured()
 						return nil
 					}),
 				}, nil
@@ -166,10 +166,8 @@ func TestProviderConfigDefinition(t *testing.T) {
 						return errNotFound
 					}),
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*unstructured.CustomResourceDefinitionList) = unstructured.CustomResourceDefinitionList{
-							UnstructuredList: kunstructured.UnstructuredList{
-								Items: []kunstructured.Unstructured{otherGroup.Unstructured, otherKind.Unstructured, crdDifferingPlural.Unstructured},
-							},
+						*obj.(*kunstructured.UnstructuredList) = kunstructured.UnstructuredList{
+							Items: []kunstructured.Unstructured{otherGroup.Unstructured, otherKind.Unstructured, crdDifferingPlural.Unstructured},
 						}
 						return nil
 					}),
@@ -194,10 +192,8 @@ func TestProviderConfigDefinition(t *testing.T) {
 						return errNotFound
 					}),
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*unstructured.CustomResourceDefinitionList) = unstructured.CustomResourceDefinitionList{
-							UnstructuredList: kunstructured.UnstructuredList{
-								Items: []kunstructured.Unstructured{otherGroup.Unstructured, otherKind.Unstructured},
-							},
+						*obj.(*kunstructured.UnstructuredList) = kunstructured.UnstructuredList{
+							Items: []kunstructured.Unstructured{otherGroup.Unstructured, otherKind.Unstructured},
 						}
 						return nil
 					}),

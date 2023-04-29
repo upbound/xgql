@@ -66,10 +66,8 @@ func (r *xrd) getCrd(ctx context.Context, group string, names *model.CompositeRe
 	}
 
 	nn := types.NamespacedName{Name: fmt.Sprintf("%s.%s", names.Plural, group)}
-	in := &unstructured.CustomResourceDefinition{}
-	in.SetAPIVersion("apiextensions.k8s.io/v1")
-	in.SetKind("CustomResourceDefinition")
-	if err := c.Get(ctx, nn, in); err != nil {
+	in := unstructured.NewCRD()
+	if err := c.Get(ctx, nn, in.GetUnstructured()); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetCRD))
 		return nil, nil
 	}

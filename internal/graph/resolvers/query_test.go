@@ -1067,12 +1067,10 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*xunstructured.CustomResourceDefinitionList) = xunstructured.CustomResourceDefinitionList{
-							UnstructuredList: unstructured.UnstructuredList{
-								Items: []unstructured.Unstructured{
-									dangler.Unstructured,
-									owned.Unstructured,
-								},
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{
+							Items: []unstructured.Unstructured{
+								dangler.Unstructured,
+								owned.Unstructured,
 							},
 						}
 						return nil
@@ -1097,12 +1095,10 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						*obj.(*xunstructured.CustomResourceDefinitionList) = xunstructured.CustomResourceDefinitionList{
-							UnstructuredList: unstructured.UnstructuredList{
-								Items: []unstructured.Unstructured{
-									dangler.Unstructured,
-									owned.Unstructured,
-								},
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{
+							Items: []unstructured.Unstructured{
+								dangler.Unstructured,
+								owned.Unstructured,
 							},
 						}
 						return nil

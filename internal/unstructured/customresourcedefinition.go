@@ -76,6 +76,11 @@ func (c *CustomResourceDefinition) GetUnstructured() *unstructured.Unstructured 
 	return &c.Unstructured
 }
 
+// GetUnstructuredList of this CustomResourceDefinitionList.
+func (c *CustomResourceDefinitionList) GetUnstructuredList() *unstructured.UnstructuredList {
+	return &c.UnstructuredList
+}
+
 // GetSpecGroup of this CustomResourceDefinition.
 func (c *CustomResourceDefinition) GetSpecGroup() string {
 	p, err := fieldpath.Pave(c.Object).GetString("spec.group")
