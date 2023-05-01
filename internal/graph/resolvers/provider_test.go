@@ -38,6 +38,7 @@ import (
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/model"
+	xunstructured "github.com/upbound/xgql/internal/unstructured"
 )
 
 var (
@@ -316,7 +317,7 @@ func TestProviderActiveRevision(t *testing.T) {
 func TestProviderRevisionStatusObjects(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gcrd := model.GetCustomResourceDefinitionFromCRD(&kextv1.CustomResourceDefinition{})
+	gcrd := model.GetCustomResourceDefinition(&xunstructured.CustomResourceDefinition{})
 
 	type args struct {
 		ctx context.Context

@@ -30,6 +30,7 @@ import (
 
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/graph/model"
+	xunstructured "github.com/upbound/xgql/internal/unstructured"
 )
 
 const (
@@ -173,13 +174,13 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 			continue
 		}
 
-		crd := &kextv1.CustomResourceDefinition{}
-		if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, crd); err != nil {
+		crd := xunstructured.NewCRD()
+		if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, crd.GetUnstructured()); err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errGetCRD))
 			continue
 		}
 
-		out.Nodes = append(out.Nodes, model.GetCustomResourceDefinitionFromCRD(crd))
+		out.Nodes = append(out.Nodes, model.GetCustomResourceDefinition(crd))
 		out.TotalCount++
 	}
 
