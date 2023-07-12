@@ -179,7 +179,7 @@ func (r *compositeResourceSpec) ClaimRef(ctx context.Context, obj *model.Composi
 	return model.GetObjectReference(obj.ClaimReference), nil
 }
 
-func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.CompositeResourceSpec) (*model.KubernetesResourceConnection, error) {
+func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.CompositeResourceSpec) (model.KubernetesResourceConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -187,7 +187,7 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.KubernetesResourceConnection{}, nil
 	}
 
 	out := &model.KubernetesResourceConnection{
@@ -220,7 +220,7 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
 func (r *compositeResourceSpec) ConnectionSecret(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error) {

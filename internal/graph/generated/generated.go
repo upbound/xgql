@@ -653,7 +653,7 @@ type CompositeResourceSpecResolver interface {
 	Claim(ctx context.Context, obj *model.CompositeResourceSpec) (*model.CompositeResourceClaim, error)
 	ClaimRef(ctx context.Context, obj *model.CompositeResourceSpec) (*model.ObjectReference, error)
 	ConnectionSecret(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error)
-	Resources(ctx context.Context, obj *model.CompositeResourceSpec) (*model.KubernetesResourceConnection, error)
+	Resources(ctx context.Context, obj *model.CompositeResourceSpec) (model.KubernetesResourceConnection, error)
 	WriteConnectionSecretToReference(ctx context.Context, obj *model.CompositeResourceSpec) (*model.SecretReference, error)
 }
 type CompositionResolver interface {
@@ -4357,7 +4357,7 @@ type CompositeResourceSpec {
   """
   The resources of which this composite resource is composed.
   """
-  resources: KubernetesResourceConnection @goField(forceResolver: true)
+  resources: KubernetesResourceConnection! @goField(forceResolver: true)
 
   "Reference to the secret this composite resource writes its connection details to"
   writeConnectionSecretToReference: SecretReference
@@ -9799,11 +9799,14 @@ func (ec *executionContext) _CompositeResourceSpec_resources(ctx context.Context
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KubernetesResourceConnection)
+	res := resTmp.(model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalOKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceSpec_resources(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -25674,6 +25677,9 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 					}
 				}()
 				res = ec._CompositeResourceSpec_resources(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -31504,13 +31510,6 @@ func (ec *executionContext) marshalOKubernetesResource2ᚕgithubᚗcomᚋupbound
 	}
 
 	return ret
-}
-
-func (ec *executionContext) marshalOKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.KubernetesResourceConnection) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._KubernetesResourceConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOLabelSelector2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐLabelSelector(ctx context.Context, sel ast.SelectionSet, v *model.LabelSelector) graphql.Marshaler {
