@@ -104,7 +104,7 @@ func GetProvider(p *pkgv1.Provider) Provider {
 		APIVersion: p.APIVersion,
 		Kind:       p.Kind,
 		Metadata:   GetObjectMeta(p),
-		Spec: &ProviderSpec{
+		Spec: ProviderSpec{
 			Package:                     p.Spec.Package,
 			RevisionActivationPolicy:    GetRevisionActivationPolicy(p.Spec.RevisionActivationPolicy),
 			RevisionHistoryLimit:        getIntPtr(p.Spec.RevisionHistoryLimit),
@@ -156,7 +156,7 @@ func GetProviderRevision(pr *pkgv1.ProviderRevision) ProviderRevision {
 		APIVersion: pr.APIVersion,
 		Kind:       pr.Kind,
 		Metadata:   GetObjectMeta(pr),
-		Spec: &ProviderRevisionSpec{
+		Spec: ProviderRevisionSpec{
 			DesiredState:                GetPackageRevisionDesiredState(pr.Spec.DesiredState),
 			Package:                     pr.Spec.Package,
 			PackagePullPolicy:           GetPackagePullPolicy(pr.Spec.PackagePullPolicy),
@@ -196,7 +196,7 @@ func GetConfiguration(c *pkgv1.Configuration) Configuration {
 		APIVersion: c.APIVersion,
 		Kind:       c.Kind,
 		Metadata:   GetObjectMeta(c),
-		Spec: &ConfigurationSpec{
+		Spec: ConfigurationSpec{
 			Package:                     c.Spec.Package,
 			RevisionActivationPolicy:    GetRevisionActivationPolicy(c.Spec.RevisionActivationPolicy),
 			RevisionHistoryLimit:        getIntPtr(c.Spec.RevisionHistoryLimit),
@@ -237,7 +237,7 @@ func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision) ConfigurationRevi
 		APIVersion: cr.APIVersion,
 		Kind:       cr.Kind,
 		Metadata:   GetObjectMeta(cr),
-		Spec: &ConfigurationRevisionSpec{
+		Spec: ConfigurationRevisionSpec{
 			DesiredState:                GetPackageRevisionDesiredState(cr.Spec.DesiredState),
 			Package:                     cr.Spec.Package,
 			PackagePullPolicy:           GetPackagePullPolicy(cr.Spec.PackagePullPolicy),

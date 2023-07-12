@@ -67,7 +67,7 @@ func GetCompositeResource(u *kunstructured.Unstructured) CompositeResource {
 		APIVersion: xr.GetAPIVersion(),
 		Kind:       xr.GetKind(),
 		Metadata:   GetObjectMeta(xr),
-		Spec: &CompositeResourceSpec{
+		Spec: CompositeResourceSpec{
 			CompositionSelector:              GetLabelSelector(xr.GetCompositionSelector()),
 			CompositionReference:             xr.GetCompositionReference(),
 			ClaimReference:                   xr.GetClaimReference(),
@@ -134,7 +134,7 @@ func GetCompositeResourceClaim(u *kunstructured.Unstructured) CompositeResourceC
 		APIVersion: xrc.GetAPIVersion(),
 		Kind:       xrc.GetKind(),
 		Metadata:   GetObjectMeta(xrc),
-		Spec: &CompositeResourceClaimSpec{
+		Spec: CompositeResourceClaimSpec{
 			CompositionSelector:              GetLabelSelector(xrc.GetCompositionSelector()),
 			CompositionReference:             xrc.GetCompositionReference(),
 			ResourceReference:                xrc.GetResourceReference(),

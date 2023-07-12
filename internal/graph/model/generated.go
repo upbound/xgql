@@ -57,15 +57,15 @@ type CompositeResource struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The desired state of this resource.
-	Spec *CompositeResourceSpec `json:"spec"`
+	Spec CompositeResourceSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *CompositeResourceStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 	// The definition of this resource.
 	Definition *CompositeResourceDefinition `json:"definition,omitempty"`
 }
@@ -83,15 +83,15 @@ type CompositeResourceClaim struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The desired state of this resource.
-	Spec *CompositeResourceClaimSpec `json:"spec"`
+	Spec CompositeResourceClaimSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *CompositeResourceClaimStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 	// The definition of this resource.
 	Definition *CompositeResourceDefinition `json:"definition,omitempty"`
 }
@@ -154,23 +154,23 @@ type CompositeResourceDefinition struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The desired state of this resource.
-	Spec *CompositeResourceDefinitionSpec `json:"spec"`
+	Spec CompositeResourceDefinitionSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *CompositeResourceDefinitionStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 	// The generated `CustomResourceDefinition` for this XRD
 	CompositeResourceCrd *CustomResourceDefinition `json:"compositeResourceCRD,omitempty"`
 	// The generated `CustomResourceDefinition` of this XRDs `CompositeClaim` if defined
 	CompositeResourceClaimCrd *CustomResourceDefinition `json:"compositeResourceClaimCRD,omitempty"`
 	// Composite resources (XRs) defined by this XRD.
-	DefinedCompositeResources *CompositeResourceConnection `json:"definedCompositeResources"`
+	DefinedCompositeResources CompositeResourceConnection `json:"definedCompositeResources"`
 	// Composite resource claims (XRCs) defined by this XRD.
-	DefinedCompositeResourceClaims *CompositeResourceClaimConnection `json:"definedCompositeResourceClaims"`
+	DefinedCompositeResourceClaims CompositeResourceClaimConnection `json:"definedCompositeResourceClaims"`
 }
 
 func (CompositeResourceDefinition) IsNode() {}
@@ -285,15 +285,15 @@ type Composition struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The desired state of this resource.
-	Spec *CompositionSpec `json:"spec"`
+	Spec CompositionSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *CompositionStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 }
 
 func (Composition) IsNode() {}
@@ -312,7 +312,7 @@ type CompositionConnection struct {
 type CompositionSpec struct {
 	// CompositeTypeRef specifies the type of composite resource that this
 	// composition is compatible with.
-	CompositeTypeRef *TypeReference `json:"compositeTypeRef"`
+	CompositeTypeRef TypeReference `json:"compositeTypeRef"`
 	// WriteConnectionSecretsToNamespace specifies the namespace in which the
 	// connection secrets of composite resource dynamically provisioned using this
 	// composition will be created.
@@ -356,13 +356,13 @@ type ConfigMap struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The data stored in this config map.
 	data map[string]string `json:"data,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 }
 
 func (ConfigMap) IsNode() {}
@@ -378,17 +378,17 @@ type Configuration struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The desired state of this resource.
-	Spec *ConfigurationSpec `json:"spec"`
+	Spec ConfigurationSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *ConfigurationStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 	// Revisions of this configuration.
-	Revisions *ConfigurationRevisionConnection `json:"revisions"`
+	Revisions ConfigurationRevisionConnection `json:"revisions"`
 	// The active revision of this configuration.
 	ActiveRevision *ConfigurationRevision `json:"activeRevision,omitempty"`
 }
@@ -414,15 +414,15 @@ type ConfigurationRevision struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The desired state of this resource.
-	Spec *ConfigurationRevisionSpec `json:"spec"`
+	Spec ConfigurationRevisionSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *ConfigurationRevisionStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 }
 
 func (ConfigurationRevision) IsNode() {}
@@ -480,8 +480,8 @@ type ConfigurationRevisionStatus struct {
 	// enforce this, but it's not enforced at the Kubernetes API level. We return an
 	// array of KubernetesResource here because doing so allows us to package
 	// different types in future without a breaking GraphQL schema change.
-	Objects    *KubernetesResourceConnection `json:"objects"`
-	ObjectRefs []v1.TypedReference           `json:"-"`
+	Objects    KubernetesResourceConnection `json:"objects"`
+	ObjectRefs []v1.TypedReference          `json:"-"`
 }
 
 func (ConfigurationRevisionStatus) IsConditionedStatus() {}
@@ -567,17 +567,17 @@ type CustomResourceDefinition struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The desired state of this resource.
-	Spec *CustomResourceDefinitionSpec `json:"spec"`
+	Spec CustomResourceDefinitionSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *CustomResourceDefinitionStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 	// Custom resources defined by this CRD
-	DefinedResources *KubernetesResourceConnection `json:"definedResources"`
+	DefinedResources KubernetesResourceConnection `json:"definedResources"`
 }
 
 func (CustomResourceDefinition) IsNode() {}
@@ -626,7 +626,7 @@ type CustomResourceDefinitionSpec struct {
 	// form `<names.plural>.<group>`).
 	Group string `json:"group"`
 	// Names specifies the resource and kind names of the defined custom resource.
-	Names *CustomResourceDefinitionNames `json:"names"`
+	Names CustomResourceDefinitionNames `json:"names"`
 	// Scope of the defined custom resource.
 	Scope ResourceScope `json:"scope"`
 	// Versions is the list of all API versions of the defined custom resource.
@@ -707,7 +707,7 @@ type Event struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The Kubernetes resource this event pertains to.
 	InvolvedObject KubernetesResource `json:"involvedObject"`
 	// The type of event.
@@ -758,11 +758,11 @@ type GenericResource struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 }
 
 func (GenericResource) IsNode() {}
@@ -801,15 +801,15 @@ type ManagedResource struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The desired state of this resource.
-	Spec *ManagedResourceSpec `json:"spec"`
+	Spec ManagedResourceSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *ManagedResourceStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 	// The definition of this resource.
 	Definition ManagedResourceDefinition `json:"definition,omitempty"`
 }
@@ -915,17 +915,17 @@ type Provider struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The desired state of this resource.
-	Spec *ProviderSpec `json:"spec"`
+	Spec ProviderSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *ProviderStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 	// Revisions of this provider.
-	Revisions *ProviderRevisionConnection `json:"revisions"`
+	Revisions ProviderRevisionConnection `json:"revisions"`
 	// The active revision of this provider.
 	ActiveRevision *ProviderRevision `json:"activeRevision,omitempty"`
 }
@@ -944,13 +944,13 @@ type ProviderConfig struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The observed state of this resource.
 	Status *ProviderConfigStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 	// The definition of this resource.
 	Definition ProviderConfigDefinition `json:"definition,omitempty"`
 }
@@ -992,15 +992,15 @@ type ProviderRevision struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// The desired state of this resource.
-	Spec *ProviderRevisionSpec `json:"spec"`
+	Spec ProviderRevisionSpec `json:"spec"`
 	// The observed state of this resource.
 	Status *ProviderRevisionStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 }
 
 func (ProviderRevision) IsNode() {}
@@ -1056,8 +1056,8 @@ type ProviderRevisionStatus struct {
 	// not enforced at the Kubernetes API level. We return an array of
 	// KubernetesResource here because doing so allows us to package different types
 	// in future without a breaking GraphQL schema change.
-	Objects    *KubernetesResourceConnection `json:"objects"`
-	ObjectRefs []v1.TypedReference           `json:"-"`
+	Objects    KubernetesResourceConnection `json:"objects"`
+	ObjectRefs []v1.TypedReference          `json:"-"`
 }
 
 func (ProviderRevisionStatus) IsConditionedStatus() {}
@@ -1108,7 +1108,7 @@ type Secret struct {
 	// The underlying Kubernetes API kind of this resource.
 	Kind string `json:"kind"`
 	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
+	Metadata ObjectMeta `json:"metadata"`
 	// Type of this secret.
 	Type *string `json:"type,omitempty"`
 	// The data stored in this secret. Values are not base64 encoded.
@@ -1116,7 +1116,7 @@ type Secret struct {
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	Unstructured []byte `json:"unstructured"`
 	// Events pertaining to this resource.
-	Events *EventConnection `json:"events"`
+	Events EventConnection `json:"events"`
 }
 
 func (Secret) IsNode() {}

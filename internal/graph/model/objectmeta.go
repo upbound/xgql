@@ -38,7 +38,7 @@ type ObjectMeta struct {
 }
 
 // GetObjectMeta from the supplied Kubernetes object.
-func GetObjectMeta(m metav1.Object) *ObjectMeta {
+func GetObjectMeta(m metav1.Object) ObjectMeta {
 	om := &ObjectMeta{
 		Name:            m.GetName(),
 		UID:             string(m.GetUID()),
@@ -60,11 +60,11 @@ func GetObjectMeta(m metav1.Object) *ObjectMeta {
 		om.DeletionTime = &t.Time
 	}
 
-	return om
+	return *om
 }
 
 // Labels this ObjectMeta contains.
-func (om *ObjectMeta) Labels(keys []string) map[string]string {
+func (om ObjectMeta) Labels(keys []string) map[string]string {
 	if keys == nil || om.labels == nil {
 		return om.labels
 	}
@@ -78,7 +78,7 @@ func (om *ObjectMeta) Labels(keys []string) map[string]string {
 }
 
 // Annotations this ObjectMeta contains.
-func (om *ObjectMeta) Annotations(keys []string) map[string]string {
+func (om ObjectMeta) Annotations(keys []string) map[string]string {
 	if keys == nil || om.annotations == nil {
 		return om.annotations
 	}

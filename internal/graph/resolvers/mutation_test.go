@@ -108,7 +108,7 @@ func TestCreateKubernetesResource(t *testing.T) {
 		input model.CreateKubernetesResourceInput
 	}
 	type want struct {
-		payload *model.CreateKubernetesResourcePayload
+		payload model.CreateKubernetesResourcePayload
 		err     error
 		errs    gqlerror.List
 	}
@@ -224,7 +224,7 @@ func TestCreateKubernetesResource(t *testing.T) {
 				},
 			},
 			want: want{
-				payload: &model.CreateKubernetesResourcePayload{
+				payload: model.CreateKubernetesResourcePayload{
 					Resource: kr,
 				},
 			},
@@ -276,7 +276,7 @@ func TestUpdateKubernetesResource(t *testing.T) {
 		input model.UpdateKubernetesResourceInput
 	}
 	type want struct {
-		payload *model.UpdateKubernetesResourcePayload
+		payload model.UpdateKubernetesResourcePayload
 		err     error
 		errs    gqlerror.List
 	}
@@ -398,7 +398,7 @@ func TestUpdateKubernetesResource(t *testing.T) {
 				},
 			},
 			want: want{
-				payload: &model.UpdateKubernetesResourcePayload{
+				payload: model.UpdateKubernetesResourcePayload{
 					Resource: kr,
 				},
 			},
@@ -435,7 +435,7 @@ func TestDeleteKubernetesResource(t *testing.T) {
 		id  model.ReferenceID
 	}
 	type want struct {
-		payload *model.DeleteKubernetesResourcePayload
+		payload model.DeleteKubernetesResourcePayload
 		err     error
 		errs    gqlerror.List
 	}
@@ -500,7 +500,7 @@ func TestDeleteKubernetesResource(t *testing.T) {
 				},
 			},
 			want: want{
-				payload: &model.DeleteKubernetesResourcePayload{
+				payload: model.DeleteKubernetesResourcePayload{
 					Resource: kr,
 				},
 			},

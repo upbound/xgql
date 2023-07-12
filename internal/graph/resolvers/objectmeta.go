@@ -36,7 +36,7 @@ type objectMeta struct {
 	clients ClientCache
 }
 
-func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta) (*model.OwnerConnection, error) {
+func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta) (model.OwnerConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -44,7 +44,7 @@ func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta) (*model.
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.OwnerConnection{}, nil
 	}
 
 	owners := make([]model.Owner, 0, len(obj.OwnerReferences))
@@ -68,7 +68,7 @@ func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta) (*model.
 		owners = append(owners, model.Owner{Controller: ref.Controller, Resource: kr})
 	}
 
-	return &model.OwnerConnection{Nodes: owners, TotalCount: len(owners)}, nil
+	return model.OwnerConnection{Nodes: owners, TotalCount: len(owners)}, nil
 }
 
 func (r *objectMeta) Controller(ctx context.Context, obj *model.ObjectMeta) (model.KubernetesResource, error) {

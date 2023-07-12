@@ -46,7 +46,7 @@ type compositeResource struct {
 	clients ClientCache
 }
 
-func (r *compositeResource) Events(ctx context.Context, obj *model.CompositeResource) (*model.EventConnection, error) {
+func (r *compositeResource) Events(ctx context.Context, obj *model.CompositeResource) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,
@@ -263,7 +263,7 @@ type compositeResourceClaim struct {
 	clients ClientCache
 }
 
-func (r *compositeResourceClaim) Events(ctx context.Context, obj *model.CompositeResourceClaim) (*model.EventConnection, error) {
+func (r *compositeResourceClaim) Events(ctx context.Context, obj *model.CompositeResourceClaim) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,

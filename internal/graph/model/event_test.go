@@ -63,7 +63,7 @@ func TestGetEvent(t *testing.T) {
 				},
 				APIVersion: kschema.GroupVersion{Group: corev1.GroupName, Version: "v1"}.String(),
 				Kind:       "Event",
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
 				Type:    &warn,
@@ -81,7 +81,7 @@ func TestGetEvent(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			s:      &corev1.Event{},
 			want: Event{
-				Metadata:  &ObjectMeta{},
+				Metadata:  ObjectMeta{},
 				FirstTime: &time.Time{},
 				LastTime:  &time.Time{},
 			},

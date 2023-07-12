@@ -42,7 +42,7 @@ type configuration struct {
 	clients ClientCache
 }
 
-func (r *configuration) Events(ctx context.Context, obj *model.Configuration) (*model.EventConnection, error) {
+func (r *configuration) Events(ctx context.Context, obj *model.Configuration) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,
@@ -52,7 +52,7 @@ func (r *configuration) Events(ctx context.Context, obj *model.Configuration) (*
 	})
 }
 
-func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration) (*model.ConfigurationRevisionConnection, error) {
+func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration) (model.ConfigurationRevisionConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -60,13 +60,13 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration)
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.ConfigurationRevisionConnection{}, nil
 	}
 
 	in := &pkgv1.ConfigurationRevisionList{}
 	if err := c.List(ctx, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListConfigRevs))
-		return nil, nil
+		return model.ConfigurationRevisionConnection{}, nil
 	}
 
 	out := &model.ConfigurationRevisionConnection{
@@ -88,7 +88,7 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration)
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
 func (r *configuration) ActiveRevision(ctx context.Context, obj *model.Configuration) (*model.ConfigurationRevision, error) {
@@ -134,7 +134,7 @@ type configurationRevision struct {
 	clients ClientCache
 }
 
-func (r *configurationRevision) Events(ctx context.Context, obj *model.ConfigurationRevision) (*model.EventConnection, error) {
+func (r *configurationRevision) Events(ctx context.Context, obj *model.ConfigurationRevision) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,
@@ -148,7 +148,7 @@ type configurationRevisionStatus struct {
 	clients ClientCache
 }
 
-func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (*model.KubernetesResourceConnection, error) {
+func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (model.KubernetesResourceConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -156,7 +156,7 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.KubernetesResourceConnection{}, nil
 	}
 
 	out := &model.KubernetesResourceConnection{
@@ -193,5 +193,5 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 		}
 	}
 
-	return out, nil
+	return *out, nil
 }

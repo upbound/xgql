@@ -295,9 +295,9 @@ func GetCustomResourceDefinition(crd *unstructured.CustomResourceDefinition) Cus
 		APIVersion: crd.GetAPIVersion(),
 		Kind:       crd.GetKind(),
 		Metadata:   GetObjectMeta(crd),
-		Spec: &CustomResourceDefinitionSpec{
+		Spec: CustomResourceDefinitionSpec{
 			Group:    crd.GetSpecGroup(),
-			Names:    GetCustomResourceDefinitionNames(crd.GetSpecNames()),
+			Names:    *GetCustomResourceDefinitionNames(crd.GetSpecNames()),
 			Scope:    GetResourceScope(crd.GetSpecScope()),
 			Versions: GetCustomResourceDefinitionVersions(crd.GetSpecVersions()),
 		},
@@ -318,9 +318,9 @@ func GetCustomResourceDefinitionFromCRD(crd *kextv1.CustomResourceDefinition) Cu
 		APIVersion: crd.APIVersion,
 		Kind:       crd.Kind,
 		Metadata:   GetObjectMeta(crd),
-		Spec: &CustomResourceDefinitionSpec{
+		Spec: CustomResourceDefinitionSpec{
 			Group:    crd.Spec.Group,
-			Names:    GetCustomResourceDefinitionNames(crd.Spec.Names),
+			Names:    *GetCustomResourceDefinitionNames(crd.Spec.Names),
 			Scope:    GetResourceScope(crd.Spec.Scope),
 			Versions: GetCustomResourceDefinitionVersions(crd.Spec.Versions),
 		},

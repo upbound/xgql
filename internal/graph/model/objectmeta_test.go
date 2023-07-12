@@ -34,7 +34,7 @@ func TestGetObjectMeta(t *testing.T) {
 	cases := map[string]struct {
 		reason string
 		o      metav1.Object
-		want   *ObjectMeta
+		want   ObjectMeta
 	}{
 		"Full": {
 			reason: "All supported fields should be converted to our model",
@@ -55,7 +55,7 @@ func TestGetObjectMeta(t *testing.T) {
 
 				return u
 			}(),
-			want: &ObjectMeta{
+			want: ObjectMeta{
 				Namespace:       pointer.String("default"),
 				Name:            "cool-rando",
 				GenerateName:    pointer.String("cool-"),
@@ -72,7 +72,7 @@ func TestGetObjectMeta(t *testing.T) {
 		"Empty": {
 			reason: "Absent optional fields should be absent in our model",
 			o:      &unstructured.Unstructured{},
-			want:   &ObjectMeta{},
+			want:   ObjectMeta{},
 		},
 	}
 
@@ -96,24 +96,24 @@ func TestObjectMetaLabels(t *testing.T) {
 
 	cases := map[string]struct {
 		reason string
-		om     *ObjectMeta
+		om     ObjectMeta
 		keys   []string
 		want   map[string]string
 	}{
 		"NilData": {
 			reason: "If no labels exists no labels should be returned.",
-			om:     &ObjectMeta{},
+			om:     ObjectMeta{},
 			keys:   []string{"dataplz"},
 			want:   nil,
 		},
 		"AllData": {
 			reason: "If no keys are passed no labels should be returned.",
-			om:     &ObjectMeta{labels: l},
+			om:     ObjectMeta{labels: l},
 			want:   l,
 		},
 		"SomeData": {
 			reason: "If keys are passed only those keys (if they exist) should be returned.",
-			om:     &ObjectMeta{labels: l},
+			om:     ObjectMeta{labels: l},
 			keys:   []string{"some", "dataplz"},
 			want:   map[string]string{"some": "data"},
 		},
@@ -138,24 +138,24 @@ func TestObjectMetaAnnotations(t *testing.T) {
 
 	cases := map[string]struct {
 		reason string
-		om     *ObjectMeta
+		om     ObjectMeta
 		keys   []string
 		want   map[string]string
 	}{
 		"NilData": {
 			reason: "If no annotations exists no annotations should be returned.",
-			om:     &ObjectMeta{},
+			om:     ObjectMeta{},
 			keys:   []string{"dataplz"},
 			want:   nil,
 		},
 		"AllData": {
 			reason: "If no keys are passed no annotations should be returned.",
-			om:     &ObjectMeta{annotations: a},
+			om:     ObjectMeta{annotations: a},
 			want:   a,
 		},
 		"SomeData": {
 			reason: "If keys are passed only those keys (if they exist) should be returned.",
-			om:     &ObjectMeta{annotations: a},
+			om:     ObjectMeta{annotations: a},
 			keys:   []string{"some", "dataplz"},
 			want:   map[string]string{"some": "data"},
 		},

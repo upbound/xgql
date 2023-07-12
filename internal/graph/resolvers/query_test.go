@@ -53,7 +53,7 @@ func TestCrossplaneResourceTree(t *testing.T) {
 		id  model.ReferenceID
 	}
 	type want struct {
-		kr   *model.CrossplaneResourceTreeConnection
+		kr   model.CrossplaneResourceTreeConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -105,12 +105,12 @@ func TestCrossplaneResourceTree(t *testing.T) {
 				id:  model.ReferenceID{Name: "root"},
 			},
 			want: want{
-				kr: &model.CrossplaneResourceTreeConnection{TotalCount: 1, Nodes: []model.CrossplaneResourceTreeNode{
+				kr: model.CrossplaneResourceTreeConnection{TotalCount: 1, Nodes: []model.CrossplaneResourceTreeNode{
 					{
 						Resource: model.CompositeResourceClaim{
 							ID:       model.ReferenceID{Namespace: namespace},
-							Metadata: &model.ObjectMeta{Namespace: &namespace},
-							Spec:     &model.CompositeResourceClaimSpec{CompositionReference: &corev1.ObjectReference{Name: "coolcomposition"}},
+							Metadata: model.ObjectMeta{Namespace: &namespace},
+							Spec:     model.CompositeResourceClaimSpec{CompositionReference: &corev1.ObjectReference{Name: "coolcomposition"}},
 						},
 					},
 				}},
@@ -150,28 +150,28 @@ func TestCrossplaneResourceTree(t *testing.T) {
 				id:  model.ReferenceID{Name: "root"},
 			},
 			want: want{
-				kr: &model.CrossplaneResourceTreeConnection{TotalCount: 6, Nodes: []model.CrossplaneResourceTreeNode{
+				kr: model.CrossplaneResourceTreeConnection{TotalCount: 6, Nodes: []model.CrossplaneResourceTreeNode{
 					{
 						Resource: model.CompositeResourceClaim{
 							ID:       model.ReferenceID{Namespace: namespace, Name: "root"},
-							Metadata: &model.ObjectMeta{Namespace: &namespace, Name: "root"},
-							Spec:     &model.CompositeResourceClaimSpec{ResourceReference: &corev1.ObjectReference{Name: "composite"}},
+							Metadata: model.ObjectMeta{Namespace: &namespace, Name: "root"},
+							Spec:     model.CompositeResourceClaimSpec{ResourceReference: &corev1.ObjectReference{Name: "composite"}},
 						},
 					},
 					{
 						ParentID: &model.ReferenceID{Namespace: "default", Name: "root"},
 						Resource: model.CompositeResource{
 							ID:       model.ReferenceID{Name: "composite"},
-							Metadata: &model.ObjectMeta{Name: "composite"},
-							Spec:     &model.CompositeResourceSpec{ResourceReferences: []corev1.ObjectReference{{Name: "managed1"}, {Name: "child-composite"}}},
+							Metadata: model.ObjectMeta{Name: "composite"},
+							Spec:     model.CompositeResourceSpec{ResourceReferences: []corev1.ObjectReference{{Name: "managed1"}, {Name: "child-composite"}}},
 						},
 					},
 					{
 						ParentID: &model.ReferenceID{Name: "composite"},
 						Resource: model.CompositeResource{
 							ID:       model.ReferenceID{Name: "child-composite"},
-							Metadata: &model.ObjectMeta{Name: "child-composite"},
-							Spec:     &model.CompositeResourceSpec{ResourceReferences: []corev1.ObjectReference{{Name: "managed2"}, {Name: "provider-config"}}},
+							Metadata: model.ObjectMeta{Name: "child-composite"},
+							Spec:     model.CompositeResourceSpec{ResourceReferences: []corev1.ObjectReference{{Name: "managed2"}, {Name: "provider-config"}}},
 						},
 					},
 					{
@@ -179,23 +179,23 @@ func TestCrossplaneResourceTree(t *testing.T) {
 						Resource: model.ProviderConfig{
 							ID:       model.ReferenceID{Kind: "ProviderConfig", Name: "provider-config"},
 							Kind:     "ProviderConfig",
-							Metadata: &model.ObjectMeta{Name: "provider-config"},
+							Metadata: model.ObjectMeta{Name: "provider-config"},
 						},
 					},
 					{
 						ParentID: &model.ReferenceID{Name: "child-composite"},
 						Resource: model.ManagedResource{
 							ID:       model.ReferenceID{Name: "managed2"},
-							Metadata: &model.ObjectMeta{Name: "managed2"},
-							Spec:     &model.ManagedResourceSpec{ProviderConfigRef: &model.ProviderConfigReference{}, DeletionPolicy: &deletionPolicyDelete},
+							Metadata: model.ObjectMeta{Name: "managed2"},
+							Spec:     model.ManagedResourceSpec{ProviderConfigRef: &model.ProviderConfigReference{}, DeletionPolicy: &deletionPolicyDelete},
 						},
 					},
 					{
 						ParentID: &model.ReferenceID{Name: "composite"},
 						Resource: model.ManagedResource{
 							ID:       model.ReferenceID{Name: "managed1"},
-							Metadata: &model.ObjectMeta{Name: "managed1"},
-							Spec:     &model.ManagedResourceSpec{ProviderConfigRef: &model.ProviderConfigReference{}, DeletionPolicy: &deletionPolicyDelete},
+							Metadata: model.ObjectMeta{Name: "managed1"},
+							Spec:     model.ManagedResourceSpec{ProviderConfigRef: &model.ProviderConfigReference{}, DeletionPolicy: &deletionPolicyDelete},
 						},
 					},
 				}},
@@ -348,7 +348,7 @@ func TestQueryKubernetesResources(t *testing.T) {
 		namespace  *string
 	}
 	type want struct {
-		krc  *model.KubernetesResourceConnection
+		krc  model.KubernetesResourceConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -414,7 +414,7 @@ func TestQueryKubernetesResources(t *testing.T) {
 				kind:       kind,
 			},
 			want: want{
-				krc: &model.KubernetesResourceConnection{
+				krc: model.KubernetesResourceConnection{
 					Nodes:      []model.KubernetesResource{gkr},
 					TotalCount: 1,
 				},
@@ -446,7 +446,7 @@ func TestQueryKubernetesResources(t *testing.T) {
 				listKind:   &listKind,
 			},
 			want: want{
-				krc: &model.KubernetesResourceConnection{
+				krc: model.KubernetesResourceConnection{
 					Nodes:      []model.KubernetesResource{gkr},
 					TotalCount: 1,
 				},
@@ -481,7 +481,7 @@ func TestQueryKubernetesResources(t *testing.T) {
 				namespace:  &ns,
 			},
 			want: want{
-				krc: &model.KubernetesResourceConnection{
+				krc: model.KubernetesResourceConnection{
 					Nodes:      []model.KubernetesResource{gkr},
 					TotalCount: 1,
 				},
@@ -701,7 +701,7 @@ func TestQueryProviders(t *testing.T) {
 		ctx context.Context
 	}
 	type want struct {
-		pc   *model.ProviderConnection
+		pc   model.ProviderConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -756,7 +756,7 @@ func TestQueryProviders(t *testing.T) {
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
-				pc: &model.ProviderConnection{
+				pc: model.ProviderConnection{
 					Nodes:      []model.Provider{gp},
 					TotalCount: 1,
 				},
@@ -842,7 +842,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 		active *bool
 	}
 	type want struct {
-		pc   *model.ProviderRevisionConnection
+		pc   model.ProviderRevisionConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -899,7 +899,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
-				pc: &model.ProviderRevisionConnection{
+				pc: model.ProviderRevisionConnection{
 					Nodes:      []model.ProviderRevision{gactive, ginactive, gother},
 					TotalCount: 3,
 				},
@@ -922,7 +922,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 				id:  &id,
 			},
 			want: want{
-				pc: &model.ProviderRevisionConnection{
+				pc: model.ProviderRevisionConnection{
 					Nodes:      []model.ProviderRevision{gactive, ginactive},
 					TotalCount: 2,
 				},
@@ -945,7 +945,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 				active: pointer.Bool(true),
 			},
 			want: want{
-				pc: &model.ProviderRevisionConnection{
+				pc: model.ProviderRevisionConnection{
 					Nodes:      []model.ProviderRevision{gactive},
 					TotalCount: 1,
 				},
@@ -1021,7 +1021,7 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 		revision *model.ReferenceID
 	}
 	type want struct {
-		xrdc *model.CustomResourceDefinitionConnection
+		xrdc model.CustomResourceDefinitionConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -1081,7 +1081,7 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
-				xrdc: &model.CustomResourceDefinitionConnection{
+				xrdc: model.CustomResourceDefinitionConnection{
 					Nodes: []model.CustomResourceDefinition{
 						gdangler,
 						gowned,
@@ -1110,7 +1110,7 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 				revision: &id,
 			},
 			want: want{
-				xrdc: &model.CustomResourceDefinitionConnection{
+				xrdc: model.CustomResourceDefinitionConnection{
 					Nodes: []model.CustomResourceDefinition{
 						gowned,
 					},
@@ -1155,7 +1155,7 @@ func TestQueryConfigurations(t *testing.T) {
 		ctx context.Context
 	}
 	type want struct {
-		cc   *model.ConfigurationConnection
+		cc   model.ConfigurationConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -1210,7 +1210,7 @@ func TestQueryConfigurations(t *testing.T) {
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
-				cc: &model.ConfigurationConnection{
+				cc: model.ConfigurationConnection{
 					Nodes:      []model.Configuration{gc},
 					TotalCount: 1,
 				},
@@ -1296,7 +1296,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 		active *bool
 	}
 	type want struct {
-		pc   *model.ConfigurationRevisionConnection
+		pc   model.ConfigurationRevisionConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -1353,7 +1353,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
-				pc: &model.ConfigurationRevisionConnection{
+				pc: model.ConfigurationRevisionConnection{
 					Nodes:      []model.ConfigurationRevision{gactive, ginactive, gother},
 					TotalCount: 3,
 				},
@@ -1376,7 +1376,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 				id:  &id,
 			},
 			want: want{
-				pc: &model.ConfigurationRevisionConnection{
+				pc: model.ConfigurationRevisionConnection{
 					Nodes:      []model.ConfigurationRevision{gactive, ginactive},
 					TotalCount: 2,
 				},
@@ -1399,7 +1399,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 				active: pointer.Bool(true),
 			},
 			want: want{
-				pc: &model.ConfigurationRevisionConnection{
+				pc: model.ConfigurationRevisionConnection{
 					Nodes:      []model.ConfigurationRevision{gactive},
 					TotalCount: 1,
 				},
@@ -1474,7 +1474,7 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 		dangling *bool
 	}
 	type want struct {
-		xrdc *model.CompositeResourceDefinitionConnection
+		xrdc model.CompositeResourceDefinitionConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -1534,7 +1534,7 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
-				xrdc: &model.CompositeResourceDefinitionConnection{
+				xrdc: model.CompositeResourceDefinitionConnection{
 					Nodes: []model.CompositeResourceDefinition{
 						gdangler,
 						gowned,
@@ -1563,7 +1563,7 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 				dangling: pointer.Bool(true),
 			},
 			want: want{
-				xrdc: &model.CompositeResourceDefinitionConnection{
+				xrdc: model.CompositeResourceDefinitionConnection{
 					Nodes: []model.CompositeResourceDefinition{
 						gdangler,
 					},
@@ -1591,7 +1591,7 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 				revision: &id,
 			},
 			want: want{
-				xrdc: &model.CompositeResourceDefinitionConnection{
+				xrdc: model.CompositeResourceDefinitionConnection{
 					Nodes: []model.CompositeResourceDefinition{
 						gowned,
 					},
@@ -1669,7 +1669,7 @@ func TestQueryCompositions(t *testing.T) {
 		dangling *bool
 	}
 	type want struct {
-		cc   *model.CompositionConnection
+		cc   model.CompositionConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -1729,7 +1729,7 @@ func TestQueryCompositions(t *testing.T) {
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
-				cc: &model.CompositionConnection{
+				cc: model.CompositionConnection{
 					Nodes: []model.Composition{
 						gdangler,
 						gowned,
@@ -1758,7 +1758,7 @@ func TestQueryCompositions(t *testing.T) {
 				dangling: pointer.Bool(true),
 			},
 			want: want{
-				cc: &model.CompositionConnection{
+				cc: model.CompositionConnection{
 					Nodes: []model.Composition{
 						gdangler,
 					},
@@ -1786,7 +1786,7 @@ func TestQueryCompositions(t *testing.T) {
 				revision: &id,
 			},
 			want: want{
-				cc: &model.CompositionConnection{
+				cc: model.CompositionConnection{
 					Nodes: []model.Composition{
 						gowned,
 					},

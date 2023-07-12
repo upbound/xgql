@@ -80,10 +80,10 @@ func TestGetProvider(t *testing.T) {
 				},
 				APIVersion: pkgv1.ProviderGroupVersionKind.GroupVersion().String(),
 				Kind:       pkgv1.ProviderKind,
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
-				Spec: &ProviderSpec{
+				Spec: ProviderSpec{
 					Package:                     "coolthing:v1",
 					RevisionActivationPolicy:    &mrap,
 					RevisionHistoryLimit:        &mlim,
@@ -102,8 +102,8 @@ func TestGetProvider(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			cfg:    &pkgv1.Provider{},
 			want: Provider{
-				Metadata: &ObjectMeta{},
-				Spec:     &ProviderSpec{},
+				Metadata: ObjectMeta{},
+				Spec:     ProviderSpec{},
 			},
 		},
 	}
@@ -173,10 +173,10 @@ func TestGetProviderRevision(t *testing.T) {
 				},
 				APIVersion: pkgv1.ProviderRevisionGroupVersionKind.GroupVersion().String(),
 				Kind:       pkgv1.ProviderRevisionKind,
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
-				Spec: &ProviderRevisionSpec{
+				Spec: ProviderRevisionSpec{
 					DesiredState:                PackageRevisionDesiredStateActive,
 					Package:                     "coolthing:v1",
 					PackagePullPolicy:           &mppp,
@@ -204,8 +204,8 @@ func TestGetProviderRevision(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			cfg:    &pkgv1.ProviderRevision{},
 			want: ProviderRevision{
-				Metadata: &ObjectMeta{},
-				Spec:     &ProviderRevisionSpec{},
+				Metadata: ObjectMeta{},
+				Spec:     ProviderRevisionSpec{},
 			},
 		},
 	}
@@ -272,10 +272,10 @@ func TestGetConfiguration(t *testing.T) {
 				},
 				APIVersion: pkgv1.ConfigurationGroupVersionKind.GroupVersion().String(),
 				Kind:       pkgv1.ConfigurationKind,
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
-				Spec: &ConfigurationSpec{
+				Spec: ConfigurationSpec{
 					Package:                     "coolthing:v1",
 					RevisionActivationPolicy:    &mrap,
 					RevisionHistoryLimit:        &mlim,
@@ -294,8 +294,8 @@ func TestGetConfiguration(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			cfg:    &pkgv1.Configuration{},
 			want: Configuration{
-				Metadata: &ObjectMeta{},
-				Spec:     &ConfigurationSpec{},
+				Metadata: ObjectMeta{},
+				Spec:     ConfigurationSpec{},
 			},
 		},
 	}
@@ -365,10 +365,10 @@ func TestGetConfigurationRevision(t *testing.T) {
 				},
 				APIVersion: pkgv1.ConfigurationRevisionGroupVersionKind.GroupVersion().String(),
 				Kind:       pkgv1.ConfigurationRevisionKind,
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
-				Spec: &ConfigurationRevisionSpec{
+				Spec: ConfigurationRevisionSpec{
 					DesiredState:                PackageRevisionDesiredStateActive,
 					Package:                     "coolthing:v1",
 					PackagePullPolicy:           &mppp,
@@ -396,8 +396,8 @@ func TestGetConfigurationRevision(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			cfg:    &pkgv1.ConfigurationRevision{},
 			want: ConfigurationRevision{
-				Metadata: &ObjectMeta{},
-				Spec:     &ConfigurationRevisionSpec{},
+				Metadata: ObjectMeta{},
+				Spec:     ConfigurationRevisionSpec{},
 			},
 		},
 	}

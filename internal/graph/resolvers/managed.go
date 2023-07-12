@@ -39,7 +39,7 @@ type managedResource struct {
 	clients ClientCache
 }
 
-func (r *managedResource) Events(ctx context.Context, obj *model.ManagedResource) (*model.EventConnection, error) {
+func (r *managedResource) Events(ctx context.Context, obj *model.ManagedResource) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,

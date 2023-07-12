@@ -53,7 +53,7 @@ func TestGetProviderConfig(t *testing.T) {
 				},
 				APIVersion: "example.org/v1",
 				Kind:       "ProviderConfig",
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
 				Status: &ProviderConfigStatus{
@@ -66,7 +66,7 @@ func TestGetProviderConfig(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			u:      &kunstructured.Unstructured{Object: make(map[string]interface{})},
 			want: ProviderConfig{
-				Metadata: &ObjectMeta{},
+				Metadata: ObjectMeta{},
 			},
 		},
 	}

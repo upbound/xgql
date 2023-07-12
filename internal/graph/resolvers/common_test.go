@@ -66,7 +66,7 @@ func TestCRDDefinedResources(t *testing.T) {
 		version *string
 	}
 	type want struct {
-		krc  *model.KubernetesResourceConnection
+		krc  model.KubernetesResourceConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -101,9 +101,9 @@ func TestCRDDefinedResources(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CustomResourceDefinition{
-					Spec: &model.CustomResourceDefinitionSpec{
+					Spec: model.CustomResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CustomResourceDefinitionNames{Kind: kind},
+						Names: model.CustomResourceDefinitionNames{Kind: kind},
 					},
 				},
 			},
@@ -135,9 +135,9 @@ func TestCRDDefinedResources(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CustomResourceDefinition{
-					Spec: &model.CustomResourceDefinitionSpec{
+					Spec: model.CustomResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CustomResourceDefinitionNames{
+						Names: model.CustomResourceDefinitionNames{
 							Kind:     kind,
 							ListKind: pointer.String(listKind),
 						},
@@ -156,7 +156,7 @@ func TestCRDDefinedResources(t *testing.T) {
 				},
 			},
 			want: want{
-				krc: &model.KubernetesResourceConnection{
+				krc: model.KubernetesResourceConnection{
 					Nodes:      []model.KubernetesResource{ggr},
 					TotalCount: 1,
 				},
@@ -184,9 +184,9 @@ func TestCRDDefinedResources(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CustomResourceDefinition{
-					Spec: &model.CustomResourceDefinitionSpec{
+					Spec: model.CustomResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CustomResourceDefinitionNames{
+						Names: model.CustomResourceDefinitionNames{
 							Kind:     kind,
 							ListKind: pointer.String(listKind),
 						},
@@ -208,7 +208,7 @@ func TestCRDDefinedResources(t *testing.T) {
 				version: pointer.String(version),
 			},
 			want: want{
-				krc: &model.KubernetesResourceConnection{
+				krc: model.KubernetesResourceConnection{
 					Nodes:      []model.KubernetesResource{ggr},
 					TotalCount: 1,
 				},

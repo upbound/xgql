@@ -65,10 +65,10 @@ func TestGetCompositeResource(t *testing.T) {
 				},
 				APIVersion: "example.org/v1",
 				Kind:       "CompositeResource",
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
-				Spec: &CompositeResourceSpec{
+				Spec: CompositeResourceSpec{
 					CompositionSelector:              &LabelSelector{MatchLabels: map[string]string{"cool": "very"}},
 					CompositionReference:             &corev1.ObjectReference{Name: "coolcmp"},
 					ClaimReference:                   &corev1.ObjectReference{Name: "coolclaim"},
@@ -87,8 +87,8 @@ func TestGetCompositeResource(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			u:      &kunstructured.Unstructured{Object: make(map[string]interface{})},
 			want: CompositeResource{
-				Metadata: &ObjectMeta{},
-				Spec: &CompositeResourceSpec{
+				Metadata: ObjectMeta{},
+				Spec: CompositeResourceSpec{
 					// We don't mind this empty list being here because it's
 					// not exposed as part of our GraphQL API. We use it instead
 					// to resolve the resources array.
@@ -150,11 +150,11 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 				},
 				APIVersion: "example.org/v1",
 				Kind:       "CompositeResource",
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Namespace: pointer.String("default"),
 					Name:      "cool",
 				},
-				Spec: &CompositeResourceClaimSpec{
+				Spec: CompositeResourceClaimSpec{
 					CompositionSelector:              &LabelSelector{MatchLabels: map[string]string{"cool": "very"}},
 					CompositionReference:             &corev1.ObjectReference{Name: "coolcmp"},
 					ResourceReference:                &corev1.ObjectReference{Name: "coolxr"},
@@ -172,8 +172,8 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			u:      &kunstructured.Unstructured{Object: make(map[string]interface{})},
 			want: CompositeResourceClaim{
-				Metadata: &ObjectMeta{},
-				Spec:     &CompositeResourceClaimSpec{},
+				Metadata: ObjectMeta{},
+				Spec:     CompositeResourceClaimSpec{},
 			},
 		},
 	}

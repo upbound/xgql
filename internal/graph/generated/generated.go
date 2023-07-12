@@ -619,11 +619,11 @@ type ComplexityRoot struct {
 }
 
 type CompositeResourceResolver interface {
-	Events(ctx context.Context, obj *model.CompositeResource) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.CompositeResource) (model.EventConnection, error)
 	Definition(ctx context.Context, obj *model.CompositeResource) (*model.CompositeResourceDefinition, error)
 }
 type CompositeResourceClaimResolver interface {
-	Events(ctx context.Context, obj *model.CompositeResourceClaim) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.CompositeResourceClaim) (model.EventConnection, error)
 	Definition(ctx context.Context, obj *model.CompositeResourceClaim) (*model.CompositeResourceDefinition, error)
 }
 type CompositeResourceClaimSpecResolver interface {
@@ -636,11 +636,11 @@ type CompositeResourceClaimSpecResolver interface {
 	WriteConnectionSecretToReference(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.SecretReference, error)
 }
 type CompositeResourceDefinitionResolver interface {
-	Events(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.CompositeResourceDefinition) (model.EventConnection, error)
 	CompositeResourceCrd(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.CustomResourceDefinition, error)
 	CompositeResourceClaimCrd(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.CustomResourceDefinition, error)
-	DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, options *model.DefinedCompositeResourceOptionsInput) (*model.CompositeResourceConnection, error)
-	DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, namespace *string, options *model.DefinedCompositeResourceClaimOptionsInput) (*model.CompositeResourceClaimConnection, error)
+	DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, options *model.DefinedCompositeResourceOptionsInput) (model.CompositeResourceConnection, error)
+	DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, namespace *string, options *model.DefinedCompositeResourceClaimOptionsInput) (model.CompositeResourceClaimConnection, error)
 }
 type CompositeResourceDefinitionSpecResolver interface {
 	DefaultComposition(ctx context.Context, obj *model.CompositeResourceDefinitionSpec) (*model.Composition, error)
@@ -657,80 +657,80 @@ type CompositeResourceSpecResolver interface {
 	WriteConnectionSecretToReference(ctx context.Context, obj *model.CompositeResourceSpec) (*model.SecretReference, error)
 }
 type CompositionResolver interface {
-	Events(ctx context.Context, obj *model.Composition) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.Composition) (model.EventConnection, error)
 }
 type ConfigMapResolver interface {
-	Events(ctx context.Context, obj *model.ConfigMap) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.ConfigMap) (model.EventConnection, error)
 }
 type ConfigurationResolver interface {
-	Events(ctx context.Context, obj *model.Configuration) (*model.EventConnection, error)
-	Revisions(ctx context.Context, obj *model.Configuration) (*model.ConfigurationRevisionConnection, error)
+	Events(ctx context.Context, obj *model.Configuration) (model.EventConnection, error)
+	Revisions(ctx context.Context, obj *model.Configuration) (model.ConfigurationRevisionConnection, error)
 	ActiveRevision(ctx context.Context, obj *model.Configuration) (*model.ConfigurationRevision, error)
 }
 type ConfigurationRevisionResolver interface {
-	Events(ctx context.Context, obj *model.ConfigurationRevision) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.ConfigurationRevision) (model.EventConnection, error)
 }
 type ConfigurationRevisionStatusResolver interface {
-	Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (*model.KubernetesResourceConnection, error)
+	Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (model.KubernetesResourceConnection, error)
 }
 type CustomResourceDefinitionResolver interface {
-	Events(ctx context.Context, obj *model.CustomResourceDefinition) (*model.EventConnection, error)
-	DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error)
+	Events(ctx context.Context, obj *model.CustomResourceDefinition) (model.EventConnection, error)
+	DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (model.KubernetesResourceConnection, error)
 }
 type EventResolver interface {
 	InvolvedObject(ctx context.Context, obj *model.Event) (model.KubernetesResource, error)
 }
 type GenericResourceResolver interface {
-	Events(ctx context.Context, obj *model.GenericResource) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.GenericResource) (model.EventConnection, error)
 }
 type ManagedResourceResolver interface {
-	Events(ctx context.Context, obj *model.ManagedResource) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.ManagedResource) (model.EventConnection, error)
 	Definition(ctx context.Context, obj *model.ManagedResource) (model.ManagedResourceDefinition, error)
 }
 type ManagedResourceSpecResolver interface {
 	ConnectionSecret(ctx context.Context, obj *model.ManagedResourceSpec) (*model.Secret, error)
 }
 type MutationResolver interface {
-	CreateKubernetesResource(ctx context.Context, input model.CreateKubernetesResourceInput) (*model.CreateKubernetesResourcePayload, error)
-	UpdateKubernetesResource(ctx context.Context, id model.ReferenceID, input model.UpdateKubernetesResourceInput) (*model.UpdateKubernetesResourcePayload, error)
-	DeleteKubernetesResource(ctx context.Context, id model.ReferenceID) (*model.DeleteKubernetesResourcePayload, error)
+	CreateKubernetesResource(ctx context.Context, input model.CreateKubernetesResourceInput) (model.CreateKubernetesResourcePayload, error)
+	UpdateKubernetesResource(ctx context.Context, id model.ReferenceID, input model.UpdateKubernetesResourceInput) (model.UpdateKubernetesResourcePayload, error)
+	DeleteKubernetesResource(ctx context.Context, id model.ReferenceID) (model.DeleteKubernetesResourcePayload, error)
 }
 type ObjectMetaResolver interface {
-	Owners(ctx context.Context, obj *model.ObjectMeta) (*model.OwnerConnection, error)
+	Owners(ctx context.Context, obj *model.ObjectMeta) (model.OwnerConnection, error)
 	Controller(ctx context.Context, obj *model.ObjectMeta) (model.KubernetesResource, error)
 }
 type ProviderResolver interface {
-	Events(ctx context.Context, obj *model.Provider) (*model.EventConnection, error)
-	Revisions(ctx context.Context, obj *model.Provider) (*model.ProviderRevisionConnection, error)
+	Events(ctx context.Context, obj *model.Provider) (model.EventConnection, error)
+	Revisions(ctx context.Context, obj *model.Provider) (model.ProviderRevisionConnection, error)
 	ActiveRevision(ctx context.Context, obj *model.Provider) (*model.ProviderRevision, error)
 }
 type ProviderConfigResolver interface {
-	Events(ctx context.Context, obj *model.ProviderConfig) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.ProviderConfig) (model.EventConnection, error)
 	Definition(ctx context.Context, obj *model.ProviderConfig) (model.ProviderConfigDefinition, error)
 }
 type ProviderRevisionResolver interface {
-	Events(ctx context.Context, obj *model.ProviderRevision) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.ProviderRevision) (model.EventConnection, error)
 }
 type ProviderRevisionStatusResolver interface {
-	Objects(ctx context.Context, obj *model.ProviderRevisionStatus) (*model.KubernetesResourceConnection, error)
+	Objects(ctx context.Context, obj *model.ProviderRevisionStatus) (model.KubernetesResourceConnection, error)
 }
 type QueryResolver interface {
 	KubernetesResource(ctx context.Context, id model.ReferenceID) (model.KubernetesResource, error)
-	KubernetesResources(ctx context.Context, apiVersion string, kind string, listKind *string, namespace *string) (*model.KubernetesResourceConnection, error)
-	Events(ctx context.Context, involved *model.ReferenceID) (*model.EventConnection, error)
+	KubernetesResources(ctx context.Context, apiVersion string, kind string, listKind *string, namespace *string) (model.KubernetesResourceConnection, error)
+	Events(ctx context.Context, involved *model.ReferenceID) (model.EventConnection, error)
 	Secret(ctx context.Context, namespace string, name string) (*model.Secret, error)
 	ConfigMap(ctx context.Context, namespace string, name string) (*model.ConfigMap, error)
-	Providers(ctx context.Context) (*model.ProviderConnection, error)
-	ProviderRevisions(ctx context.Context, provider *model.ReferenceID, active *bool) (*model.ProviderRevisionConnection, error)
-	CustomResourceDefinitions(ctx context.Context, revision *model.ReferenceID) (*model.CustomResourceDefinitionConnection, error)
-	Configurations(ctx context.Context) (*model.ConfigurationConnection, error)
-	ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID, active *bool) (*model.ConfigurationRevisionConnection, error)
-	CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositeResourceDefinitionConnection, error)
-	Compositions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositionConnection, error)
-	CrossplaneResourceTree(ctx context.Context, id model.ReferenceID) (*model.CrossplaneResourceTreeConnection, error)
+	Providers(ctx context.Context) (model.ProviderConnection, error)
+	ProviderRevisions(ctx context.Context, provider *model.ReferenceID, active *bool) (model.ProviderRevisionConnection, error)
+	CustomResourceDefinitions(ctx context.Context, revision *model.ReferenceID) (model.CustomResourceDefinitionConnection, error)
+	Configurations(ctx context.Context) (model.ConfigurationConnection, error)
+	ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID, active *bool) (model.ConfigurationRevisionConnection, error)
+	CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (model.CompositeResourceDefinitionConnection, error)
+	Compositions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (model.CompositionConnection, error)
+	CrossplaneResourceTree(ctx context.Context, id model.ReferenceID) (model.CrossplaneResourceTreeConnection, error)
 }
 type SecretResolver interface {
-	Events(ctx context.Context, obj *model.Secret) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.Secret) (model.EventConnection, error)
 }
 
 type executableSchema struct {
@@ -6173,9 +6173,9 @@ func (ec *executionContext) _CompositeResource_metadata(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResource_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6243,9 +6243,9 @@ func (ec *executionContext) _CompositeResource_spec(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceSpec)
+	res := resTmp.(model.CompositeResourceSpec)
 	fc.Result = res
-	return ec.marshalNCompositeResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceSpec(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResource_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6396,9 +6396,9 @@ func (ec *executionContext) _CompositeResource_events(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResource_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6645,9 +6645,9 @@ func (ec *executionContext) _CompositeResourceClaim_metadata(ctx context.Context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceClaim_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6715,9 +6715,9 @@ func (ec *executionContext) _CompositeResourceClaim_spec(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceClaimSpec)
+	res := resTmp.(model.CompositeResourceClaimSpec)
 	fc.Result = res
-	return ec.marshalNCompositeResourceClaimSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimSpec(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceClaimSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceClaim_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6866,9 +6866,9 @@ func (ec *executionContext) _CompositeResourceClaim_events(ctx context.Context, 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceClaim_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7870,9 +7870,9 @@ func (ec *executionContext) _CompositeResourceDefinition_metadata(ctx context.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceDefinition_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7940,9 +7940,9 @@ func (ec *executionContext) _CompositeResourceDefinition_spec(ctx context.Contex
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceDefinitionSpec)
+	res := resTmp.(model.CompositeResourceDefinitionSpec)
 	fc.Result = res
-	return ec.marshalNCompositeResourceDefinitionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionSpec(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceDefinitionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceDefinition_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8091,9 +8091,9 @@ func (ec *executionContext) _CompositeResourceDefinition_events(ctx context.Cont
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceDefinition_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8263,9 +8263,9 @@ func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResourc
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceConnection)
+	res := resTmp.(model.CompositeResourceConnection)
 	fc.Result = res
-	return ec.marshalNCompositeResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceDefinition_definedCompositeResources(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8324,9 +8324,9 @@ func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResourc
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceClaimConnection)
+	res := resTmp.(model.CompositeResourceClaimConnection)
 	fc.Result = res
-	return ec.marshalNCompositeResourceClaimConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceClaimConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceDefinition_definedCompositeResourceClaims(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8886,9 +8886,9 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec_names(ctx context.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceDefinitionNames)
+	res := resTmp.(model.CompositeResourceDefinitionNames)
 	fc.Result = res
-	return ec.marshalNCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceDefinitionNames2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceDefinitionSpec_names(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10169,9 +10169,9 @@ func (ec *executionContext) _Composition_metadata(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Composition_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10239,9 +10239,9 @@ func (ec *executionContext) _Composition_spec(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositionSpec)
+	res := resTmp.(model.CompositionSpec)
 	fc.Result = res
-	return ec.marshalNCompositionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx, field.Selections, res)
+	return ec.marshalNCompositionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Composition_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10378,9 +10378,9 @@ func (ec *executionContext) _Composition_events(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Composition_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10531,9 +10531,9 @@ func (ec *executionContext) _CompositionSpec_compositeTypeRef(ctx context.Contex
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.TypeReference)
+	res := resTmp.(model.TypeReference)
 	fc.Result = res
-	return ec.marshalNTypeReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx, field.Selections, res)
+	return ec.marshalNTypeReference2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositionSpec_compositeTypeRef(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11024,9 +11024,9 @@ func (ec *executionContext) _ConfigMap_metadata(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigMap_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11190,9 +11190,9 @@ func (ec *executionContext) _ConfigMap_events(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigMap_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11372,9 +11372,9 @@ func (ec *executionContext) _Configuration_metadata(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Configuration_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11442,9 +11442,9 @@ func (ec *executionContext) _Configuration_spec(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ConfigurationSpec)
+	res := resTmp.(model.ConfigurationSpec)
 	fc.Result = res
-	return ec.marshalNConfigurationSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationSpec(ctx, field.Selections, res)
+	return ec.marshalNConfigurationSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Configuration_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11593,9 +11593,9 @@ func (ec *executionContext) _Configuration_events(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Configuration_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11643,9 +11643,9 @@ func (ec *executionContext) _Configuration_revisions(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ConfigurationRevisionConnection)
+	res := resTmp.(model.ConfigurationRevisionConnection)
 	fc.Result = res
-	return ec.marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
+	return ec.marshalNConfigurationRevisionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Configuration_revisions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11991,9 +11991,9 @@ func (ec *executionContext) _ConfigurationRevision_metadata(ctx context.Context,
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigurationRevision_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12061,9 +12061,9 @@ func (ec *executionContext) _ConfigurationRevision_spec(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ConfigurationRevisionSpec)
+	res := resTmp.(model.ConfigurationRevisionSpec)
 	fc.Result = res
-	return ec.marshalNConfigurationRevisionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionSpec(ctx, field.Selections, res)
+	return ec.marshalNConfigurationRevisionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigurationRevision_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12218,9 +12218,9 @@ func (ec *executionContext) _ConfigurationRevision_events(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigurationRevision_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12855,9 +12855,9 @@ func (ec *executionContext) _ConfigurationRevisionStatus_objects(ctx context.Con
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KubernetesResourceConnection)
+	res := resTmp.(model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigurationRevisionStatus_objects(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13638,9 +13638,9 @@ func (ec *executionContext) _CustomResourceDefinition_metadata(ctx context.Conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CustomResourceDefinition_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13708,9 +13708,9 @@ func (ec *executionContext) _CustomResourceDefinition_spec(ctx context.Context, 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CustomResourceDefinitionSpec)
+	res := resTmp.(model.CustomResourceDefinitionSpec)
 	fc.Result = res
-	return ec.marshalNCustomResourceDefinitionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionSpec(ctx, field.Selections, res)
+	return ec.marshalNCustomResourceDefinitionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CustomResourceDefinition_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13851,9 +13851,9 @@ func (ec *executionContext) _CustomResourceDefinition_events(ctx context.Context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CustomResourceDefinition_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13901,9 +13901,9 @@ func (ec *executionContext) _CustomResourceDefinition_definedResources(ctx conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KubernetesResourceConnection)
+	res := resTmp.(model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CustomResourceDefinition_definedResources(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14363,9 +14363,9 @@ func (ec *executionContext) _CustomResourceDefinitionSpec_names(ctx context.Cont
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CustomResourceDefinitionNames)
+	res := resTmp.(model.CustomResourceDefinitionNames)
 	fc.Result = res
-	return ec.marshalNCustomResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx, field.Selections, res)
+	return ec.marshalNCustomResourceDefinitionNames2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CustomResourceDefinitionSpec_names(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14914,9 +14914,9 @@ func (ec *executionContext) _Event_metadata(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Event_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15649,9 +15649,9 @@ func (ec *executionContext) _GenericResource_metadata(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_GenericResource_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15763,9 +15763,9 @@ func (ec *executionContext) _GenericResource_events(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_GenericResource_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16115,9 +16115,9 @@ func (ec *executionContext) _ManagedResource_metadata(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ManagedResource_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16185,9 +16185,9 @@ func (ec *executionContext) _ManagedResource_spec(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ManagedResourceSpec)
+	res := resTmp.(model.ManagedResourceSpec)
 	fc.Result = res
-	return ec.marshalNManagedResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx, field.Selections, res)
+	return ec.marshalNManagedResourceSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ManagedResource_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16326,9 +16326,9 @@ func (ec *executionContext) _ManagedResource_events(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ManagedResource_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16615,9 +16615,9 @@ func (ec *executionContext) _Mutation_createKubernetesResource(ctx context.Conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CreateKubernetesResourcePayload)
+	res := resTmp.(model.CreateKubernetesResourcePayload)
 	fc.Result = res
-	return ec.marshalNCreateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourcePayload(ctx, field.Selections, res)
+	return ec.marshalNCreateKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourcePayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createKubernetesResource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16674,9 +16674,9 @@ func (ec *executionContext) _Mutation_updateKubernetesResource(ctx context.Conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.UpdateKubernetesResourcePayload)
+	res := resTmp.(model.UpdateKubernetesResourcePayload)
 	fc.Result = res
-	return ec.marshalNUpdateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx, field.Selections, res)
+	return ec.marshalNUpdateKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateKubernetesResource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16733,9 +16733,9 @@ func (ec *executionContext) _Mutation_deleteKubernetesResource(ctx context.Conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.DeleteKubernetesResourcePayload)
+	res := resTmp.(model.DeleteKubernetesResourcePayload)
 	fc.Result = res
-	return ec.marshalNDeleteKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeleteKubernetesResourcePayload(ctx, field.Selections, res)
+	return ec.marshalNDeleteKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeleteKubernetesResourcePayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteKubernetesResource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -17239,9 +17239,9 @@ func (ec *executionContext) _ObjectMeta_owners(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.OwnerConnection)
+	res := resTmp.(model.OwnerConnection)
 	fc.Result = res
-	return ec.marshalNOwnerConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx, field.Selections, res)
+	return ec.marshalNOwnerConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ObjectMeta_owners(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -17969,9 +17969,9 @@ func (ec *executionContext) _Provider_metadata(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Provider_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -18039,9 +18039,9 @@ func (ec *executionContext) _Provider_spec(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProviderSpec)
+	res := resTmp.(model.ProviderSpec)
 	fc.Result = res
-	return ec.marshalNProviderSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderSpec(ctx, field.Selections, res)
+	return ec.marshalNProviderSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Provider_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -18190,9 +18190,9 @@ func (ec *executionContext) _Provider_events(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Provider_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -18240,9 +18240,9 @@ func (ec *executionContext) _Provider_revisions(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProviderRevisionConnection)
+	res := resTmp.(model.ProviderRevisionConnection)
 	fc.Result = res
-	return ec.marshalNProviderRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx, field.Selections, res)
+	return ec.marshalNProviderRevisionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Provider_revisions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -18481,9 +18481,9 @@ func (ec *executionContext) _ProviderConfig_metadata(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProviderConfig_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -18642,9 +18642,9 @@ func (ec *executionContext) _ProviderConfig_events(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProviderConfig_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -19110,9 +19110,9 @@ func (ec *executionContext) _ProviderRevision_metadata(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProviderRevision_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -19180,9 +19180,9 @@ func (ec *executionContext) _ProviderRevision_spec(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProviderRevisionSpec)
+	res := resTmp.(model.ProviderRevisionSpec)
 	fc.Result = res
-	return ec.marshalNProviderRevisionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionSpec(ctx, field.Selections, res)
+	return ec.marshalNProviderRevisionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProviderRevision_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -19337,9 +19337,9 @@ func (ec *executionContext) _ProviderRevision_events(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProviderRevision_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -19974,9 +19974,9 @@ func (ec *executionContext) _ProviderRevisionStatus_objects(ctx context.Context,
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KubernetesResourceConnection)
+	res := resTmp.(model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProviderRevisionStatus_objects(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20460,9 +20460,9 @@ func (ec *executionContext) _Query_kubernetesResources(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KubernetesResourceConnection)
+	res := resTmp.(model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_kubernetesResources(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20521,9 +20521,9 @@ func (ec *executionContext) _Query_events(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20720,9 +20720,9 @@ func (ec *executionContext) _Query_providers(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProviderConnection)
+	res := resTmp.(model.ProviderConnection)
 	fc.Result = res
-	return ec.marshalNProviderConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConnection(ctx, field.Selections, res)
+	return ec.marshalNProviderConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_providers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20770,9 +20770,9 @@ func (ec *executionContext) _Query_providerRevisions(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProviderRevisionConnection)
+	res := resTmp.(model.ProviderRevisionConnection)
 	fc.Result = res
-	return ec.marshalNProviderRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx, field.Selections, res)
+	return ec.marshalNProviderRevisionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_providerRevisions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20831,9 +20831,9 @@ func (ec *executionContext) _Query_customResourceDefinitions(ctx context.Context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CustomResourceDefinitionConnection)
+	res := resTmp.(model.CustomResourceDefinitionConnection)
 	fc.Result = res
-	return ec.marshalNCustomResourceDefinitionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionConnection(ctx, field.Selections, res)
+	return ec.marshalNCustomResourceDefinitionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_customResourceDefinitions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20892,9 +20892,9 @@ func (ec *executionContext) _Query_configurations(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ConfigurationConnection)
+	res := resTmp.(model.ConfigurationConnection)
 	fc.Result = res
-	return ec.marshalNConfigurationConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationConnection(ctx, field.Selections, res)
+	return ec.marshalNConfigurationConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_configurations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20942,9 +20942,9 @@ func (ec *executionContext) _Query_configurationRevisions(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ConfigurationRevisionConnection)
+	res := resTmp.(model.ConfigurationRevisionConnection)
 	fc.Result = res
-	return ec.marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
+	return ec.marshalNConfigurationRevisionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_configurationRevisions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -21003,9 +21003,9 @@ func (ec *executionContext) _Query_compositeResourceDefinitions(ctx context.Cont
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceDefinitionConnection)
+	res := resTmp.(model.CompositeResourceDefinitionConnection)
 	fc.Result = res
-	return ec.marshalNCompositeResourceDefinitionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionConnection(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceDefinitionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_compositeResourceDefinitions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -21064,9 +21064,9 @@ func (ec *executionContext) _Query_compositions(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositionConnection)
+	res := resTmp.(model.CompositionConnection)
 	fc.Result = res
-	return ec.marshalNCompositionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionConnection(ctx, field.Selections, res)
+	return ec.marshalNCompositionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_compositions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -21125,9 +21125,9 @@ func (ec *executionContext) _Query_crossplaneResourceTree(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CrossplaneResourceTreeConnection)
+	res := resTmp.(model.CrossplaneResourceTreeConnection)
 	fc.Result = res
-	return ec.marshalNCrossplaneResourceTreeConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeConnection(ctx, field.Selections, res)
+	return ec.marshalNCrossplaneResourceTreeConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_crossplaneResourceTree(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -21447,9 +21447,9 @@ func (ec *executionContext) _Secret_metadata(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Secret_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -21654,9 +21654,9 @@ func (ec *executionContext) _Secret_events(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Secret_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -30031,38 +30031,12 @@ func (ec *executionContext) marshalNCompositeResourceClaimConnection2githubᚗco
 	return ec._CompositeResourceClaimConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceClaimConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceClaimConnection(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNCompositeResourceClaimSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceClaimSpec(ctx, sel, v)
+func (ec *executionContext) marshalNCompositeResourceClaimSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimSpec(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceClaimSpec) graphql.Marshaler {
+	return ec._CompositeResourceClaimSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNCompositeResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceConnection) graphql.Marshaler {
 	return ec._CompositeResourceConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNCompositeResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNCompositeResourceDefinition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinition(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinition) graphql.Marshaler {
@@ -30073,48 +30047,20 @@ func (ec *executionContext) marshalNCompositeResourceDefinitionConnection2github
 	return ec._CompositeResourceDefinitionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceDefinitionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceDefinitionConnection(ctx, sel, v)
+func (ec *executionContext) marshalNCompositeResourceDefinitionNames2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinitionNames) graphql.Marshaler {
+	return ec._CompositeResourceDefinitionNames(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionNames) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceDefinitionNames(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNCompositeResourceDefinitionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceDefinitionSpec(ctx, sel, v)
+func (ec *executionContext) marshalNCompositeResourceDefinitionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinitionSpec) graphql.Marshaler {
+	return ec._CompositeResourceDefinitionSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNCompositeResourceDefinitionVersion2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinitionVersion) graphql.Marshaler {
 	return ec._CompositeResourceDefinitionVersion(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceSpec(ctx, sel, v)
+func (ec *executionContext) marshalNCompositeResourceSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceSpec(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceSpec) graphql.Marshaler {
+	return ec._CompositeResourceSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNComposition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx context.Context, sel ast.SelectionSet, v model.Composition) graphql.Marshaler {
@@ -30125,24 +30071,8 @@ func (ec *executionContext) marshalNCompositionConnection2githubᚗcomᚋupbound
 	return ec._CompositionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositionConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositionConnection(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNCompositionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositionSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositionSpec(ctx, sel, v)
+func (ec *executionContext) marshalNCompositionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx context.Context, sel ast.SelectionSet, v model.CompositionSpec) graphql.Marshaler {
+	return ec._CompositionSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNCondition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCondition(ctx context.Context, sel ast.SelectionSet, v model.Condition) graphql.Marshaler {
@@ -30167,16 +30097,6 @@ func (ec *executionContext) marshalNConfigurationConnection2githubᚗcomᚋupbou
 	return ec._ConfigurationConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigurationConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationConnection(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ConfigurationConnection(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNConfigurationRevision2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevision(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationRevision) graphql.Marshaler {
 	return ec._ConfigurationRevision(ctx, sel, &v)
 }
@@ -30185,34 +30105,12 @@ func (ec *executionContext) marshalNConfigurationRevisionConnection2githubᚗcom
 	return ec._ConfigurationRevisionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationRevisionConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ConfigurationRevisionConnection(ctx, sel, v)
+func (ec *executionContext) marshalNConfigurationRevisionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionSpec(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationRevisionSpec) graphql.Marshaler {
+	return ec._ConfigurationRevisionSpec(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigurationRevisionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionSpec(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationRevisionSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ConfigurationRevisionSpec(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNConfigurationSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationSpec(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ConfigurationSpec(ctx, sel, v)
+func (ec *executionContext) marshalNConfigurationSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationSpec(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationSpec) graphql.Marshaler {
+	return ec._ConfigurationSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalNCreateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourceInput(ctx context.Context, v interface{}) (model.CreateKubernetesResourceInput, error) {
@@ -30224,28 +30122,8 @@ func (ec *executionContext) marshalNCreateKubernetesResourcePayload2githubᚗcom
 	return ec._CreateKubernetesResourcePayload(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCreateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v *model.CreateKubernetesResourcePayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CreateKubernetesResourcePayload(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNCrossplaneResourceTreeConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeConnection(ctx context.Context, sel ast.SelectionSet, v model.CrossplaneResourceTreeConnection) graphql.Marshaler {
 	return ec._CrossplaneResourceTreeConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNCrossplaneResourceTreeConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeConnection(ctx context.Context, sel ast.SelectionSet, v *model.CrossplaneResourceTreeConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CrossplaneResourceTreeConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNCrossplaneResourceTreeNode2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeNode(ctx context.Context, sel ast.SelectionSet, v model.CrossplaneResourceTreeNode) graphql.Marshaler {
@@ -30260,34 +30138,12 @@ func (ec *executionContext) marshalNCustomResourceDefinitionConnection2githubᚗ
 	return ec._CustomResourceDefinitionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCustomResourceDefinitionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CustomResourceDefinitionConnection(ctx, sel, v)
+func (ec *executionContext) marshalNCustomResourceDefinitionNames2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinitionNames) graphql.Marshaler {
+	return ec._CustomResourceDefinitionNames(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCustomResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionNames) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CustomResourceDefinitionNames(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNCustomResourceDefinitionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CustomResourceDefinitionSpec(ctx, sel, v)
+func (ec *executionContext) marshalNCustomResourceDefinitionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinitionSpec) graphql.Marshaler {
+	return ec._CustomResourceDefinitionSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNCustomResourceDefinitionVersion2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinitionVersion) graphql.Marshaler {
@@ -30298,32 +30154,12 @@ func (ec *executionContext) marshalNDeleteKubernetesResourcePayload2githubᚗcom
 	return ec._DeleteKubernetesResourcePayload(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNDeleteKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeleteKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteKubernetesResourcePayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._DeleteKubernetesResourcePayload(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNEvent2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEvent(ctx context.Context, sel ast.SelectionSet, v model.Event) graphql.Marshaler {
 	return ec._Event(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx context.Context, sel ast.SelectionSet, v model.EventConnection) graphql.Marshaler {
 	return ec._EventConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx context.Context, sel ast.SelectionSet, v *model.EventConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._EventConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx context.Context, v interface{}) (model.ReferenceID, error) {
@@ -30386,34 +30222,12 @@ func (ec *executionContext) marshalNKubernetesResourceConnection2githubᚗcomᚋ
 	return ec._KubernetesResourceConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.KubernetesResourceConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._KubernetesResourceConnection(ctx, sel, v)
+func (ec *executionContext) marshalNManagedResourceSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx context.Context, sel ast.SelectionSet, v model.ManagedResourceSpec) graphql.Marshaler {
+	return ec._ManagedResourceSpec(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNManagedResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx context.Context, sel ast.SelectionSet, v *model.ManagedResourceSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ManagedResourceSpec(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx context.Context, sel ast.SelectionSet, v *model.ObjectMeta) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ObjectMeta(ctx, sel, v)
+func (ec *executionContext) marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx context.Context, sel ast.SelectionSet, v model.ObjectMeta) graphql.Marshaler {
+	return ec._ObjectMeta(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNOwner2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwner(ctx context.Context, sel ast.SelectionSet, v model.Owner) graphql.Marshaler {
@@ -30422,16 +30236,6 @@ func (ec *executionContext) marshalNOwner2githubᚗcomᚋupboundᚋxgqlᚋintern
 
 func (ec *executionContext) marshalNOwnerConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx context.Context, sel ast.SelectionSet, v model.OwnerConnection) graphql.Marshaler {
 	return ec._OwnerConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNOwnerConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx context.Context, sel ast.SelectionSet, v *model.OwnerConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._OwnerConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNPackageRevisionDesiredState2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackageRevisionDesiredState(ctx context.Context, v interface{}) (model.PackageRevisionDesiredState, error) {
@@ -30461,16 +30265,6 @@ func (ec *executionContext) marshalNProviderConnection2githubᚗcomᚋupboundᚋ
 	return ec._ProviderConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProviderConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConnection(ctx context.Context, sel ast.SelectionSet, v *model.ProviderConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProviderConnection(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNProviderRevision2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevision(ctx context.Context, sel ast.SelectionSet, v model.ProviderRevision) graphql.Marshaler {
 	return ec._ProviderRevision(ctx, sel, &v)
 }
@@ -30479,34 +30273,12 @@ func (ec *executionContext) marshalNProviderRevisionConnection2githubᚗcomᚋup
 	return ec._ProviderRevisionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProviderRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx context.Context, sel ast.SelectionSet, v *model.ProviderRevisionConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProviderRevisionConnection(ctx, sel, v)
+func (ec *executionContext) marshalNProviderRevisionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionSpec(ctx context.Context, sel ast.SelectionSet, v model.ProviderRevisionSpec) graphql.Marshaler {
+	return ec._ProviderRevisionSpec(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProviderRevisionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionSpec(ctx context.Context, sel ast.SelectionSet, v *model.ProviderRevisionSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProviderRevisionSpec(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNProviderSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderSpec(ctx context.Context, sel ast.SelectionSet, v *model.ProviderSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProviderSpec(ctx, sel, v)
+func (ec *executionContext) marshalNProviderSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderSpec(ctx context.Context, sel ast.SelectionSet, v model.ProviderSpec) graphql.Marshaler {
+	return ec._ProviderSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalNResourceScope2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐResourceScope(ctx context.Context, v interface{}) (model.ResourceScope, error) {
@@ -30581,14 +30353,8 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalNTypeReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx context.Context, sel ast.SelectionSet, v *model.TypeReference) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._TypeReference(ctx, sel, v)
+func (ec *executionContext) marshalNTypeReference2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx context.Context, sel ast.SelectionSet, v model.TypeReference) graphql.Marshaler {
+	return ec._TypeReference(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalNUpdateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourceInput(ctx context.Context, v interface{}) (model.UpdateKubernetesResourceInput, error) {
@@ -30598,16 +30364,6 @@ func (ec *executionContext) unmarshalNUpdateKubernetesResourceInput2githubᚗcom
 
 func (ec *executionContext) marshalNUpdateKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v model.UpdateKubernetesResourcePayload) graphql.Marshaler {
 	return ec._UpdateKubernetesResourcePayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNUpdateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateKubernetesResourcePayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._UpdateKubernetesResourcePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

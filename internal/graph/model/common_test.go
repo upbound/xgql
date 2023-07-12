@@ -94,7 +94,7 @@ func TestGetGenericResource(t *testing.T) {
 				},
 				APIVersion: "example.org/v1",
 				Kind:       "GenericResource",
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
 			},
@@ -103,7 +103,7 @@ func TestGetGenericResource(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			u:      &kunstructured.Unstructured{Object: make(map[string]interface{})},
 			want: GenericResource{
-				Metadata: &ObjectMeta{},
+				Metadata: ObjectMeta{},
 			},
 		},
 	}
@@ -187,7 +187,7 @@ func TestGetSecret(t *testing.T) {
 				},
 				APIVersion: corev1.SchemeGroupVersion.String(),
 				Kind:       "Secret",
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
 				Type: pointer.String("cool"),
@@ -204,7 +204,7 @@ func TestGetSecret(t *testing.T) {
 				},
 				APIVersion: corev1.SchemeGroupVersion.String(),
 				Kind:       "Secret",
-				Metadata:   &ObjectMeta{},
+				Metadata:   ObjectMeta{},
 			},
 		},
 	}
@@ -286,7 +286,7 @@ func TestGetConfigMap(t *testing.T) {
 				},
 				APIVersion: corev1.SchemeGroupVersion.String(),
 				Kind:       "ConfigMap",
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
 				data: map[string]string{"cool": "secret"},
@@ -302,7 +302,7 @@ func TestGetConfigMap(t *testing.T) {
 				},
 				APIVersion: corev1.SchemeGroupVersion.String(),
 				Kind:       "ConfigMap",
-				Metadata:   &ObjectMeta{},
+				Metadata:   ObjectMeta{},
 			},
 		},
 	}
@@ -367,12 +367,12 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 				},
 				APIVersion: kschema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String(),
 				Kind:       "CustomResourceDefinition",
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
-				Spec: &CustomResourceDefinitionSpec{
+				Spec: CustomResourceDefinitionSpec{
 					Group: "group",
-					Names: &CustomResourceDefinitionNames{
+					Names: CustomResourceDefinitionNames{
 						Plural:     "clusterexamples",
 						Singular:   pointer.String("clusterexample"),
 						ShortNames: []string{"cex"},
@@ -409,9 +409,9 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 				},
 				APIVersion: "apiextensions.k8s.io/v1",
 				Kind:       "CustomResourceDefinition",
-				Metadata:   &ObjectMeta{},
-				Spec: &CustomResourceDefinitionSpec{
-					Names:    &CustomResourceDefinitionNames{},
+				Metadata:   ObjectMeta{},
+				Spec: CustomResourceDefinitionSpec{
+					Names:    CustomResourceDefinitionNames{},
 					Versions: []CustomResourceDefinitionVersion{},
 				},
 			},
@@ -469,8 +469,8 @@ func TestGetKubernetesResource(t *testing.T) {
 			want: want{
 				kr: ManagedResource{
 					ID:       ReferenceID{Name: "cool"},
-					Metadata: &ObjectMeta{Name: "cool"},
-					Spec: &ManagedResourceSpec{
+					Metadata: ObjectMeta{Name: "cool"},
+					Spec: ManagedResourceSpec{
 						ProviderConfigRef: &ProviderConfigReference{Name: "pr"},
 						DeletionPolicy:    &dp,
 					},
@@ -487,7 +487,7 @@ func TestGetKubernetesResource(t *testing.T) {
 				kr: ProviderConfig{
 					ID:       ReferenceID{Kind: "ProviderConfig"},
 					Kind:     "ProviderConfig",
-					Metadata: &ObjectMeta{},
+					Metadata: ObjectMeta{},
 				},
 			},
 		},
@@ -503,8 +503,8 @@ func TestGetKubernetesResource(t *testing.T) {
 			want: want{
 				kr: CompositeResource{
 					ID:       ReferenceID{Name: "cool"},
-					Metadata: &ObjectMeta{Name: "cool"},
-					Spec: &CompositeResourceSpec{
+					Metadata: ObjectMeta{Name: "cool"},
+					Spec: CompositeResourceSpec{
 						CompositionReference: &corev1.ObjectReference{Name: "cmp"},
 						ResourceReferences:   []corev1.ObjectReference{{Name: "cool"}},
 					},
@@ -527,11 +527,11 @@ func TestGetKubernetesResource(t *testing.T) {
 						Namespace: "default",
 						Name:      "cool",
 					},
-					Metadata: &ObjectMeta{
+					Metadata: ObjectMeta{
 						Namespace: pointer.String("default"),
 						Name:      "cool",
 					},
-					Spec: &CompositeResourceClaimSpec{
+					Spec: CompositeResourceClaimSpec{
 						CompositionReference: &corev1.ObjectReference{Name: "cmp"},
 						ResourceReference:    &corev1.ObjectReference{Name: "xr"},
 					},
@@ -553,8 +553,8 @@ func TestGetKubernetesResource(t *testing.T) {
 					},
 					APIVersion: kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
 					Kind:       pkgv1.ProviderKind,
-					Metadata:   &ObjectMeta{},
-					Spec:       &ProviderSpec{},
+					Metadata:   ObjectMeta{},
+					Spec:       ProviderSpec{},
 				},
 			},
 		},
@@ -573,8 +573,8 @@ func TestGetKubernetesResource(t *testing.T) {
 					},
 					APIVersion: kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
 					Kind:       pkgv1.ProviderRevisionKind,
-					Metadata:   &ObjectMeta{},
-					Spec:       &ProviderRevisionSpec{},
+					Metadata:   ObjectMeta{},
+					Spec:       ProviderRevisionSpec{},
 				},
 			},
 		},
@@ -593,8 +593,8 @@ func TestGetKubernetesResource(t *testing.T) {
 					},
 					APIVersion: kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
 					Kind:       pkgv1.ConfigurationKind,
-					Metadata:   &ObjectMeta{},
-					Spec:       &ConfigurationSpec{},
+					Metadata:   ObjectMeta{},
+					Spec:       ConfigurationSpec{},
 				},
 			},
 		},
@@ -613,8 +613,8 @@ func TestGetKubernetesResource(t *testing.T) {
 					},
 					APIVersion: kschema.GroupVersion{Group: pkgv1.Group, Version: pkgv1.Version}.String(),
 					Kind:       pkgv1.ConfigurationRevisionKind,
-					Metadata:   &ObjectMeta{},
-					Spec:       &ConfigurationRevisionSpec{},
+					Metadata:   ObjectMeta{},
+					Spec:       ConfigurationRevisionSpec{},
 				},
 			},
 		},
@@ -633,9 +633,9 @@ func TestGetKubernetesResource(t *testing.T) {
 					},
 					APIVersion: kschema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
 					Kind:       extv1.CompositeResourceDefinitionKind,
-					Metadata:   &ObjectMeta{},
-					Spec: &CompositeResourceDefinitionSpec{
-						Names: &CompositeResourceDefinitionNames{},
+					Metadata:   ObjectMeta{},
+					Spec: CompositeResourceDefinitionSpec{
+						Names: CompositeResourceDefinitionNames{},
 					},
 				},
 			},
@@ -655,9 +655,9 @@ func TestGetKubernetesResource(t *testing.T) {
 					},
 					APIVersion: kschema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
 					Kind:       extv1.CompositionKind,
-					Metadata:   &ObjectMeta{},
-					Spec: &CompositionSpec{
-						CompositeTypeRef: &TypeReference{},
+					Metadata:   ObjectMeta{},
+					Spec: CompositionSpec{
+						CompositeTypeRef: TypeReference{},
 					},
 				},
 			},
@@ -677,9 +677,9 @@ func TestGetKubernetesResource(t *testing.T) {
 					},
 					APIVersion: kschema.GroupVersion{Group: kextv1.GroupName, Version: "v1"}.String(),
 					Kind:       "CustomResourceDefinition",
-					Metadata:   &ObjectMeta{},
-					Spec: &CustomResourceDefinitionSpec{
-						Names:    &CustomResourceDefinitionNames{},
+					Metadata:   ObjectMeta{},
+					Spec: CustomResourceDefinitionSpec{
+						Names:    CustomResourceDefinitionNames{},
 						Versions: []CustomResourceDefinitionVersion{},
 					},
 				},
@@ -700,7 +700,7 @@ func TestGetKubernetesResource(t *testing.T) {
 					},
 					APIVersion: corev1.SchemeGroupVersion.String(),
 					Kind:       "Secret",
-					Metadata:   &ObjectMeta{},
+					Metadata:   ObjectMeta{},
 				},
 			},
 		},
@@ -719,7 +719,7 @@ func TestGetKubernetesResource(t *testing.T) {
 					},
 					APIVersion: corev1.SchemeGroupVersion.String(),
 					Kind:       "ConfigMap",
-					Metadata:   &ObjectMeta{},
+					Metadata:   ObjectMeta{},
 				},
 			},
 		},
@@ -727,7 +727,7 @@ func TestGetKubernetesResource(t *testing.T) {
 			u: &kunstructured.Unstructured{},
 			want: want{
 				kr: GenericResource{
-					Metadata: &ObjectMeta{},
+					Metadata: ObjectMeta{},
 				},
 			},
 		},

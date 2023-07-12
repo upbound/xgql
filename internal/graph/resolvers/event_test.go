@@ -55,7 +55,7 @@ func TestEvent(t *testing.T) {
 		involved *corev1.ObjectReference
 	}
 	type want struct {
-		ec   *model.EventConnection
+		ec   model.EventConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -110,7 +110,7 @@ func TestEvent(t *testing.T) {
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
-				ec: &model.EventConnection{
+				ec: model.EventConnection{
 					Nodes:      []model.Event{model.GetEvent(&related), model.GetEvent(&unrelated)},
 					TotalCount: 2,
 				},
@@ -131,7 +131,7 @@ func TestEvent(t *testing.T) {
 				involved: involved,
 			},
 			want: want{
-				ec: &model.EventConnection{
+				ec: model.EventConnection{
 					Nodes:      []model.Event{model.GetEvent(&related)},
 					TotalCount: 1,
 				},
