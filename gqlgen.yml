@@ -12,6 +12,10 @@ model:
   filename: internal/graph/model/generated.go
   package: model
 
+# gqlgen by defaut generates getter methods for interfaces and types that
+# implement it.
+omit_getters: true
+
 # Use []Thing instead of []*Thing
 omit_slice_element_pointers: true
 
@@ -40,3 +44,15 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  ProviderRevisionStatus:
+    extraFields:
+      ObjectRefs:
+        type: "[]github.com/crossplane/crossplane-runtime/apis/common/v1.TypedReference"
+  ConfigurationRevisionStatus:
+    extraFields:
+      ObjectRefs:
+        type: "[]github.com/crossplane/crossplane-runtime/apis/common/v1.TypedReference"
+  Event:
+    extraFields:
+      InvolvedObjectRef:
+        type: "k8s.io/api/core/v1.ObjectReference"

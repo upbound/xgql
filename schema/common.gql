@@ -415,6 +415,7 @@ type Secret implements Node & KubernetesResource {
   The data stored in this secret. Values are not base64 encoded.
   """
   data("Data keys for which to return values." keys: [String!]): StringMap
+    @goField(name: "data")
 
   """
   An unstructured JSON representation of the underlying Kubernetes resource.
@@ -455,6 +456,7 @@ type ConfigMap implements Node & KubernetesResource {
   The data stored in this config map.
   """
   data("Data keys for which to return values." keys: [String!]): StringMap
+    @goField(name: "data")
 
   """
   An unstructured JSON representation of the underlying Kubernetes resource.
