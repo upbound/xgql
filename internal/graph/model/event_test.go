@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kschema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -90,8 +89,8 @@ func TestGetEvent(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetEvent(tc.s)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Event{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			got := GetEvent(tc.s, SkipFields(FieldUnstructured))
+			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetEvent(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

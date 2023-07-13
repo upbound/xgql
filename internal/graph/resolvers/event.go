@@ -54,6 +54,7 @@ func (r *events) Resolve(ctx context.Context, obj *corev1.ObjectReference) (mode
 		graphql.AddError(ctx, errors.Wrap(err, errListEvents))
 		return model.EventConnection{}, nil
 	}
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	// If no involved object was supplied we want to fetch all events. This may
 	// include Kubernetes events that don't pertain to Crossplane.
@@ -63,7 +64,7 @@ func (r *events) Resolve(ctx context.Context, obj *corev1.ObjectReference) (mode
 			TotalCount: len(in.Items),
 		}
 		for i := range in.Items {
-			out.Nodes = append(out.Nodes, model.GetEvent(&in.Items[i]))
+			out.Nodes = append(out.Nodes, model.GetEvent(&in.Items[i], selectedFields))
 		}
 
 		sort.Stable(sort.Reverse(out))
@@ -87,7 +88,7 @@ func (r *events) Resolve(ctx context.Context, obj *corev1.ObjectReference) (mode
 			continue
 		}
 
-		out.Nodes = append(out.Nodes, model.GetEvent(e))
+		out.Nodes = append(out.Nodes, model.GetEvent(e, selectedFields))
 		out.TotalCount++
 	}
 

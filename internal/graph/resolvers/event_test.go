@@ -22,6 +22,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
+	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -48,6 +49,18 @@ func TestEvent(t *testing.T) {
 	unrelated := corev1.Event{
 		ObjectMeta:     metav1.ObjectMeta{Name: "coolevent"},
 		InvolvedObject: corev1.ObjectReference{UID: "wat"},
+	}
+
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldNodes,
+			SelectionSet: ast.SelectionSet{
+				&ast.Field{
+					Name: model.FieldUnstructured,
+				},
+			},
+		},
 	}
 
 	type args struct {
@@ -107,11 +120,31 @@ func TestEvent(t *testing.T) {
 				}, nil
 			}),
 			args: args{
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				ec: model.EventConnection{
+					Nodes:      []model.Event{model.GetEvent(&related, model.SelectAll), model.GetEvent(&unrelated, model.SelectAll)},
+					TotalCount: 2,
+				},
+			},
+		},
+		"ListAllEventsSkipUnstructured": {
+			reason: "We should successfully return events for all resources if the involved object is nil without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*corev1.EventList) = corev1.EventList{Items: []corev1.Event{related, unrelated}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
 				ec: model.EventConnection{
-					Nodes:      []model.Event{model.GetEvent(&related), model.GetEvent(&unrelated)},
+					Nodes:      []model.Event{model.GetEvent(&related, model.SkipFields(model.FieldUnstructured)), model.GetEvent(&unrelated, model.SkipFields(model.FieldUnstructured))},
 					TotalCount: 2,
 				},
 			},
@@ -127,12 +160,33 @@ func TestEvent(t *testing.T) {
 				}, nil
 			}),
 			args: args{
+				ctx:      graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				involved: involved,
+			},
+			want: want{
+				ec: model.EventConnection{
+					Nodes:      []model.Event{model.GetEvent(&related, model.SelectAll)},
+					TotalCount: 1,
+				},
+			},
+		},
+		"ListEventsInvolvingSkipUnstructured": {
+			reason: "We should successfully return events for all resources if the involved object is nil without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*corev1.EventList) = corev1.EventList{Items: []corev1.Event{related, unrelated}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
 				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				involved: involved,
 			},
 			want: want{
 				ec: model.EventConnection{
-					Nodes:      []model.Event{model.GetEvent(&related)},
+					Nodes:      []model.Event{model.GetEvent(&related, model.SkipFields(model.FieldUnstructured))},
 					TotalCount: 1,
 				},
 			},

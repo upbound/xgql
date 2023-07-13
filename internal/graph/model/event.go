@@ -34,7 +34,7 @@ func GetEventType(in string) *EventType {
 }
 
 // GetEvent from the supplied Kubernetes event.
-func GetEvent(e *corev1.Event) Event {
+func GetEvent(e *corev1.Event, s SelectedFields) Event {
 	out := Event{
 		ID: ReferenceID{
 			APIVersion: e.APIVersion,
@@ -46,7 +46,6 @@ func GetEvent(e *corev1.Event) Event {
 		Kind:              e.Kind,
 		Metadata:          GetObjectMeta(e),
 		Type:              GetEventType(e.Type),
-		Unstructured:      unstruct(e),
 		InvolvedObjectRef: e.InvolvedObject,
 	}
 
@@ -67,6 +66,10 @@ func GetEvent(e *corev1.Event) Event {
 	out.FirstTime = &ft
 	lt := e.LastTimestamp.Time
 	out.LastTime = &lt
+
+	if s.Has(FieldUnstructured) {
+		out.Unstructured = unstruct(e)
+	}
 
 	return out
 }
