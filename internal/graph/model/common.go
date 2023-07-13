@@ -284,8 +284,8 @@ func GetCustomResourceDefinitionStatus(in kextv1.CustomResourceDefinitionStatus)
 }
 
 // GetCustomResourceDefinition from the suppled Kubernetes CRD.
-func GetCustomResourceDefinition(crd *unstructured.CustomResourceDefinition) CustomResourceDefinition {
-	return CustomResourceDefinition{
+func GetCustomResourceDefinition(crd *unstructured.CustomResourceDefinition, s SelectedFields) CustomResourceDefinition {
+	out := CustomResourceDefinition{
 		ID: ReferenceID{
 			APIVersion: crd.GetAPIVersion(),
 			Kind:       crd.GetKind(),
@@ -301,9 +301,12 @@ func GetCustomResourceDefinition(crd *unstructured.CustomResourceDefinition) Cus
 			Scope:    GetResourceScope(crd.GetSpecScope()),
 			Versions: GetCustomResourceDefinitionVersions(crd.GetSpecVersions()),
 		},
-		Status:       GetCustomResourceDefinitionStatus(crd.GetStatus()),
-		Unstructured: bytesForUnstructured(&crd.Unstructured),
+		Status: GetCustomResourceDefinitionStatus(crd.GetStatus()),
 	}
+	if s.Has(FieldUnstructured) {
+		out.Unstructured = bytesForUnstructured(&crd.Unstructured)
+	}
+	return out
 }
 
 // GetCustomResourceDefinitionFromCRD from the suppled Kubernetes CRD.
@@ -405,7 +408,7 @@ func GetKubernetesResource(u *kunstructured.Unstructured, s SelectedFields) (Kub
 		if err := convert(u, crd); err != nil {
 			return nil, errors.Wrap(err, "cannot convert custom resource definition")
 		}
-		return GetCustomResourceDefinition(crd), nil
+		return GetCustomResourceDefinition(crd, s), nil
 
 	case u.GroupVersionKind() == schema.GroupVersionKind{Group: corev1.GroupName, Version: "v1", Kind: "Secret"}:
 		sec := &corev1.Secret{}

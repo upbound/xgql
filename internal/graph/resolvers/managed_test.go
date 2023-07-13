@@ -58,8 +58,8 @@ func TestManagedResourceDefinition(t *testing.T) {
 	crdDifferingPlural.SetSpecGroup("example.org")
 	crdDifferingPlural.SetSpecNames(kextv1.CustomResourceDefinitionNames{Kind: "Example", Plural: "Examplii"})
 
-	gcrd := model.GetCustomResourceDefinition(crd)
-	dcrd := model.GetCustomResourceDefinition((crdDifferingPlural))
+	gcrd := model.GetCustomResourceDefinition(crd, model.SelectAll)
+	dcrd := model.GetCustomResourceDefinition(crdDifferingPlural, model.SelectAll)
 
 	otherGroup := unstructured.NewCRD()
 	otherGroup.SetSpecGroup("example.net")

@@ -101,7 +101,7 @@ func (r *providerConfig) Definition(ctx context.Context, obj *model.ProviderConf
 				continue
 			}
 
-			out := model.GetCustomResourceDefinition(&crd)
+			out := model.GetCustomResourceDefinition(&crd, GetSelectedFields(ctx))
 			return &out, nil
 		}
 	}
@@ -109,7 +109,7 @@ func (r *providerConfig) Definition(ctx context.Context, obj *model.ProviderConf
 	// We found a CRD, let's double check the Group and Kind match our
 	// expectations.
 	if in.GetSpecGroup() == gv.Group && in.GetSpecNames().Kind == obj.Kind {
-		out := model.GetCustomResourceDefinition(in)
+		out := model.GetCustomResourceDefinition(in, GetSelectedFields(ctx))
 		return &out, nil
 	}
 

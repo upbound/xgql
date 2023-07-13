@@ -385,7 +385,7 @@ func TestProviderActiveRevision(t *testing.T) {
 func TestProviderRevisionStatusObjects(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gcrd := model.GetCustomResourceDefinition(&xunstructured.CustomResourceDefinition{})
+	gcrd := model.GetCustomResourceDefinition(&xunstructured.CustomResourceDefinition{}, model.SelectAll)
 
 	type args struct {
 		ctx context.Context

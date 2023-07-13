@@ -75,7 +75,7 @@ func (r *xrd) getCrd(ctx context.Context, group string, names *model.CompositeRe
 		return nil, nil
 	}
 
-	out := model.GetCustomResourceDefinition(in)
+	out := model.GetCustomResourceDefinition(in, GetSelectedFields(ctx))
 	return &out, nil
 }
 

@@ -1154,12 +1154,12 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 		},
 	})
 
-	gowned := model.GetCustomResourceDefinition(owned)
+	gowned := model.GetCustomResourceDefinition(owned, model.SelectAll)
 
 	dangler := xunstructured.NewCRD()
 	dangler.SetName("coolconfig")
 
-	gdangler := model.GetCustomResourceDefinition(dangler)
+	gdangler := model.GetCustomResourceDefinition(dangler, model.SelectAll)
 
 	type args struct {
 		ctx      context.Context

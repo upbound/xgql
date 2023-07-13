@@ -81,6 +81,7 @@ func (r *managedResource) Definition(ctx context.Context, obj *model.ManagedReso
 		graphql.AddError(ctx, errors.Wrap(err, errGetCRD))
 		return nil, nil
 	}
+	selectedFields := GetSelectedFields(ctx)
 
 	// We didn't find the CRD we were looking for, list all CRDs and see if we
 	// can find the matching one.
@@ -102,7 +103,7 @@ func (r *managedResource) Definition(ctx context.Context, obj *model.ManagedReso
 				continue
 			}
 
-			out := model.GetCustomResourceDefinition(&crd)
+			out := model.GetCustomResourceDefinition(&crd, selectedFields)
 			return &out, nil
 		}
 	}
@@ -110,7 +111,7 @@ func (r *managedResource) Definition(ctx context.Context, obj *model.ManagedReso
 	// We found a CRD, let's double check the Group and Kind match our
 	// expectations.
 	if in.GetSpecGroup() == gv.Group && in.GetSpecNames().Kind == obj.Kind {
-		out := model.GetCustomResourceDefinition(in)
+		out := model.GetCustomResourceDefinition(in, selectedFields)
 		return &out, nil
 	}
 

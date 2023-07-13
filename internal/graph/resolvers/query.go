@@ -346,6 +346,7 @@ func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.R
 	out := &model.CustomResourceDefinitionConnection{
 		Nodes: make([]model.CustomResourceDefinition, 0),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for i := range in.Items {
 		xrd := &xunstructured.CustomResourceDefinition{Unstructured: in.Items[i]}
@@ -355,7 +356,7 @@ func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.R
 			continue
 		}
 
-		out.Nodes = append(out.Nodes, model.GetCustomResourceDefinition(xrd))
+		out.Nodes = append(out.Nodes, model.GetCustomResourceDefinition(xrd, selectedFields))
 		out.TotalCount++
 	}
 

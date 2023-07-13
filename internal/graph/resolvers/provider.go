@@ -164,6 +164,7 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 	out := &model.KubernetesResourceConnection{
 		Nodes: make([]model.KubernetesResource, 0, len(obj.ObjectRefs)),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for _, ref := range obj.ObjectRefs {
 		// Crossplane lints provider packages to ensure they only contain CRDs,
@@ -182,7 +183,7 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 			continue
 		}
 
-		out.Nodes = append(out.Nodes, model.GetCustomResourceDefinition(crd))
+		out.Nodes = append(out.Nodes, model.GetCustomResourceDefinition(crd, selectedFields))
 		out.TotalCount++
 	}
 
