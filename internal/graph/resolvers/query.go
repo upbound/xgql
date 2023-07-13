@@ -226,7 +226,7 @@ func (r *query) Secret(ctx context.Context, namespace, name string) (*model.Secr
 		return nil, nil
 	}
 
-	out := model.GetSecret(s)
+	out := model.GetSecret(s, GetSelectedFields(ctx))
 	return &out, nil
 }
 

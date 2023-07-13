@@ -252,7 +252,7 @@ func (r *compositeResourceSpec) ConnectionSecret(ctx context.Context, obj *model
 		return nil, nil
 	}
 
-	out := model.GetSecret(s)
+	out := model.GetSecret(s, GetSelectedFields(ctx))
 	return &out, nil
 }
 
@@ -426,7 +426,7 @@ func (r *compositeResourceClaimSpec) ConnectionSecret(ctx context.Context, obj *
 		return nil, nil
 	}
 
-	out := model.GetSecret(s)
+	out := model.GetSecret(s, GetSelectedFields(ctx))
 	return &out, nil
 }
 

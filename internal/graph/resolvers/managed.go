@@ -147,6 +147,6 @@ func (r *managedResourceSpec) ConnectionSecret(ctx context.Context, obj *model.M
 		return nil, nil
 	}
 
-	out := model.GetSecret(s)
+	out := model.GetSecret(s, GetSelectedFields(ctx))
 	return &out, nil
 }

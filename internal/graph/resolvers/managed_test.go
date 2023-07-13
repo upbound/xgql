@@ -22,6 +22,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
+	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	corev1 "k8s.io/api/core/v1"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -242,7 +243,15 @@ func TestManagedResourceDefinition(t *testing.T) {
 func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gsec := model.GetSecret(&corev1.Secret{})
+	gsec := model.GetSecret(&corev1.Secret{}, model.SelectAll)
+	gsecSkipUnstructured := model.GetSecret(&corev1.Secret{}, model.SkipFields(model.FieldUnstructured))
+
+	// A selection set with "unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldUnstructured,
+		},
+	}
 
 	type args struct {
 		ctx context.Context
@@ -312,13 +321,30 @@ func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.ManagedResourceSpec{
 					WriteConnectionSecretToReference: &xpv1.SecretReference{},
 				},
 			},
 			want: want{
 				sec: &gsec,
+			},
+		},
+		"SuccessSkipUnstructured": {
+			reason: "If we can get and model the secret we should return it.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.ManagedResourceSpec{
+					WriteConnectionSecretToReference: &xpv1.SecretReference{},
+				},
+			},
+			want: want{
+				sec: &gsecSkipUnstructured,
 			},
 		},
 	}

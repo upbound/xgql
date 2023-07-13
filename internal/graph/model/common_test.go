@@ -211,8 +211,8 @@ func TestGetSecret(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetSecret(tc.s)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Secret{}, "Unstructured"), cmp.AllowUnexported(Secret{}, ObjectMeta{})); diff != "" {
+			got := GetSecret(tc.s, SkipFields(FieldUnstructured))
+			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(Secret{}, ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetSecret(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

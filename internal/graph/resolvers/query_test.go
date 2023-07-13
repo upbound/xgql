@@ -515,7 +515,15 @@ func TestQueryKubernetesResources(t *testing.T) {
 func TestQuerySecret(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gsec := model.GetSecret(&corev1.Secret{})
+	gsec := model.GetSecret(&corev1.Secret{}, model.SelectAll)
+	gsecSkipUnstructured := model.GetSecret(&corev1.Secret{}, model.SkipFields(model.FieldUnstructured))
+
+	// A selection set with "unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldUnstructured,
+		},
+	}
 
 	type args struct {
 		ctx       context.Context
@@ -572,10 +580,24 @@ func TestQuerySecret(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
 				sec: &gsec,
+			},
+		},
+		"SuccessSkipUnstructured": {
+			reason: "If we can get and model the secret we should return it without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				sec: &gsecSkipUnstructured,
 			},
 		},
 	}

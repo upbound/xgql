@@ -153,7 +153,7 @@ func (cm ConfigMap) Data(keys []string) map[string]string {
 }
 
 // GetSecret from the suppled Kubernetes Secret
-func GetSecret(s *corev1.Secret) Secret {
+func GetSecret(s *corev1.Secret, sel SelectedFields) Secret {
 	out := Secret{
 		ID: ReferenceID{
 			APIVersion: corev1.SchemeGroupVersion.String(),
@@ -161,10 +161,9 @@ func GetSecret(s *corev1.Secret) Secret {
 			Namespace:  s.GetNamespace(),
 			Name:       s.GetName(),
 		},
-		APIVersion:   corev1.SchemeGroupVersion.String(),
-		Kind:         "Secret",
-		Metadata:     GetObjectMeta(s),
-		Unstructured: unstruct(s),
+		APIVersion: corev1.SchemeGroupVersion.String(),
+		Kind:       "Secret",
+		Metadata:   GetObjectMeta(s),
 	}
 
 	if s.Data != nil {
@@ -176,6 +175,10 @@ func GetSecret(s *corev1.Secret) Secret {
 
 	if s.Type != "" {
 		out.Type = pointer.String(string(s.Type))
+	}
+
+	if sel.Has(FieldUnstructured) {
+		out.Unstructured = unstruct(s)
 	}
 
 	return out
@@ -415,7 +418,7 @@ func GetKubernetesResource(u *kunstructured.Unstructured, s SelectedFields) (Kub
 		if err := convert(u, sec); err != nil {
 			return nil, errors.Wrap(err, "cannot convert secret")
 		}
-		return GetSecret(sec), nil
+		return GetSecret(sec, s), nil
 
 	case u.GroupVersionKind() == schema.GroupVersionKind{Group: corev1.GroupName, Version: "v1", Kind: "ConfigMap"}:
 		cm := &corev1.ConfigMap{}
