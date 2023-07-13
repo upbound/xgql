@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -73,9 +72,9 @@ func TestGetProviderConfig(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetProviderConfig(tc.u)
+			got := GetProviderConfig(tc.u, SkipFields("unstructured"))
 
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ProviderConfig{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetProviderConfig(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

@@ -38,19 +38,22 @@ func GetProviderConfigStatus(pc *unstructured.ProviderConfig) *ProviderConfigSta
 }
 
 // GetProviderConfig from the suppled Crossplane ProviderConfig.
-func GetProviderConfig(u *kunstructured.Unstructured) ProviderConfig {
+func GetProviderConfig(u *kunstructured.Unstructured, s SelectedFields) ProviderConfig {
 	pc := &unstructured.ProviderConfig{Unstructured: *u}
-	return ProviderConfig{
+	out := ProviderConfig{
 		ID: ReferenceID{
 			APIVersion: pc.GetAPIVersion(),
 			Kind:       pc.GetKind(),
 			Name:       pc.GetName(),
 		},
 
-		APIVersion:   pc.GetAPIVersion(),
-		Kind:         pc.GetKind(),
-		Metadata:     GetObjectMeta(pc),
-		Status:       GetProviderConfigStatus(pc),
-		Unstructured: bytesForUnstructured(u),
+		APIVersion: pc.GetAPIVersion(),
+		Kind:       pc.GetKind(),
+		Metadata:   GetObjectMeta(pc),
+		Status:     GetProviderConfigStatus(pc),
 	}
+	if s.Has("unstructured") {
+		out.Unstructured = bytesForUnstructured(u)
+	}
+	return out
 }
