@@ -166,7 +166,7 @@ func GetProviderRevision(pr *pkgv1.ProviderRevision, s SelectedFields) ProviderR
 		},
 		Status: GetProviderRevisionStatus(pr.Status),
 	}
-	if s.Has("unstructured") {
+	if s.Has(FieldUnstructured) {
 		out.Unstructured = unstruct(pr)
 	}
 	return out

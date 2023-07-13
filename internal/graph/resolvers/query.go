@@ -176,7 +176,7 @@ func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string
 	out := &model.KubernetesResourceConnection{
 		Nodes: make([]model.KubernetesResource, 0, len(in.Items)),
 	}
-	selectedFields := GetSelectedFields(ctx).Sub("nodes")
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for i := range in.Items {
 		kr, err := model.GetKubernetesResource(&in.Items[i], selectedFields)
@@ -302,7 +302,7 @@ func (r *query) ProviderRevisions(ctx context.Context, provider *model.Reference
 	out := &model.ProviderRevisionConnection{
 		Nodes: make([]model.ProviderRevision, 0),
 	}
-	selectedFields := GetSelectedFields(ctx).Sub("nodes")
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for i := range in.Items {
 		pr := in.Items[i] // So we don't take the address of a range variable.

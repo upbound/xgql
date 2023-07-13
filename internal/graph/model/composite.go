@@ -76,7 +76,7 @@ func GetCompositeResource(u *kunstructured.Unstructured, s SelectedFields) Compo
 		},
 		Status: GetCompositeResourceStatus(xr),
 	}
-	if s.Has("unstructured") {
+	if s.Has(FieldUnstructured) {
 		out.Unstructured = bytesForUnstructured(u)
 	}
 	return out

@@ -136,7 +136,7 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 		Nodes:      make([]model.KubernetesResource, 0, len(in.Items)),
 		TotalCount: len(in.Items),
 	}
-	selectedFields := GetSelectedFields(ctx).Sub("nodes")
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for i := range in.Items {
 		u := in.Items[i]

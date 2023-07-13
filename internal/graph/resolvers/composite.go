@@ -193,7 +193,7 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 	out := &model.KubernetesResourceConnection{
 		Nodes: make([]model.KubernetesResource, 0, len(obj.ResourceReferences)),
 	}
-	selectedFields := GetSelectedFields(ctx).Sub("nodes")
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for _, ref := range obj.ResourceReferences {
 		// Ignore nameless resource references

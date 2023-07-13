@@ -14,6 +14,11 @@
 
 package model
 
+const (
+	FieldUnstructured = "unstructured"
+	FieldNodes        = "nodes"
+)
+
 // SelectedFields allows checking if a field was selected in a GraphQL query.
 // It uses "." as a separator for nested fields.
 // Example:

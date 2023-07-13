@@ -72,7 +72,7 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider) (model.Pr
 	out := &model.ProviderRevisionConnection{
 		Nodes: make([]model.ProviderRevision, 0),
 	}
-	selectedFields := GetSelectedFields(ctx).Sub("nodes")
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for i := range in.Items {
 		pr := in.Items[i] // So we don't take the address of a range variable.

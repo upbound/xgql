@@ -133,7 +133,7 @@ that is filtered and sorted
 */
 func getCompositeResourceConnection(ctx context.Context, in *kunstructured.UnstructuredList, options *model.DefinedCompositeResourceOptionsInput) model.CompositeResourceConnection {
 	xrs := []model.CompositeResource{}
-	selectedFields := GetSelectedFields(ctx).Sub("nodes")
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for i := range in.Items {
 		xr := model.GetCompositeResource(&in.Items[i], selectedFields)

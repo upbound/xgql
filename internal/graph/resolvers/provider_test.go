@@ -62,7 +62,7 @@ func TestProviderRevisions(t *testing.T) {
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
 	gactive := model.GetProviderRevision(&active, model.SelectAll)
-	gactiveSkipUnstructured := model.GetProviderRevision(&active, model.SkipFields("unstructured"))
+	gactiveSkipUnstructured := model.GetProviderRevision(&active, model.SkipFields(model.FieldUnstructured))
 
 	// A ProviderRevision we control, but that is inactive.
 	inactive := pkgv1.ProviderRevision{
@@ -73,7 +73,7 @@ func TestProviderRevisions(t *testing.T) {
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
 	}
 	ginactive := model.GetProviderRevision(&inactive, model.SelectAll)
-	ginactiveSkipUnstructured := model.GetProviderRevision(&inactive, model.SkipFields("unstructured"))
+	ginactiveSkipUnstructured := model.GetProviderRevision(&inactive, model.SkipFields(model.FieldUnstructured))
 
 	// A ProviderRevision which we do not control.
 	other := pkgv1.ProviderRevision{ObjectMeta: metav1.ObjectMeta{Name: "not-ours"}}
@@ -81,9 +81,9 @@ func TestProviderRevisions(t *testing.T) {
 	// A selection set with "nodes.unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
 		&ast.Field{
-			Name: "nodes",
+			Name: model.FieldNodes,
 			SelectionSet: ast.SelectionSet{
-				&ast.Field{Name: "unstructured"},
+				&ast.Field{Name: model.FieldUnstructured},
 			},
 		},
 	}
@@ -222,7 +222,7 @@ func TestProviderActiveRevision(t *testing.T) {
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
 	gactive := model.GetProviderRevision(&active, model.SelectAll)
-	gactiveSkipUnstructured := model.GetProviderRevision(&active, model.SkipFields("unstructured"))
+	gactiveSkipUnstructured := model.GetProviderRevision(&active, model.SkipFields(model.FieldUnstructured))
 
 	// A ProviderRevision we control, but that is inactive.
 	inactive := pkgv1.ProviderRevision{
@@ -239,10 +239,10 @@ func TestProviderActiveRevision(t *testing.T) {
 		Spec:       pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
 
-	// A selection set with "unstructured" field included.
+	// A selection set with fieldUnstructured field included.
 	gselectWithUnstructured := ast.SelectionSet{
 		&ast.Field{
-			Name: "unstructured",
+			Name: model.FieldUnstructured,
 		},
 	}
 

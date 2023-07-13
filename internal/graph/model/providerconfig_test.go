@@ -72,7 +72,7 @@ func TestGetProviderConfig(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetProviderConfig(tc.u, SkipFields("unstructured"))
+			got := GetProviderConfig(tc.u, SkipFields(FieldUnstructured))
 
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetProviderConfig(...): -want, +got\n:%s", tc.reason, diff)

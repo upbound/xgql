@@ -52,7 +52,7 @@ func GetProviderConfig(u *kunstructured.Unstructured, s SelectedFields) Provider
 		Metadata:   GetObjectMeta(pc),
 		Status:     GetProviderConfigStatus(pc),
 	}
-	if s.Has("unstructured") {
+	if s.Has(FieldUnstructured) {
 		out.Unstructured = bytesForUnstructured(u)
 	}
 	return out
