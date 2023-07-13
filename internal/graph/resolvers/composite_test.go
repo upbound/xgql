@@ -571,11 +571,11 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 
 	kra := &unstructured.Unstructured{}
 	kra.SetKind("A")
-	gkra, _ := model.GetKubernetesResource(kra)
+	gkra, _ := model.GetKubernetesResource(kra, model.SelectAll)
 
 	krb := &unstructured.Unstructured{}
 	krb.SetKind("B")
-	gkrb, _ := model.GetKubernetesResource(krb)
+	gkrb, _ := model.GetKubernetesResource(krb, model.SelectAll)
 
 	krc := &unstructured.Unstructured{}
 	krc.SetKind("C")

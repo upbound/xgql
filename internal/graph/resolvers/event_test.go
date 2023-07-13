@@ -270,7 +270,7 @@ var _ generated.EventResolver = &event{}
 func TestEventInvolvedObject(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gu, _ := model.GetKubernetesResource(&unstructured.Unstructured{})
+	gu, _ := model.GetKubernetesResource(&unstructured.Unstructured{}, model.SelectAll)
 
 	type args struct {
 		ctx context.Context

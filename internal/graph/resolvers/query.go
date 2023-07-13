@@ -135,7 +135,7 @@ func (r *query) KubernetesResource(ctx context.Context, id model.ReferenceID) (m
 		return nil, nil
 	}
 
-	out, err := model.GetKubernetesResource(u)
+	out, err := model.GetKubernetesResource(u, GetSelectedFields(ctx))
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errModelResource))
 		return nil, nil
@@ -176,9 +176,10 @@ func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string
 	out := &model.KubernetesResourceConnection{
 		Nodes: make([]model.KubernetesResource, 0, len(in.Items)),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub("nodes")
 
 	for i := range in.Items {
-		kr, err := model.GetKubernetesResource(&in.Items[i])
+		kr, err := model.GetKubernetesResource(&in.Items[i], selectedFields)
 		if err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errModelResource))
 			continue
@@ -301,6 +302,7 @@ func (r *query) ProviderRevisions(ctx context.Context, provider *model.Reference
 	out := &model.ProviderRevisionConnection{
 		Nodes: make([]model.ProviderRevision, 0),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub("nodes")
 
 	for i := range in.Items {
 		pr := in.Items[i] // So we don't take the address of a range variable.
@@ -315,7 +317,7 @@ func (r *query) ProviderRevisions(ctx context.Context, provider *model.Reference
 			continue
 		}
 
-		out.Nodes = append(out.Nodes, model.GetProviderRevision(&pr))
+		out.Nodes = append(out.Nodes, model.GetProviderRevision(&pr, selectedFields))
 		out.TotalCount++
 	}
 

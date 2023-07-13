@@ -20,6 +20,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
+	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -237,7 +238,7 @@ func TestCrossplaneResourceTree(t *testing.T) {
 func TestQueryKubernetesResource(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gkr, _ := model.GetKubernetesResource(&unstructured.Unstructured{})
+	gkr, _ := model.GetKubernetesResource(&unstructured.Unstructured{}, model.SelectAll)
 
 	type args struct {
 		ctx context.Context
@@ -327,7 +328,7 @@ func TestQueryKubernetesResources(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	kr := unstructured.Unstructured{}
-	gkr, _ := model.GetKubernetesResource(&kr)
+	gkr, _ := model.GetKubernetesResource(&kr, model.SelectAll)
 
 	group := "example.org"
 	version := "v1"
@@ -807,7 +808,8 @@ func TestQueryProviderRevisions(t *testing.T) {
 		},
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
-	gactive := model.GetProviderRevision(&active)
+	gactive := model.GetProviderRevision(&active, model.SelectAll)
+	gactiveSkipUnstructured := model.GetProviderRevision(&active, model.SkipFields("unstructured"))
 
 	// A ProviderRevision we control, but that is inactive.
 	inactive := pkgv1.ProviderRevision{
@@ -821,7 +823,8 @@ func TestQueryProviderRevisions(t *testing.T) {
 		},
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
 	}
-	ginactive := model.GetProviderRevision(&inactive)
+	ginactive := model.GetProviderRevision(&inactive, model.SelectAll)
+	ginactiveSkipUnstructured := model.GetProviderRevision(&inactive, model.SkipFields("unstructured"))
 
 	// A ProviderRevision which we do not control.
 	other := pkgv1.ProviderRevision{
@@ -834,7 +837,20 @@ func TestQueryProviderRevisions(t *testing.T) {
 			}},
 		},
 	}
-	gother := model.GetProviderRevision(&other)
+	gother := model.GetProviderRevision(&other, model.SelectAll)
+	gotherSkipUnstructured := model.GetProviderRevision(&other, model.SkipFields("unstructured"))
+
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: "nodes",
+			SelectionSet: ast.SelectionSet{
+				&ast.Field{
+					Name: "unstructured",
+				},
+			},
+		},
+	}
 
 	type args struct {
 		ctx    context.Context
@@ -896,11 +912,37 @@ func TestQueryProviderRevisions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(
+					testContext(gselectWithUnstructured),
+					graphql.DefaultErrorPresenter,
+					graphql.DefaultRecover,
+				),
 			},
 			want: want{
 				pc: model.ProviderRevisionConnection{
 					Nodes:      []model.ProviderRevision{gactive, ginactive, gother},
+					TotalCount: 3,
+				},
+			},
+		},
+		"AllRevisionsNoSelection": {
+			reason: "We should successfully return any revisions we own that we can list and model without optional fields.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ProviderRevisionList) = pkgv1.ProviderRevisionList{
+							Items: []pkgv1.ProviderRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				pc: model.ProviderRevisionConnection{
+					Nodes:      []model.ProviderRevision{gactiveSkipUnstructured, ginactiveSkipUnstructured, gotherSkipUnstructured},
 					TotalCount: 3,
 				},
 			},
@@ -918,12 +960,39 @@ func TestQueryProviderRevisions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
+				ctx: graphql.WithResponseContext(
+					testContext(gselectWithUnstructured),
+					graphql.DefaultErrorPresenter,
+					graphql.DefaultRecover,
+				),
+				id: &id,
+			},
+			want: want{
+				pc: model.ProviderRevisionConnection{
+					Nodes:      []model.ProviderRevision{gactive, ginactive},
+					TotalCount: 2,
+				},
+			},
+		},
+		"ProvidersRevisionsNoSelection": {
+			reason: "We should successfully return any revisions the supplied provider id owns that we can list and model without optional fields.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ProviderRevisionList) = pkgv1.ProviderRevisionList{
+							Items: []pkgv1.ProviderRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				id:  &id,
 			},
 			want: want{
 				pc: model.ProviderRevisionConnection{
-					Nodes:      []model.ProviderRevision{gactive, ginactive},
+					Nodes:      []model.ProviderRevision{gactiveSkipUnstructured, ginactiveSkipUnstructured},
 					TotalCount: 2,
 				},
 			},
@@ -941,12 +1010,39 @@ func TestQueryProviderRevisions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx:    graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(
+					testContext(gselectWithUnstructured),
+					graphql.DefaultErrorPresenter,
+					graphql.DefaultRecover,
+				),
 				active: pointer.Bool(true),
 			},
 			want: want{
 				pc: model.ProviderRevisionConnection{
 					Nodes:      []model.ProviderRevision{gactive},
+					TotalCount: 1,
+				},
+			},
+		},
+		"ActiveRevisionsNoSelection": {
+			reason: "We should successfully return any active revisions that we can list and model without optional fields.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ProviderRevisionList) = pkgv1.ProviderRevisionList{
+							Items: []pkgv1.ProviderRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx:    graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				active: pointer.Bool(true),
+			},
+			want: want{
+				pc: model.ProviderRevisionConnection{
+					Nodes:      []model.ProviderRevision{gactiveSkipUnstructured},
 					TotalCount: 1,
 				},
 			},
@@ -973,6 +1069,22 @@ func TestQueryProviderRevisions(t *testing.T) {
 			}
 		})
 	}
+}
+
+func testContext(sel ast.SelectionSet) context.Context {
+	ctx := context.Background()
+
+	rqCtx := &graphql.OperationContext{}
+	ctx = graphql.WithOperationContext(ctx, rqCtx)
+
+	root := &graphql.FieldContext{
+		Field: graphql.CollectedField{
+			Selections: sel,
+		},
+	}
+	ctx = graphql.WithFieldContext(ctx, root)
+
+	return ctx
 }
 
 func TestQueryCustomResourceDefinitions(t *testing.T) {

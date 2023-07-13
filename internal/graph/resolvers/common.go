@@ -136,11 +136,12 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 		Nodes:      make([]model.KubernetesResource, 0, len(in.Items)),
 		TotalCount: len(in.Items),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub("nodes")
 
 	for i := range in.Items {
 		u := in.Items[i]
 
-		kr, err := model.GetKubernetesResource(&u)
+		kr, err := model.GetKubernetesResource(&u, selectedFields)
 		if err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errModelDefined))
 		}

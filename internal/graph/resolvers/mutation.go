@@ -102,7 +102,7 @@ func (r *mutation) CreateKubernetesResource(ctx context.Context, input model.Cre
 		return model.CreateKubernetesResourcePayload{}, nil
 	}
 
-	kr, err := model.GetKubernetesResource(u)
+	kr, err := model.GetKubernetesResource(u, GetSelectedFields(ctx).Sub("resource"))
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errModelResource))
 		return model.CreateKubernetesResourcePayload{}, nil
@@ -153,7 +153,7 @@ func (r *mutation) UpdateKubernetesResource(ctx context.Context, id model.Refere
 		return model.UpdateKubernetesResourcePayload{}, nil
 	}
 
-	kr, err := model.GetKubernetesResource(u)
+	kr, err := model.GetKubernetesResource(u, GetSelectedFields(ctx).Sub("resource"))
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errModelResource))
 		return model.UpdateKubernetesResourcePayload{}, nil
@@ -182,7 +182,7 @@ func (r *mutation) DeleteKubernetesResource(ctx context.Context, id model.Refere
 		return model.DeleteKubernetesResourcePayload{}, nil //nolint:nilerr // IgnoreNotFound appears to trigger this linter.
 	}
 
-	kr, err := model.GetKubernetesResource(u)
+	kr, err := model.GetKubernetesResource(u, GetSelectedFields(ctx).Sub("resource"))
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errModelResource))
 		return model.DeleteKubernetesResourcePayload{}, nil

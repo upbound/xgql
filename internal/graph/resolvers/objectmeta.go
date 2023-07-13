@@ -48,6 +48,7 @@ func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta) (model.O
 	}
 
 	owners := make([]model.Owner, 0, len(obj.OwnerReferences))
+	selectedFields := GetSelectedFields(ctx).Sub("nodes.resource")
 	for _, ref := range obj.OwnerReferences {
 		u := &kunstructured.Unstructured{}
 		u.SetAPIVersion(ref.APIVersion)
@@ -59,7 +60,7 @@ func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta) (model.O
 			continue
 		}
 
-		kr, err := model.GetKubernetesResource(u)
+		kr, err := model.GetKubernetesResource(u, selectedFields)
 		if err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errModelOwner))
 			continue
@@ -82,6 +83,7 @@ func (r *objectMeta) Controller(ctx context.Context, obj *model.ObjectMeta) (mod
 		return nil, nil
 	}
 
+	selectedFields := GetSelectedFields(ctx)
 	for _, ref := range obj.OwnerReferences {
 		if !pointer.BoolDeref(ref.Controller, false) {
 			continue
@@ -97,7 +99,7 @@ func (r *objectMeta) Controller(ctx context.Context, obj *model.ObjectMeta) (mod
 			return nil, nil
 		}
 
-		kr, err := model.GetKubernetesResource(u)
+		kr, err := model.GetKubernetesResource(u, selectedFields)
 		if err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errModelOwner))
 			return nil, nil

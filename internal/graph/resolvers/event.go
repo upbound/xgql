@@ -153,7 +153,7 @@ func (r *event) InvolvedObject(ctx context.Context, obj *model.Event) (model.Kub
 		return nil, nil
 	}
 
-	out, err := model.GetKubernetesResource(u)
+	out, err := model.GetKubernetesResource(u, GetSelectedFields(ctx))
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errModelInvolved))
 		return nil, nil

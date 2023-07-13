@@ -72,6 +72,7 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider) (model.Pr
 	out := &model.ProviderRevisionConnection{
 		Nodes: make([]model.ProviderRevision, 0),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub("nodes")
 
 	for i := range in.Items {
 		pr := in.Items[i] // So we don't take the address of a range variable.
@@ -83,7 +84,7 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider) (model.Pr
 			continue
 		}
 
-		out.Nodes = append(out.Nodes, model.GetProviderRevision(&pr))
+		out.Nodes = append(out.Nodes, model.GetProviderRevision(&pr, selectedFields))
 		out.TotalCount++
 	}
 
@@ -108,6 +109,7 @@ func (r *provider) ActiveRevision(ctx context.Context, obj *model.Provider) (*mo
 		return nil, nil
 	}
 
+	selectedFields := GetSelectedFields(ctx)
 	for i := range in.Items {
 		pr := in.Items[i] // So we don't take the address of a range variable.
 
@@ -123,7 +125,7 @@ func (r *provider) ActiveRevision(ctx context.Context, obj *model.Provider) (*mo
 			continue
 		}
 
-		out := model.GetProviderRevision(&pr)
+		out := model.GetProviderRevision(&pr, selectedFields)
 		return &out, nil
 	}
 

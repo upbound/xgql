@@ -101,7 +101,7 @@ func TestCreateKubernetesResource(t *testing.T) {
 	u.SetName("example")
 	uj, _ := json.Marshal(u)
 
-	kr, _ := model.GetKubernetesResource(u)
+	kr, _ := model.GetKubernetesResource(u, model.SelectAll)
 
 	type args struct {
 		ctx   context.Context
@@ -268,7 +268,7 @@ func TestUpdateKubernetesResource(t *testing.T) {
 	u.SetName("example")
 	uj, _ := json.Marshal(u)
 
-	kr, _ := model.GetKubernetesResource(u)
+	kr, _ := model.GetKubernetesResource(u, model.SelectAll)
 
 	type args struct {
 		ctx   context.Context
@@ -444,7 +444,7 @@ func TestDeleteKubernetesResource(t *testing.T) {
 	u.SetKind("Example")
 	u.SetName("example")
 
-	kr, _ := model.GetKubernetesResource(u)
+	kr, _ := model.GetKubernetesResource(u, model.SelectAll)
 
 	cases := map[string]struct {
 		reason  string

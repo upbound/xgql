@@ -334,7 +334,7 @@ func GetCustomResourceDefinitionFromCRD(crd *kextv1.CustomResourceDefinition) Cu
 // unstructured data contains (e.g. a managed resource, a provider, etc) and
 // return the appropriate model type. If no type can be detected it returns a
 // GenericResource.
-func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, error) { //nolint:gocyclo
+func GetKubernetesResource(u *kunstructured.Unstructured, s SelectedFields) (KubernetesResource, error) { //nolint:gocyclo
 	// This isn't _really_ that complex; it's a long but simple switch.
 
 	switch {
@@ -368,7 +368,7 @@ func GetKubernetesResource(u *kunstructured.Unstructured) (KubernetesResource, e
 		if err := convert(u, pr); err != nil {
 			return nil, errors.Wrap(err, "cannot convert provider revision")
 		}
-		return GetProviderRevision(pr), nil
+		return GetProviderRevision(pr, s), nil
 
 	case u.GroupVersionKind() == pkgv1.ConfigurationGroupVersionKind:
 		c := &pkgv1.Configuration{}

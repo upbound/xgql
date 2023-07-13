@@ -50,7 +50,7 @@ func TestObjectMetaOwners(t *testing.T) {
 	own := unstructured.Unstructured{}
 	own.SetAPIVersion("example.org/v1")
 	own.SetKind("AnOwner")
-	gown, _ := model.GetKubernetesResource(&own)
+	gown, _ := model.GetKubernetesResource(&own, model.SelectAll)
 
 	type args struct {
 		ctx context.Context
@@ -156,7 +156,7 @@ func TestObjectMetaController(t *testing.T) {
 	ctrl := unstructured.Unstructured{}
 	ctrl.SetAPIVersion("example.org/v1")
 	ctrl.SetKind("TheController")
-	gctrl, _ := model.GetKubernetesResource(&ctrl)
+	gctrl, _ := model.GetKubernetesResource(&ctrl, model.SelectAll)
 
 	// An owner
 	own := unstructured.Unstructured{}

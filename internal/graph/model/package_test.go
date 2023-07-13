@@ -212,7 +212,7 @@ func TestGetProviderRevision(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetProviderRevision(tc.cfg)
+			got := GetProviderRevision(tc.cfg, SelectAll)
 			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ProviderRevision{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetProviderRevision(...): -want, +got\n:%s", tc.reason, diff)
 			}

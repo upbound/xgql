@@ -193,6 +193,7 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 	out := &model.KubernetesResourceConnection{
 		Nodes: make([]model.KubernetesResource, 0, len(obj.ResourceReferences)),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub("nodes")
 
 	for _, ref := range obj.ResourceReferences {
 		// Ignore nameless resource references
@@ -209,7 +210,7 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 			continue
 		}
 
-		kr, err := model.GetKubernetesResource(xrc)
+		kr, err := model.GetKubernetesResource(xrc, selectedFields)
 		if err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errModelComposed))
 			continue
