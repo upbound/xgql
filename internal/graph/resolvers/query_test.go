@@ -2015,11 +2015,24 @@ func TestQueryCompositions(t *testing.T) {
 			},
 		},
 	}}
-	gowned := model.GetComposition(&owned)
+	gowned := model.GetComposition(&owned, model.SelectAll)
+	gownedSkipUnstructured := model.GetComposition(&owned, model.SkipFields(model.FieldUnstructured))
 
 	dangler := extv1.Composition{ObjectMeta: metav1.ObjectMeta{Name: "coolconfig"}}
-	gdangler := model.GetComposition(&dangler)
+	gdangler := model.GetComposition(&dangler, model.SelectAll)
+	gdanglerSkipUnstructured := model.GetComposition(&dangler, model.SkipFields(model.FieldUnstructured))
 
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldNodes,
+			SelectionSet: ast.SelectionSet{
+				&ast.Field{
+					Name: model.FieldUnstructured,
+				},
+			},
+		},
+	}
 	type args struct {
 		ctx      context.Context
 		revision *model.ReferenceID
@@ -2083,13 +2096,41 @@ func TestQueryCompositions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
 				cc: model.CompositionConnection{
 					Nodes: []model.Composition{
 						gdangler,
 						gowned,
+					},
+					TotalCount: 2,
+				},
+			},
+		},
+		"AllCompositionsSkipUnstructured": {
+			reason: "We should successfully return all compositions we can list and model when no arguments are supplied without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*extv1.CompositionList) = extv1.CompositionList{
+							Items: []extv1.Composition{
+								dangler,
+								owned,
+							},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				cc: model.CompositionConnection{
+					Nodes: []model.Composition{
+						gdanglerSkipUnstructured,
+						gownedSkipUnstructured,
 					},
 					TotalCount: 2,
 				},
@@ -2111,13 +2152,41 @@ func TestQueryCompositions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx:      graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				dangling: pointer.Bool(true),
 			},
 			want: want{
 				cc: model.CompositionConnection{
 					Nodes: []model.Composition{
 						gdangler,
+					},
+					TotalCount: 1,
+				},
+			},
+		},
+		"DanglingCompositionsSkipUnstructured": {
+			reason: "We should successfully return dangling compositions we can list and model without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*extv1.CompositionList) = extv1.CompositionList{
+							Items: []extv1.Composition{
+								dangler,
+								owned,
+							},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				dangling: pointer.Bool(true),
+			},
+			want: want{
+				cc: model.CompositionConnection{
+					Nodes: []model.Composition{
+						gdanglerSkipUnstructured,
 					},
 					TotalCount: 1,
 				},
@@ -2139,13 +2208,41 @@ func TestQueryCompositions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx:      graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				revision: &id,
 			},
 			want: want{
 				cc: model.CompositionConnection{
 					Nodes: []model.Composition{
 						gowned,
+					},
+					TotalCount: 1,
+				},
+			},
+		},
+		"OwnedCompositionsSkipUnstructured": {
+			reason: "We should successfully return the compositions we can list and model that are owned by the supplied ID without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*extv1.CompositionList) = extv1.CompositionList{
+							Items: []extv1.Composition{
+								dangler,
+								owned,
+							},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				revision: &id,
+			},
+			want: want{
+				cc: model.CompositionConnection{
+					Nodes: []model.Composition{
+						gownedSkipUnstructured,
 					},
 					TotalCount: 1,
 				},

@@ -155,8 +155,8 @@ func GetCompositionStatus(in extv1.CompositionStatus) *CompositionStatus {
 }
 
 // GetComposition from the supplied Crossplane Composition.
-func GetComposition(cmp *extv1.Composition) Composition {
-	return Composition{
+func GetComposition(cmp *extv1.Composition, s SelectedFields) Composition {
+	out := Composition{
 		ID: ReferenceID{
 			APIVersion: cmp.APIVersion,
 			Kind:       cmp.Kind,
@@ -172,9 +172,12 @@ func GetComposition(cmp *extv1.Composition) Composition {
 			},
 			WriteConnectionSecretsToNamespace: cmp.Spec.WriteConnectionSecretsToNamespace,
 		},
-		Status:       GetCompositionStatus(cmp.Status),
-		Unstructured: unstruct(cmp),
+		Status: GetCompositionStatus(cmp.Status),
 	}
+	if s.Has(FieldUnstructured) {
+		out.Unstructured = unstruct(cmp)
+	}
+	return out
 }
 
 /* Handle deprecated items preferring non-deprecated */

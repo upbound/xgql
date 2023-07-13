@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -241,8 +240,8 @@ func TestGetComposition(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetComposition(tc.xrd)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(Composition{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			got := GetComposition(tc.xrd, SkipFields(FieldUnstructured))
+			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetComposition(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

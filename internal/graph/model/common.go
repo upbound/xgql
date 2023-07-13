@@ -396,7 +396,7 @@ func GetKubernetesResource(u *kunstructured.Unstructured, s SelectedFields) (Kub
 		if err := convert(u, cmp); err != nil {
 			return nil, errors.Wrap(err, "cannot convert composition")
 		}
-		return GetComposition(cmp), nil
+		return GetComposition(cmp, s), nil
 
 	case u.GroupVersionKind() == schema.GroupVersionKind{Group: kextv1.GroupName, Version: "v1", Kind: "CustomResourceDefinition"}:
 		crd := &unstructured.CustomResourceDefinition{}

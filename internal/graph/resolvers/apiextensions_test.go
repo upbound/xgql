@@ -22,6 +22,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
+	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -1434,7 +1435,15 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gcmp := model.GetComposition(&extv1.Composition{})
+	gcmp := model.GetComposition(&extv1.Composition{}, model.SelectAll)
+	gcmpSkipUnstructured := model.GetComposition(&extv1.Composition{}, model.SkipFields(model.FieldUnstructured))
+
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldUnstructured,
+		},
+	}
 
 	type args struct {
 		ctx context.Context
@@ -1504,13 +1513,30 @@ func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
 					DefaultCompositionReference: &xpv1.Reference{},
 				},
 			},
 			want: want{
 				cmp: &gcmp,
+			},
+		},
+		"SuccessSkipUnstructured": {
+			reason: "If we can get and model the composition we should return it without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinitionSpec{
+					DefaultCompositionReference: &xpv1.Reference{},
+				},
+			},
+			want: want{
+				cmp: &gcmpSkipUnstructured,
 			},
 		},
 	}
@@ -1540,7 +1566,15 @@ func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 func TestCompositeResourceDefinitionSpecEnforcedComposition(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gcmp := model.GetComposition(&extv1.Composition{})
+	gcmp := model.GetComposition(&extv1.Composition{}, model.SelectAll)
+	gcmpSkipUnstructured := model.GetComposition(&extv1.Composition{}, model.SkipFields(model.FieldUnstructured))
+
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldUnstructured,
+		},
+	}
 
 	type args struct {
 		ctx context.Context
@@ -1610,13 +1644,30 @@ func TestCompositeResourceDefinitionSpecEnforcedComposition(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
 					EnforcedCompositionReference: &xpv1.Reference{},
 				},
 			},
 			want: want{
 				cmp: &gcmp,
+			},
+		},
+		"SuccessSkipUnstructured": {
+			reason: "If we can get and model the composition we should return it without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceDefinitionSpec{
+					EnforcedCompositionReference: &xpv1.Reference{},
+				},
+			},
+			want: want{
+				cmp: &gcmpSkipUnstructured,
 			},
 		},
 	}

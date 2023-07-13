@@ -190,7 +190,7 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 				continue
 			}
 
-			out.Nodes = append(out.Nodes, model.GetComposition(cmp))
+			out.Nodes = append(out.Nodes, model.GetComposition(cmp, selectedFields))
 			out.TotalCount++
 		}
 	}

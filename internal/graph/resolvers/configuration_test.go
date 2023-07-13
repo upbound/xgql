@@ -386,7 +386,8 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 
 	gxrd := model.GetCompositeResourceDefinition(&extv1.CompositeResourceDefinition{}, model.SelectAll)
 	gxrdSkipUnstructured := model.GetCompositeResourceDefinition(&extv1.CompositeResourceDefinition{}, model.SkipFields(model.FieldUnstructured))
-	gcmp := model.GetComposition(&extv1.Composition{})
+	gcmp := model.GetComposition(&extv1.Composition{}, model.SelectAll)
+	gcmpSkipUnstructured := model.GetComposition(&extv1.Composition{}, model.SkipFields(model.FieldUnstructured))
 
 	// A selection set with "nodes.unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -465,7 +466,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.ConfigurationRevisionStatus{
 					ObjectRefs: []xpv1.TypedReference{
 						{
@@ -483,6 +484,45 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 				krc: model.KubernetesResourceConnection{
 					Nodes: []model.KubernetesResource{
 						gcmp,
+					},
+					TotalCount: 1,
+				},
+				errs: gqlerror.List{
+					gqlerror.Errorf(errors.Wrap(errBoom, errGetXRD).Error()),
+				},
+			},
+		},
+		"GetXRDErrorSkipUnstructured": {
+			reason: "If we can't get an XRD we should add the error to the GraphQL context and continue without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil, func(obj client.Object) error {
+						if _, ok := obj.(*extv1.CompositeResourceDefinition); ok {
+							return errBoom
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.ConfigurationRevisionStatus{
+					ObjectRefs: []xpv1.TypedReference{
+						{
+							APIVersion: schema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
+							Kind:       extv1.CompositeResourceDefinitionKind,
+						},
+						{
+							APIVersion: schema.GroupVersion{Group: extv1.Group, Version: extv1.Version}.String(),
+							Kind:       extv1.CompositionKind,
+						},
+					},
+				},
+			},
+			want: want{
+				krc: model.KubernetesResourceConnection{
+					Nodes: []model.KubernetesResource{
+						gcmpSkipUnstructured,
 					},
 					TotalCount: 1,
 				},

@@ -130,7 +130,7 @@ func (r *compositeResourceSpec) Composition(ctx context.Context, obj *model.Comp
 		return nil, nil
 	}
 
-	out := model.GetComposition(cmp)
+	out := model.GetComposition(cmp, GetSelectedFields(ctx))
 	return &out, nil
 }
 
@@ -360,7 +360,7 @@ func (r *compositeResourceClaimSpec) Composition(ctx context.Context, obj *model
 		return nil, nil
 	}
 
-	out := model.GetComposition(cmp)
+	out := model.GetComposition(cmp, GetSelectedFields(ctx))
 	return &out, nil
 }
 

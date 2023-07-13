@@ -293,7 +293,7 @@ func (r *xrdSpec) DefaultComposition(ctx context.Context, obj *model.CompositeRe
 		return nil, nil
 	}
 
-	out := model.GetComposition(cmp)
+	out := model.GetComposition(cmp, GetSelectedFields(ctx))
 	return &out, nil
 }
 
@@ -318,7 +318,7 @@ func (r *xrdSpec) EnforcedComposition(ctx context.Context, obj *model.CompositeR
 		return nil, nil
 	}
 
-	out := model.GetComposition(cmp)
+	out := model.GetComposition(cmp, GetSelectedFields(ctx))
 	return &out, nil
 }
 

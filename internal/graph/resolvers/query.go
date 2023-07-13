@@ -500,6 +500,7 @@ func (r *query) Compositions(ctx context.Context, revision *model.ReferenceID, d
 	out := &model.CompositionConnection{
 		Nodes: make([]model.Composition, 0),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for i := range in.Items {
 		cmp := &in.Items[i]
@@ -514,7 +515,7 @@ func (r *query) Compositions(ctx context.Context, revision *model.ReferenceID, d
 			continue
 		}
 
-		out.Nodes = append(out.Nodes, model.GetComposition(cmp))
+		out.Nodes = append(out.Nodes, model.GetComposition(cmp, selectedFields))
 		out.TotalCount++
 	}
 
