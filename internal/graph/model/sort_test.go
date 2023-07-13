@@ -244,7 +244,7 @@ func TestSort(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			sort.Stable(tc.conn)
-			if diff := cmp.Diff(tc.want, tc.conn); diff != "" {
+			if diff := cmp.Diff(tc.want, tc.conn, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("sort.Stable(...): -want, +got:\n%s", diff)
 			}
 		})

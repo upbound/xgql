@@ -38,7 +38,7 @@ type events struct {
 	clients ClientCache
 }
 
-func (r *events) Resolve(ctx context.Context, obj *corev1.ObjectReference) (*model.EventConnection, error) {
+func (r *events) Resolve(ctx context.Context, obj *corev1.ObjectReference) (model.EventConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -46,13 +46,13 @@ func (r *events) Resolve(ctx context.Context, obj *corev1.ObjectReference) (*mod
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.EventConnection{}, nil
 	}
 
 	in := &corev1.EventList{}
 	if err := c.List(ctx, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListEvents))
-		return nil, nil
+		return model.EventConnection{}, nil
 	}
 
 	// If no involved object was supplied we want to fetch all events. This may
@@ -67,7 +67,7 @@ func (r *events) Resolve(ctx context.Context, obj *corev1.ObjectReference) (*mod
 		}
 
 		sort.Stable(sort.Reverse(out))
-		return out, nil
+		return *out, nil
 	}
 
 	out := &model.EventConnection{
@@ -92,7 +92,7 @@ func (r *events) Resolve(ctx context.Context, obj *corev1.ObjectReference) (*mod
 	}
 
 	sort.Stable(sort.Reverse(out))
-	return out, nil
+	return *out, nil
 }
 
 func involves(e *corev1.Event, ref *corev1.ObjectReference) bool {

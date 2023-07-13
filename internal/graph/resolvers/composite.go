@@ -46,7 +46,7 @@ type compositeResource struct {
 	clients ClientCache
 }
 
-func (r *compositeResource) Events(ctx context.Context, obj *model.CompositeResource) (*model.EventConnection, error) {
+func (r *compositeResource) Events(ctx context.Context, obj *model.CompositeResource) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,
@@ -179,7 +179,7 @@ func (r *compositeResourceSpec) ClaimRef(ctx context.Context, obj *model.Composi
 	return model.GetObjectReference(obj.ClaimReference), nil
 }
 
-func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.CompositeResourceSpec) (*model.KubernetesResourceConnection, error) {
+func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.CompositeResourceSpec) (model.KubernetesResourceConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -187,7 +187,7 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.KubernetesResourceConnection{}, nil
 	}
 
 	out := &model.KubernetesResourceConnection{
@@ -220,7 +220,7 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
 func (r *compositeResourceSpec) ConnectionSecret(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error) {
@@ -263,7 +263,7 @@ type compositeResourceClaim struct {
 	clients ClientCache
 }
 
-func (r *compositeResourceClaim) Events(ctx context.Context, obj *model.CompositeResourceClaim) (*model.EventConnection, error) {
+func (r *compositeResourceClaim) Events(ctx context.Context, obj *model.CompositeResourceClaim) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,

@@ -74,7 +74,7 @@ func GetManagedResource(u *kunstructured.Unstructured) ManagedResource {
 		APIVersion: mg.GetAPIVersion(),
 		Kind:       mg.GetKind(),
 		Metadata:   GetObjectMeta(mg),
-		Spec: &ManagedResourceSpec{
+		Spec: ManagedResourceSpec{
 			WriteConnectionSecretToReference: mg.GetWriteConnectionSecretToReference(),
 			ProviderConfigRef:                GetProviderConfigReference(mg.GetProviderConfigReference()),
 			DeletionPolicy:                   GetDeletionPolicy(mg.GetDeletionPolicy()),

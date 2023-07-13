@@ -585,7 +585,7 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 		obj *model.CompositeResourceSpec
 	}
 	type want struct {
-		krc  *model.KubernetesResourceConnection
+		krc  model.KubernetesResourceConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -634,7 +634,7 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 			},
 			want: want{
 				// KR 'A' returned an error, but 'B' did not.
-				krc: &model.KubernetesResourceConnection{
+				krc: model.KubernetesResourceConnection{
 					TotalCount: 1,
 					Nodes:      []model.KubernetesResource{gkrb},
 				},
@@ -661,7 +661,7 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 				},
 			},
 			want: want{
-				krc: &model.KubernetesResourceConnection{
+				krc: model.KubernetesResourceConnection{
 					TotalCount: 2,
 					Nodes:      []model.KubernetesResource{gkra, gkrb},
 				},
@@ -684,7 +684,7 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 				},
 			},
 			want: want{
-				krc: &model.KubernetesResourceConnection{
+				krc: model.KubernetesResourceConnection{
 					TotalCount: 2,
 					Nodes:      []model.KubernetesResource{gkra, gkrb},
 				},

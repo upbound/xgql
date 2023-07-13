@@ -12,8 +12,23 @@ model:
   filename: internal/graph/model/generated.go
   package: model
 
-# Use []Thing instead of []*Thing
+# gqlgen by defaut generates getter methods for interfaces and types that
+# implement it.
+omit_getters: true
+
+# The following three stanzas configure resolver and model code to use structs
+# instead of struct pointers for all required fields. This enforces schema
+# constraints at compile time, and makes for a better experience in editor
+# tooling.
+
+# Use []Thing instead of []*Thing.
 omit_slice_element_pointers: true
+# Use type Thing struct { FieldA OtherThing } instead of { FieldA *OtherThing }.
+struct_fields_always_pointers: false
+# Make generated resolvers return Thing instead of *Thing.
+# Use type Resolver interface { Resolve(...) (ValueA, error) } instead of
+# { Resolve(...) (*ValueA, error) }
+resolvers_always_return_pointers: false
 
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
@@ -40,3 +55,21 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  # Below we define additional fields to be added to the generated models.
+  # These fields are not part of the GraphQL schema, but are used to resolve
+  # fields that are part of the schema.
+  ProviderRevisionStatus:
+    extraFields:
+      # Used to resolve ProviderRevisionStatus.objects field.
+      ObjectRefs:
+        type: "[]github.com/crossplane/crossplane-runtime/apis/common/v1.TypedReference"
+  ConfigurationRevisionStatus:
+    extraFields:
+      # Used to resolve ConfigurationRevisionStatus.objects field.
+      ObjectRefs:
+        type: "[]github.com/crossplane/crossplane-runtime/apis/common/v1.TypedReference"
+  Event:
+    extraFields:
+      # Used to resolve Event.involvedObject field.
+      InvolvedObjectRef:
+        type: "k8s.io/api/core/v1.ObjectReference"

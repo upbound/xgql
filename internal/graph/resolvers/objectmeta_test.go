@@ -57,7 +57,7 @@ func TestObjectMetaOwners(t *testing.T) {
 		obj *model.ObjectMeta
 	}
 	type want struct {
-		oc   *model.OwnerConnection
+		oc   model.OwnerConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -113,7 +113,7 @@ func TestObjectMetaOwners(t *testing.T) {
 				},
 			},
 			want: want{
-				oc: &model.OwnerConnection{
+				oc: model.OwnerConnection{
 					Nodes:      []model.Owner{{Resource: gown}},
 					TotalCount: 1,
 				},

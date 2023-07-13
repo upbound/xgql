@@ -68,7 +68,7 @@ type CompositeResourceSpec {
   """
   The resources of which this composite resource is composed.
   """
-  resources: KubernetesResourceConnection @goField(forceResolver: true)
+  resources: KubernetesResourceConnection! @goField(forceResolver: true)
 
   "Reference to the secret this composite resource writes its connection details to"
   writeConnectionSecretToReference: SecretReference

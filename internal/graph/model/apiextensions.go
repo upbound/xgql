@@ -29,7 +29,7 @@ import (
 // CompositeResourceDefinition.
 type CompositeResourceDefinitionSpec struct {
 	Group                string                               `json:"group"`
-	Names                *CompositeResourceDefinitionNames    `json:"names"`
+	Names                CompositeResourceDefinitionNames     `json:"names"`
 	ClaimNames           *CompositeResourceDefinitionNames    `json:"claimNames"`
 	ConnectionSecretKeys []string                             `json:"connectionSecretKeys"`
 	Versions             []CompositeResourceDefinitionVersion `json:"versions"`
@@ -130,9 +130,9 @@ func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) Comp
 		APIVersion: xrd.APIVersion,
 		Kind:       xrd.Kind,
 		Metadata:   GetObjectMeta(xrd),
-		Spec: &CompositeResourceDefinitionSpec{
+		Spec: CompositeResourceDefinitionSpec{
 			Group:                        xrd.Spec.Group,
-			Names:                        GetCompositeResourceDefinitionNames(&xrd.Spec.Names),
+			Names:                        *GetCompositeResourceDefinitionNames(&xrd.Spec.Names),
 			ClaimNames:                   GetCompositeResourceDefinitionNames(xrd.Spec.ClaimNames),
 			Versions:                     GetCompositeResourceDefinitionVersions(xrd.Spec.Versions),
 			DefaultCompositionReference:  xrd.Spec.DefaultCompositionRef,
@@ -162,8 +162,8 @@ func GetComposition(cmp *extv1.Composition) Composition {
 		APIVersion: cmp.APIVersion,
 		Kind:       cmp.Kind,
 		Metadata:   GetObjectMeta(cmp),
-		Spec: &CompositionSpec{
-			CompositeTypeRef: &TypeReference{
+		Spec: CompositionSpec{
+			CompositeTypeRef: TypeReference{
 				APIVersion: cmp.Spec.CompositeTypeRef.APIVersion,
 				Kind:       cmp.Spec.CompositeTypeRef.Kind,
 			},

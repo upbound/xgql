@@ -131,7 +131,7 @@ func convert(err error) error {
 			Reason: err.Error(),
 			Code:   ErrorRetryable,
 		}
-	case errors.As(err, &dead), errors.As(err, &ref):
+	case errors.Is(err, dead), errors.As(err, &ref):
 		return &serverError{
 			Source: ErrorSourceNetwork,
 			Reason: err.Error(),

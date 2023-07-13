@@ -619,11 +619,11 @@ type ComplexityRoot struct {
 }
 
 type CompositeResourceResolver interface {
-	Events(ctx context.Context, obj *model.CompositeResource) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.CompositeResource) (model.EventConnection, error)
 	Definition(ctx context.Context, obj *model.CompositeResource) (*model.CompositeResourceDefinition, error)
 }
 type CompositeResourceClaimResolver interface {
-	Events(ctx context.Context, obj *model.CompositeResourceClaim) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.CompositeResourceClaim) (model.EventConnection, error)
 	Definition(ctx context.Context, obj *model.CompositeResourceClaim) (*model.CompositeResourceDefinition, error)
 }
 type CompositeResourceClaimSpecResolver interface {
@@ -636,11 +636,11 @@ type CompositeResourceClaimSpecResolver interface {
 	WriteConnectionSecretToReference(ctx context.Context, obj *model.CompositeResourceClaimSpec) (*model.SecretReference, error)
 }
 type CompositeResourceDefinitionResolver interface {
-	Events(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.CompositeResourceDefinition) (model.EventConnection, error)
 	CompositeResourceCrd(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.CustomResourceDefinition, error)
 	CompositeResourceClaimCrd(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.CustomResourceDefinition, error)
-	DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, options *model.DefinedCompositeResourceOptionsInput) (*model.CompositeResourceConnection, error)
-	DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, namespace *string, options *model.DefinedCompositeResourceClaimOptionsInput) (*model.CompositeResourceClaimConnection, error)
+	DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, options *model.DefinedCompositeResourceOptionsInput) (model.CompositeResourceConnection, error)
+	DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, namespace *string, options *model.DefinedCompositeResourceClaimOptionsInput) (model.CompositeResourceClaimConnection, error)
 }
 type CompositeResourceDefinitionSpecResolver interface {
 	DefaultComposition(ctx context.Context, obj *model.CompositeResourceDefinitionSpec) (*model.Composition, error)
@@ -653,84 +653,84 @@ type CompositeResourceSpecResolver interface {
 	Claim(ctx context.Context, obj *model.CompositeResourceSpec) (*model.CompositeResourceClaim, error)
 	ClaimRef(ctx context.Context, obj *model.CompositeResourceSpec) (*model.ObjectReference, error)
 	ConnectionSecret(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error)
-	Resources(ctx context.Context, obj *model.CompositeResourceSpec) (*model.KubernetesResourceConnection, error)
+	Resources(ctx context.Context, obj *model.CompositeResourceSpec) (model.KubernetesResourceConnection, error)
 	WriteConnectionSecretToReference(ctx context.Context, obj *model.CompositeResourceSpec) (*model.SecretReference, error)
 }
 type CompositionResolver interface {
-	Events(ctx context.Context, obj *model.Composition) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.Composition) (model.EventConnection, error)
 }
 type ConfigMapResolver interface {
-	Events(ctx context.Context, obj *model.ConfigMap) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.ConfigMap) (model.EventConnection, error)
 }
 type ConfigurationResolver interface {
-	Events(ctx context.Context, obj *model.Configuration) (*model.EventConnection, error)
-	Revisions(ctx context.Context, obj *model.Configuration) (*model.ConfigurationRevisionConnection, error)
+	Events(ctx context.Context, obj *model.Configuration) (model.EventConnection, error)
+	Revisions(ctx context.Context, obj *model.Configuration) (model.ConfigurationRevisionConnection, error)
 	ActiveRevision(ctx context.Context, obj *model.Configuration) (*model.ConfigurationRevision, error)
 }
 type ConfigurationRevisionResolver interface {
-	Events(ctx context.Context, obj *model.ConfigurationRevision) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.ConfigurationRevision) (model.EventConnection, error)
 }
 type ConfigurationRevisionStatusResolver interface {
-	Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (*model.KubernetesResourceConnection, error)
+	Objects(ctx context.Context, obj *model.ConfigurationRevisionStatus) (model.KubernetesResourceConnection, error)
 }
 type CustomResourceDefinitionResolver interface {
-	Events(ctx context.Context, obj *model.CustomResourceDefinition) (*model.EventConnection, error)
-	DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error)
+	Events(ctx context.Context, obj *model.CustomResourceDefinition) (model.EventConnection, error)
+	DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (model.KubernetesResourceConnection, error)
 }
 type EventResolver interface {
 	InvolvedObject(ctx context.Context, obj *model.Event) (model.KubernetesResource, error)
 }
 type GenericResourceResolver interface {
-	Events(ctx context.Context, obj *model.GenericResource) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.GenericResource) (model.EventConnection, error)
 }
 type ManagedResourceResolver interface {
-	Events(ctx context.Context, obj *model.ManagedResource) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.ManagedResource) (model.EventConnection, error)
 	Definition(ctx context.Context, obj *model.ManagedResource) (model.ManagedResourceDefinition, error)
 }
 type ManagedResourceSpecResolver interface {
 	ConnectionSecret(ctx context.Context, obj *model.ManagedResourceSpec) (*model.Secret, error)
 }
 type MutationResolver interface {
-	CreateKubernetesResource(ctx context.Context, input model.CreateKubernetesResourceInput) (*model.CreateKubernetesResourcePayload, error)
-	UpdateKubernetesResource(ctx context.Context, id model.ReferenceID, input model.UpdateKubernetesResourceInput) (*model.UpdateKubernetesResourcePayload, error)
-	DeleteKubernetesResource(ctx context.Context, id model.ReferenceID) (*model.DeleteKubernetesResourcePayload, error)
+	CreateKubernetesResource(ctx context.Context, input model.CreateKubernetesResourceInput) (model.CreateKubernetesResourcePayload, error)
+	UpdateKubernetesResource(ctx context.Context, id model.ReferenceID, input model.UpdateKubernetesResourceInput) (model.UpdateKubernetesResourcePayload, error)
+	DeleteKubernetesResource(ctx context.Context, id model.ReferenceID) (model.DeleteKubernetesResourcePayload, error)
 }
 type ObjectMetaResolver interface {
-	Owners(ctx context.Context, obj *model.ObjectMeta) (*model.OwnerConnection, error)
+	Owners(ctx context.Context, obj *model.ObjectMeta) (model.OwnerConnection, error)
 	Controller(ctx context.Context, obj *model.ObjectMeta) (model.KubernetesResource, error)
 }
 type ProviderResolver interface {
-	Events(ctx context.Context, obj *model.Provider) (*model.EventConnection, error)
-	Revisions(ctx context.Context, obj *model.Provider) (*model.ProviderRevisionConnection, error)
+	Events(ctx context.Context, obj *model.Provider) (model.EventConnection, error)
+	Revisions(ctx context.Context, obj *model.Provider) (model.ProviderRevisionConnection, error)
 	ActiveRevision(ctx context.Context, obj *model.Provider) (*model.ProviderRevision, error)
 }
 type ProviderConfigResolver interface {
-	Events(ctx context.Context, obj *model.ProviderConfig) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.ProviderConfig) (model.EventConnection, error)
 	Definition(ctx context.Context, obj *model.ProviderConfig) (model.ProviderConfigDefinition, error)
 }
 type ProviderRevisionResolver interface {
-	Events(ctx context.Context, obj *model.ProviderRevision) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.ProviderRevision) (model.EventConnection, error)
 }
 type ProviderRevisionStatusResolver interface {
-	Objects(ctx context.Context, obj *model.ProviderRevisionStatus) (*model.KubernetesResourceConnection, error)
+	Objects(ctx context.Context, obj *model.ProviderRevisionStatus) (model.KubernetesResourceConnection, error)
 }
 type QueryResolver interface {
 	KubernetesResource(ctx context.Context, id model.ReferenceID) (model.KubernetesResource, error)
-	KubernetesResources(ctx context.Context, apiVersion string, kind string, listKind *string, namespace *string) (*model.KubernetesResourceConnection, error)
-	Events(ctx context.Context, involved *model.ReferenceID) (*model.EventConnection, error)
+	KubernetesResources(ctx context.Context, apiVersion string, kind string, listKind *string, namespace *string) (model.KubernetesResourceConnection, error)
+	Events(ctx context.Context, involved *model.ReferenceID) (model.EventConnection, error)
 	Secret(ctx context.Context, namespace string, name string) (*model.Secret, error)
 	ConfigMap(ctx context.Context, namespace string, name string) (*model.ConfigMap, error)
-	Providers(ctx context.Context) (*model.ProviderConnection, error)
-	ProviderRevisions(ctx context.Context, provider *model.ReferenceID, active *bool) (*model.ProviderRevisionConnection, error)
-	CustomResourceDefinitions(ctx context.Context, revision *model.ReferenceID) (*model.CustomResourceDefinitionConnection, error)
-	Configurations(ctx context.Context) (*model.ConfigurationConnection, error)
-	ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID, active *bool) (*model.ConfigurationRevisionConnection, error)
-	CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositeResourceDefinitionConnection, error)
-	Compositions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositionConnection, error)
-	CrossplaneResourceTree(ctx context.Context, id model.ReferenceID) (*model.CrossplaneResourceTreeConnection, error)
+	Providers(ctx context.Context) (model.ProviderConnection, error)
+	ProviderRevisions(ctx context.Context, provider *model.ReferenceID, active *bool) (model.ProviderRevisionConnection, error)
+	CustomResourceDefinitions(ctx context.Context, revision *model.ReferenceID) (model.CustomResourceDefinitionConnection, error)
+	Configurations(ctx context.Context) (model.ConfigurationConnection, error)
+	ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID, active *bool) (model.ConfigurationRevisionConnection, error)
+	CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (model.CompositeResourceDefinitionConnection, error)
+	Compositions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (model.CompositionConnection, error)
+	CrossplaneResourceTree(ctx context.Context, id model.ReferenceID) (model.CrossplaneResourceTreeConnection, error)
 }
 type SecretResolver interface {
-	Events(ctx context.Context, obj *model.Secret) (*model.EventConnection, error)
+	Events(ctx context.Context, obj *model.Secret) (model.EventConnection, error)
 }
 
 type executableSchema struct {
@@ -744,7 +744,7 @@ func (e *executableSchema) Schema() *ast.Schema {
 }
 
 func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]interface{}) (int, bool) {
-	ec := executionContext{nil, e}
+	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
 
@@ -3134,7 +3134,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
-	ec := executionContext{rc, e}
+	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateKubernetesResourceInput,
 		ec.unmarshalInputDefinedCompositeResourceClaimOptionsInput,
@@ -3147,18 +3147,33 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	switch rc.Operation.Operation {
 	case ast.Query:
 		return func(ctx context.Context) *graphql.Response {
-			if !first {
-				return nil
+			var response graphql.Response
+			var data graphql.Marshaler
+			if first {
+				first = false
+				ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
+				data = ec._Query(ctx, rc.Operation.SelectionSet)
+			} else {
+				if atomic.LoadInt32(&ec.pendingDeferred) > 0 {
+					result := <-ec.deferredResults
+					atomic.AddInt32(&ec.pendingDeferred, -1)
+					data = result.Result
+					response.Path = result.Path
+					response.Label = result.Label
+					response.Errors = result.Errors
+				} else {
+					return nil
+				}
 			}
-			first = false
-			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-			data := ec._Query(ctx, rc.Operation.SelectionSet)
 			var buf bytes.Buffer
 			data.MarshalGQL(&buf)
-
-			return &graphql.Response{
-				Data: buf.Bytes(),
+			response.Data = buf.Bytes()
+			if atomic.LoadInt32(&ec.deferred) > 0 {
+				hasNext := atomic.LoadInt32(&ec.pendingDeferred) > 0
+				response.HasNext = &hasNext
 			}
+
+			return &response
 		}
 	case ast.Mutation:
 		return func(ctx context.Context) *graphql.Response {
@@ -3184,6 +3199,28 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 type executionContext struct {
 	*graphql.OperationContext
 	*executableSchema
+	deferred        int32
+	pendingDeferred int32
+	deferredResults chan graphql.DeferredResult
+}
+
+func (ec *executionContext) processDeferredGroup(dg graphql.DeferredGroup) {
+	atomic.AddInt32(&ec.pendingDeferred, 1)
+	go func() {
+		ctx := graphql.WithFreshResponseContext(dg.Context)
+		dg.FieldSet.Dispatch(ctx)
+		ds := graphql.DeferredResult{
+			Path:   dg.Path,
+			Label:  dg.Label,
+			Result: dg.FieldSet,
+			Errors: graphql.GetErrors(ctx),
+		}
+		// null fields should bubble up
+		if dg.FieldSet.Invalids > 0 {
+			ds.Result = graphql.Null
+		}
+		ec.deferredResults <- ds
+	}()
 }
 
 func (ec *executionContext) introspectSchema() (*introspection.Schema, error) {
@@ -3993,6 +4030,7 @@ type Secret implements Node & KubernetesResource {
   The data stored in this secret. Values are not base64 encoded.
   """
   data("Data keys for which to return values." keys: [String!]): StringMap
+    @goField(name: "data")
 
   """
   An unstructured JSON representation of the underlying Kubernetes resource.
@@ -4033,6 +4071,7 @@ type ConfigMap implements Node & KubernetesResource {
   The data stored in this config map.
   """
   data("Data keys for which to return values." keys: [String!]): StringMap
+    @goField(name: "data")
 
   """
   An unstructured JSON representation of the underlying Kubernetes resource.
@@ -4318,7 +4357,7 @@ type CompositeResourceSpec {
   """
   The resources of which this composite resource is composed.
   """
-  resources: KubernetesResourceConnection @goField(forceResolver: true)
+  resources: KubernetesResourceConnection! @goField(forceResolver: true)
 
   "Reference to the secret this composite resource writes its connection details to"
   writeConnectionSecretToReference: SecretReference
@@ -4686,6 +4725,12 @@ type ConfigurationRevisionStatus implements ConditionedStatus {
 directive @goField(
   forceResolver: Boolean
   name: String
+  omittable: Boolean
+) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+directive @goTag(
+  key: String!
+  value: String
 ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 `, BuiltIn: false},
 	{Name: "../../../schema/managed.gql", Input: `"""
@@ -6128,9 +6173,9 @@ func (ec *executionContext) _CompositeResource_metadata(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResource_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6198,9 +6243,9 @@ func (ec *executionContext) _CompositeResource_spec(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceSpec)
+	res := resTmp.(model.CompositeResourceSpec)
 	fc.Result = res
-	return ec.marshalNCompositeResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceSpec(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResource_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6351,9 +6396,9 @@ func (ec *executionContext) _CompositeResource_events(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResource_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6600,9 +6645,9 @@ func (ec *executionContext) _CompositeResourceClaim_metadata(ctx context.Context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceClaim_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6670,9 +6715,9 @@ func (ec *executionContext) _CompositeResourceClaim_spec(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceClaimSpec)
+	res := resTmp.(model.CompositeResourceClaimSpec)
 	fc.Result = res
-	return ec.marshalNCompositeResourceClaimSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimSpec(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceClaimSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceClaim_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6821,9 +6866,9 @@ func (ec *executionContext) _CompositeResourceClaim_events(ctx context.Context, 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceClaim_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7825,9 +7870,9 @@ func (ec *executionContext) _CompositeResourceDefinition_metadata(ctx context.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceDefinition_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7895,9 +7940,9 @@ func (ec *executionContext) _CompositeResourceDefinition_spec(ctx context.Contex
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceDefinitionSpec)
+	res := resTmp.(model.CompositeResourceDefinitionSpec)
 	fc.Result = res
-	return ec.marshalNCompositeResourceDefinitionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionSpec(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceDefinitionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceDefinition_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8046,9 +8091,9 @@ func (ec *executionContext) _CompositeResourceDefinition_events(ctx context.Cont
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceDefinition_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8218,9 +8263,9 @@ func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResourc
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceConnection)
+	res := resTmp.(model.CompositeResourceConnection)
 	fc.Result = res
-	return ec.marshalNCompositeResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceDefinition_definedCompositeResources(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8248,7 +8293,7 @@ func (ec *executionContext) fieldContext_CompositeResourceDefinition_definedComp
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_CompositeResourceDefinition_definedCompositeResources_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -8279,9 +8324,9 @@ func (ec *executionContext) _CompositeResourceDefinition_definedCompositeResourc
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceClaimConnection)
+	res := resTmp.(model.CompositeResourceClaimConnection)
 	fc.Result = res
-	return ec.marshalNCompositeResourceClaimConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceClaimConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceDefinition_definedCompositeResourceClaims(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8309,7 +8354,7 @@ func (ec *executionContext) fieldContext_CompositeResourceDefinition_definedComp
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_CompositeResourceDefinition_definedCompositeResourceClaims_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -8841,9 +8886,9 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec_names(ctx context.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceDefinitionNames)
+	res := resTmp.(model.CompositeResourceDefinitionNames)
 	fc.Result = res
-	return ec.marshalNCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceDefinitionNames2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceDefinitionSpec_names(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9754,11 +9799,14 @@ func (ec *executionContext) _CompositeResourceSpec_resources(ctx context.Context
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KubernetesResourceConnection)
+	res := resTmp.(model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalOKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositeResourceSpec_resources(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10124,9 +10172,9 @@ func (ec *executionContext) _Composition_metadata(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Composition_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10194,9 +10242,9 @@ func (ec *executionContext) _Composition_spec(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositionSpec)
+	res := resTmp.(model.CompositionSpec)
 	fc.Result = res
-	return ec.marshalNCompositionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx, field.Selections, res)
+	return ec.marshalNCompositionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Composition_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10333,9 +10381,9 @@ func (ec *executionContext) _Composition_events(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Composition_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10486,9 +10534,9 @@ func (ec *executionContext) _CompositionSpec_compositeTypeRef(ctx context.Contex
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.TypeReference)
+	res := resTmp.(model.TypeReference)
 	fc.Result = res
-	return ec.marshalNTypeReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx, field.Selections, res)
+	return ec.marshalNTypeReference2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CompositionSpec_compositeTypeRef(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10979,9 +11027,9 @@ func (ec *executionContext) _ConfigMap_metadata(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigMap_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11070,7 +11118,7 @@ func (ec *executionContext) fieldContext_ConfigMap_data(ctx context.Context, fie
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ConfigMap_data_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -11145,9 +11193,9 @@ func (ec *executionContext) _ConfigMap_events(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigMap_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11327,9 +11375,9 @@ func (ec *executionContext) _Configuration_metadata(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Configuration_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11397,9 +11445,9 @@ func (ec *executionContext) _Configuration_spec(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ConfigurationSpec)
+	res := resTmp.(model.ConfigurationSpec)
 	fc.Result = res
-	return ec.marshalNConfigurationSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationSpec(ctx, field.Selections, res)
+	return ec.marshalNConfigurationSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Configuration_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11548,9 +11596,9 @@ func (ec *executionContext) _Configuration_events(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Configuration_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11598,9 +11646,9 @@ func (ec *executionContext) _Configuration_revisions(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ConfigurationRevisionConnection)
+	res := resTmp.(model.ConfigurationRevisionConnection)
 	fc.Result = res
-	return ec.marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
+	return ec.marshalNConfigurationRevisionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Configuration_revisions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11946,9 +11994,9 @@ func (ec *executionContext) _ConfigurationRevision_metadata(ctx context.Context,
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigurationRevision_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12016,9 +12064,9 @@ func (ec *executionContext) _ConfigurationRevision_spec(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ConfigurationRevisionSpec)
+	res := resTmp.(model.ConfigurationRevisionSpec)
 	fc.Result = res
-	return ec.marshalNConfigurationRevisionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionSpec(ctx, field.Selections, res)
+	return ec.marshalNConfigurationRevisionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigurationRevision_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12173,9 +12221,9 @@ func (ec *executionContext) _ConfigurationRevision_events(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigurationRevision_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12810,9 +12858,9 @@ func (ec *executionContext) _ConfigurationRevisionStatus_objects(ctx context.Con
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KubernetesResourceConnection)
+	res := resTmp.(model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ConfigurationRevisionStatus_objects(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13593,9 +13641,9 @@ func (ec *executionContext) _CustomResourceDefinition_metadata(ctx context.Conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CustomResourceDefinition_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13663,9 +13711,9 @@ func (ec *executionContext) _CustomResourceDefinition_spec(ctx context.Context, 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CustomResourceDefinitionSpec)
+	res := resTmp.(model.CustomResourceDefinitionSpec)
 	fc.Result = res
-	return ec.marshalNCustomResourceDefinitionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionSpec(ctx, field.Selections, res)
+	return ec.marshalNCustomResourceDefinitionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CustomResourceDefinition_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13806,9 +13854,9 @@ func (ec *executionContext) _CustomResourceDefinition_events(ctx context.Context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CustomResourceDefinition_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13856,9 +13904,9 @@ func (ec *executionContext) _CustomResourceDefinition_definedResources(ctx conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KubernetesResourceConnection)
+	res := resTmp.(model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CustomResourceDefinition_definedResources(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13886,7 +13934,7 @@ func (ec *executionContext) fieldContext_CustomResourceDefinition_definedResourc
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_CustomResourceDefinition_definedResources_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -14318,9 +14366,9 @@ func (ec *executionContext) _CustomResourceDefinitionSpec_names(ctx context.Cont
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CustomResourceDefinitionNames)
+	res := resTmp.(model.CustomResourceDefinitionNames)
 	fc.Result = res
-	return ec.marshalNCustomResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx, field.Selections, res)
+	return ec.marshalNCustomResourceDefinitionNames2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CustomResourceDefinitionSpec_names(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14869,9 +14917,9 @@ func (ec *executionContext) _Event_metadata(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Event_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15604,9 +15652,9 @@ func (ec *executionContext) _GenericResource_metadata(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_GenericResource_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -15718,9 +15766,9 @@ func (ec *executionContext) _GenericResource_events(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_GenericResource_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16070,9 +16118,9 @@ func (ec *executionContext) _ManagedResource_metadata(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ManagedResource_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16140,9 +16188,9 @@ func (ec *executionContext) _ManagedResource_spec(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ManagedResourceSpec)
+	res := resTmp.(model.ManagedResourceSpec)
 	fc.Result = res
-	return ec.marshalNManagedResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx, field.Selections, res)
+	return ec.marshalNManagedResourceSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ManagedResource_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16281,9 +16329,9 @@ func (ec *executionContext) _ManagedResource_events(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ManagedResource_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16570,9 +16618,9 @@ func (ec *executionContext) _Mutation_createKubernetesResource(ctx context.Conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CreateKubernetesResourcePayload)
+	res := resTmp.(model.CreateKubernetesResourcePayload)
 	fc.Result = res
-	return ec.marshalNCreateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourcePayload(ctx, field.Selections, res)
+	return ec.marshalNCreateKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourcePayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createKubernetesResource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16598,7 +16646,7 @@ func (ec *executionContext) fieldContext_Mutation_createKubernetesResource(ctx c
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createKubernetesResource_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16629,9 +16677,9 @@ func (ec *executionContext) _Mutation_updateKubernetesResource(ctx context.Conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.UpdateKubernetesResourcePayload)
+	res := resTmp.(model.UpdateKubernetesResourcePayload)
 	fc.Result = res
-	return ec.marshalNUpdateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx, field.Selections, res)
+	return ec.marshalNUpdateKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateKubernetesResource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16657,7 +16705,7 @@ func (ec *executionContext) fieldContext_Mutation_updateKubernetesResource(ctx c
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateKubernetesResource_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16688,9 +16736,9 @@ func (ec *executionContext) _Mutation_deleteKubernetesResource(ctx context.Conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.DeleteKubernetesResourcePayload)
+	res := resTmp.(model.DeleteKubernetesResourcePayload)
 	fc.Result = res
-	return ec.marshalNDeleteKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeleteKubernetesResourcePayload(ctx, field.Selections, res)
+	return ec.marshalNDeleteKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeleteKubernetesResourcePayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteKubernetesResource(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16716,7 +16764,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteKubernetesResource(ctx c
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteKubernetesResource_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -17111,7 +17159,7 @@ func (ec *executionContext) fieldContext_ObjectMeta_labels(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ObjectMeta_labels_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -17163,7 +17211,7 @@ func (ec *executionContext) fieldContext_ObjectMeta_annotations(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_ObjectMeta_annotations_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -17194,9 +17242,9 @@ func (ec *executionContext) _ObjectMeta_owners(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.OwnerConnection)
+	res := resTmp.(model.OwnerConnection)
 	fc.Result = res
-	return ec.marshalNOwnerConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx, field.Selections, res)
+	return ec.marshalNOwnerConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ObjectMeta_owners(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -17924,9 +17972,9 @@ func (ec *executionContext) _Provider_metadata(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Provider_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -17994,9 +18042,9 @@ func (ec *executionContext) _Provider_spec(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProviderSpec)
+	res := resTmp.(model.ProviderSpec)
 	fc.Result = res
-	return ec.marshalNProviderSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderSpec(ctx, field.Selections, res)
+	return ec.marshalNProviderSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Provider_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -18145,9 +18193,9 @@ func (ec *executionContext) _Provider_events(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Provider_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -18195,9 +18243,9 @@ func (ec *executionContext) _Provider_revisions(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProviderRevisionConnection)
+	res := resTmp.(model.ProviderRevisionConnection)
 	fc.Result = res
-	return ec.marshalNProviderRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx, field.Selections, res)
+	return ec.marshalNProviderRevisionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Provider_revisions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -18436,9 +18484,9 @@ func (ec *executionContext) _ProviderConfig_metadata(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProviderConfig_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -18597,9 +18645,9 @@ func (ec *executionContext) _ProviderConfig_events(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProviderConfig_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -19065,9 +19113,9 @@ func (ec *executionContext) _ProviderRevision_metadata(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProviderRevision_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -19135,9 +19183,9 @@ func (ec *executionContext) _ProviderRevision_spec(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProviderRevisionSpec)
+	res := resTmp.(model.ProviderRevisionSpec)
 	fc.Result = res
-	return ec.marshalNProviderRevisionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionSpec(ctx, field.Selections, res)
+	return ec.marshalNProviderRevisionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionSpec(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProviderRevision_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -19292,9 +19340,9 @@ func (ec *executionContext) _ProviderRevision_events(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProviderRevision_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -19929,9 +19977,9 @@ func (ec *executionContext) _ProviderRevisionStatus_objects(ctx context.Context,
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KubernetesResourceConnection)
+	res := resTmp.(model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProviderRevisionStatus_objects(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20384,7 +20432,7 @@ func (ec *executionContext) fieldContext_Query_kubernetesResource(ctx context.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_kubernetesResource_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20415,9 +20463,9 @@ func (ec *executionContext) _Query_kubernetesResources(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KubernetesResourceConnection)
+	res := resTmp.(model.KubernetesResourceConnection)
 	fc.Result = res
-	return ec.marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
+	return ec.marshalNKubernetesResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_kubernetesResources(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20445,7 +20493,7 @@ func (ec *executionContext) fieldContext_Query_kubernetesResources(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_kubernetesResources_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20476,9 +20524,9 @@ func (ec *executionContext) _Query_events(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20506,7 +20554,7 @@ func (ec *executionContext) fieldContext_Query_events(ctx context.Context, field
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_events_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20576,7 +20624,7 @@ func (ec *executionContext) fieldContext_Query_secret(ctx context.Context, field
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_secret_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20644,7 +20692,7 @@ func (ec *executionContext) fieldContext_Query_configMap(ctx context.Context, fi
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_configMap_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20675,9 +20723,9 @@ func (ec *executionContext) _Query_providers(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProviderConnection)
+	res := resTmp.(model.ProviderConnection)
 	fc.Result = res
-	return ec.marshalNProviderConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConnection(ctx, field.Selections, res)
+	return ec.marshalNProviderConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_providers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20725,9 +20773,9 @@ func (ec *executionContext) _Query_providerRevisions(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ProviderRevisionConnection)
+	res := resTmp.(model.ProviderRevisionConnection)
 	fc.Result = res
-	return ec.marshalNProviderRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx, field.Selections, res)
+	return ec.marshalNProviderRevisionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_providerRevisions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20755,7 +20803,7 @@ func (ec *executionContext) fieldContext_Query_providerRevisions(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_providerRevisions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20786,9 +20834,9 @@ func (ec *executionContext) _Query_customResourceDefinitions(ctx context.Context
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CustomResourceDefinitionConnection)
+	res := resTmp.(model.CustomResourceDefinitionConnection)
 	fc.Result = res
-	return ec.marshalNCustomResourceDefinitionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionConnection(ctx, field.Selections, res)
+	return ec.marshalNCustomResourceDefinitionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_customResourceDefinitions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20816,7 +20864,7 @@ func (ec *executionContext) fieldContext_Query_customResourceDefinitions(ctx con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_customResourceDefinitions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20847,9 +20895,9 @@ func (ec *executionContext) _Query_configurations(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ConfigurationConnection)
+	res := resTmp.(model.ConfigurationConnection)
 	fc.Result = res
-	return ec.marshalNConfigurationConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationConnection(ctx, field.Selections, res)
+	return ec.marshalNConfigurationConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_configurations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20897,9 +20945,9 @@ func (ec *executionContext) _Query_configurationRevisions(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ConfigurationRevisionConnection)
+	res := resTmp.(model.ConfigurationRevisionConnection)
 	fc.Result = res
-	return ec.marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
+	return ec.marshalNConfigurationRevisionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_configurationRevisions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20927,7 +20975,7 @@ func (ec *executionContext) fieldContext_Query_configurationRevisions(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_configurationRevisions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -20958,9 +21006,9 @@ func (ec *executionContext) _Query_compositeResourceDefinitions(ctx context.Cont
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositeResourceDefinitionConnection)
+	res := resTmp.(model.CompositeResourceDefinitionConnection)
 	fc.Result = res
-	return ec.marshalNCompositeResourceDefinitionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionConnection(ctx, field.Selections, res)
+	return ec.marshalNCompositeResourceDefinitionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_compositeResourceDefinitions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -20988,7 +21036,7 @@ func (ec *executionContext) fieldContext_Query_compositeResourceDefinitions(ctx 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_compositeResourceDefinitions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -21019,9 +21067,9 @@ func (ec *executionContext) _Query_compositions(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CompositionConnection)
+	res := resTmp.(model.CompositionConnection)
 	fc.Result = res
-	return ec.marshalNCompositionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionConnection(ctx, field.Selections, res)
+	return ec.marshalNCompositionConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_compositions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -21049,7 +21097,7 @@ func (ec *executionContext) fieldContext_Query_compositions(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_compositions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -21080,9 +21128,9 @@ func (ec *executionContext) _Query_crossplaneResourceTree(ctx context.Context, f
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.CrossplaneResourceTreeConnection)
+	res := resTmp.(model.CrossplaneResourceTreeConnection)
 	fc.Result = res
-	return ec.marshalNCrossplaneResourceTreeConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeConnection(ctx, field.Selections, res)
+	return ec.marshalNCrossplaneResourceTreeConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_crossplaneResourceTree(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -21110,7 +21158,7 @@ func (ec *executionContext) fieldContext_Query_crossplaneResourceTree(ctx contex
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_crossplaneResourceTree_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -21184,7 +21232,7 @@ func (ec *executionContext) fieldContext_Query___type(ctx context.Context, field
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query___type_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -21402,9 +21450,9 @@ func (ec *executionContext) _Secret_metadata(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.ObjectMeta)
+	res := resTmp.(model.ObjectMeta)
 	fc.Result = res
-	return ec.marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
+	return ec.marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Secret_metadata(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -21534,7 +21582,7 @@ func (ec *executionContext) fieldContext_Secret_data(ctx context.Context, field 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Secret_data_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -21609,9 +21657,9 @@ func (ec *executionContext) _Secret_events(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.EventConnection)
+	res := resTmp.(model.EventConnection)
 	fc.Result = res
-	return ec.marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
+	return ec.marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Secret_events(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -23271,7 +23319,7 @@ func (ec *executionContext) fieldContext___Type_fields(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field___Type_fields_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -23459,7 +23507,7 @@ func (ec *executionContext) fieldContext___Type_enumValues(ctx context.Context, 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field___Type_enumValues_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -23641,18 +23689,20 @@ func (ec *executionContext) unmarshalInputCreateKubernetesResourceInput(ctx cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unstructured"))
-			it.Unstructured, err = ec.unmarshalNJSON2ᚕbyte(ctx, v)
+			data, err := ec.unmarshalNJSON2ᚕbyte(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Unstructured = data
 		case "patches":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("patches"))
-			it.Patches, err = ec.unmarshalOPatch2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatchᚄ(ctx, v)
+			data, err := ec.unmarshalOPatch2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatchᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Patches = data
 		}
 	}
 
@@ -23677,26 +23727,29 @@ func (ec *executionContext) unmarshalInputDefinedCompositeResourceClaimOptionsIn
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("version"))
-			it.Version, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Version = data
 		case "namespace":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("namespace"))
-			it.Namespace, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Namespace = data
 		case "ready":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ready"))
-			it.Ready, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Ready = data
 		}
 	}
 
@@ -23721,18 +23774,20 @@ func (ec *executionContext) unmarshalInputDefinedCompositeResourceOptionsInput(c
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("version"))
-			it.Version, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Version = data
 		case "ready":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ready"))
-			it.Ready, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Ready = data
 		}
 	}
 
@@ -23757,18 +23812,20 @@ func (ec *executionContext) unmarshalInputPatch(ctx context.Context, obj interfa
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fieldPath"))
-			it.FieldPath, err = ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.FieldPath = data
 		case "unstructured":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unstructured"))
-			it.Unstructured, err = ec.unmarshalNJSON2ᚕbyte(ctx, v)
+			data, err := ec.unmarshalNJSON2ᚕbyte(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Unstructured = data
 		}
 	}
 
@@ -23793,18 +23850,20 @@ func (ec *executionContext) unmarshalInputUpdateKubernetesResourceInput(ctx cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("unstructured"))
-			it.Unstructured, err = ec.unmarshalNJSON2ᚕbyte(ctx, v)
+			data, err := ec.unmarshalNJSON2ᚕbyte(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Unstructured = data
 		case "patches":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("patches"))
-			it.Patches, err = ec.unmarshalOPatch2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatchᚄ(ctx, v)
+			data, err := ec.unmarshalOPatch2ᚕgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPatchᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
+			it.Patches = data
 		}
 	}
 
@@ -24162,62 +24221,49 @@ var compositeResourceImplementors = []string{"CompositeResource", "Node", "Kuber
 
 func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResource")
 		case "id":
-
 			out.Values[i] = ec._CompositeResource_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._CompositeResource_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._CompositeResource_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._CompositeResource_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "spec":
-
 			out.Values[i] = ec._CompositeResource_spec(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
-
 			out.Values[i] = ec._CompositeResource_status(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._CompositeResource_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24225,19 +24271,35 @@ func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.Sele
 				}()
 				res = ec._CompositeResource_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "definition":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24247,18 +24309,46 @@ func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.Sele
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24266,62 +24356,49 @@ var compositeResourceClaimImplementors = []string{"CompositeResourceClaim", "Nod
 
 func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceClaim) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceClaimImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceClaim")
 		case "id":
-
 			out.Values[i] = ec._CompositeResourceClaim_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._CompositeResourceClaim_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._CompositeResourceClaim_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._CompositeResourceClaim_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "spec":
-
 			out.Values[i] = ec._CompositeResourceClaim_spec(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
-
 			out.Values[i] = ec._CompositeResourceClaim_status(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._CompositeResourceClaim_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24329,19 +24406,35 @@ func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast
 				}()
 				res = ec._CompositeResourceClaim_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "definition":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24351,18 +24444,46 @@ func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24370,31 +24491,40 @@ var compositeResourceClaimConnectionImplementors = []string{"CompositeResourceCl
 
 func (ec *executionContext) _CompositeResourceClaimConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceClaimConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceClaimConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceClaimConnection")
 		case "nodes":
-
 			out.Values[i] = ec._CompositeResourceClaimConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._CompositeResourceClaimConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24402,24 +24532,35 @@ var compositeResourceClaimConnectionDetailsImplementors = []string{"CompositeRes
 
 func (ec *executionContext) _CompositeResourceClaimConnectionDetails(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceClaimConnectionDetails) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceClaimConnectionDetailsImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceClaimConnectionDetails")
 		case "lastPublishedTime":
-
 			out.Values[i] = ec._CompositeResourceClaimConnectionDetails_lastPublishedTime(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24427,8 +24568,9 @@ var compositeResourceClaimSpecImplementors = []string{"CompositeResourceClaimSpe
 
 func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceClaimSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceClaimSpecImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -24436,7 +24578,7 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 		case "composition":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24446,14 +24588,30 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "compositionRef":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24463,18 +24621,32 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "compositionSelector":
-
 			out.Values[i] = ec._CompositeResourceClaimSpec_compositionSelector(ctx, field, obj)
-
 		case "resource":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24484,14 +24656,30 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "resourceRef":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24501,14 +24689,30 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "connectionSecret":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24518,14 +24722,30 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "writeConnectionSecretToReference":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24535,18 +24755,46 @@ func (ec *executionContext) _CompositeResourceClaimSpec(ctx context.Context, sel
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24554,28 +24802,37 @@ var compositeResourceClaimStatusImplementors = []string{"CompositeResourceClaimS
 
 func (ec *executionContext) _CompositeResourceClaimStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceClaimStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceClaimStatusImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceClaimStatus")
 		case "conditions":
-
 			out.Values[i] = ec._CompositeResourceClaimStatus_conditions(ctx, field, obj)
-
 		case "connectionDetails":
-
 			out.Values[i] = ec._CompositeResourceClaimStatus_connectionDetails(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24583,31 +24840,40 @@ var compositeResourceConnectionImplementors = []string{"CompositeResourceConnect
 
 func (ec *executionContext) _CompositeResourceConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceConnection")
 		case "nodes":
-
 			out.Values[i] = ec._CompositeResourceConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._CompositeResourceConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24615,24 +24881,35 @@ var compositeResourceConnectionDetailsImplementors = []string{"CompositeResource
 
 func (ec *executionContext) _CompositeResourceConnectionDetails(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceConnectionDetails) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceConnectionDetailsImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceConnectionDetails")
 		case "lastPublishedTime":
-
 			out.Values[i] = ec._CompositeResourceConnectionDetails_lastPublishedTime(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24640,62 +24917,49 @@ var compositeResourceDefinitionImplementors = []string{"CompositeResourceDefinit
 
 func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinition) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinition")
 		case "id":
-
 			out.Values[i] = ec._CompositeResourceDefinition_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._CompositeResourceDefinition_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._CompositeResourceDefinition_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._CompositeResourceDefinition_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "spec":
-
 			out.Values[i] = ec._CompositeResourceDefinition_spec(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
-
 			out.Values[i] = ec._CompositeResourceDefinition_status(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._CompositeResourceDefinition_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24703,19 +24967,35 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 				}()
 				res = ec._CompositeResourceDefinition_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "compositeResourceCRD":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24725,14 +25005,30 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "compositeResourceClaimCRD":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24742,14 +25038,30 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "definedCompositeResources":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24757,19 +25069,35 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 				}()
 				res = ec._CompositeResourceDefinition_definedCompositeResources(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "definedCompositeResourceClaims":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24777,23 +25105,51 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 				}()
 				res = ec._CompositeResourceDefinition_definedCompositeResourceClaims(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24801,31 +25157,40 @@ var compositeResourceDefinitionConnectionImplementors = []string{"CompositeResou
 
 func (ec *executionContext) _CompositeResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionConnection")
 		case "nodes":
-
 			out.Values[i] = ec._CompositeResourceDefinitionConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._CompositeResourceDefinitionConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24833,28 +25198,37 @@ var compositeResourceDefinitionControllerStatusImplementors = []string{"Composit
 
 func (ec *executionContext) _CompositeResourceDefinitionControllerStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionControllerStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionControllerStatusImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionControllerStatus")
 		case "compositeResourceType":
-
 			out.Values[i] = ec._CompositeResourceDefinitionControllerStatus_compositeResourceType(ctx, field, obj)
-
 		case "compositeResourceClaimType":
-
 			out.Values[i] = ec._CompositeResourceDefinitionControllerStatus_compositeResourceClaimType(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24862,50 +25236,51 @@ var compositeResourceDefinitionNamesImplementors = []string{"CompositeResourceDe
 
 func (ec *executionContext) _CompositeResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionNames) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionNamesImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionNames")
 		case "plural":
-
 			out.Values[i] = ec._CompositeResourceDefinitionNames_plural(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "singular":
-
 			out.Values[i] = ec._CompositeResourceDefinitionNames_singular(ctx, field, obj)
-
 		case "shortNames":
-
 			out.Values[i] = ec._CompositeResourceDefinitionNames_shortNames(ctx, field, obj)
-
 		case "kind":
-
 			out.Values[i] = ec._CompositeResourceDefinitionNames_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "listKind":
-
 			out.Values[i] = ec._CompositeResourceDefinitionNames_listKind(ctx, field, obj)
-
 		case "categories":
-
 			out.Values[i] = ec._CompositeResourceDefinitionNames_categories(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24913,38 +25288,31 @@ var compositeResourceDefinitionSpecImplementors = []string{"CompositeResourceDef
 
 func (ec *executionContext) _CompositeResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionSpecImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionSpec")
 		case "group":
-
 			out.Values[i] = ec._CompositeResourceDefinitionSpec_group(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "names":
-
 			out.Values[i] = ec._CompositeResourceDefinitionSpec_names(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "claimNames":
-
 			out.Values[i] = ec._CompositeResourceDefinitionSpec_claimNames(ctx, field, obj)
-
 		case "connectionSecretKeys":
-
 			out.Values[i] = ec._CompositeResourceDefinitionSpec_connectionSecretKeys(ctx, field, obj)
-
 		case "defaultComposition":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24954,14 +25322,30 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec(ctx context.Context
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "enforcedComposition":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -24971,22 +25355,48 @@ func (ec *executionContext) _CompositeResourceDefinitionSpec(ctx context.Context
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "versions":
-
 			out.Values[i] = ec._CompositeResourceDefinitionSpec_versions(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -24994,28 +25404,37 @@ var compositeResourceDefinitionStatusImplementors = []string{"CompositeResourceD
 
 func (ec *executionContext) _CompositeResourceDefinitionStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionStatusImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionStatus")
 		case "conditions":
-
 			out.Values[i] = ec._CompositeResourceDefinitionStatus_conditions(ctx, field, obj)
-
 		case "controllers":
-
 			out.Values[i] = ec._CompositeResourceDefinitionStatus_controllers(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25023,45 +25442,50 @@ var compositeResourceDefinitionVersionImplementors = []string{"CompositeResource
 
 func (ec *executionContext) _CompositeResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceDefinitionVersion) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceDefinitionVersionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceDefinitionVersion")
 		case "name":
-
 			out.Values[i] = ec._CompositeResourceDefinitionVersion_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "referenceable":
-
 			out.Values[i] = ec._CompositeResourceDefinitionVersion_referenceable(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "served":
-
 			out.Values[i] = ec._CompositeResourceDefinitionVersion_served(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "schema":
-
 			out.Values[i] = ec._CompositeResourceDefinitionVersion_schema(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25069,8 +25493,9 @@ var compositeResourceSpecImplementors = []string{"CompositeResourceSpec"}
 
 func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceSpecImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -25078,7 +25503,7 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 		case "composition":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25088,14 +25513,30 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "compositionRef":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25105,18 +25546,32 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "compositionSelector":
-
 			out.Values[i] = ec._CompositeResourceSpec_compositionSelector(ctx, field, obj)
-
 		case "claim":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25126,14 +25581,30 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "claimRef":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25143,14 +25614,30 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "connectionSecret":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25160,31 +25647,66 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "resources":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
 				res = ec._CompositeResourceSpec_resources(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "writeConnectionSecretToReference":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25194,18 +25716,46 @@ func (ec *executionContext) _CompositeResourceSpec(ctx context.Context, sel ast.
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25213,28 +25763,37 @@ var compositeResourceStatusImplementors = []string{"CompositeResourceStatus", "C
 
 func (ec *executionContext) _CompositeResourceStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceStatusImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceStatus")
 		case "conditions":
-
 			out.Values[i] = ec._CompositeResourceStatus_conditions(ctx, field, obj)
-
 		case "connectionDetails":
-
 			out.Values[i] = ec._CompositeResourceStatus_connectionDetails(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25242,24 +25801,35 @@ var compositeResourceValidationImplementors = []string{"CompositeResourceValidat
 
 func (ec *executionContext) _CompositeResourceValidation(ctx context.Context, sel ast.SelectionSet, obj *model.CompositeResourceValidation) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositeResourceValidationImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositeResourceValidation")
 		case "openAPIV3Schema":
-
 			out.Values[i] = ec._CompositeResourceValidation_openAPIV3Schema(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25267,62 +25837,49 @@ var compositionImplementors = []string{"Composition", "Node", "KubernetesResourc
 
 func (ec *executionContext) _Composition(ctx context.Context, sel ast.SelectionSet, obj *model.Composition) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Composition")
 		case "id":
-
 			out.Values[i] = ec._Composition_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._Composition_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._Composition_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._Composition_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "spec":
-
 			out.Values[i] = ec._Composition_spec(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
-
 			out.Values[i] = ec._Composition_status(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._Composition_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25330,23 +25887,51 @@ func (ec *executionContext) _Composition(ctx context.Context, sel ast.SelectionS
 				}()
 				res = ec._Composition_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25354,31 +25939,40 @@ var compositionConnectionImplementors = []string{"CompositionConnection"}
 
 func (ec *executionContext) _CompositionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CompositionConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositionConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositionConnection")
 		case "nodes":
-
 			out.Values[i] = ec._CompositionConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._CompositionConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25386,31 +25980,40 @@ var compositionSpecImplementors = []string{"CompositionSpec"}
 
 func (ec *executionContext) _CompositionSpec(ctx context.Context, sel ast.SelectionSet, obj *model.CompositionSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositionSpecImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositionSpec")
 		case "compositeTypeRef":
-
 			out.Values[i] = ec._CompositionSpec_compositeTypeRef(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "writeConnectionSecretsToNamespace":
-
 			out.Values[i] = ec._CompositionSpec_writeConnectionSecretsToNamespace(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25418,24 +26021,35 @@ var compositionStatusImplementors = []string{"CompositionStatus", "ConditionedSt
 
 func (ec *executionContext) _CompositionStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CompositionStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, compositionStatusImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CompositionStatus")
 		case "conditions":
-
 			out.Values[i] = ec._CompositionStatus_conditions(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25443,52 +26057,55 @@ var conditionImplementors = []string{"Condition"}
 
 func (ec *executionContext) _Condition(ctx context.Context, sel ast.SelectionSet, obj *model.Condition) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, conditionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Condition")
 		case "type":
-
 			out.Values[i] = ec._Condition_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "status":
-
 			out.Values[i] = ec._Condition_status(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "lastTransitionTime":
-
 			out.Values[i] = ec._Condition_lastTransitionTime(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "reason":
-
 			out.Values[i] = ec._Condition_reason(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "message":
-
 			out.Values[i] = ec._Condition_message(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25496,55 +26113,44 @@ var configMapImplementors = []string{"ConfigMap", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _ConfigMap(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigMap) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configMapImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigMap")
 		case "id":
-
 			out.Values[i] = ec._ConfigMap_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._ConfigMap_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._ConfigMap_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._ConfigMap_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "data":
-
 			out.Values[i] = ec._ConfigMap_data(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._ConfigMap_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25552,23 +26158,51 @@ func (ec *executionContext) _ConfigMap(ctx context.Context, sel ast.SelectionSet
 				}()
 				res = ec._ConfigMap_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25576,62 +26210,49 @@ var configurationImplementors = []string{"Configuration", "Node", "KubernetesRes
 
 func (ec *executionContext) _Configuration(ctx context.Context, sel ast.SelectionSet, obj *model.Configuration) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Configuration")
 		case "id":
-
 			out.Values[i] = ec._Configuration_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._Configuration_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._Configuration_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._Configuration_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "spec":
-
 			out.Values[i] = ec._Configuration_spec(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
-
 			out.Values[i] = ec._Configuration_status(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._Configuration_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25639,19 +26260,35 @@ func (ec *executionContext) _Configuration(ctx context.Context, sel ast.Selectio
 				}()
 				res = ec._Configuration_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "revisions":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25659,19 +26296,35 @@ func (ec *executionContext) _Configuration(ctx context.Context, sel ast.Selectio
 				}()
 				res = ec._Configuration_revisions(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "activeRevision":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25681,18 +26334,46 @@ func (ec *executionContext) _Configuration(ctx context.Context, sel ast.Selectio
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25700,31 +26381,40 @@ var configurationConnectionImplementors = []string{"ConfigurationConnection"}
 
 func (ec *executionContext) _ConfigurationConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationConnection")
 		case "nodes":
-
 			out.Values[i] = ec._ConfigurationConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._ConfigurationConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25732,62 +26422,49 @@ var configurationRevisionImplementors = []string{"ConfigurationRevision", "Node"
 
 func (ec *executionContext) _ConfigurationRevision(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationRevision) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationRevisionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationRevision")
 		case "id":
-
 			out.Values[i] = ec._ConfigurationRevision_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._ConfigurationRevision_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._ConfigurationRevision_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._ConfigurationRevision_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "spec":
-
 			out.Values[i] = ec._ConfigurationRevision_spec(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
-
 			out.Values[i] = ec._ConfigurationRevision_status(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._ConfigurationRevision_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25795,23 +26472,51 @@ func (ec *executionContext) _ConfigurationRevision(ctx context.Context, sel ast.
 				}()
 				res = ec._ConfigurationRevision_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25819,31 +26524,40 @@ var configurationRevisionConnectionImplementors = []string{"ConfigurationRevisio
 
 func (ec *executionContext) _ConfigurationRevisionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationRevisionConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationRevisionConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationRevisionConnection")
 		case "nodes":
-
 			out.Values[i] = ec._ConfigurationRevisionConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._ConfigurationRevisionConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25851,53 +26565,54 @@ var configurationRevisionSpecImplementors = []string{"ConfigurationRevisionSpec"
 
 func (ec *executionContext) _ConfigurationRevisionSpec(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationRevisionSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationRevisionSpecImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationRevisionSpec")
 		case "desiredState":
-
 			out.Values[i] = ec._ConfigurationRevisionSpec_desiredState(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "package":
-
 			out.Values[i] = ec._ConfigurationRevisionSpec_package(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "packagePullPolicy":
-
 			out.Values[i] = ec._ConfigurationRevisionSpec_packagePullPolicy(ctx, field, obj)
-
 		case "revision":
-
 			out.Values[i] = ec._ConfigurationRevisionSpec_revision(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "ignoreCrossplaneConstraints":
-
 			out.Values[i] = ec._ConfigurationRevisionSpec_ignoreCrossplaneConstraints(ctx, field, obj)
-
 		case "skipDependencyResolution":
-
 			out.Values[i] = ec._ConfigurationRevisionSpec_skipDependencyResolution(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25905,36 +26620,27 @@ var configurationRevisionStatusImplementors = []string{"ConfigurationRevisionSta
 
 func (ec *executionContext) _ConfigurationRevisionStatus(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationRevisionStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationRevisionStatusImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationRevisionStatus")
 		case "conditions":
-
 			out.Values[i] = ec._ConfigurationRevisionStatus_conditions(ctx, field, obj)
-
 		case "foundDependencies":
-
 			out.Values[i] = ec._ConfigurationRevisionStatus_foundDependencies(ctx, field, obj)
-
 		case "installedDependencies":
-
 			out.Values[i] = ec._ConfigurationRevisionStatus_installedDependencies(ctx, field, obj)
-
 		case "invalidDependencies":
-
 			out.Values[i] = ec._ConfigurationRevisionStatus_invalidDependencies(ctx, field, obj)
-
 		case "permissionRequests":
-
 			out.Values[i] = ec._ConfigurationRevisionStatus_permissionRequests(ctx, field, obj)
-
 		case "objects":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -25942,23 +26648,51 @@ func (ec *executionContext) _ConfigurationRevisionStatus(ctx context.Context, se
 				}()
 				res = ec._ConfigurationRevisionStatus_objects(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -25966,47 +26700,48 @@ var configurationSpecImplementors = []string{"ConfigurationSpec"}
 
 func (ec *executionContext) _ConfigurationSpec(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationSpecImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationSpec")
 		case "package":
-
 			out.Values[i] = ec._ConfigurationSpec_package(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "revisionActivationPolicy":
-
 			out.Values[i] = ec._ConfigurationSpec_revisionActivationPolicy(ctx, field, obj)
-
 		case "revisionHistoryLimit":
-
 			out.Values[i] = ec._ConfigurationSpec_revisionHistoryLimit(ctx, field, obj)
-
 		case "packagePullPolicy":
-
 			out.Values[i] = ec._ConfigurationSpec_packagePullPolicy(ctx, field, obj)
-
 		case "ignoreCrossplaneConstraints":
-
 			out.Values[i] = ec._ConfigurationSpec_ignoreCrossplaneConstraints(ctx, field, obj)
-
 		case "skipDependencyResolution":
-
 			out.Values[i] = ec._ConfigurationSpec_skipDependencyResolution(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26014,32 +26749,39 @@ var configurationStatusImplementors = []string{"ConfigurationStatus", "Condition
 
 func (ec *executionContext) _ConfigurationStatus(ctx context.Context, sel ast.SelectionSet, obj *model.ConfigurationStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, configurationStatusImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ConfigurationStatus")
 		case "conditions":
-
 			out.Values[i] = ec._ConfigurationStatus_conditions(ctx, field, obj)
-
 		case "currentRevision":
-
 			out.Values[i] = ec._ConfigurationStatus_currentRevision(ctx, field, obj)
-
 		case "currentIdentifier":
-
 			out.Values[i] = ec._ConfigurationStatus_currentIdentifier(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26047,24 +26789,35 @@ var createKubernetesResourcePayloadImplementors = []string{"CreateKubernetesReso
 
 func (ec *executionContext) _CreateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, obj *model.CreateKubernetesResourcePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, createKubernetesResourcePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CreateKubernetesResourcePayload")
 		case "resource":
-
 			out.Values[i] = ec._CreateKubernetesResourcePayload_resource(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26072,31 +26825,40 @@ var crossplaneResourceTreeConnectionImplementors = []string{"CrossplaneResourceT
 
 func (ec *executionContext) _CrossplaneResourceTreeConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CrossplaneResourceTreeConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, crossplaneResourceTreeConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CrossplaneResourceTreeConnection")
 		case "nodes":
-
 			out.Values[i] = ec._CrossplaneResourceTreeConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._CrossplaneResourceTreeConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26104,31 +26866,40 @@ var crossplaneResourceTreeNodeImplementors = []string{"CrossplaneResourceTreeNod
 
 func (ec *executionContext) _CrossplaneResourceTreeNode(ctx context.Context, sel ast.SelectionSet, obj *model.CrossplaneResourceTreeNode) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, crossplaneResourceTreeNodeImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CrossplaneResourceTreeNode")
 		case "parentId":
-
 			out.Values[i] = ec._CrossplaneResourceTreeNode_parentId(ctx, field, obj)
-
 		case "resource":
-
 			out.Values[i] = ec._CrossplaneResourceTreeNode_resource(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26136,62 +26907,49 @@ var customResourceDefinitionImplementors = []string{"CustomResourceDefinition", 
 
 func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinition) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinition")
 		case "id":
-
 			out.Values[i] = ec._CustomResourceDefinition_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._CustomResourceDefinition_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._CustomResourceDefinition_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._CustomResourceDefinition_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "spec":
-
 			out.Values[i] = ec._CustomResourceDefinition_spec(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
-
 			out.Values[i] = ec._CustomResourceDefinition_status(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._CustomResourceDefinition_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -26199,19 +26957,35 @@ func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel a
 				}()
 				res = ec._CustomResourceDefinition_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "definedResources":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -26219,23 +26993,51 @@ func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel a
 				}()
 				res = ec._CustomResourceDefinition_definedResources(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26243,31 +27045,40 @@ var customResourceDefinitionConnectionImplementors = []string{"CustomResourceDef
 
 func (ec *executionContext) _CustomResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinitionConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinitionConnection")
 		case "nodes":
-
 			out.Values[i] = ec._CustomResourceDefinitionConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._CustomResourceDefinitionConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26275,50 +27086,51 @@ var customResourceDefinitionNamesImplementors = []string{"CustomResourceDefiniti
 
 func (ec *executionContext) _CustomResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinitionNames) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionNamesImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinitionNames")
 		case "plural":
-
 			out.Values[i] = ec._CustomResourceDefinitionNames_plural(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "singular":
-
 			out.Values[i] = ec._CustomResourceDefinitionNames_singular(ctx, field, obj)
-
 		case "shortNames":
-
 			out.Values[i] = ec._CustomResourceDefinitionNames_shortNames(ctx, field, obj)
-
 		case "kind":
-
 			out.Values[i] = ec._CustomResourceDefinitionNames_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "listKind":
-
 			out.Values[i] = ec._CustomResourceDefinitionNames_listKind(ctx, field, obj)
-
 		case "categories":
-
 			out.Values[i] = ec._CustomResourceDefinitionNames_categories(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26326,45 +27138,50 @@ var customResourceDefinitionSpecImplementors = []string{"CustomResourceDefinitio
 
 func (ec *executionContext) _CustomResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinitionSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionSpecImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinitionSpec")
 		case "group":
-
 			out.Values[i] = ec._CustomResourceDefinitionSpec_group(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "names":
-
 			out.Values[i] = ec._CustomResourceDefinitionSpec_names(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "scope":
-
 			out.Values[i] = ec._CustomResourceDefinitionSpec_scope(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "versions":
-
 			out.Values[i] = ec._CustomResourceDefinitionSpec_versions(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26372,24 +27189,35 @@ var customResourceDefinitionStatusImplementors = []string{"CustomResourceDefinit
 
 func (ec *executionContext) _CustomResourceDefinitionStatus(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinitionStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionStatusImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinitionStatus")
 		case "conditions":
-
 			out.Values[i] = ec._CustomResourceDefinitionStatus_conditions(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26397,38 +27225,45 @@ var customResourceDefinitionVersionImplementors = []string{"CustomResourceDefini
 
 func (ec *executionContext) _CustomResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceDefinitionVersion) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceDefinitionVersionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceDefinitionVersion")
 		case "name":
-
 			out.Values[i] = ec._CustomResourceDefinitionVersion_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "served":
-
 			out.Values[i] = ec._CustomResourceDefinitionVersion_served(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "schema":
-
 			out.Values[i] = ec._CustomResourceDefinitionVersion_schema(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26436,24 +27271,35 @@ var customResourceValidationImplementors = []string{"CustomResourceValidation"}
 
 func (ec *executionContext) _CustomResourceValidation(ctx context.Context, sel ast.SelectionSet, obj *model.CustomResourceValidation) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, customResourceValidationImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CustomResourceValidation")
 		case "openAPIV3Schema":
-
 			out.Values[i] = ec._CustomResourceValidation_openAPIV3Schema(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26461,24 +27307,35 @@ var deleteKubernetesResourcePayloadImplementors = []string{"DeleteKubernetesReso
 
 func (ec *executionContext) _DeleteKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, obj *model.DeleteKubernetesResourcePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, deleteKubernetesResourcePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteKubernetesResourcePayload")
 		case "resource":
-
 			out.Values[i] = ec._DeleteKubernetesResourcePayload_resource(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26486,44 +27343,37 @@ var eventImplementors = []string{"Event", "Node"}
 
 func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, obj *model.Event) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Event")
 		case "id":
-
 			out.Values[i] = ec._Event_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._Event_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._Event_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._Event_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "involvedObject":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -26531,58 +27381,70 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 				}()
 				res = ec._Event_involvedObject(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "type":
-
 			out.Values[i] = ec._Event_type(ctx, field, obj)
-
 		case "reason":
-
 			out.Values[i] = ec._Event_reason(ctx, field, obj)
-
 		case "message":
-
 			out.Values[i] = ec._Event_message(ctx, field, obj)
-
 		case "source":
-
 			out.Values[i] = ec._Event_source(ctx, field, obj)
-
 		case "count":
-
 			out.Values[i] = ec._Event_count(ctx, field, obj)
-
 		case "firstTime":
-
 			out.Values[i] = ec._Event_firstTime(ctx, field, obj)
-
 		case "lastTime":
-
 			out.Values[i] = ec._Event_lastTime(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._Event_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26590,31 +27452,40 @@ var eventConnectionImplementors = []string{"EventConnection"}
 
 func (ec *executionContext) _EventConnection(ctx context.Context, sel ast.SelectionSet, obj *model.EventConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventConnection")
 		case "nodes":
-
 			out.Values[i] = ec._EventConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._EventConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26622,24 +27493,35 @@ var eventSourceImplementors = []string{"EventSource"}
 
 func (ec *executionContext) _EventSource(ctx context.Context, sel ast.SelectionSet, obj *model.EventSource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, eventSourceImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EventSource")
 		case "component":
-
 			out.Values[i] = ec._EventSource_component(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26647,51 +27529,42 @@ var genericResourceImplementors = []string{"GenericResource", "Node", "Kubernete
 
 func (ec *executionContext) _GenericResource(ctx context.Context, sel ast.SelectionSet, obj *model.GenericResource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, genericResourceImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("GenericResource")
 		case "id":
-
 			out.Values[i] = ec._GenericResource_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._GenericResource_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._GenericResource_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._GenericResource_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "unstructured":
-
 			out.Values[i] = ec._GenericResource_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -26699,23 +27572,51 @@ func (ec *executionContext) _GenericResource(ctx context.Context, sel ast.Select
 				}()
 				res = ec._GenericResource_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26723,31 +27624,40 @@ var kubernetesResourceConnectionImplementors = []string{"KubernetesResourceConne
 
 func (ec *executionContext) _KubernetesResourceConnection(ctx context.Context, sel ast.SelectionSet, obj *model.KubernetesResourceConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, kubernetesResourceConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("KubernetesResourceConnection")
 		case "nodes":
-
 			out.Values[i] = ec._KubernetesResourceConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._KubernetesResourceConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26755,24 +27665,35 @@ var labelSelectorImplementors = []string{"LabelSelector"}
 
 func (ec *executionContext) _LabelSelector(ctx context.Context, sel ast.SelectionSet, obj *model.LabelSelector) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, labelSelectorImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("LabelSelector")
 		case "matchLabels":
-
 			out.Values[i] = ec._LabelSelector_matchLabels(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26780,27 +27701,38 @@ var localObjectReferenceImplementors = []string{"LocalObjectReference"}
 
 func (ec *executionContext) _LocalObjectReference(ctx context.Context, sel ast.SelectionSet, obj *model.LocalObjectReference) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, localObjectReferenceImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("LocalObjectReference")
 		case "name":
-
 			out.Values[i] = ec._LocalObjectReference_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26808,62 +27740,49 @@ var managedResourceImplementors = []string{"ManagedResource", "Node", "Kubernete
 
 func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.SelectionSet, obj *model.ManagedResource) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, managedResourceImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ManagedResource")
 		case "id":
-
 			out.Values[i] = ec._ManagedResource_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._ManagedResource_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._ManagedResource_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._ManagedResource_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "spec":
-
 			out.Values[i] = ec._ManagedResource_spec(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
-
 			out.Values[i] = ec._ManagedResource_status(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._ManagedResource_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -26871,19 +27790,35 @@ func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.Select
 				}()
 				res = ec._ManagedResource_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "definition":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -26893,18 +27828,46 @@ func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.Select
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26912,8 +27875,9 @@ var managedResourceSpecImplementors = []string{"ManagedResourceSpec"}
 
 func (ec *executionContext) _ManagedResourceSpec(ctx context.Context, sel ast.SelectionSet, obj *model.ManagedResourceSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, managedResourceSpecImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
@@ -26921,7 +27885,7 @@ func (ec *executionContext) _ManagedResourceSpec(ctx context.Context, sel ast.Se
 		case "connectionSecret":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -26931,26 +27895,50 @@ func (ec *executionContext) _ManagedResourceSpec(ctx context.Context, sel ast.Se
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "providerConfigRef":
-
 			out.Values[i] = ec._ManagedResourceSpec_providerConfigRef(ctx, field, obj)
-
 		case "deletionPolicy":
-
 			out.Values[i] = ec._ManagedResourceSpec_deletionPolicy(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26958,24 +27946,35 @@ var managedResourceStatusImplementors = []string{"ManagedResourceStatus", "Condi
 
 func (ec *executionContext) _ManagedResourceStatus(ctx context.Context, sel ast.SelectionSet, obj *model.ManagedResourceStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, managedResourceStatusImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ManagedResourceStatus")
 		case "conditions":
-
 			out.Values[i] = ec._ManagedResourceStatus_conditions(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -26988,7 +27987,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	})
 
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
 			Object: field.Name,
@@ -26999,40 +27998,46 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "createKubernetesResource":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createKubernetesResource(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updateKubernetesResource":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateKubernetesResource(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "deleteKubernetesResource":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteKubernetesResource(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27040,71 +28045,52 @@ var objectMetaImplementors = []string{"ObjectMeta"}
 
 func (ec *executionContext) _ObjectMeta(ctx context.Context, sel ast.SelectionSet, obj *model.ObjectMeta) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, objectMetaImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ObjectMeta")
 		case "name":
-
 			out.Values[i] = ec._ObjectMeta_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "generateName":
-
 			out.Values[i] = ec._ObjectMeta_generateName(ctx, field, obj)
-
 		case "namespace":
-
 			out.Values[i] = ec._ObjectMeta_namespace(ctx, field, obj)
-
 		case "uid":
-
 			out.Values[i] = ec._ObjectMeta_uid(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "resourceVersion":
-
 			out.Values[i] = ec._ObjectMeta_resourceVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "generation":
-
 			out.Values[i] = ec._ObjectMeta_generation(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "creationTime":
-
 			out.Values[i] = ec._ObjectMeta_creationTime(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "deletionTime":
-
 			out.Values[i] = ec._ObjectMeta_deletionTime(ctx, field, obj)
-
 		case "labels":
-
 			out.Values[i] = ec._ObjectMeta_labels(ctx, field, obj)
-
 		case "annotations":
-
 			out.Values[i] = ec._ObjectMeta_annotations(ctx, field, obj)
-
 		case "owners":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -27112,19 +28098,35 @@ func (ec *executionContext) _ObjectMeta(ctx context.Context, sel ast.SelectionSe
 				}()
 				res = ec._ObjectMeta_owners(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "controller":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -27134,18 +28136,46 @@ func (ec *executionContext) _ObjectMeta(ctx context.Context, sel ast.SelectionSe
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27153,32 +28183,39 @@ var objectReferenceImplementors = []string{"ObjectReference"}
 
 func (ec *executionContext) _ObjectReference(ctx context.Context, sel ast.SelectionSet, obj *model.ObjectReference) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, objectReferenceImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ObjectReference")
 		case "kind":
-
 			out.Values[i] = ec._ObjectReference_kind(ctx, field, obj)
-
 		case "namespace":
-
 			out.Values[i] = ec._ObjectReference_namespace(ctx, field, obj)
-
 		case "name":
-
 			out.Values[i] = ec._ObjectReference_name(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27186,31 +28223,40 @@ var ownerImplementors = []string{"Owner"}
 
 func (ec *executionContext) _Owner(ctx context.Context, sel ast.SelectionSet, obj *model.Owner) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, ownerImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Owner")
 		case "resource":
-
 			out.Values[i] = ec._Owner_resource(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "controller":
-
 			out.Values[i] = ec._Owner_controller(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27218,31 +28264,40 @@ var ownerConnectionImplementors = []string{"OwnerConnection"}
 
 func (ec *executionContext) _OwnerConnection(ctx context.Context, sel ast.SelectionSet, obj *model.OwnerConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, ownerConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("OwnerConnection")
 		case "nodes":
-
 			out.Values[i] = ec._OwnerConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._OwnerConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27250,43 +28305,46 @@ var policyRuleImplementors = []string{"PolicyRule"}
 
 func (ec *executionContext) _PolicyRule(ctx context.Context, sel ast.SelectionSet, obj *model.PolicyRule) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, policyRuleImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PolicyRule")
 		case "verbs":
-
 			out.Values[i] = ec._PolicyRule_verbs(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "apiGroups":
-
 			out.Values[i] = ec._PolicyRule_apiGroups(ctx, field, obj)
-
 		case "resources":
-
 			out.Values[i] = ec._PolicyRule_resources(ctx, field, obj)
-
 		case "resourceNames":
-
 			out.Values[i] = ec._PolicyRule_resourceNames(ctx, field, obj)
-
 		case "nonResourceURLs":
-
 			out.Values[i] = ec._PolicyRule_nonResourceURLs(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27294,62 +28352,49 @@ var providerImplementors = []string{"Provider", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet, obj *model.Provider) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Provider")
 		case "id":
-
 			out.Values[i] = ec._Provider_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._Provider_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._Provider_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._Provider_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "spec":
-
 			out.Values[i] = ec._Provider_spec(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
-
 			out.Values[i] = ec._Provider_status(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._Provider_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -27357,19 +28402,35 @@ func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet,
 				}()
 				res = ec._Provider_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "revisions":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -27377,19 +28438,35 @@ func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet,
 				}()
 				res = ec._Provider_revisions(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "activeRevision":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -27399,18 +28476,46 @@ func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet,
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27418,55 +28523,44 @@ var providerConfigImplementors = []string{"ProviderConfig", "Node", "KubernetesR
 
 func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConfig) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerConfigImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderConfig")
 		case "id":
-
 			out.Values[i] = ec._ProviderConfig_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._ProviderConfig_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._ProviderConfig_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._ProviderConfig_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
-
 			out.Values[i] = ec._ProviderConfig_status(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._ProviderConfig_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -27474,19 +28568,35 @@ func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.Selecti
 				}()
 				res = ec._ProviderConfig_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "definition":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -27496,18 +28606,46 @@ func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.Selecti
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27515,27 +28653,38 @@ var providerConfigReferenceImplementors = []string{"ProviderConfigReference"}
 
 func (ec *executionContext) _ProviderConfigReference(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConfigReference) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerConfigReferenceImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderConfigReference")
 		case "name":
-
 			out.Values[i] = ec._ProviderConfigReference_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27543,28 +28692,37 @@ var providerConfigStatusImplementors = []string{"ProviderConfigStatus", "Conditi
 
 func (ec *executionContext) _ProviderConfigStatus(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConfigStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerConfigStatusImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderConfigStatus")
 		case "conditions":
-
 			out.Values[i] = ec._ProviderConfigStatus_conditions(ctx, field, obj)
-
 		case "users":
-
 			out.Values[i] = ec._ProviderConfigStatus_users(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27572,31 +28730,40 @@ var providerConnectionImplementors = []string{"ProviderConnection"}
 
 func (ec *executionContext) _ProviderConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderConnection")
 		case "nodes":
-
 			out.Values[i] = ec._ProviderConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._ProviderConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27604,62 +28771,49 @@ var providerRevisionImplementors = []string{"ProviderRevision", "Node", "Kuberne
 
 func (ec *executionContext) _ProviderRevision(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderRevision) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerRevisionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderRevision")
 		case "id":
-
 			out.Values[i] = ec._ProviderRevision_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._ProviderRevision_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._ProviderRevision_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._ProviderRevision_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "spec":
-
 			out.Values[i] = ec._ProviderRevision_spec(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
-
 			out.Values[i] = ec._ProviderRevision_status(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._ProviderRevision_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -27667,23 +28821,51 @@ func (ec *executionContext) _ProviderRevision(ctx context.Context, sel ast.Selec
 				}()
 				res = ec._ProviderRevision_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27691,31 +28873,40 @@ var providerRevisionConnectionImplementors = []string{"ProviderRevisionConnectio
 
 func (ec *executionContext) _ProviderRevisionConnection(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderRevisionConnection) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerRevisionConnectionImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderRevisionConnection")
 		case "nodes":
-
 			out.Values[i] = ec._ProviderRevisionConnection_nodes(ctx, field, obj)
-
 		case "totalCount":
-
 			out.Values[i] = ec._ProviderRevisionConnection_totalCount(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27723,53 +28914,54 @@ var providerRevisionSpecImplementors = []string{"ProviderRevisionSpec"}
 
 func (ec *executionContext) _ProviderRevisionSpec(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderRevisionSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerRevisionSpecImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderRevisionSpec")
 		case "desiredState":
-
 			out.Values[i] = ec._ProviderRevisionSpec_desiredState(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "package":
-
 			out.Values[i] = ec._ProviderRevisionSpec_package(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "packagePullPolicy":
-
 			out.Values[i] = ec._ProviderRevisionSpec_packagePullPolicy(ctx, field, obj)
-
 		case "revision":
-
 			out.Values[i] = ec._ProviderRevisionSpec_revision(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "ignoreCrossplaneConstraints":
-
 			out.Values[i] = ec._ProviderRevisionSpec_ignoreCrossplaneConstraints(ctx, field, obj)
-
 		case "skipDependencyResolution":
-
 			out.Values[i] = ec._ProviderRevisionSpec_skipDependencyResolution(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27777,36 +28969,27 @@ var providerRevisionStatusImplementors = []string{"ProviderRevisionStatus", "Con
 
 func (ec *executionContext) _ProviderRevisionStatus(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderRevisionStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerRevisionStatusImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderRevisionStatus")
 		case "conditions":
-
 			out.Values[i] = ec._ProviderRevisionStatus_conditions(ctx, field, obj)
-
 		case "foundDependencies":
-
 			out.Values[i] = ec._ProviderRevisionStatus_foundDependencies(ctx, field, obj)
-
 		case "installedDependencies":
-
 			out.Values[i] = ec._ProviderRevisionStatus_installedDependencies(ctx, field, obj)
-
 		case "invalidDependencies":
-
 			out.Values[i] = ec._ProviderRevisionStatus_invalidDependencies(ctx, field, obj)
-
 		case "permissionRequests":
-
 			out.Values[i] = ec._ProviderRevisionStatus_permissionRequests(ctx, field, obj)
-
 		case "objects":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -27814,23 +28997,51 @@ func (ec *executionContext) _ProviderRevisionStatus(ctx context.Context, sel ast
 				}()
 				res = ec._ProviderRevisionStatus_objects(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27838,47 +29049,48 @@ var providerSpecImplementors = []string{"ProviderSpec"}
 
 func (ec *executionContext) _ProviderSpec(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderSpec) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerSpecImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderSpec")
 		case "package":
-
 			out.Values[i] = ec._ProviderSpec_package(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "revisionActivationPolicy":
-
 			out.Values[i] = ec._ProviderSpec_revisionActivationPolicy(ctx, field, obj)
-
 		case "revisionHistoryLimit":
-
 			out.Values[i] = ec._ProviderSpec_revisionHistoryLimit(ctx, field, obj)
-
 		case "packagePullPolicy":
-
 			out.Values[i] = ec._ProviderSpec_packagePullPolicy(ctx, field, obj)
-
 		case "ignoreCrossplaneConstraints":
-
 			out.Values[i] = ec._ProviderSpec_ignoreCrossplaneConstraints(ctx, field, obj)
-
 		case "skipDependencyResolution":
-
 			out.Values[i] = ec._ProviderSpec_skipDependencyResolution(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27886,32 +29098,39 @@ var providerStatusImplementors = []string{"ProviderStatus", "ConditionedStatus"}
 
 func (ec *executionContext) _ProviderStatus(ctx context.Context, sel ast.SelectionSet, obj *model.ProviderStatus) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, providerStatusImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ProviderStatus")
 		case "conditions":
-
 			out.Values[i] = ec._ProviderStatus_conditions(ctx, field, obj)
-
 		case "currentRevision":
-
 			out.Values[i] = ec._ProviderStatus_currentRevision(ctx, field, obj)
-
 		case "currentIdentifier":
-
 			out.Values[i] = ec._ProviderStatus_currentIdentifier(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -27924,7 +29143,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	})
 
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
 			Object: field.Name,
@@ -27937,7 +29156,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		case "kubernetesResource":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -27948,16 +29167,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "kubernetesResources":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -27965,22 +29183,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_kubernetesResources(ctx, field)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -27988,22 +29205,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_events(ctx, field)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "secret":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -28014,16 +29230,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "configMap":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -28034,16 +29249,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "providers":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -28051,22 +29265,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_providers(ctx, field)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "providerRevisions":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -28074,22 +29287,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_providerRevisions(ctx, field)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "customResourceDefinitions":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -28097,22 +29309,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_customResourceDefinitions(ctx, field)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "configurations":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -28120,22 +29331,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_configurations(ctx, field)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "configurationRevisions":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -28143,22 +29353,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_configurationRevisions(ctx, field)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "compositeResourceDefinitions":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -28166,22 +29375,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_compositeResourceDefinitions(ctx, field)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "compositions":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -28189,22 +29397,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_compositions(ctx, field)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "crossplaneResourceTree":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -28212,38 +29419,45 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}()
 				res = ec._Query_crossplaneResourceTree(ctx, field)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
 			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
 			})
-
 		case "__schema":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -28251,59 +29465,46 @@ var secretImplementors = []string{"Secret", "Node", "KubernetesResource"}
 
 func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, obj *model.Secret) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, secretImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Secret")
 		case "id":
-
 			out.Values[i] = ec._Secret_id(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "apiVersion":
-
 			out.Values[i] = ec._Secret_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
-
 			out.Values[i] = ec._Secret_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "metadata":
-
 			out.Values[i] = ec._Secret_metadata(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "type":
-
 			out.Values[i] = ec._Secret_type(ctx, field, obj)
-
 		case "data":
-
 			out.Values[i] = ec._Secret_data(ctx, field, obj)
-
 		case "unstructured":
-
 			out.Values[i] = ec._Secret_unstructured(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "events":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -28311,23 +29512,51 @@ func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, o
 				}()
 				res = ec._Secret_events(ctx, field, obj)
 				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
+					atomic.AddUint32(&fs.Invalids, 1)
 				}
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -28335,34 +29564,43 @@ var secretReferenceImplementors = []string{"SecretReference"}
 
 func (ec *executionContext) _SecretReference(ctx context.Context, sel ast.SelectionSet, obj *model.SecretReference) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, secretReferenceImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("SecretReference")
 		case "name":
-
 			out.Values[i] = ec._SecretReference_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "namespace":
-
 			out.Values[i] = ec._SecretReference_namespace(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -28370,34 +29608,43 @@ var typeReferenceImplementors = []string{"TypeReference"}
 
 func (ec *executionContext) _TypeReference(ctx context.Context, sel ast.SelectionSet, obj *model.TypeReference) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, typeReferenceImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("TypeReference")
 		case "apiVersion":
-
 			out.Values[i] = ec._TypeReference_apiVersion(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "kind":
-
 			out.Values[i] = ec._TypeReference_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -28405,24 +29652,35 @@ var updateKubernetesResourcePayloadImplementors = []string{"UpdateKubernetesReso
 
 func (ec *executionContext) _UpdateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateKubernetesResourcePayload) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, updateKubernetesResourcePayloadImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("UpdateKubernetesResourcePayload")
 		case "resource":
-
 			out.Values[i] = ec._UpdateKubernetesResourcePayload_resource(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -28430,52 +29688,55 @@ var __DirectiveImplementors = []string{"__Directive"}
 
 func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionSet, obj *introspection.Directive) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __DirectiveImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Directive")
 		case "name":
-
 			out.Values[i] = ec.___Directive_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "description":
-
 			out.Values[i] = ec.___Directive_description(ctx, field, obj)
-
 		case "locations":
-
 			out.Values[i] = ec.___Directive_locations(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "args":
-
 			out.Values[i] = ec.___Directive_args(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "isRepeatable":
-
 			out.Values[i] = ec.___Directive_isRepeatable(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -28483,42 +29744,47 @@ var __EnumValueImplementors = []string{"__EnumValue"}
 
 func (ec *executionContext) ___EnumValue(ctx context.Context, sel ast.SelectionSet, obj *introspection.EnumValue) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __EnumValueImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__EnumValue")
 		case "name":
-
 			out.Values[i] = ec.___EnumValue_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "description":
-
 			out.Values[i] = ec.___EnumValue_description(ctx, field, obj)
-
 		case "isDeprecated":
-
 			out.Values[i] = ec.___EnumValue_isDeprecated(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "deprecationReason":
-
 			out.Values[i] = ec.___EnumValue_deprecationReason(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -28526,56 +29792,57 @@ var __FieldImplementors = []string{"__Field"}
 
 func (ec *executionContext) ___Field(ctx context.Context, sel ast.SelectionSet, obj *introspection.Field) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __FieldImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Field")
 		case "name":
-
 			out.Values[i] = ec.___Field_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "description":
-
 			out.Values[i] = ec.___Field_description(ctx, field, obj)
-
 		case "args":
-
 			out.Values[i] = ec.___Field_args(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "type":
-
 			out.Values[i] = ec.___Field_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "isDeprecated":
-
 			out.Values[i] = ec.___Field_isDeprecated(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "deprecationReason":
-
 			out.Values[i] = ec.___Field_deprecationReason(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -28583,42 +29850,47 @@ var __InputValueImplementors = []string{"__InputValue"}
 
 func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.SelectionSet, obj *introspection.InputValue) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __InputValueImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__InputValue")
 		case "name":
-
 			out.Values[i] = ec.___InputValue_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "description":
-
 			out.Values[i] = ec.___InputValue_description(ctx, field, obj)
-
 		case "type":
-
 			out.Values[i] = ec.___InputValue_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "defaultValue":
-
 			out.Values[i] = ec.___InputValue_defaultValue(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -28626,53 +29898,54 @@ var __SchemaImplementors = []string{"__Schema"}
 
 func (ec *executionContext) ___Schema(ctx context.Context, sel ast.SelectionSet, obj *introspection.Schema) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __SchemaImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Schema")
 		case "description":
-
 			out.Values[i] = ec.___Schema_description(ctx, field, obj)
-
 		case "types":
-
 			out.Values[i] = ec.___Schema_types(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "queryType":
-
 			out.Values[i] = ec.___Schema_queryType(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "mutationType":
-
 			out.Values[i] = ec.___Schema_mutationType(ctx, field, obj)
-
 		case "subscriptionType":
-
 			out.Values[i] = ec.___Schema_subscriptionType(ctx, field, obj)
-
 		case "directives":
-
 			out.Values[i] = ec.___Schema_directives(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -28680,63 +29953,56 @@ var __TypeImplementors = []string{"__Type"}
 
 func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, obj *introspection.Type) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, __TypeImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("__Type")
 		case "kind":
-
 			out.Values[i] = ec.___Type_kind(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "name":
-
 			out.Values[i] = ec.___Type_name(ctx, field, obj)
-
 		case "description":
-
 			out.Values[i] = ec.___Type_description(ctx, field, obj)
-
 		case "fields":
-
 			out.Values[i] = ec.___Type_fields(ctx, field, obj)
-
 		case "interfaces":
-
 			out.Values[i] = ec.___Type_interfaces(ctx, field, obj)
-
 		case "possibleTypes":
-
 			out.Values[i] = ec.___Type_possibleTypes(ctx, field, obj)
-
 		case "enumValues":
-
 			out.Values[i] = ec.___Type_enumValues(ctx, field, obj)
-
 		case "inputFields":
-
 			out.Values[i] = ec.___Type_inputFields(ctx, field, obj)
-
 		case "ofType":
-
 			out.Values[i] = ec.___Type_ofType(ctx, field, obj)
-
 		case "specifiedByURL":
-
 			out.Values[i] = ec.___Type_specifiedByURL(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -28771,38 +30037,12 @@ func (ec *executionContext) marshalNCompositeResourceClaimConnection2githubᚗco
 	return ec._CompositeResourceClaimConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceClaimConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceClaimConnection(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNCompositeResourceClaimSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceClaimSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceClaimSpec(ctx, sel, v)
+func (ec *executionContext) marshalNCompositeResourceClaimSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceClaimSpec(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceClaimSpec) graphql.Marshaler {
+	return ec._CompositeResourceClaimSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNCompositeResourceConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceConnection) graphql.Marshaler {
 	return ec._CompositeResourceConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNCompositeResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNCompositeResourceDefinition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinition(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinition) graphql.Marshaler {
@@ -28813,48 +30053,20 @@ func (ec *executionContext) marshalNCompositeResourceDefinitionConnection2github
 	return ec._CompositeResourceDefinitionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceDefinitionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceDefinitionConnection(ctx, sel, v)
+func (ec *executionContext) marshalNCompositeResourceDefinitionNames2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinitionNames) graphql.Marshaler {
+	return ec._CompositeResourceDefinitionNames(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionNames) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceDefinitionNames(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNCompositeResourceDefinitionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceDefinitionSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceDefinitionSpec(ctx, sel, v)
+func (ec *executionContext) marshalNCompositeResourceDefinitionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinitionSpec) graphql.Marshaler {
+	return ec._CompositeResourceDefinitionSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNCompositeResourceDefinitionVersion2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceDefinitionVersion) graphql.Marshaler {
 	return ec._CompositeResourceDefinitionVersion(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositeResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositeResourceSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositeResourceSpec(ctx, sel, v)
+func (ec *executionContext) marshalNCompositeResourceSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositeResourceSpec(ctx context.Context, sel ast.SelectionSet, v model.CompositeResourceSpec) graphql.Marshaler {
+	return ec._CompositeResourceSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNComposition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐComposition(ctx context.Context, sel ast.SelectionSet, v model.Composition) graphql.Marshaler {
@@ -28865,24 +30077,8 @@ func (ec *executionContext) marshalNCompositionConnection2githubᚗcomᚋupbound
 	return ec._CompositionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCompositionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionConnection(ctx context.Context, sel ast.SelectionSet, v *model.CompositionConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositionConnection(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNCompositionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CompositionSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompositionSpec(ctx, sel, v)
+func (ec *executionContext) marshalNCompositionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCompositionSpec(ctx context.Context, sel ast.SelectionSet, v model.CompositionSpec) graphql.Marshaler {
+	return ec._CompositionSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNCondition2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCondition(ctx context.Context, sel ast.SelectionSet, v model.Condition) graphql.Marshaler {
@@ -28907,16 +30103,6 @@ func (ec *executionContext) marshalNConfigurationConnection2githubᚗcomᚋupbou
 	return ec._ConfigurationConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigurationConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationConnection(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ConfigurationConnection(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNConfigurationRevision2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevision(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationRevision) graphql.Marshaler {
 	return ec._ConfigurationRevision(ctx, sel, &v)
 }
@@ -28925,34 +30111,12 @@ func (ec *executionContext) marshalNConfigurationRevisionConnection2githubᚗcom
 	return ec._ConfigurationRevisionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigurationRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionConnection(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationRevisionConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ConfigurationRevisionConnection(ctx, sel, v)
+func (ec *executionContext) marshalNConfigurationRevisionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionSpec(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationRevisionSpec) graphql.Marshaler {
+	return ec._ConfigurationRevisionSpec(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNConfigurationRevisionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationRevisionSpec(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationRevisionSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ConfigurationRevisionSpec(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNConfigurationSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationSpec(ctx context.Context, sel ast.SelectionSet, v *model.ConfigurationSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ConfigurationSpec(ctx, sel, v)
+func (ec *executionContext) marshalNConfigurationSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐConfigurationSpec(ctx context.Context, sel ast.SelectionSet, v model.ConfigurationSpec) graphql.Marshaler {
+	return ec._ConfigurationSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalNCreateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourceInput(ctx context.Context, v interface{}) (model.CreateKubernetesResourceInput, error) {
@@ -28964,28 +30128,8 @@ func (ec *executionContext) marshalNCreateKubernetesResourcePayload2githubᚗcom
 	return ec._CreateKubernetesResourcePayload(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCreateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCreateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v *model.CreateKubernetesResourcePayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CreateKubernetesResourcePayload(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNCrossplaneResourceTreeConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeConnection(ctx context.Context, sel ast.SelectionSet, v model.CrossplaneResourceTreeConnection) graphql.Marshaler {
 	return ec._CrossplaneResourceTreeConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNCrossplaneResourceTreeConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeConnection(ctx context.Context, sel ast.SelectionSet, v *model.CrossplaneResourceTreeConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CrossplaneResourceTreeConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNCrossplaneResourceTreeNode2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCrossplaneResourceTreeNode(ctx context.Context, sel ast.SelectionSet, v model.CrossplaneResourceTreeNode) graphql.Marshaler {
@@ -29000,34 +30144,12 @@ func (ec *executionContext) marshalNCustomResourceDefinitionConnection2githubᚗ
 	return ec._CustomResourceDefinitionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCustomResourceDefinitionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionConnection(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CustomResourceDefinitionConnection(ctx, sel, v)
+func (ec *executionContext) marshalNCustomResourceDefinitionNames2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinitionNames) graphql.Marshaler {
+	return ec._CustomResourceDefinitionNames(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCustomResourceDefinitionNames2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionNames(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionNames) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CustomResourceDefinitionNames(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNCustomResourceDefinitionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, v *model.CustomResourceDefinitionSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CustomResourceDefinitionSpec(ctx, sel, v)
+func (ec *executionContext) marshalNCustomResourceDefinitionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionSpec(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinitionSpec) graphql.Marshaler {
+	return ec._CustomResourceDefinitionSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNCustomResourceDefinitionVersion2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐCustomResourceDefinitionVersion(ctx context.Context, sel ast.SelectionSet, v model.CustomResourceDefinitionVersion) graphql.Marshaler {
@@ -29038,32 +30160,12 @@ func (ec *executionContext) marshalNDeleteKubernetesResourcePayload2githubᚗcom
 	return ec._DeleteKubernetesResourcePayload(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNDeleteKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐDeleteKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v *model.DeleteKubernetesResourcePayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._DeleteKubernetesResourcePayload(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNEvent2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEvent(ctx context.Context, sel ast.SelectionSet, v model.Event) graphql.Marshaler {
 	return ec._Event(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNEventConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx context.Context, sel ast.SelectionSet, v model.EventConnection) graphql.Marshaler {
 	return ec._EventConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNEventConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐEventConnection(ctx context.Context, sel ast.SelectionSet, v *model.EventConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._EventConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNID2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐReferenceID(ctx context.Context, v interface{}) (model.ReferenceID, error) {
@@ -29126,34 +30228,12 @@ func (ec *executionContext) marshalNKubernetesResourceConnection2githubᚗcomᚋ
 	return ec._KubernetesResourceConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.KubernetesResourceConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._KubernetesResourceConnection(ctx, sel, v)
+func (ec *executionContext) marshalNManagedResourceSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx context.Context, sel ast.SelectionSet, v model.ManagedResourceSpec) graphql.Marshaler {
+	return ec._ManagedResourceSpec(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNManagedResourceSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐManagedResourceSpec(ctx context.Context, sel ast.SelectionSet, v *model.ManagedResourceSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ManagedResourceSpec(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNObjectMeta2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx context.Context, sel ast.SelectionSet, v *model.ObjectMeta) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ObjectMeta(ctx, sel, v)
+func (ec *executionContext) marshalNObjectMeta2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐObjectMeta(ctx context.Context, sel ast.SelectionSet, v model.ObjectMeta) graphql.Marshaler {
+	return ec._ObjectMeta(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNOwner2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwner(ctx context.Context, sel ast.SelectionSet, v model.Owner) graphql.Marshaler {
@@ -29162,16 +30242,6 @@ func (ec *executionContext) marshalNOwner2githubᚗcomᚋupboundᚋxgqlᚋintern
 
 func (ec *executionContext) marshalNOwnerConnection2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx context.Context, sel ast.SelectionSet, v model.OwnerConnection) graphql.Marshaler {
 	return ec._OwnerConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNOwnerConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐOwnerConnection(ctx context.Context, sel ast.SelectionSet, v *model.OwnerConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._OwnerConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNPackageRevisionDesiredState2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐPackageRevisionDesiredState(ctx context.Context, v interface{}) (model.PackageRevisionDesiredState, error) {
@@ -29201,16 +30271,6 @@ func (ec *executionContext) marshalNProviderConnection2githubᚗcomᚋupboundᚋ
 	return ec._ProviderConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProviderConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderConnection(ctx context.Context, sel ast.SelectionSet, v *model.ProviderConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProviderConnection(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNProviderRevision2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevision(ctx context.Context, sel ast.SelectionSet, v model.ProviderRevision) graphql.Marshaler {
 	return ec._ProviderRevision(ctx, sel, &v)
 }
@@ -29219,34 +30279,12 @@ func (ec *executionContext) marshalNProviderRevisionConnection2githubᚗcomᚋup
 	return ec._ProviderRevisionConnection(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProviderRevisionConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionConnection(ctx context.Context, sel ast.SelectionSet, v *model.ProviderRevisionConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProviderRevisionConnection(ctx, sel, v)
+func (ec *executionContext) marshalNProviderRevisionSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionSpec(ctx context.Context, sel ast.SelectionSet, v model.ProviderRevisionSpec) graphql.Marshaler {
+	return ec._ProviderRevisionSpec(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProviderRevisionSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderRevisionSpec(ctx context.Context, sel ast.SelectionSet, v *model.ProviderRevisionSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProviderRevisionSpec(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNProviderSpec2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderSpec(ctx context.Context, sel ast.SelectionSet, v *model.ProviderSpec) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProviderSpec(ctx, sel, v)
+func (ec *executionContext) marshalNProviderSpec2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐProviderSpec(ctx context.Context, sel ast.SelectionSet, v model.ProviderSpec) graphql.Marshaler {
+	return ec._ProviderSpec(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalNResourceScope2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐResourceScope(ctx context.Context, v interface{}) (model.ResourceScope, error) {
@@ -29321,14 +30359,8 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalNTypeReference2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx context.Context, sel ast.SelectionSet, v *model.TypeReference) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._TypeReference(ctx, sel, v)
+func (ec *executionContext) marshalNTypeReference2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐTypeReference(ctx context.Context, sel ast.SelectionSet, v model.TypeReference) graphql.Marshaler {
+	return ec._TypeReference(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalNUpdateKubernetesResourceInput2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourceInput(ctx context.Context, v interface{}) (model.UpdateKubernetesResourceInput, error) {
@@ -29338,16 +30370,6 @@ func (ec *executionContext) unmarshalNUpdateKubernetesResourceInput2githubᚗcom
 
 func (ec *executionContext) marshalNUpdateKubernetesResourcePayload2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v model.UpdateKubernetesResourcePayload) graphql.Marshaler {
 	return ec._UpdateKubernetesResourcePayload(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNUpdateKubernetesResourcePayload2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐUpdateKubernetesResourcePayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateKubernetesResourcePayload) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._UpdateKubernetesResourcePayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -30488,13 +31510,6 @@ func (ec *executionContext) marshalOKubernetesResource2ᚕgithubᚗcomᚋupbound
 	}
 
 	return ret
-}
-
-func (ec *executionContext) marshalOKubernetesResourceConnection2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResourceConnection(ctx context.Context, sel ast.SelectionSet, v *model.KubernetesResourceConnection) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._KubernetesResourceConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOLabelSelector2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐLabelSelector(ctx context.Context, sel ast.SelectionSet, v *model.LabelSelector) graphql.Marshaler {

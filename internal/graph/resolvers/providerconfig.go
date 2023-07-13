@@ -36,7 +36,7 @@ type providerConfig struct {
 	clients ClientCache
 }
 
-func (r *providerConfig) Events(ctx context.Context, obj *model.ProviderConfig) (*model.EventConnection, error) {
+func (r *providerConfig) Events(ctx context.Context, obj *model.ProviderConfig) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,

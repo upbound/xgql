@@ -42,7 +42,7 @@ type provider struct {
 	clients ClientCache
 }
 
-func (r *provider) Events(ctx context.Context, obj *model.Provider) (*model.EventConnection, error) {
+func (r *provider) Events(ctx context.Context, obj *model.Provider) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,
@@ -52,7 +52,7 @@ func (r *provider) Events(ctx context.Context, obj *model.Provider) (*model.Even
 	})
 }
 
-func (r *provider) Revisions(ctx context.Context, obj *model.Provider) (*model.ProviderRevisionConnection, error) {
+func (r *provider) Revisions(ctx context.Context, obj *model.Provider) (model.ProviderRevisionConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -60,13 +60,13 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider) (*model.P
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.ProviderRevisionConnection{}, nil
 	}
 
 	in := &pkgv1.ProviderRevisionList{}
 	if err := c.List(ctx, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListProviderRevs))
-		return nil, nil
+		return model.ProviderRevisionConnection{}, nil
 	}
 
 	out := &model.ProviderRevisionConnection{
@@ -88,7 +88,7 @@ func (r *provider) Revisions(ctx context.Context, obj *model.Provider) (*model.P
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
 func (r *provider) ActiveRevision(ctx context.Context, obj *model.Provider) (*model.ProviderRevision, error) {
@@ -134,7 +134,7 @@ type providerRevision struct {
 	clients ClientCache
 }
 
-func (r *providerRevision) Events(ctx context.Context, obj *model.ProviderRevision) (*model.EventConnection, error) {
+func (r *providerRevision) Events(ctx context.Context, obj *model.ProviderRevision) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,
@@ -148,7 +148,7 @@ type providerRevisionStatus struct {
 	clients ClientCache
 }
 
-func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.ProviderRevisionStatus) (*model.KubernetesResourceConnection, error) {
+func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.ProviderRevisionStatus) (model.KubernetesResourceConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -156,7 +156,7 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.KubernetesResourceConnection{}, nil
 	}
 
 	out := &model.KubernetesResourceConnection{
@@ -184,5 +184,5 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 		out.TotalCount++
 	}
 
-	return out, nil
+	return *out, nil
 }

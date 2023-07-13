@@ -65,28 +65,6 @@ func TestCompositeResourceCrd(t *testing.T) {
 		args    args
 		want    want
 	}{
-		"NoSpec": {
-			reason: "If the XRD has no spec we return nil.",
-			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
-				return &test.MockClient{}, nil
-			}),
-			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{},
-			},
-			want: want{},
-		},
-		"NoNames": {
-			reason: "If the XRD has no Names we return nil.",
-			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
-				return &test.MockClient{}, nil
-			}),
-			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{}},
-			},
-			want: want{},
-		},
 		"GetClientError": {
 			reason: "If we can't get a client we should add the error to the GraphQL context and return early.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
@@ -94,7 +72,7 @@ func TestCompositeResourceCrd(t *testing.T) {
 			}),
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{Names: &model.CompositeResourceDefinitionNames{}}},
+				obj: &model.CompositeResourceDefinition{Spec: model.CompositeResourceDefinitionSpec{Names: model.CompositeResourceDefinitionNames{}}},
 			},
 			want: want{
 				errs: gqlerror.List{
@@ -113,7 +91,7 @@ func TestCompositeResourceCrd(t *testing.T) {
 			}),
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{Names: &model.CompositeResourceDefinitionNames{}}},
+				obj: &model.CompositeResourceDefinition{Spec: model.CompositeResourceDefinitionSpec{Names: model.CompositeResourceDefinitionNames{}}},
 			},
 			want: want{
 				errs: gqlerror.List{
@@ -136,15 +114,15 @@ func TestCompositeResourceCrd(t *testing.T) {
 			}),
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{Group: "some.group", Names: &model.CompositeResourceDefinitionNames{Plural: "things"}}},
+				obj: &model.CompositeResourceDefinition{Spec: model.CompositeResourceDefinitionSpec{Group: "some.group", Names: model.CompositeResourceDefinitionNames{Plural: "things"}}},
 			},
 			want: want{
 				crd: &model.CustomResourceDefinition{
 					APIVersion: crdAPIVersion,
 					Kind:       crdKind,
 					ID:         model.ReferenceID{Name: "some.crd", APIVersion: crdAPIVersion, Kind: crdKind},
-					Metadata:   &model.ObjectMeta{Name: "some.crd"},
-					Spec:       &model.CustomResourceDefinitionSpec{Names: &model.CustomResourceDefinitionNames{}, Versions: []model.CustomResourceDefinitionVersion{}},
+					Metadata:   model.ObjectMeta{Name: "some.crd"},
+					Spec:       model.CustomResourceDefinitionSpec{Names: model.CustomResourceDefinitionNames{}, Versions: []model.CustomResourceDefinitionVersion{}},
 				},
 			},
 		},
@@ -191,17 +169,6 @@ func TestCompositeResourceClaimCrd(t *testing.T) {
 		args    args
 		want    want
 	}{
-		"NoSpec": {
-			reason: "If the XRD has no spec we return nil.",
-			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
-				return &test.MockClient{}, nil
-			}),
-			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{},
-			},
-			want: want{},
-		},
 		"NoClaimNames": {
 			reason: "If the XRD has no Names we return nil.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
@@ -209,7 +176,7 @@ func TestCompositeResourceClaimCrd(t *testing.T) {
 			}),
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{}},
+				obj: &model.CompositeResourceDefinition{Spec: model.CompositeResourceDefinitionSpec{}},
 			},
 			want: want{},
 		},
@@ -220,7 +187,7 @@ func TestCompositeResourceClaimCrd(t *testing.T) {
 			}),
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{ClaimNames: &model.CompositeResourceDefinitionNames{}}},
+				obj: &model.CompositeResourceDefinition{Spec: model.CompositeResourceDefinitionSpec{ClaimNames: &model.CompositeResourceDefinitionNames{}}},
 			},
 			want: want{
 				errs: gqlerror.List{
@@ -239,7 +206,7 @@ func TestCompositeResourceClaimCrd(t *testing.T) {
 			}),
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{ClaimNames: &model.CompositeResourceDefinitionNames{}}},
+				obj: &model.CompositeResourceDefinition{Spec: model.CompositeResourceDefinitionSpec{ClaimNames: &model.CompositeResourceDefinitionNames{}}},
 			},
 			want: want{
 				errs: gqlerror.List{
@@ -262,15 +229,15 @@ func TestCompositeResourceClaimCrd(t *testing.T) {
 			}),
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceDefinition{Spec: &model.CompositeResourceDefinitionSpec{Group: "some.group", ClaimNames: &model.CompositeResourceDefinitionNames{Plural: "things"}}},
+				obj: &model.CompositeResourceDefinition{Spec: model.CompositeResourceDefinitionSpec{Group: "some.group", ClaimNames: &model.CompositeResourceDefinitionNames{Plural: "things"}}},
 			},
 			want: want{
 				crd: &model.CustomResourceDefinition{
 					APIVersion: crdAPIVersion,
 					Kind:       crdKind,
 					ID:         model.ReferenceID{Name: "some.crd", APIVersion: crdAPIVersion, Kind: crdKind},
-					Metadata:   &model.ObjectMeta{Name: "some.crd"},
-					Spec:       &model.CustomResourceDefinitionSpec{Names: &model.CustomResourceDefinitionNames{}, Versions: []model.CustomResourceDefinitionVersion{}},
+					Metadata:   model.ObjectMeta{Name: "some.crd"},
+					Spec:       model.CustomResourceDefinitionSpec{Names: model.CustomResourceDefinitionNames{}, Versions: []model.CustomResourceDefinitionVersion{}},
 				},
 			},
 		},
@@ -328,7 +295,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 		options *model.DefinedCompositeResourceOptionsInput
 	}
 	type want struct {
-		crc  *model.CompositeResourceConnection
+		crc  model.CompositeResourceConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -363,9 +330,9 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{Kind: kind},
+						Names: model.CompositeResourceDefinitionNames{Kind: kind},
 					},
 				},
 			},
@@ -397,9 +364,9 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{
+						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
 							ListKind: pointer.String(listKind),
 						},
@@ -419,7 +386,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 				},
 			},
 			want: want{
-				crc: &model.CompositeResourceConnection{
+				crc: model.CompositeResourceConnection{
 					Nodes:      []model.CompositeResource{gxr},
 					TotalCount: 1,
 				},
@@ -447,9 +414,9 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{
+						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
 							ListKind: pointer.String(listKind),
 						},
@@ -468,7 +435,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 				},
 			},
 			want: want{
-				crc: &model.CompositeResourceConnection{
+				crc: model.CompositeResourceConnection{
 					Nodes:      []model.CompositeResource{gxr},
 					TotalCount: 1,
 				},
@@ -496,9 +463,9 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{
+						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
 							ListKind: pointer.String(listKind),
 						},
@@ -520,7 +487,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 				options: &model.DefinedCompositeResourceOptionsInput{Version: pointer.String(version)},
 			},
 			want: want{
-				crc: &model.CompositeResourceConnection{
+				crc: model.CompositeResourceConnection{
 					Nodes:      []model.CompositeResource{gxr},
 					TotalCount: 1,
 				},
@@ -548,9 +515,9 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{
+						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
 							ListKind: pointer.String(listKind),
 						},
@@ -572,7 +539,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 				version: pointer.String(version),
 			},
 			want: want{
-				crc: &model.CompositeResourceConnection{
+				crc: model.CompositeResourceConnection{
 					Nodes:      []model.CompositeResource{gxr},
 					TotalCount: 1,
 				},
@@ -600,9 +567,9 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{
+						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
 							ListKind: pointer.String(listKind),
 						},
@@ -625,7 +592,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 				version: pointer.String("v2"),
 			},
 			want: want{
-				crc: &model.CompositeResourceConnection{
+				crc: model.CompositeResourceConnection{
 					Nodes:      []model.CompositeResource{gxr},
 					TotalCount: 1,
 				},
@@ -644,9 +611,9 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{
+						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
 							ListKind: pointer.String(listKind),
 						},
@@ -668,7 +635,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 				options: &model.DefinedCompositeResourceOptionsInput{Ready: nil},
 			},
 			want: want{
-				crc: &model.CompositeResourceConnection{
+				crc: model.CompositeResourceConnection{
 					Nodes:      []model.CompositeResource{gxr, gxrNotReady, gxrReady, gxrReadyUnknown},
 					TotalCount: 4,
 				},
@@ -687,9 +654,9 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{
+						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
 							ListKind: pointer.String(listKind),
 						},
@@ -711,7 +678,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 				options: &model.DefinedCompositeResourceOptionsInput{Ready: pointer.Bool(false)},
 			},
 			want: want{
-				crc: &model.CompositeResourceConnection{
+				crc: model.CompositeResourceConnection{
 					Nodes:      []model.CompositeResource{gxr, gxrNotReady, gxrReadyUnknown},
 					TotalCount: 3,
 				},
@@ -730,9 +697,9 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
-						Names: &model.CompositeResourceDefinitionNames{
+						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
 							ListKind: pointer.String(listKind),
 						},
@@ -754,7 +721,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 				options: &model.DefinedCompositeResourceOptionsInput{Ready: pointer.Bool(true)},
 			},
 			want: want{
-				crc: &model.CompositeResourceConnection{
+				crc: model.CompositeResourceConnection{
 					Nodes:      []model.CompositeResource{gxrReady},
 					TotalCount: 1,
 				},
@@ -818,7 +785,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 		options   *model.DefinedCompositeResourceClaimOptionsInput
 	}
 	type want struct {
-		crcc *model.CompositeResourceClaimConnection
+		crcc model.CompositeResourceClaimConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -834,11 +801,11 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{},
+					Spec: model.CompositeResourceDefinitionSpec{},
 				},
 			},
 			want: want{
-				crcc: &model.CompositeResourceClaimConnection{},
+				crcc: model.CompositeResourceClaimConnection{},
 			},
 		},
 		"GetClientError": {
@@ -849,7 +816,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						ClaimNames: &model.CompositeResourceDefinitionNames{},
 					},
 				},
@@ -870,7 +837,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group:      group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{Kind: kind},
 					},
@@ -904,7 +871,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
@@ -926,7 +893,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 				},
 			},
 			want: want{
-				crcc: &model.CompositeResourceClaimConnection{
+				crcc: model.CompositeResourceClaimConnection{
 					Nodes:      []model.CompositeResourceClaim{gxrc},
 					TotalCount: 1,
 				},
@@ -954,7 +921,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
@@ -975,7 +942,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 				},
 			},
 			want: want{
-				crcc: &model.CompositeResourceClaimConnection{
+				crcc: model.CompositeResourceClaimConnection{
 					Nodes:      []model.CompositeResourceClaim{gxrc},
 					TotalCount: 1,
 				},
@@ -1003,7 +970,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
@@ -1027,7 +994,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 				options: &model.DefinedCompositeResourceClaimOptionsInput{Version: pointer.String(version)},
 			},
 			want: want{
-				crcc: &model.CompositeResourceClaimConnection{
+				crcc: model.CompositeResourceClaimConnection{
 					Nodes:      []model.CompositeResourceClaim{gxrc},
 					TotalCount: 1,
 				},
@@ -1055,7 +1022,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
@@ -1079,7 +1046,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 				version: pointer.String(version),
 			},
 			want: want{
-				crcc: &model.CompositeResourceClaimConnection{
+				crcc: model.CompositeResourceClaimConnection{
 					Nodes:      []model.CompositeResourceClaim{gxrc},
 					TotalCount: 1,
 				},
@@ -1107,7 +1074,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
@@ -1132,7 +1099,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 				version: pointer.String("v2"),
 			},
 			want: want{
-				crcc: &model.CompositeResourceClaimConnection{
+				crcc: model.CompositeResourceClaimConnection{
 					Nodes:      []model.CompositeResourceClaim{gxrc},
 					TotalCount: 1,
 				},
@@ -1164,7 +1131,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
@@ -1188,7 +1155,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 				options: &model.DefinedCompositeResourceClaimOptionsInput{Version: pointer.String(version), Namespace: pointer.String("some-namespace")},
 			},
 			want: want{
-				crcc: &model.CompositeResourceClaimConnection{
+				crcc: model.CompositeResourceClaimConnection{
 					Nodes:      []model.CompositeResourceClaim{gxrc},
 					TotalCount: 1,
 				},
@@ -1220,7 +1187,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
@@ -1245,7 +1212,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 				namespace: pointer.String("some-namespace"),
 			},
 			want: want{
-				crcc: &model.CompositeResourceClaimConnection{
+				crcc: model.CompositeResourceClaimConnection{
 					Nodes:      []model.CompositeResourceClaim{gxrc},
 					TotalCount: 1,
 				},
@@ -1277,7 +1244,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
@@ -1302,7 +1269,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 				namespace: pointer.String("some-other-namespace"),
 			},
 			want: want{
-				crcc: &model.CompositeResourceClaimConnection{
+				crcc: model.CompositeResourceClaimConnection{
 					Nodes:      []model.CompositeResourceClaim{gxrc},
 					TotalCount: 1,
 				},
@@ -1321,7 +1288,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
@@ -1345,7 +1312,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 				options: &model.DefinedCompositeResourceClaimOptionsInput{Ready: nil},
 			},
 			want: want{
-				crcc: &model.CompositeResourceClaimConnection{
+				crcc: model.CompositeResourceClaimConnection{
 					Nodes:      []model.CompositeResourceClaim{gxrc, gxrcNotReady, gxrcReady, gxrcReadyUnknown},
 					TotalCount: 4,
 				},
@@ -1364,7 +1331,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
@@ -1388,7 +1355,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 				options: &model.DefinedCompositeResourceClaimOptionsInput{Ready: pointer.Bool(false)},
 			},
 			want: want{
-				crcc: &model.CompositeResourceClaimConnection{
+				crcc: model.CompositeResourceClaimConnection{
 					Nodes:      []model.CompositeResourceClaim{gxrc, gxrcNotReady, gxrcReadyUnknown},
 					TotalCount: 3,
 				},
@@ -1407,7 +1374,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinition{
-					Spec: &model.CompositeResourceDefinitionSpec{
+					Spec: model.CompositeResourceDefinitionSpec{
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
@@ -1431,7 +1398,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 				options: &model.DefinedCompositeResourceClaimOptionsInput{Ready: pointer.Bool(true)},
 			},
 			want: want{
-				crcc: &model.CompositeResourceClaimConnection{
+				crcc: model.CompositeResourceClaimConnection{
 					Nodes:      []model.CompositeResourceClaim{gxrcReady},
 					TotalCount: 1,
 				},

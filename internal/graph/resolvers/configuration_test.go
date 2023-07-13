@@ -79,7 +79,7 @@ func TestConfigurationRevisions(t *testing.T) {
 		obj *model.Configuration
 	}
 	type want struct {
-		crc  *model.ConfigurationRevisionConnection
+		crc  model.ConfigurationRevisionConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -135,11 +135,11 @@ func TestConfigurationRevisions(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.Configuration{
-					Metadata: &model.ObjectMeta{UID: uid},
+					Metadata: model.ObjectMeta{UID: uid},
 				},
 			},
 			want: want{
-				crc: &model.ConfigurationRevisionConnection{
+				crc: model.ConfigurationRevisionConnection{
 					Nodes:      []model.ConfigurationRevision{gactive, ginactive},
 					TotalCount: 2,
 				},
@@ -260,7 +260,7 @@ func TestConfigurationActiveRevision(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.Configuration{
-					Metadata: &model.ObjectMeta{UID: uid},
+					Metadata: model.ObjectMeta{UID: uid},
 				},
 			},
 			want: want{
@@ -282,7 +282,7 @@ func TestConfigurationActiveRevision(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.Configuration{
-					Metadata: &model.ObjectMeta{UID: uid},
+					Metadata: model.ObjectMeta{UID: uid},
 				},
 			},
 			want: want{
@@ -324,7 +324,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 		obj *model.ConfigurationRevisionStatus
 	}
 	type want struct {
-		krc  *model.KubernetesResourceConnection
+		krc  model.KubernetesResourceConnection
 		err  error
 		errs gqlerror.List
 	}
@@ -365,7 +365,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 				},
 			},
 			want: want{
-				krc: &model.KubernetesResourceConnection{
+				krc: model.KubernetesResourceConnection{
 					Nodes:      []model.KubernetesResource{},
 					TotalCount: 0,
 				},
@@ -399,7 +399,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 				},
 			},
 			want: want{
-				krc: &model.KubernetesResourceConnection{
+				krc: model.KubernetesResourceConnection{
 					Nodes: []model.KubernetesResource{
 						gcmp,
 					},
@@ -438,7 +438,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 				},
 			},
 			want: want{
-				krc: &model.KubernetesResourceConnection{
+				krc: model.KubernetesResourceConnection{
 					Nodes: []model.KubernetesResource{
 						gxrd,
 					},

@@ -67,7 +67,7 @@ type mutation struct {
 	clients ClientCache
 }
 
-func (r *mutation) CreateKubernetesResource(ctx context.Context, input model.CreateKubernetesResourceInput) (*model.CreateKubernetesResourcePayload, error) {
+func (r *mutation) CreateKubernetesResource(ctx context.Context, input model.CreateKubernetesResourceInput) (model.CreateKubernetesResourcePayload, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -75,13 +75,13 @@ func (r *mutation) CreateKubernetesResource(ctx context.Context, input model.Cre
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.CreateKubernetesResourcePayload{}, nil
 	}
 
 	u := &unstructured.Unstructured{}
 	if err := json.Unmarshal(input.Unstructured, u); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errUnmarshalUnstructured))
-		return nil, nil
+		return model.CreateKubernetesResourcePayload{}, nil
 	}
 
 	pv := fieldpath.Pave(u.Object)
@@ -89,28 +89,28 @@ func (r *mutation) CreateKubernetesResource(ctx context.Context, input model.Cre
 		var v interface{}
 		if err := json.Unmarshal(p.Unstructured, &v); err != nil {
 			graphql.AddError(ctx, errors.Wrapf(err, errFmtUnmarshalPatch, i))
-			return nil, nil
+			return model.CreateKubernetesResourcePayload{}, nil
 		}
 		if err := pv.SetValue(p.FieldPath, v); err != nil {
 			graphql.AddError(ctx, errors.Wrapf(err, errFmtPatch, i))
-			return nil, nil
+			return model.CreateKubernetesResourcePayload{}, nil
 		}
 	}
 
 	if err := retry.OnError(retry.DefaultBackoff, IsRetriable, func() error { return c.Create(ctx, u) }); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errCreateResource))
-		return nil, nil
+		return model.CreateKubernetesResourcePayload{}, nil
 	}
 
 	kr, err := model.GetKubernetesResource(u)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errModelResource))
-		return nil, nil
+		return model.CreateKubernetesResourcePayload{}, nil
 	}
-	return &model.CreateKubernetesResourcePayload{Resource: kr}, nil
+	return model.CreateKubernetesResourcePayload{Resource: kr}, nil
 }
 
-func (r *mutation) UpdateKubernetesResource(ctx context.Context, id model.ReferenceID, input model.UpdateKubernetesResourceInput) (*model.UpdateKubernetesResourcePayload, error) {
+func (r *mutation) UpdateKubernetesResource(ctx context.Context, id model.ReferenceID, input model.UpdateKubernetesResourceInput) (model.UpdateKubernetesResourcePayload, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -118,13 +118,13 @@ func (r *mutation) UpdateKubernetesResource(ctx context.Context, id model.Refere
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.UpdateKubernetesResourcePayload{}, nil
 	}
 
 	u := &unstructured.Unstructured{}
 	if err := json.Unmarshal(input.Unstructured, u); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errUnmarshalUnstructured))
-		return nil, nil
+		return model.UpdateKubernetesResourcePayload{}, nil
 	}
 
 	pv := fieldpath.Pave(u.Object)
@@ -132,11 +132,11 @@ func (r *mutation) UpdateKubernetesResource(ctx context.Context, id model.Refere
 		var v interface{}
 		if err := json.Unmarshal(p.Unstructured, &v); err != nil {
 			graphql.AddError(ctx, errors.Wrapf(err, errFmtUnmarshalPatch, i))
-			return nil, nil
+			return model.UpdateKubernetesResourcePayload{}, nil
 		}
 		if err := pv.SetValue(p.FieldPath, v); err != nil {
 			graphql.AddError(ctx, errors.Wrapf(err, errFmtPatch, i))
-			return nil, nil
+			return model.UpdateKubernetesResourcePayload{}, nil
 		}
 	}
 
@@ -150,18 +150,18 @@ func (r *mutation) UpdateKubernetesResource(ctx context.Context, id model.Refere
 
 	if err := retry.OnError(retry.DefaultBackoff, IsRetriable, func() error { return c.Update(ctx, u) }); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errUpdateResource))
-		return nil, nil
+		return model.UpdateKubernetesResourcePayload{}, nil
 	}
 
 	kr, err := model.GetKubernetesResource(u)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errModelResource))
-		return nil, nil
+		return model.UpdateKubernetesResourcePayload{}, nil
 	}
-	return &model.UpdateKubernetesResourcePayload{Resource: kr}, nil
+	return model.UpdateKubernetesResourcePayload{Resource: kr}, nil
 }
 
-func (r *mutation) DeleteKubernetesResource(ctx context.Context, id model.ReferenceID) (*model.DeleteKubernetesResourcePayload, error) {
+func (r *mutation) DeleteKubernetesResource(ctx context.Context, id model.ReferenceID) (model.DeleteKubernetesResourcePayload, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -169,7 +169,7 @@ func (r *mutation) DeleteKubernetesResource(ctx context.Context, id model.Refere
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.DeleteKubernetesResourcePayload{}, nil
 	}
 
 	u := &unstructured.Unstructured{}
@@ -179,13 +179,13 @@ func (r *mutation) DeleteKubernetesResource(ctx context.Context, id model.Refere
 	u.SetName(id.Name)
 	if err := retry.OnError(retry.DefaultBackoff, IsRetriable, func() error { return c.Delete(ctx, u) }); resource.IgnoreNotFound(err) != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errDeleteResource))
-		return nil, nil //nolint:nilerr // IgnoreNotFound appears to trigger this linter.
+		return model.DeleteKubernetesResourcePayload{}, nil //nolint:nilerr // IgnoreNotFound appears to trigger this linter.
 	}
 
 	kr, err := model.GetKubernetesResource(u)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errModelResource))
-		return nil, nil
+		return model.DeleteKubernetesResourcePayload{}, nil
 	}
-	return &model.DeleteKubernetesResourcePayload{Resource: kr}, nil
+	return model.DeleteKubernetesResourcePayload{Resource: kr}, nil
 }

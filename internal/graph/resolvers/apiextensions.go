@@ -43,7 +43,7 @@ type xrd struct {
 	clients ClientCache
 }
 
-func (r *xrd) Events(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.EventConnection, error) {
+func (r *xrd) Events(ctx context.Context, obj *model.CompositeResourceDefinition) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,
@@ -54,6 +54,9 @@ func (r *xrd) Events(ctx context.Context, obj *model.CompositeResourceDefinition
 }
 
 func (r *xrd) getCrd(ctx context.Context, group string, names *model.CompositeResourceDefinitionNames) (*model.CustomResourceDefinition, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
 	if names == nil {
 		return nil, nil
 	}
@@ -77,28 +80,14 @@ func (r *xrd) getCrd(ctx context.Context, group string, names *model.CompositeRe
 }
 
 func (r *xrd) CompositeResourceCrd(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.CustomResourceDefinition, error) {
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-
-	if obj.Spec == nil {
-		return nil, nil
-	}
-
-	return r.getCrd(ctx, obj.Spec.Group, obj.Spec.Names)
+	return r.getCrd(ctx, obj.Spec.Group, &obj.Spec.Names)
 }
 
 func (r *xrd) CompositeResourceClaimCrd(ctx context.Context, obj *model.CompositeResourceDefinition) (*model.CustomResourceDefinition, error) {
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-
-	if obj.Spec == nil {
-		return nil, nil
-	}
-
 	return r.getCrd(ctx, obj.Spec.Group, obj.Spec.ClaimNames)
 }
 
-func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, options *model.DefinedCompositeResourceOptionsInput) (*model.CompositeResourceConnection, error) {
+func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, options *model.DefinedCompositeResourceOptionsInput) (model.CompositeResourceConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -112,7 +101,7 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.CompositeResourceConnection{}, nil
 	}
 
 	gv := schema.GroupVersion{Group: obj.Spec.Group}
@@ -132,7 +121,7 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 
 	if err := c.List(ctx, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListResources))
-		return nil, nil
+		return model.CompositeResourceConnection{}, nil
 	}
 
 	return getCompositeResourceConnection(in, options), nil
@@ -142,7 +131,7 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 Produce a CompositeResourceClaimConnection from the raw k8s UnstructuredList
 that is filtered and sorted
 */
-func getCompositeResourceConnection(in *kunstructured.UnstructuredList, options *model.DefinedCompositeResourceOptionsInput) *model.CompositeResourceConnection {
+func getCompositeResourceConnection(in *kunstructured.UnstructuredList, options *model.DefinedCompositeResourceOptionsInput) model.CompositeResourceConnection {
 	xrs := []model.CompositeResource{}
 
 	for i := range in.Items {
@@ -157,16 +146,16 @@ func getCompositeResourceConnection(in *kunstructured.UnstructuredList, options 
 	}
 
 	sort.Stable(out)
-	return out
+	return *out
 }
 
-func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, namespace *string, options *model.DefinedCompositeResourceClaimOptionsInput) (*model.CompositeResourceClaimConnection, error) {
+func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.CompositeResourceDefinition, version *string, namespace *string, options *model.DefinedCompositeResourceClaimOptionsInput) (model.CompositeResourceClaimConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	// Return early if this XRD doesn't offer a claim.
 	if obj.Spec.ClaimNames == nil {
-		return &model.CompositeResourceClaimConnection{}, nil
+		return model.CompositeResourceClaimConnection{}, nil
 	}
 
 	if options == nil {
@@ -186,7 +175,7 @@ func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.Com
 	c, err := r.clients.Get(creds, gopts...)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.CompositeResourceClaimConnection{}, nil
 	}
 
 	gv := schema.GroupVersion{Group: obj.Spec.Group}
@@ -206,7 +195,7 @@ func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.Com
 
 	if err := c.List(ctx, in, lopts...); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListResources))
-		return nil, nil
+		return model.CompositeResourceClaimConnection{}, nil
 	}
 
 	return getCompositeResourceClaimConnection(in, options), nil
@@ -216,7 +205,7 @@ func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.Com
 Produce a CompositeResourceClaimConnection from the raw k8s UnstructuredList
 that is filtered and sorted
 */
-func getCompositeResourceClaimConnection(in *kunstructured.UnstructuredList, options *model.DefinedCompositeResourceClaimOptionsInput) *model.CompositeResourceClaimConnection {
+func getCompositeResourceClaimConnection(in *kunstructured.UnstructuredList, options *model.DefinedCompositeResourceClaimOptionsInput) model.CompositeResourceClaimConnection {
 	claims := []model.CompositeResourceClaim{}
 
 	for i := range in.Items {
@@ -232,7 +221,7 @@ func getCompositeResourceClaimConnection(in *kunstructured.UnstructuredList, opt
 	}
 
 	sort.Stable(out)
-	return out
+	return *out
 }
 
 /* Check that ready matches filter
@@ -335,7 +324,7 @@ type composition struct {
 	clients ClientCache
 }
 
-func (r *composition) Events(ctx context.Context, obj *model.Composition) (*model.EventConnection, error) {
+func (r *composition) Events(ctx context.Context, obj *model.Composition) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,

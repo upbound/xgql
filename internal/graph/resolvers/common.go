@@ -38,7 +38,7 @@ type genericResource struct {
 	clients ClientCache
 }
 
-func (r *genericResource) Events(ctx context.Context, obj *model.GenericResource) (*model.EventConnection, error) {
+func (r *genericResource) Events(ctx context.Context, obj *model.GenericResource) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,
@@ -53,7 +53,7 @@ type secret struct {
 	clients ClientCache
 }
 
-func (r *secret) Events(ctx context.Context, obj *model.Secret) (*model.EventConnection, error) {
+func (r *secret) Events(ctx context.Context, obj *model.Secret) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,
@@ -68,7 +68,7 @@ type configMap struct {
 	clients ClientCache
 }
 
-func (r *configMap) Events(ctx context.Context, obj *model.ConfigMap) (*model.EventConnection, error) {
+func (r *configMap) Events(ctx context.Context, obj *model.ConfigMap) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,
@@ -83,7 +83,7 @@ type crd struct {
 	clients ClientCache
 }
 
-func (r *crd) Events(ctx context.Context, obj *model.CustomResourceDefinition) (*model.EventConnection, error) {
+func (r *crd) Events(ctx context.Context, obj *model.CustomResourceDefinition) (model.EventConnection, error) {
 	e := &events{clients: r.clients}
 	return e.Resolve(ctx, &corev1.ObjectReference{
 		APIVersion: obj.APIVersion,
@@ -93,7 +93,7 @@ func (r *crd) Events(ctx context.Context, obj *model.CustomResourceDefinition) (
 	})
 }
 
-func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (*model.KubernetesResourceConnection, error) {
+func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDefinition, version *string) (model.KubernetesResourceConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -101,7 +101,7 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.KubernetesResourceConnection{}, nil
 	}
 
 	gv := schema.GroupVersion{Group: obj.Spec.Group}
@@ -129,7 +129,7 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 	// passing clients.WithNamespace to r.clients.Get above.
 	if err := c.List(ctx, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListResources))
-		return nil, nil
+		return model.KubernetesResourceConnection{}, nil
 	}
 
 	out := &model.KubernetesResourceConnection{
@@ -148,7 +148,7 @@ func (r *crd) DefinedResources(ctx context.Context, obj *model.CustomResourceDef
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
 // TODO(negz): Try to pick the 'highest' version (e.g. v2 > v1 > v1beta1),

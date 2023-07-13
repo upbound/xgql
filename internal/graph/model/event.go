@@ -15,55 +15,9 @@
 package model
 
 import (
-	"time"
-
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/utils/pointer"
 )
-
-// An Event pertaining to a Kubernetes resource.
-type Event struct {
-	// An opaque identifier that is unique across all types.
-	ID ReferenceID `json:"id"`
-
-	// The underlying Kubernetes API version of this resource.
-	APIVersion string `json:"apiVersion"`
-
-	// The underlying Kubernetes API kind of this resource.
-	Kind string `json:"kind"`
-
-	// Metadata that is common to all Kubernetes API resources.
-	Metadata *ObjectMeta `json:"metadata"`
-
-	// The type of event.
-	Type *EventType `json:"type"`
-
-	// The reason the event was emitted.
-	Reason *string `json:"reason"`
-
-	// Details about the event, if any.
-	Message *string `json:"message"`
-
-	// The source of the event - e.g. a controller.
-	Source *EventSource `json:"source"`
-
-	// The number of times this event has occurred.
-	Count *int `json:"count"`
-
-	// The time at which this event was first recorded.
-	FirstTime *time.Time `json:"firstTime"`
-
-	// The time at which this event was most recently recorded.
-	LastTime *time.Time `json:"lastTime"`
-
-	// An unstructured JSON representation of the event.
-	Unstructured []byte `json:"raw"`
-
-	InvolvedObjectRef corev1.ObjectReference
-}
-
-// IsNode indicates that an Event satisfies the GraphQL node interface.
-func (Event) IsNode() {}
 
 // GetEventType from the supplied Kubernetes event type.
 func GetEventType(in string) *EventType {

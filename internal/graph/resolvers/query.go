@@ -59,7 +59,7 @@ func (r *query) getAllDescendant(ctx context.Context, res model.KubernetesResour
 		list := []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
 
 		compositeResolver := compositeResourceSpec{clients: r.clients}
-		resources, err := compositeResolver.Resources(ctx, typedRes.Spec)
+		resources, err := compositeResolver.Resources(ctx, &typedRes.Spec)
 		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
 			return nil, err
 		}
@@ -78,7 +78,7 @@ func (r *query) getAllDescendant(ctx context.Context, res model.KubernetesResour
 		list := []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
 
 		claimResolver := compositeResourceClaimSpec{clients: r.clients}
-		composite, err := claimResolver.Resource(ctx, typedRes.Spec)
+		composite, err := claimResolver.Resource(ctx, &typedRes.Spec)
 		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
 			return nil, err
 		}
@@ -98,21 +98,21 @@ func (r *query) getAllDescendant(ctx context.Context, res model.KubernetesResour
 	}
 }
 
-func (r *query) CrossplaneResourceTree(ctx context.Context, id model.ReferenceID) (*model.CrossplaneResourceTreeConnection, error) {
+func (r *query) CrossplaneResourceTree(ctx context.Context, id model.ReferenceID) (model.CrossplaneResourceTreeConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	rootRes, err := r.KubernetesResource(ctx, id)
 	if err != nil || len(graphql.GetErrors(ctx)) > 0 {
-		return nil, err
+		return model.CrossplaneResourceTreeConnection{}, err
 	}
 
 	list, err := r.getAllDescendant(ctx, rootRes, nil)
 	if err != nil || len(graphql.GetErrors(ctx)) > 0 {
-		return nil, err
+		return model.CrossplaneResourceTreeConnection{}, err
 	}
 
-	return &model.CrossplaneResourceTreeConnection{Nodes: list, TotalCount: len(list)}, nil
+	return model.CrossplaneResourceTreeConnection{Nodes: list, TotalCount: len(list)}, nil
 }
 
 func (r *query) KubernetesResource(ctx context.Context, id model.ReferenceID) (model.KubernetesResource, error) {
@@ -143,7 +143,7 @@ func (r *query) KubernetesResource(ctx context.Context, id model.ReferenceID) (m
 	return out, nil
 }
 
-func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string, listKind, namespace *string) (*model.KubernetesResourceConnection, error) {
+func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string, listKind, namespace *string) (model.KubernetesResourceConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -158,7 +158,7 @@ func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string
 	c, err := r.clients.Get(creds, gopts...)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.KubernetesResourceConnection{}, nil
 	}
 
 	in := &kunstructured.UnstructuredList{}
@@ -170,7 +170,7 @@ func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string
 
 	if err := c.List(ctx, in, lopts...); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListResources))
-		return nil, nil
+		return model.KubernetesResourceConnection{}, nil
 	}
 
 	out := &model.KubernetesResourceConnection{
@@ -188,10 +188,10 @@ func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
-func (r *query) Events(ctx context.Context, involved *model.ReferenceID) (*model.EventConnection, error) {
+func (r *query) Events(ctx context.Context, involved *model.ReferenceID) (model.EventConnection, error) {
 	e := events{clients: r.clients}
 	if involved == nil {
 		// Resolve all events.
@@ -251,7 +251,7 @@ func (r *query) ConfigMap(ctx context.Context, namespace, name string) (*model.C
 	return &out, nil
 }
 
-func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error) {
+func (r *query) Providers(ctx context.Context) (model.ProviderConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -259,13 +259,13 @@ func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.ProviderConnection{}, nil
 	}
 
 	in := &pkgv1.ProviderList{}
 	if err := c.List(ctx, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListProviders))
-		return nil, nil
+		return model.ProviderConnection{}, nil
 	}
 
 	out := &model.ProviderConnection{
@@ -278,10 +278,10 @@ func (r *query) Providers(ctx context.Context) (*model.ProviderConnection, error
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
-func (r *query) ProviderRevisions(ctx context.Context, provider *model.ReferenceID, active *bool) (*model.ProviderRevisionConnection, error) {
+func (r *query) ProviderRevisions(ctx context.Context, provider *model.ReferenceID, active *bool) (model.ProviderRevisionConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -289,13 +289,13 @@ func (r *query) ProviderRevisions(ctx context.Context, provider *model.Reference
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.ProviderRevisionConnection{}, nil
 	}
 
 	in := &pkgv1.ProviderRevisionList{}
 	if err := c.List(ctx, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListProviderRevs))
-		return nil, nil
+		return model.ProviderRevisionConnection{}, nil
 	}
 
 	out := &model.ProviderRevisionConnection{
@@ -320,10 +320,10 @@ func (r *query) ProviderRevisions(ctx context.Context, provider *model.Reference
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
-func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.ReferenceID) (*model.CustomResourceDefinitionConnection, error) {
+func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.ReferenceID) (model.CustomResourceDefinitionConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -331,13 +331,13 @@ func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.R
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.CustomResourceDefinitionConnection{}, nil
 	}
 
 	in := xunstructured.NewCRDList()
 	if err := c.List(ctx, in.GetUnstructuredList()); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListConfigs))
-		return nil, nil
+		return model.CustomResourceDefinitionConnection{}, nil
 	}
 
 	out := &model.CustomResourceDefinitionConnection{
@@ -357,10 +357,10 @@ func (r *query) CustomResourceDefinitions(ctx context.Context, revision *model.R
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
-func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnection, error) {
+func (r *query) Configurations(ctx context.Context) (model.ConfigurationConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -368,13 +368,13 @@ func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnect
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.ConfigurationConnection{}, nil
 	}
 
 	in := &pkgv1.ConfigurationList{}
 	if err := c.List(ctx, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListConfigs))
-		return nil, nil
+		return model.ConfigurationConnection{}, nil
 	}
 
 	out := &model.ConfigurationConnection{
@@ -387,10 +387,10 @@ func (r *query) Configurations(ctx context.Context) (*model.ConfigurationConnect
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
-func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID, active *bool) (*model.ConfigurationRevisionConnection, error) {
+func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model.ReferenceID, active *bool) (model.ConfigurationRevisionConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -398,13 +398,13 @@ func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.ConfigurationRevisionConnection{}, nil
 	}
 
 	in := &pkgv1.ConfigurationRevisionList{}
 	if err := c.List(ctx, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListConfigRevs))
-		return nil, nil
+		return model.ConfigurationRevisionConnection{}, nil
 	}
 
 	out := &model.ConfigurationRevisionConnection{
@@ -429,10 +429,10 @@ func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
-func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositeResourceDefinitionConnection, error) {
+func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (model.CompositeResourceDefinitionConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -440,13 +440,13 @@ func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *mode
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.CompositeResourceDefinitionConnection{}, nil
 	}
 
 	in := &extv1.CompositeResourceDefinitionList{}
 	if err := c.List(ctx, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListConfigs))
-		return nil, nil
+		return model.CompositeResourceDefinitionConnection{}, nil
 	}
 
 	out := &model.CompositeResourceDefinitionConnection{
@@ -471,10 +471,10 @@ func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *mode
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
-func (r *query) Compositions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (*model.CompositionConnection, error) {
+func (r *query) Compositions(ctx context.Context, revision *model.ReferenceID, dangling *bool) (model.CompositionConnection, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -482,13 +482,13 @@ func (r *query) Compositions(ctx context.Context, revision *model.ReferenceID, d
 	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
-		return nil, nil
+		return model.CompositionConnection{}, nil
 	}
 
 	in := &extv1.CompositionList{}
 	if err := c.List(ctx, in); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListConfigs))
-		return nil, nil
+		return model.CompositionConnection{}, nil
 	}
 
 	out := &model.CompositionConnection{
@@ -513,7 +513,7 @@ func (r *query) Compositions(ctx context.Context, revision *model.ReferenceID, d
 	}
 
 	sort.Stable(out)
-	return out, nil
+	return *out, nil
 }
 
 func containsCR(in []metav1.OwnerReference) bool {

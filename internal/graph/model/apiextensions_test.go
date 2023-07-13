@@ -103,12 +103,12 @@ func TestGetCompositeResourceDefinition(t *testing.T) {
 				},
 				APIVersion: extv1.CompositeResourceDefinitionGroupVersionKind.GroupVersion().String(),
 				Kind:       extv1.CompositeResourceDefinitionKind,
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
-				Spec: &CompositeResourceDefinitionSpec{
+				Spec: CompositeResourceDefinitionSpec{
 					Group: "group",
-					Names: &CompositeResourceDefinitionNames{
+					Names: CompositeResourceDefinitionNames{
 						Plural:     "clusterexamples",
 						Singular:   pointer.String("clusterexample"),
 						ShortNames: []string{"cex"},
@@ -152,9 +152,9 @@ func TestGetCompositeResourceDefinition(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			xrd:    &extv1.CompositeResourceDefinition{},
 			want: CompositeResourceDefinition{
-				Metadata: &ObjectMeta{},
-				Spec: &CompositeResourceDefinitionSpec{
-					Names: &CompositeResourceDefinitionNames{},
+				Metadata: ObjectMeta{},
+				Spec: CompositeResourceDefinitionSpec{
+					Names: CompositeResourceDefinitionNames{},
 				},
 			},
 		},
@@ -212,11 +212,11 @@ func TestGetComposition(t *testing.T) {
 				},
 				APIVersion: extv1.CompositionGroupVersionKind.GroupVersion().String(),
 				Kind:       extv1.CompositionKind,
-				Metadata: &ObjectMeta{
+				Metadata: ObjectMeta{
 					Name: "cool",
 				},
-				Spec: &CompositionSpec{
-					CompositeTypeRef: &TypeReference{
+				Spec: CompositionSpec{
+					CompositeTypeRef: TypeReference{
 						APIVersion: "group/v1",
 						Kind:       "ClusterExample",
 					},
@@ -231,9 +231,9 @@ func TestGetComposition(t *testing.T) {
 			reason: "Absent optional fields should be absent in our model",
 			xrd:    &extv1.Composition{},
 			want: Composition{
-				Metadata: &ObjectMeta{},
-				Spec: &CompositionSpec{
-					CompositeTypeRef: &TypeReference{},
+				Metadata: ObjectMeta{},
+				Spec: CompositionSpec{
+					CompositeTypeRef: TypeReference{},
 				},
 			},
 		},
