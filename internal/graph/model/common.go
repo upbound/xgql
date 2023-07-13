@@ -109,19 +109,22 @@ func GetLabelSelector(s *metav1.LabelSelector) *LabelSelector {
 }
 
 // GetGenericResource from the suppled Kubernetes resource.
-func GetGenericResource(u *kunstructured.Unstructured) GenericResource {
-	return GenericResource{
+func GetGenericResource(u *kunstructured.Unstructured, s SelectedFields) GenericResource {
+	out := GenericResource{
 		ID: ReferenceID{
 			APIVersion: u.GetAPIVersion(),
 			Kind:       u.GetKind(),
 			Namespace:  u.GetNamespace(),
 			Name:       u.GetName(),
 		},
-		APIVersion:   u.GetAPIVersion(),
-		Kind:         u.GetKind(),
-		Metadata:     GetObjectMeta(u),
-		Unstructured: bytesForUnstructured(u),
+		APIVersion: u.GetAPIVersion(),
+		Kind:       u.GetKind(),
+		Metadata:   GetObjectMeta(u),
 	}
+	if s.Has(FieldUnstructured) {
+		out.Unstructured = bytesForUnstructured(u)
+	}
+	return out
 }
 
 // Data of this secret.
@@ -431,7 +434,7 @@ func GetKubernetesResource(u *kunstructured.Unstructured, s SelectedFields) (Kub
 		return GetConfigMap(cm, s), nil
 
 	default:
-		return GetGenericResource(u), nil
+		return GetGenericResource(u, s), nil
 	}
 }
 

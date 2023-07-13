@@ -110,8 +110,8 @@ func TestGetGenericResource(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetGenericResource(tc.u)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(GenericResource{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			got := GetGenericResource(tc.u, SkipFields(FieldUnstructured))
+			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetGenericResource(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

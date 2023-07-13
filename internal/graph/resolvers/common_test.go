@@ -22,6 +22,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
+	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -50,7 +51,20 @@ func TestCRDDefinedResources(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	gr := unstructured.Unstructured{}
-	ggr := model.GetGenericResource(&gr)
+	ggr := model.GetGenericResource(&gr, model.SelectAll)
+	ggrSkipUnstructured := model.GetGenericResource(&gr, model.SkipFields(model.FieldUnstructured))
+
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldNodes,
+			SelectionSet: ast.SelectionSet{
+				&ast.Field{
+					Name: model.FieldUnstructured,
+				},
+			},
+		},
+	}
 
 	group := "example.org"
 	version := "v1"
@@ -133,7 +147,7 @@ func TestCRDDefinedResources(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CustomResourceDefinition{
 					Spec: model.CustomResourceDefinitionSpec{
 						Group: group,
@@ -162,8 +176,109 @@ func TestCRDDefinedResources(t *testing.T) {
 				},
 			},
 		},
+		"InferServedVersionSkipUnstructured": {
+			reason: "We should successfully infer the served version (if none is referenceable) and return any defined resources we can list and model without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						u := *obj.(*unstructured.UnstructuredList)
+
+						// Ensure we're being asked to list the expected GVK.
+						got := u.GetObjectKind().GroupVersionKind()
+						want := schema.GroupVersionKind{Group: group, Version: version, Kind: listKind}
+						if diff := cmp.Diff(want, got); diff != "" {
+							t.Errorf("-want GVK, +got GVK:\n%s", diff)
+						}
+
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{gr}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CustomResourceDefinition{
+					Spec: model.CustomResourceDefinitionSpec{
+						Group: group,
+						Names: model.CustomResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.String(listKind),
+						},
+						Versions: []model.CustomResourceDefinitionVersion{
+							// This version should be ignored because it is
+							// neither referenceable nor served.
+							{
+								Name: "v3",
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+			},
+			want: want{
+				krc: model.KubernetesResourceConnection{
+					Nodes:      []model.KubernetesResource{ggrSkipUnstructured},
+					TotalCount: 1,
+				},
+			},
+		},
 		"SpecificVersion": {
 			reason: "We should successfully return any defined resources of the requested version that we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						u := *obj.(*unstructured.UnstructuredList)
+
+						// Ensure we're being asked to list the expected GVK.
+						got := u.GetObjectKind().GroupVersionKind()
+						want := schema.GroupVersionKind{Group: group, Version: version, Kind: listKind}
+						if diff := cmp.Diff(want, got); diff != "" {
+							t.Errorf("-want GVK, +got GVK:\n%s", diff)
+						}
+
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{gr}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CustomResourceDefinition{
+					Spec: model.CustomResourceDefinitionSpec{
+						Group: group,
+						Names: model.CustomResourceDefinitionNames{
+							Kind:     kind,
+							ListKind: pointer.String(listKind),
+						},
+						Versions: []model.CustomResourceDefinitionVersion{
+							// Normally we'd pick this version first, but in
+							// this case the caller asked us to list a specific
+							// version.
+							{
+								Name:   "v2",
+								Served: true,
+							},
+							{
+								Name:   version,
+								Served: true,
+							},
+						},
+					},
+				},
+				version: pointer.String(version),
+			},
+			want: want{
+				krc: model.KubernetesResourceConnection{
+					Nodes:      []model.KubernetesResource{ggr},
+					TotalCount: 1,
+				},
+			},
+		},
+		"SpecificVersionSkipUnstructured": {
+			reason: "We should successfully return any defined resources of the requested version that we can list and model without the unstructured field.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
@@ -209,7 +324,7 @@ func TestCRDDefinedResources(t *testing.T) {
 			},
 			want: want{
 				krc: model.KubernetesResourceConnection{
-					Nodes:      []model.KubernetesResource{ggr},
+					Nodes:      []model.KubernetesResource{ggrSkipUnstructured},
 					TotalCount: 1,
 				},
 			},

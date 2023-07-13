@@ -329,6 +329,7 @@ func TestQueryKubernetesResources(t *testing.T) {
 
 	kr := unstructured.Unstructured{}
 	gkr, _ := model.GetKubernetesResource(&kr, model.SelectAll)
+	gkrSkipUnstructured, _ := model.GetKubernetesResource(&kr, model.SkipFields(model.FieldUnstructured))
 
 	group := "example.org"
 	version := "v1"
@@ -340,6 +341,18 @@ func TestQueryKubernetesResources(t *testing.T) {
 	listKind := "Examples"
 
 	ns := "default"
+
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldNodes,
+			SelectionSet: ast.SelectionSet{
+				&ast.Field{
+					Name: model.FieldUnstructured,
+				},
+			},
+		},
+	}
 
 	type args struct {
 		ctx        context.Context
@@ -410,7 +423,7 @@ func TestQueryKubernetesResources(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx:        graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx:        graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				apiVersion: apiVersion,
 				kind:       kind,
 			},
@@ -421,8 +434,71 @@ func TestQueryKubernetesResources(t *testing.T) {
 				},
 			},
 		},
+		"GVKOnlySkipUnstructured": {
+			reason: "We should successfully return any Kubernetes resources of the specified GVK that we can list and model without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						u := *obj.(*unstructured.UnstructuredList)
+
+						// Ensure we're being asked to list the expected GVK.
+						got := u.GetObjectKind().GroupVersionKind()
+						want := schema.GroupVersionKind{Group: group, Version: version, Kind: kind + "List"}
+						if diff := cmp.Diff(want, got); diff != "" {
+							t.Errorf("-want GVK, +got GVK:\n%s", diff)
+						}
+
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{kr}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx:        graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				apiVersion: apiVersion,
+				kind:       kind,
+			},
+			want: want{
+				krc: model.KubernetesResourceConnection{
+					Nodes:      []model.KubernetesResource{gkrSkipUnstructured},
+					TotalCount: 1,
+				},
+			},
+		},
 		"WithListKind": {
 			reason: "We should successfully list, model, and return resources of a bespoke listKind.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						u := *obj.(*unstructured.UnstructuredList)
+
+						// Ensure we're being asked to list the expected GVK.
+						got := u.GetObjectKind().GroupVersionKind()
+						want := schema.GroupVersionKind{Group: group, Version: version, Kind: listKind}
+						if diff := cmp.Diff(want, got); diff != "" {
+							t.Errorf("-want GVK, +got GVK:\n%s", diff)
+						}
+
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{kr}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx:        graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				apiVersion: apiVersion,
+				kind:       kind,
+				listKind:   &listKind,
+			},
+			want: want{
+				krc: model.KubernetesResourceConnection{
+					Nodes:      []model.KubernetesResource{gkr},
+					TotalCount: 1,
+				},
+			},
+		},
+		"WithListKindSkipUnstructured": {
+			reason: "We should successfully list, model, and return resources of a bespoke listKind without the unstructured field.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
 				return &test.MockClient{
 					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
@@ -448,13 +524,48 @@ func TestQueryKubernetesResources(t *testing.T) {
 			},
 			want: want{
 				krc: model.KubernetesResourceConnection{
-					Nodes:      []model.KubernetesResource{gkr},
+					Nodes:      []model.KubernetesResource{gkrSkipUnstructured},
 					TotalCount: 1,
 				},
 			},
 		},
 		"WithNamespace": {
 			reason: "We should successfully list, model, and return resources from within a specific namespace.",
+			clients: ClientCacheFn(func(_ auth.Credentials, o ...clients.GetOption) (client.Client, error) {
+				if len(o) != 1 {
+					t.Errorf("Expected 1 GetOption, got %d", len(o))
+				}
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						u := *obj.(*unstructured.UnstructuredList)
+
+						// Ensure we're being asked to list the expected GVK.
+						got := u.GetObjectKind().GroupVersionKind()
+						want := schema.GroupVersionKind{Group: group, Version: version, Kind: kind + "List"}
+						if diff := cmp.Diff(want, got); diff != "" {
+							t.Errorf("-want GVK, +got GVK:\n%s", diff)
+						}
+
+						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{kr}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx:        graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				apiVersion: apiVersion,
+				kind:       kind,
+				namespace:  &ns,
+			},
+			want: want{
+				krc: model.KubernetesResourceConnection{
+					Nodes:      []model.KubernetesResource{gkr},
+					TotalCount: 1,
+				},
+			},
+		},
+		"WithNamespaceSkipUnstructured": {
+			reason: "We should successfully list, model, and return resources from within a specific namespace without the unstructured field.",
 			clients: ClientCacheFn(func(_ auth.Credentials, o ...clients.GetOption) (client.Client, error) {
 				if len(o) != 1 {
 					t.Errorf("Expected 1 GetOption, got %d", len(o))
@@ -483,7 +594,7 @@ func TestQueryKubernetesResources(t *testing.T) {
 			},
 			want: want{
 				krc: model.KubernetesResourceConnection{
-					Nodes:      []model.KubernetesResource{gkr},
+					Nodes:      []model.KubernetesResource{gkrSkipUnstructured},
 					TotalCount: 1,
 				},
 			},
@@ -2077,6 +2188,7 @@ func TestQueryCompositions(t *testing.T) {
 			},
 		},
 	}
+
 	type args struct {
 		ctx      context.Context
 		revision *model.ReferenceID
