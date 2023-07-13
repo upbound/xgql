@@ -343,7 +343,7 @@ func GetKubernetesResource(u *kunstructured.Unstructured, s SelectedFields) (Kub
 		return GetProviderConfig(u, s), nil
 
 	case unstructured.ProbablyComposite(u):
-		return GetCompositeResource(u), nil
+		return GetCompositeResource(u, s), nil
 
 	case unstructured.ProbablyClaim(u):
 		return GetCompositeResourceClaim(u), nil

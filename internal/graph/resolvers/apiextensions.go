@@ -124,18 +124,19 @@ func (r *xrd) DefinedCompositeResources(ctx context.Context, obj *model.Composit
 		return model.CompositeResourceConnection{}, nil
 	}
 
-	return getCompositeResourceConnection(in, options), nil
+	return getCompositeResourceConnection(ctx, in, options), nil
 }
 
 /*
 Produce a CompositeResourceClaimConnection from the raw k8s UnstructuredList
 that is filtered and sorted
 */
-func getCompositeResourceConnection(in *kunstructured.UnstructuredList, options *model.DefinedCompositeResourceOptionsInput) model.CompositeResourceConnection {
+func getCompositeResourceConnection(ctx context.Context, in *kunstructured.UnstructuredList, options *model.DefinedCompositeResourceOptionsInput) model.CompositeResourceConnection {
 	xrs := []model.CompositeResource{}
+	selectedFields := GetSelectedFields(ctx).Sub("nodes")
 
 	for i := range in.Items {
-		xr := model.GetCompositeResource(&in.Items[i])
+		xr := model.GetCompositeResource(&in.Items[i], selectedFields)
 		if readyMatches(options.Ready, &xr) {
 			xrs = append(xrs, xr)
 		}

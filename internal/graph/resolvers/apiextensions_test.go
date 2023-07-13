@@ -269,16 +269,16 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	xr := unstructured.Unstructured{}
-	gxr := model.GetCompositeResource(&xr)
+	gxr := model.GetCompositeResource(&xr, model.SelectAll)
 	xrReady := unstructured.Unstructured{Object: map[string]interface{}{}}
 	fieldpath.Pave(xrReady.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionTrue}})
-	gxrReady := model.GetCompositeResource(&xrReady)
+	gxrReady := model.GetCompositeResource(&xrReady, model.SelectAll)
 	xrNotReady := unstructured.Unstructured{Object: map[string]interface{}{}}
 	fieldpath.Pave(xrNotReady.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionFalse}})
-	gxrNotReady := model.GetCompositeResource(&xrNotReady)
+	gxrNotReady := model.GetCompositeResource(&xrNotReady, model.SelectAll)
 	xrReadyUnknown := unstructured.Unstructured{Object: map[string]interface{}{}}
 	fieldpath.Pave(xrReadyUnknown.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionUnknown}})
-	gxrReadyUnknown := model.GetCompositeResource(&xrReadyUnknown)
+	gxrReadyUnknown := model.GetCompositeResource(&xrReadyUnknown, model.SelectAll)
 
 	group := "example.org"
 	version := "v1"

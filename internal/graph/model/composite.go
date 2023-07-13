@@ -55,9 +55,9 @@ func GetCompositeResourceStatus(xr *unstructured.Composite) *CompositeResourceSt
 }
 
 // GetCompositeResource from the supplied Crossplane resource.
-func GetCompositeResource(u *kunstructured.Unstructured) CompositeResource {
+func GetCompositeResource(u *kunstructured.Unstructured, s SelectedFields) CompositeResource {
 	xr := &unstructured.Composite{Unstructured: *u}
-	return CompositeResource{
+	out := CompositeResource{
 		ID: ReferenceID{
 			APIVersion: xr.GetAPIVersion(),
 			Kind:       xr.GetKind(),
@@ -74,9 +74,12 @@ func GetCompositeResource(u *kunstructured.Unstructured) CompositeResource {
 			ResourceReferences:               xr.GetResourceReferences(),
 			WriteConnectionSecretToReference: xr.GetWriteConnectionSecretToReference(),
 		},
-		Status:       GetCompositeResourceStatus(xr),
-		Unstructured: bytesForUnstructured(u),
+		Status: GetCompositeResourceStatus(xr),
 	}
+	if s.Has("unstructured") {
+		out.Unstructured = bytesForUnstructured(u)
+	}
+	return out
 }
 
 func delocalize(ref *xpv1.LocalSecretReference, namespace string) *xpv1.SecretReference {

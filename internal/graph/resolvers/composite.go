@@ -390,7 +390,7 @@ func (r *compositeResourceClaimSpec) Resource(ctx context.Context, obj *model.Co
 		return nil, nil
 	}
 
-	out := model.GetCompositeResource(xr)
+	out := model.GetCompositeResource(xr, GetSelectedFields(ctx))
 	return &out, nil
 }
 
