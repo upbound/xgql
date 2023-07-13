@@ -1294,7 +1294,20 @@ func TestQueryConfigurations(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	c := pkgv1.Configuration{ObjectMeta: metav1.ObjectMeta{Name: "coolconfig"}}
-	gc := model.GetConfiguration(&c)
+	gc := model.GetConfiguration(&c, model.SelectAll)
+	gcSkipUnstructured := model.GetConfiguration(&c, model.SkipFields(model.FieldUnstructured))
+
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldNodes,
+			SelectionSet: ast.SelectionSet{
+				&ast.Field{
+					Name: model.FieldUnstructured,
+				},
+			},
+		},
+	}
 
 	type args struct {
 		ctx context.Context
@@ -1352,11 +1365,31 @@ func TestQueryConfigurations(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
 				cc: model.ConfigurationConnection{
 					Nodes:      []model.Configuration{gc},
+					TotalCount: 1,
+				},
+			},
+		},
+		"SuccessSkipUnstructured": {
+			reason: "We should successfully return any configurations we can list and model without unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ConfigurationList) = pkgv1.ConfigurationList{Items: []pkgv1.Configuration{c}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				cc: model.ConfigurationConnection{
+					Nodes:      []model.Configuration{gcSkipUnstructured},
 					TotalCount: 1,
 				},
 			},

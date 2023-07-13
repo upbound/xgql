@@ -384,9 +384,10 @@ func (r *query) Configurations(ctx context.Context) (model.ConfigurationConnecti
 		Nodes:      make([]model.Configuration, 0, len(in.Items)),
 		TotalCount: len(in.Items),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for i := range in.Items {
-		out.Nodes = append(out.Nodes, model.GetConfiguration(&in.Items[i]))
+		out.Nodes = append(out.Nodes, model.GetConfiguration(&in.Items[i], selectedFields))
 	}
 
 	sort.Stable(out)

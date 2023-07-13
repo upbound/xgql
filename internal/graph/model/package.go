@@ -191,8 +191,8 @@ func GetConfigurationStatus(in pkgv1.ConfigurationStatus) *ConfigurationStatus {
 }
 
 // GetConfiguration from the supplied Kubernetes configuration.
-func GetConfiguration(c *pkgv1.Configuration) Configuration {
-	return Configuration{
+func GetConfiguration(c *pkgv1.Configuration, s SelectedFields) Configuration {
+	out := Configuration{
 		ID: ReferenceID{
 			APIVersion: c.APIVersion,
 			Kind:       c.Kind,
@@ -210,9 +210,12 @@ func GetConfiguration(c *pkgv1.Configuration) Configuration {
 			IgnoreCrossplaneConstraints: c.Spec.IgnoreCrossplaneConstraints,
 			SkipDependencyResolution:    c.Spec.SkipDependencyResolution,
 		},
-		Status:       GetConfigurationStatus(c.Status),
-		Unstructured: unstruct(c),
+		Status: GetConfigurationStatus(c.Status),
 	}
+	if s.Has(FieldUnstructured) {
+		out.Unstructured = unstruct(c)
+	}
+	return out
 }
 
 // GetConfigurationRevisionStatus from the supplied Crossplane provider revision.
