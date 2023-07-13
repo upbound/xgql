@@ -309,8 +309,8 @@ func TestGetConfigMap(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetConfigMap(tc.cm)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ConfigMap{}, "Unstructured"), cmp.AllowUnexported(ConfigMap{}, ObjectMeta{})); diff != "" {
+			got := GetConfigMap(tc.cm, SkipFields(FieldUnstructured))
+			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ConfigMap{}, ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetSecret(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

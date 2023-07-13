@@ -627,7 +627,15 @@ func TestQuerySecret(t *testing.T) {
 func TestQueryConfigMap(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gsec := model.GetConfigMap(&corev1.ConfigMap{})
+	gcm := model.GetConfigMap(&corev1.ConfigMap{}, model.SelectAll)
+	gcmSkipUnstructured := model.GetConfigMap(&corev1.ConfigMap{}, model.SkipFields(model.FieldUnstructured))
+
+	// A selection set with "unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldUnstructured,
+		},
+	}
 
 	type args struct {
 		ctx       context.Context
@@ -684,10 +692,24 @@ func TestQueryConfigMap(t *testing.T) {
 				}, nil
 			}),
 			args: args{
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				cm: &gcm,
+			},
+		},
+		"SuccessSkipUnstructured": {
+			reason: "If we can get and model the config map we should return it without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: test.NewMockGetFn(nil),
+				}, nil
+			}),
+			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
-				cm: &gsec,
+				cm: &gcmSkipUnstructured,
 			},
 		},
 	}

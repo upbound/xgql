@@ -248,7 +248,7 @@ func (r *query) ConfigMap(ctx context.Context, namespace, name string) (*model.C
 		return nil, nil
 	}
 
-	out := model.GetConfigMap(cm)
+	out := model.GetConfigMap(cm, GetSelectedFields(ctx))
 	return &out, nil
 }
 

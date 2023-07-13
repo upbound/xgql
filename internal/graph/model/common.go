@@ -185,20 +185,23 @@ func GetSecret(s *corev1.Secret, sel SelectedFields) Secret {
 }
 
 // GetConfigMap from the supplied Kubernetes ConfigMap.
-func GetConfigMap(cm *corev1.ConfigMap) ConfigMap {
-	return ConfigMap{
+func GetConfigMap(cm *corev1.ConfigMap, s SelectedFields) ConfigMap {
+	out := ConfigMap{
 		ID: ReferenceID{
 			APIVersion: corev1.SchemeGroupVersion.String(),
 			Kind:       "ConfigMap",
 			Namespace:  cm.GetNamespace(),
 			Name:       cm.GetName(),
 		},
-		APIVersion:   corev1.SchemeGroupVersion.String(),
-		Kind:         "ConfigMap",
-		Metadata:     GetObjectMeta(cm),
-		Unstructured: unstruct(cm),
-		data:         cm.Data,
+		APIVersion: corev1.SchemeGroupVersion.String(),
+		Kind:       "ConfigMap",
+		Metadata:   GetObjectMeta(cm),
+		data:       cm.Data,
 	}
+	if s.Has(FieldUnstructured) {
+		out.Unstructured = unstruct(cm)
+	}
+	return out
 }
 
 // GetCustomResourceDefinitionNames from the supplied Kubernetes names.
@@ -425,7 +428,7 @@ func GetKubernetesResource(u *kunstructured.Unstructured, s SelectedFields) (Kub
 		if err := convert(u, cm); err != nil {
 			return nil, errors.Wrap(err, "cannot convert config map")
 		}
-		return GetConfigMap(cm), nil
+		return GetConfigMap(cm, s), nil
 
 	default:
 		return GetGenericResource(u), nil
