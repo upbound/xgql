@@ -179,11 +179,10 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetCompositeResourceClaim(tc.u)
+			got := GetCompositeResourceClaim(tc.u, SkipFields(FieldUnstructured))
 
 			// metav1.Time trims timestamps to second resolution.
 			if diff := cmp.Diff(tc.want, got,
-				cmpopts.IgnoreFields(CompositeResourceClaim{}, "Unstructured"),
 				cmpopts.EquateApproxTime(1*time.Second),
 				cmp.AllowUnexported(ObjectMeta{}),
 			); diff != "" {

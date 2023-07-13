@@ -171,7 +171,7 @@ func (r *compositeResourceSpec) Claim(ctx context.Context, obj *model.CompositeR
 		return nil, nil
 	}
 
-	out := model.GetCompositeResourceClaim(xrc)
+	out := model.GetCompositeResourceClaim(xrc, GetSelectedFields(ctx))
 	return &out, nil
 }
 

@@ -124,9 +124,9 @@ func GetCompositeResourceClaimStatus(xrc *unstructured.Claim) *CompositeResource
 }
 
 // GetCompositeResourceClaim from the supplied Crossplane claim.
-func GetCompositeResourceClaim(u *kunstructured.Unstructured) CompositeResourceClaim {
+func GetCompositeResourceClaim(u *kunstructured.Unstructured, s SelectedFields) CompositeResourceClaim {
 	xrc := &unstructured.Claim{Unstructured: *u}
-	return CompositeResourceClaim{
+	out := CompositeResourceClaim{
 		ID: ReferenceID{
 			APIVersion: xrc.GetAPIVersion(),
 			Kind:       xrc.GetKind(),
@@ -143,7 +143,10 @@ func GetCompositeResourceClaim(u *kunstructured.Unstructured) CompositeResourceC
 			ResourceReference:                xrc.GetResourceReference(),
 			WriteConnectionSecretToReference: delocalize(xrc.GetWriteConnectionSecretToReference(), xrc.GetNamespace()),
 		},
-		Status:       GetCompositeResourceClaimStatus(xrc),
-		Unstructured: bytesForUnstructured(u),
+		Status: GetCompositeResourceClaimStatus(xrc),
 	}
+	if s.Has(FieldUnstructured) {
+		out.Unstructured = bytesForUnstructured(u)
+	}
+	return out
 }

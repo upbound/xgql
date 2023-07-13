@@ -346,7 +346,7 @@ func GetKubernetesResource(u *kunstructured.Unstructured, s SelectedFields) (Kub
 		return GetCompositeResource(u, s), nil
 
 	case unstructured.ProbablyClaim(u):
-		return GetCompositeResourceClaim(u), nil
+		return GetCompositeResourceClaim(u, s), nil
 
 	// Note that order is important here. We want to check whether the resource
 	// seems to be a managed resource _after_ checking whether it seems to be a

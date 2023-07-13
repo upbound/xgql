@@ -381,7 +381,7 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 	errBoom := errors.New("boom")
 	errNotFound := apierrors.NewNotFound(schema.GroupResource{}, "somename")
 
-	gxrc := model.GetCompositeResourceClaim(&unstructured.Unstructured{})
+	gxrc := model.GetCompositeResourceClaim(&unstructured.Unstructured{}, model.SelectAll)
 
 	type args struct {
 		ctx context.Context
