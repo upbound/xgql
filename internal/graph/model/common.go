@@ -354,7 +354,7 @@ func GetKubernetesResource(u *kunstructured.Unstructured, s SelectedFields) (Kub
 	// that would pass the ProbablyManaged check. Such a composite resource
 	// would very likely pass the ProbablyComposite check and never reach this.
 	case unstructured.ProbablyManaged(u):
-		return GetManagedResource(u), nil
+		return GetManagedResource(u, s), nil
 
 	case u.GroupVersionKind() == pkgv1.ProviderGroupVersionKind:
 		p := &pkgv1.Provider{}

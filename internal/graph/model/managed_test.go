@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -88,9 +87,9 @@ func TestGetManagedResource(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetManagedResource(tc.u)
+			got := GetManagedResource(tc.u, SkipFields(FieldUnstructured))
 
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ManagedResource{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetManagedResource(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

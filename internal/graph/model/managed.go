@@ -62,9 +62,9 @@ func GetManagedResourceStatus(in *unstructured.Managed) *ManagedResourceStatus {
 }
 
 // GetManagedResource from the supplied Crossplane resource.
-func GetManagedResource(u *kunstructured.Unstructured) ManagedResource {
+func GetManagedResource(u *kunstructured.Unstructured, s SelectedFields) ManagedResource {
 	mg := &unstructured.Managed{Unstructured: *u}
-	return ManagedResource{
+	out := ManagedResource{
 		ID: ReferenceID{
 			APIVersion: mg.GetAPIVersion(),
 			Kind:       mg.GetKind(),
@@ -79,7 +79,10 @@ func GetManagedResource(u *kunstructured.Unstructured) ManagedResource {
 			ProviderConfigRef:                GetProviderConfigReference(mg.GetProviderConfigReference()),
 			DeletionPolicy:                   GetDeletionPolicy(mg.GetDeletionPolicy()),
 		},
-		Status:       GetManagedResourceStatus(mg),
-		Unstructured: bytesForUnstructured(u),
+		Status: GetManagedResourceStatus(mg),
 	}
+	if s.Has(FieldUnstructured) {
+		out.Unstructured = bytesForUnstructured(u)
+	}
+	return out
 }
