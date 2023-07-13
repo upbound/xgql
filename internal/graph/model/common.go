@@ -361,7 +361,7 @@ func GetKubernetesResource(u *kunstructured.Unstructured, s SelectedFields) (Kub
 		if err := convert(u, p); err != nil {
 			return nil, errors.Wrap(err, "cannot convert provider")
 		}
-		return GetProvider(p), nil
+		return GetProvider(p, s), nil
 
 	case u.GroupVersionKind() == pkgv1.ProviderRevisionGroupVersionKind:
 		pr := &pkgv1.ProviderRevision{}

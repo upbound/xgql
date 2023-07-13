@@ -93,8 +93,8 @@ func GetProviderStatus(in pkgv1.ProviderStatus) *ProviderStatus {
 }
 
 // GetProvider from the supplied Kubernetes provider.
-func GetProvider(p *pkgv1.Provider) Provider {
-	return Provider{
+func GetProvider(p *pkgv1.Provider, s SelectedFields) Provider {
+	out := Provider{
 		ID: ReferenceID{
 			APIVersion: p.APIVersion,
 			Kind:       p.Kind,
@@ -112,9 +112,12 @@ func GetProvider(p *pkgv1.Provider) Provider {
 			IgnoreCrossplaneConstraints: p.Spec.IgnoreCrossplaneConstraints,
 			SkipDependencyResolution:    p.Spec.SkipDependencyResolution,
 		},
-		Status:       GetProviderStatus(p.Status),
-		Unstructured: unstruct(p),
+		Status: GetProviderStatus(p.Status),
 	}
+	if s.Has(FieldUnstructured) {
+		out.Unstructured = unstruct(p)
+	}
+	return out
 }
 
 // GetPackageRevisionDesiredState from the supplies Crossplane state.

@@ -696,7 +696,20 @@ func TestQueryProviders(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	p := pkgv1.Provider{ObjectMeta: metav1.ObjectMeta{Name: "coolprovider"}}
-	gp := model.GetProvider(&p)
+	gp := model.GetProvider(&p, model.SelectAll)
+	gpSkipUnstructured := model.GetProvider(&p, model.SkipFields(model.FieldUnstructured))
+
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldNodes,
+			SelectionSet: ast.SelectionSet{
+				&ast.Field{
+					Name: model.FieldUnstructured,
+				},
+			},
+		},
+	}
 
 	type args struct {
 		ctx context.Context
@@ -754,11 +767,31 @@ func TestQueryProviders(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
 				pc: model.ProviderConnection{
 					Nodes:      []model.Provider{gp},
+					TotalCount: 1,
+				},
+			},
+		},
+		"SuccessSkipUnstructured": {
+			reason: "We should successfully return any providers we can list and model.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ProviderList) = pkgv1.ProviderList{Items: []pkgv1.Provider{p}}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				pc: model.ProviderConnection{
+					Nodes:      []model.Provider{gpSkipUnstructured},
 					TotalCount: 1,
 				},
 			},

@@ -273,9 +273,10 @@ func (r *query) Providers(ctx context.Context) (model.ProviderConnection, error)
 		Nodes:      make([]model.Provider, 0, len(in.Items)),
 		TotalCount: len(in.Items),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for i := range in.Items {
-		out.Nodes = append(out.Nodes, model.GetProvider(&in.Items[i]))
+		out.Nodes = append(out.Nodes, model.GetProvider(&in.Items[i], selectedFields))
 	}
 
 	sort.Stable(out)
