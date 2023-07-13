@@ -1438,7 +1438,7 @@ func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 	gcmp := model.GetComposition(&extv1.Composition{}, model.SelectAll)
 	gcmpSkipUnstructured := model.GetComposition(&extv1.Composition{}, model.SkipFields(model.FieldUnstructured))
 
-	// A selection set with "nodes.unstructured" field included.
+	// A selection set with "unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
 		&ast.Field{
 			Name: model.FieldUnstructured,
@@ -1569,7 +1569,7 @@ func TestCompositeResourceDefinitionSpecEnforcedComposition(t *testing.T) {
 	gcmp := model.GetComposition(&extv1.Composition{}, model.SelectAll)
 	gcmpSkipUnstructured := model.GetComposition(&extv1.Composition{}, model.SkipFields(model.FieldUnstructured))
 
-	// A selection set with "nodes.unstructured" field included.
+	// A selection set with "unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
 		&ast.Field{
 			Name: model.FieldUnstructured,

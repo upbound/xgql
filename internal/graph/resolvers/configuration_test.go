@@ -239,7 +239,7 @@ func TestConfigurationActiveRevision(t *testing.T) {
 		Spec:       pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
 
-	// A selection set with "nodes.unstructured" field included.
+	// A selection set with "unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
 		&ast.Field{
 			Name: model.FieldUnstructured,
