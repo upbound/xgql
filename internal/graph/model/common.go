@@ -318,29 +318,6 @@ func GetCustomResourceDefinition(crd *unstructured.CustomResourceDefinition, s S
 	return out
 }
 
-// GetCustomResourceDefinitionFromCRD from the suppled Kubernetes CRD.
-func GetCustomResourceDefinitionFromCRD(crd *kextv1.CustomResourceDefinition) CustomResourceDefinition {
-	return CustomResourceDefinition{
-		ID: ReferenceID{
-			APIVersion: crd.APIVersion,
-			Kind:       crd.Kind,
-			Name:       crd.GetName(),
-		},
-
-		APIVersion: crd.APIVersion,
-		Kind:       crd.Kind,
-		Metadata:   GetObjectMeta(crd),
-		Spec: CustomResourceDefinitionSpec{
-			Group:    crd.Spec.Group,
-			Names:    *GetCustomResourceDefinitionNames(crd.Spec.Names),
-			Scope:    GetResourceScope(crd.Spec.Scope),
-			Versions: GetCustomResourceDefinitionVersions(crd.Spec.Versions),
-		},
-		Status:       GetCustomResourceDefinitionStatus(crd.Status),
-		Unstructured: unstruct(crd),
-	}
-}
-
 // GetKubernetesResource from the supplied unstructured Kubernetes resource.
 // GetKubernetesResource attempts to determine what type of resource the
 // unstructured data contains (e.g. a managed resource, a provider, etc) and
