@@ -72,6 +72,7 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration)
 	out := &model.ConfigurationRevisionConnection{
 		Nodes: make([]model.ConfigurationRevision, 0),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for i := range in.Items {
 		cr := in.Items[i] // So we don't take the address of a range variable.
@@ -83,7 +84,7 @@ func (r *configuration) Revisions(ctx context.Context, obj *model.Configuration)
 			continue
 		}
 
-		out.Nodes = append(out.Nodes, model.GetConfigurationRevision(&cr))
+		out.Nodes = append(out.Nodes, model.GetConfigurationRevision(&cr, selectedFields))
 		out.TotalCount++
 	}
 
@@ -123,7 +124,7 @@ func (r *configuration) ActiveRevision(ctx context.Context, obj *model.Configura
 			continue
 		}
 
-		out := model.GetConfigurationRevision(&cr)
+		out := model.GetConfigurationRevision(&cr, GetSelectedFields(ctx))
 		return &out, nil
 	}
 

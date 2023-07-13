@@ -235,8 +235,8 @@ func GetConfigurationRevisionStatus(in pkgv1.PackageRevisionStatus) *Configurati
 }
 
 // GetConfigurationRevision from the supplied Kubernetes provider revision.
-func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision) ConfigurationRevision {
-	return ConfigurationRevision{
+func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision, s SelectedFields) ConfigurationRevision {
+	out := ConfigurationRevision{
 		ID: ReferenceID{
 			APIVersion: cr.APIVersion,
 			Kind:       cr.Kind,
@@ -254,7 +254,10 @@ func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision) ConfigurationRevi
 			IgnoreCrossplaneConstraints: cr.Spec.IgnoreCrossplaneConstraints,
 			SkipDependencyResolution:    cr.Spec.SkipDependencyResolution,
 		},
-		Status:       GetConfigurationRevisionStatus(cr.Status),
-		Unstructured: unstruct(cr),
+		Status: GetConfigurationRevisionStatus(cr.Status),
 	}
+	if s.Has(FieldUnstructured) {
+		out.Unstructured = unstruct(cr)
+	}
+	return out
 }

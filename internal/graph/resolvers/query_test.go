@@ -1439,7 +1439,8 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 		},
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
-	gactive := model.GetConfigurationRevision(&active)
+	gactive := model.GetConfigurationRevision(&active, model.SelectAll)
+	gactiveSkipUnstructured := model.GetConfigurationRevision(&active, model.SkipFields(model.FieldUnstructured))
 
 	// A ConfigurationRevision we control, but that is inactive.
 	inactive := pkgv1.ConfigurationRevision{
@@ -1453,7 +1454,8 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 		},
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
 	}
-	ginactive := model.GetConfigurationRevision(&inactive)
+	ginactive := model.GetConfigurationRevision(&inactive, model.SelectAll)
+	ginactiveSkipUnstructured := model.GetConfigurationRevision(&inactive, model.SkipFields(model.FieldUnstructured))
 
 	// A ConfigurationRevision which we do not control.
 	other := pkgv1.ConfigurationRevision{
@@ -1466,8 +1468,19 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 			}},
 		},
 	}
-	gother := model.GetConfigurationRevision(&other)
-
+	gother := model.GetConfigurationRevision(&other, model.SelectAll)
+	gotherSkipUnstructured := model.GetConfigurationRevision(&other, model.SkipFields(model.FieldUnstructured))
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldNodes,
+			SelectionSet: ast.SelectionSet{
+				&ast.Field{
+					Name: model.FieldUnstructured,
+				},
+			},
+		},
+	}
 	type args struct {
 		ctx    context.Context
 		id     *model.ReferenceID
@@ -1528,11 +1541,33 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
 				pc: model.ConfigurationRevisionConnection{
 					Nodes:      []model.ConfigurationRevision{gactive, ginactive, gother},
+					TotalCount: 3,
+				},
+			},
+		},
+		"AllRevisionsSkipUnstructured": {
+			reason: "We should successfully return any revisions we own that we can list and model without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ConfigurationRevisionList) = pkgv1.ConfigurationRevisionList{
+							Items: []pkgv1.ConfigurationRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				pc: model.ConfigurationRevisionConnection{
+					Nodes:      []model.ConfigurationRevision{gactiveSkipUnstructured, ginactiveSkipUnstructured, gotherSkipUnstructured},
 					TotalCount: 3,
 				},
 			},
@@ -1550,12 +1585,35 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				id:  &id,
 			},
 			want: want{
 				pc: model.ConfigurationRevisionConnection{
 					Nodes:      []model.ConfigurationRevision{gactive, ginactive},
+					TotalCount: 2,
+				},
+			},
+		},
+		"ConfigurationsRevisionsSkipUnstructured": {
+			reason: "We should successfully return any revisions the supplied provider id owns that we can list and model without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ConfigurationRevisionList) = pkgv1.ConfigurationRevisionList{
+							Items: []pkgv1.ConfigurationRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				id:  &id,
+			},
+			want: want{
+				pc: model.ConfigurationRevisionConnection{
+					Nodes:      []model.ConfigurationRevision{gactiveSkipUnstructured, ginactiveSkipUnstructured},
 					TotalCount: 2,
 				},
 			},
@@ -1573,12 +1631,35 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx:    graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx:    graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				active: pointer.Bool(true),
 			},
 			want: want{
 				pc: model.ConfigurationRevisionConnection{
 					Nodes:      []model.ConfigurationRevision{gactive},
+					TotalCount: 1,
+				},
+			},
+		},
+		"ActiveRevisionsSkipUnstructured": {
+			reason: "We should successfully return any active revisions that we can list and model without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ConfigurationRevisionList) = pkgv1.ConfigurationRevisionList{
+							Items: []pkgv1.ConfigurationRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx:    graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				active: pointer.Bool(true),
+			},
+			want: want{
+				pc: model.ConfigurationRevisionConnection{
+					Nodes:      []model.ConfigurationRevision{gactiveSkipUnstructured},
 					TotalCount: 1,
 				},
 			},

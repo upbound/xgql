@@ -404,8 +404,8 @@ func TestGetConfigurationRevision(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetConfigurationRevision(tc.cfg)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(ConfigurationRevision{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			got := GetConfigurationRevision(tc.cfg, SkipFields(FieldUnstructured))
+			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetConfigurationRevision(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

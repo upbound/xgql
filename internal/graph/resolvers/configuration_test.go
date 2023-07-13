@@ -22,6 +22,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
+	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -59,7 +60,8 @@ func TestConfigurationRevisions(t *testing.T) {
 		},
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
-	gactive := model.GetConfigurationRevision(&active)
+	gactive := model.GetConfigurationRevision(&active, model.SelectAll)
+	gactiveSkipUnstructured := model.GetConfigurationRevision(&active, model.SkipFields(model.FieldUnstructured))
 
 	// A ConfigurationRevision we control, but that is inactive.
 	inactive := pkgv1.ConfigurationRevision{
@@ -69,11 +71,23 @@ func TestConfigurationRevisions(t *testing.T) {
 		},
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
 	}
-	ginactive := model.GetConfigurationRevision(&inactive)
+	ginactive := model.GetConfigurationRevision(&inactive, model.SelectAll)
+	ginactiveSkipUnstructured := model.GetConfigurationRevision(&inactive, model.SkipFields(model.FieldUnstructured))
 
 	// A ConfigurationRevision which we do not control.
 	other := pkgv1.ConfigurationRevision{ObjectMeta: metav1.ObjectMeta{Name: "not-ours"}}
 
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldNodes,
+			SelectionSet: ast.SelectionSet{
+				&ast.Field{
+					Name: model.FieldUnstructured,
+				},
+			},
+		},
+	}
 	type args struct {
 		ctx context.Context
 		obj *model.Configuration
@@ -133,7 +147,7 @@ func TestConfigurationRevisions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.Configuration{
 					Metadata: model.ObjectMeta{UID: uid},
 				},
@@ -141,6 +155,31 @@ func TestConfigurationRevisions(t *testing.T) {
 			want: want{
 				crc: model.ConfigurationRevisionConnection{
 					Nodes:      []model.ConfigurationRevision{gactive, ginactive},
+					TotalCount: 2,
+				},
+			},
+		},
+		"AllRevisionsSkipUnstructured": {
+			reason: "We should successfully return any revisions we own that we can list and model without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ConfigurationRevisionList) = pkgv1.ConfigurationRevisionList{
+							Items: []pkgv1.ConfigurationRevision{other, active, inactive},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.Configuration{
+					Metadata: model.ObjectMeta{UID: uid},
+				},
+			},
+			want: want{
+				crc: model.ConfigurationRevisionConnection{
+					Nodes:      []model.ConfigurationRevision{gactiveSkipUnstructured, ginactiveSkipUnstructured},
 					TotalCount: 2,
 				},
 			},
@@ -182,7 +221,8 @@ func TestConfigurationActiveRevision(t *testing.T) {
 		},
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
-	gactive := model.GetConfigurationRevision(&active)
+	gactive := model.GetConfigurationRevision(&active, model.SelectAll)
+	gactiveSkipUnstructured := model.GetConfigurationRevision(&active, model.SkipFields(model.FieldUnstructured))
 
 	// A ConfigurationRevision we control, but that is inactive.
 	inactive := pkgv1.ConfigurationRevision{
@@ -199,6 +239,12 @@ func TestConfigurationActiveRevision(t *testing.T) {
 		Spec:       pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
 
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldUnstructured,
+		},
+	}
 	type args struct {
 		ctx context.Context
 		obj *model.Configuration
@@ -258,13 +304,35 @@ func TestConfigurationActiveRevision(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.Configuration{
 					Metadata: model.ObjectMeta{UID: uid},
 				},
 			},
 			want: want{
 				pr: &gactive,
+			},
+		},
+		"FoundActiveRevisionSkipUnstructured": {
+			reason: "We should successfully return the active revision.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*pkgv1.ConfigurationRevisionList) = pkgv1.ConfigurationRevisionList{
+							Items: []pkgv1.ConfigurationRevision{otherActive, inactive, active},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.Configuration{
+					Metadata: model.ObjectMeta{UID: uid},
+				},
+			},
+			want: want{
+				pr: &gactiveSkipUnstructured,
 			},
 		},
 		"NoActiveRevision": {

@@ -414,6 +414,7 @@ func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model
 	out := &model.ConfigurationRevisionConnection{
 		Nodes: make([]model.ConfigurationRevision, 0),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for i := range in.Items {
 		pr := in.Items[i] // So we don't take the address of a range variable.
@@ -428,7 +429,7 @@ func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model
 			continue
 		}
 
-		out.Nodes = append(out.Nodes, model.GetConfigurationRevision(&pr))
+		out.Nodes = append(out.Nodes, model.GetConfigurationRevision(&pr, selectedFields))
 		out.TotalCount++
 	}
 

@@ -382,7 +382,7 @@ func GetKubernetesResource(u *kunstructured.Unstructured, s SelectedFields) (Kub
 		if err := convert(u, cr); err != nil {
 			return nil, errors.Wrap(err, "cannot convert configuration revision")
 		}
-		return GetConfigurationRevision(cr), nil
+		return GetConfigurationRevision(cr, s), nil
 
 	case u.GroupVersionKind() == extv1.CompositeResourceDefinitionGroupVersionKind:
 		xrd := &extv1.CompositeResourceDefinition{}
