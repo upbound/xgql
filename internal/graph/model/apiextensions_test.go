@@ -162,8 +162,8 @@ func TestGetCompositeResourceDefinition(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetCompositeResourceDefinition(tc.xrd)
-			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreFields(CompositeResourceDefinition{}, "Unstructured"), cmp.AllowUnexported(ObjectMeta{})); diff != "" {
+			got := GetCompositeResourceDefinition(tc.xrd, SkipFields(FieldUnstructured))
+			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetCompositeResourceDefinition(...): -want, +got\n:%s", tc.reason, diff)
 			}
 		})

@@ -92,7 +92,7 @@ func (r *compositeResource) Definition(ctx context.Context, obj *model.Composite
 			continue
 		}
 
-		out := model.GetCompositeResourceDefinition(&xrd)
+		out := model.GetCompositeResourceDefinition(&xrd, GetSelectedFields(ctx))
 		return &out, nil
 	}
 
@@ -314,7 +314,7 @@ func (r *compositeResourceClaim) Definition(ctx context.Context, obj *model.Comp
 			continue
 		}
 
-		out := model.GetCompositeResourceDefinition(&xrd)
+		out := model.GetCompositeResourceDefinition(&xrd, GetSelectedFields(ctx))
 		return &out, nil
 	}
 

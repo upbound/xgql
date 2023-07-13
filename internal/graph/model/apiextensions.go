@@ -120,8 +120,8 @@ func GetCompositeResourceDefinitionStatus(in extv1.CompositeResourceDefinitionSt
 }
 
 // GetCompositeResourceDefinition from the supplied Crossplane XRD.
-func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) CompositeResourceDefinition {
-	return CompositeResourceDefinition{
+func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition, s SelectedFields) CompositeResourceDefinition {
+	out := CompositeResourceDefinition{
 		ID: ReferenceID{
 			APIVersion: xrd.APIVersion,
 			Kind:       xrd.Kind,
@@ -138,9 +138,12 @@ func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) Comp
 			DefaultCompositionReference:  xrd.Spec.DefaultCompositionRef,
 			EnforcedCompositionReference: xrd.Spec.EnforcedCompositionRef,
 		},
-		Status:       GetCompositeResourceDefinitionStatus(xrd.Status),
-		Unstructured: unstruct(xrd),
+		Status: GetCompositeResourceDefinitionStatus(xrd.Status),
 	}
+	if s.Has(FieldUnstructured) {
+		out.Unstructured = unstruct(xrd)
+	}
+	return out
 }
 
 // GetCompositionStatus from the supplied Crossplane status.

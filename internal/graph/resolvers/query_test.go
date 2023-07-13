@@ -1722,10 +1722,24 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 			},
 		},
 	}}
-	gowned := model.GetCompositeResourceDefinition(&owned)
+	gowned := model.GetCompositeResourceDefinition(&owned, model.SelectAll)
+	gownedSkipUnstructured := model.GetCompositeResourceDefinition(&owned, model.SkipFields(model.FieldUnstructured))
 
 	dangler := extv1.CompositeResourceDefinition{ObjectMeta: metav1.ObjectMeta{Name: "coolconfig"}}
-	gdangler := model.GetCompositeResourceDefinition(&dangler)
+	gdangler := model.GetCompositeResourceDefinition(&dangler, model.SelectAll)
+	gdanglerSkipUnstructured := model.GetCompositeResourceDefinition(&dangler, model.SkipFields(model.FieldUnstructured))
+
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldNodes,
+			SelectionSet: ast.SelectionSet{
+				&ast.Field{
+					Name: model.FieldUnstructured,
+				},
+			},
+		},
+	}
 
 	type args struct {
 		ctx      context.Context
@@ -1790,13 +1804,41 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 			},
 			want: want{
 				xrdc: model.CompositeResourceDefinitionConnection{
 					Nodes: []model.CompositeResourceDefinition{
 						gdangler,
 						gowned,
+					},
+					TotalCount: 2,
+				},
+			},
+		},
+		"AllXRDsSkipUnstructured": {
+			reason: "We should successfully return all XRDs we can list and model when no arguments are supplied without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*extv1.CompositeResourceDefinitionList) = extv1.CompositeResourceDefinitionList{
+							Items: []extv1.CompositeResourceDefinition{
+								dangler,
+								owned,
+							},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+			},
+			want: want{
+				xrdc: model.CompositeResourceDefinitionConnection{
+					Nodes: []model.CompositeResourceDefinition{
+						gdanglerSkipUnstructured,
+						gownedSkipUnstructured,
 					},
 					TotalCount: 2,
 				},
@@ -1818,13 +1860,41 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx:      graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				dangling: pointer.Bool(true),
 			},
 			want: want{
 				xrdc: model.CompositeResourceDefinitionConnection{
 					Nodes: []model.CompositeResourceDefinition{
 						gdangler,
+					},
+					TotalCount: 1,
+				},
+			},
+		},
+		"DanglingXRDsSkipUnstructured": {
+			reason: "We should successfully return dangling XRDs we can list and model without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*extv1.CompositeResourceDefinitionList) = extv1.CompositeResourceDefinitionList{
+							Items: []extv1.CompositeResourceDefinition{
+								dangler,
+								owned,
+							},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				dangling: pointer.Bool(true),
+			},
+			want: want{
+				xrdc: model.CompositeResourceDefinitionConnection{
+					Nodes: []model.CompositeResourceDefinition{
+						gdanglerSkipUnstructured,
 					},
 					TotalCount: 1,
 				},
@@ -1846,13 +1916,41 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx:      graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				revision: &id,
 			},
 			want: want{
 				xrdc: model.CompositeResourceDefinitionConnection{
 					Nodes: []model.CompositeResourceDefinition{
 						gowned,
+					},
+					TotalCount: 1,
+				},
+			},
+		},
+		"OwnedXRDsSkipUnstructured": {
+			reason: "We should successfully return the XRDs we can list and model that are owned by the supplied ID without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*extv1.CompositeResourceDefinitionList) = extv1.CompositeResourceDefinitionList{
+							Items: []extv1.CompositeResourceDefinition{
+								dangler,
+								owned,
+							},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				revision: &id,
+			},
+			want: want{
+				xrdc: model.CompositeResourceDefinitionConnection{
+					Nodes: []model.CompositeResourceDefinition{
+						gownedSkipUnstructured,
 					},
 					TotalCount: 1,
 				},

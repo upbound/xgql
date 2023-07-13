@@ -22,6 +22,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/pkg/errors"
+	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	corev1 "k8s.io/api/core/v1"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -56,7 +57,8 @@ func TestCompositeResourceDefinition(t *testing.T) {
 			Names: kextv1.CustomResourceDefinitionNames{Kind: "Example"},
 		},
 	}
-	gxrd := model.GetCompositeResourceDefinition(&xrd)
+	gxrd := model.GetCompositeResourceDefinition(&xrd, model.SelectAll)
+	gxrdSkipUnstructured := model.GetCompositeResourceDefinition(&xrd, model.SkipFields(model.FieldUnstructured))
 
 	otherGroup := extv1.CompositeResourceDefinition{
 		Spec: extv1.CompositeResourceDefinitionSpec{
@@ -69,6 +71,13 @@ func TestCompositeResourceDefinition(t *testing.T) {
 		Spec: extv1.CompositeResourceDefinitionSpec{
 			Group: "example.org",
 			Names: kextv1.CustomResourceDefinitionNames{Kind: "Illustration"},
+		},
+	}
+
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldUnstructured,
 		},
 	}
 
@@ -133,7 +142,7 @@ func TestCompositeResourceDefinition(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResource{
 					APIVersion: xrd.Spec.Group + "/v1",
 					Kind:       xrd.Spec.Names.Kind,
@@ -141,6 +150,29 @@ func TestCompositeResourceDefinition(t *testing.T) {
 			},
 			want: want{
 				xrd: &gxrd,
+			},
+		},
+		"FoundXRDSkipUnstructured": {
+			reason: "If we can get and model the XRD that defines this XR we should return it without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*extv1.CompositeResourceDefinitionList) = extv1.CompositeResourceDefinitionList{
+							Items: []extv1.CompositeResourceDefinition{otherGroup, otherKind, xrd},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResource{
+					APIVersion: xrd.Spec.Group + "/v1",
+					Kind:       xrd.Spec.Names.Kind,
+				},
+			},
+			want: want{
+				xrd: &gxrdSkipUnstructured,
 			},
 		},
 		"NoXRD": {
@@ -913,7 +945,8 @@ func TestCompositeResourceClaimDefinition(t *testing.T) {
 			ClaimNames: &kextv1.CustomResourceDefinitionNames{Kind: "Example"},
 		},
 	}
-	gxrd := model.GetCompositeResourceDefinition(&xrd)
+	gxrd := model.GetCompositeResourceDefinition(&xrd, model.SelectAll)
+	gxrdSkipUnstructured := model.GetCompositeResourceDefinition(&xrd, model.SkipFields(model.FieldUnstructured))
 
 	noClaim := extv1.CompositeResourceDefinition{
 		Spec: extv1.CompositeResourceDefinitionSpec{
@@ -933,6 +966,13 @@ func TestCompositeResourceClaimDefinition(t *testing.T) {
 		Spec: extv1.CompositeResourceDefinitionSpec{
 			Group:      "example.org",
 			ClaimNames: &kextv1.CustomResourceDefinitionNames{Kind: "Illustration"},
+		},
+	}
+
+	// A selection set with "nodes.unstructured" field included.
+	gselectWithUnstructured := ast.SelectionSet{
+		&ast.Field{
+			Name: model.FieldUnstructured,
 		},
 	}
 
@@ -997,7 +1037,7 @@ func TestCompositeResourceClaimDefinition(t *testing.T) {
 				}, nil
 			}),
 			args: args{
-				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				ctx: graphql.WithResponseContext(testContext(gselectWithUnstructured), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceClaim{
 					APIVersion: xrd.Spec.Group + "/v1",
 					Kind:       xrd.Spec.ClaimNames.Kind,
@@ -1005,6 +1045,29 @@ func TestCompositeResourceClaimDefinition(t *testing.T) {
 			},
 			want: want{
 				xrd: &gxrd,
+			},
+		},
+		"FoundXRDSkipUnstructured": {
+			reason: "If we can get and model the XRD that defines this XR we should return it without the unstructured field.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
+						*obj.(*extv1.CompositeResourceDefinitionList) = extv1.CompositeResourceDefinitionList{
+							Items: []extv1.CompositeResourceDefinition{noClaim, otherGroup, otherKind, xrd},
+						}
+						return nil
+					}),
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceClaim{
+					APIVersion: xrd.Spec.Group + "/v1",
+					Kind:       xrd.Spec.ClaimNames.Kind,
+				},
+			},
+			want: want{
+				xrd: &gxrdSkipUnstructured,
 			},
 		},
 		"NoXRD": {

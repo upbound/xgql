@@ -457,6 +457,7 @@ func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *mode
 	out := &model.CompositeResourceDefinitionConnection{
 		Nodes: make([]model.CompositeResourceDefinition, 0),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for i := range in.Items {
 		xrd := &in.Items[i]
@@ -471,7 +472,7 @@ func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *mode
 			continue
 		}
 
-		out.Nodes = append(out.Nodes, model.GetCompositeResourceDefinition(xrd))
+		out.Nodes = append(out.Nodes, model.GetCompositeResourceDefinition(xrd, selectedFields))
 		out.TotalCount++
 	}
 

@@ -163,6 +163,7 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 	out := &model.KubernetesResourceConnection{
 		Nodes: make([]model.KubernetesResource, 0, len(obj.ObjectRefs)),
 	}
+	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
 	for _, ref := range obj.ObjectRefs {
 		// Crossplane lints configuration packages to ensure they only contain XRDs and Compositions
@@ -180,7 +181,7 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 				continue
 			}
 
-			out.Nodes = append(out.Nodes, model.GetCompositeResourceDefinition(xrd))
+			out.Nodes = append(out.Nodes, model.GetCompositeResourceDefinition(xrd, selectedFields))
 			out.TotalCount++
 		case extv1.CompositionKind:
 			cmp := &extv1.Composition{}

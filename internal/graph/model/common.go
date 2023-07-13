@@ -389,7 +389,7 @@ func GetKubernetesResource(u *kunstructured.Unstructured, s SelectedFields) (Kub
 		if err := convert(u, xrd); err != nil {
 			return nil, errors.Wrap(err, "cannot convert composite resource definition")
 		}
-		return GetCompositeResourceDefinition(xrd), nil
+		return GetCompositeResourceDefinition(xrd, s), nil
 
 	case u.GroupVersionKind() == extv1.CompositionGroupVersionKind:
 		cmp := &extv1.Composition{}
