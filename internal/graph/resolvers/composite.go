@@ -17,6 +17,7 @@ package resolvers
 import (
 	"context"
 	"sort"
+	"sync"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
@@ -194,30 +195,43 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 		Nodes: make([]model.KubernetesResource, 0, len(obj.ResourceReferences)),
 	}
 
+	// Collect all concurrently.
+	var (
+		mu sync.Mutex
+		wg sync.WaitGroup
+	)
 	for _, ref := range obj.ResourceReferences {
 		// Ignore nameless resource references
 		if ref.Name == "" {
 			continue
 		}
 
-		xrc := &unstructured.Unstructured{}
-		xrc.SetAPIVersion(ref.APIVersion)
-		xrc.SetKind(ref.Kind)
-		nn := types.NamespacedName{Namespace: ref.Namespace, Name: ref.Name}
-		if err := c.Get(ctx, nn, xrc); err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, errGetComposed))
-			continue
-		}
+		ref := ref // So we don't take the address of a range variable.
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			xrc := &unstructured.Unstructured{}
+			xrc.SetAPIVersion(ref.APIVersion)
+			xrc.SetKind(ref.Kind)
+			nn := types.NamespacedName{Namespace: ref.Namespace, Name: ref.Name}
+			if err := c.Get(ctx, nn, xrc); err != nil {
+				graphql.AddError(ctx, errors.Wrap(err, errGetComposed))
+				return
+			}
 
-		kr, err := model.GetKubernetesResource(xrc)
-		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, errModelComposed))
-			continue
-		}
+			kr, err := model.GetKubernetesResource(xrc)
+			if err != nil {
+				graphql.AddError(ctx, errors.Wrap(err, errModelComposed))
+				return
+			}
 
-		out.Nodes = append(out.Nodes, kr)
-		out.TotalCount++
+			mu.Lock()
+			defer mu.Unlock()
+			out.Nodes = append(out.Nodes, kr)
+			out.TotalCount++
+		}()
 	}
+	wg.Wait()
 
 	sort.Stable(out)
 	return *out, nil
