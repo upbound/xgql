@@ -59,7 +59,9 @@ func (r *query) getAllDescendant(ctx context.Context, res model.KubernetesResour
 		list := []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
 
 		compositeResolver := compositeResourceSpec{clients: r.clients}
-		resources, err := compositeResolver.Resources(ctx, &typedRes.Spec)
+		resources, err := compositeResolver.Resources(WithSelectedFields(ctx,
+			GetSelectedFields(ctx).Sub("nodes.resource").Pre(model.FieldNodes),
+		), &typedRes.Spec)
 		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
 			return nil, err
 		}
@@ -78,7 +80,9 @@ func (r *query) getAllDescendant(ctx context.Context, res model.KubernetesResour
 		list := []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
 
 		claimResolver := compositeResourceClaimSpec{clients: r.clients}
-		composite, err := claimResolver.Resource(ctx, &typedRes.Spec)
+		composite, err := claimResolver.Resource(WithSelectedFields(ctx,
+			GetSelectedFields(ctx).Sub("nodes.resource"),
+		), &typedRes.Spec)
 		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
 			return nil, err
 		}
@@ -102,7 +106,12 @@ func (r *query) CrossplaneResourceTree(ctx context.Context, id model.ReferenceID
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	rootRes, err := r.KubernetesResource(ctx, id)
+	// Override the selected fields to only include the resource sub field.
+	rootRes, err := r.KubernetesResource(
+		WithSelectedFields(ctx,
+			GetSelectedFields(ctx).Sub("nodes.resource"),
+		), id,
+	)
 	if err != nil || len(graphql.GetErrors(ctx)) > 0 {
 		return model.CrossplaneResourceTreeConnection{}, err
 	}

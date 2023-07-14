@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/vektah/gqlparser/v2/ast"
 )
 
 // SelectedFields is a set of selected fields.
@@ -33,7 +34,7 @@ func (s SelectedFields) Sub(prefix string) SelectedFields {
 	if len(s) == 0 {
 		return nil
 	}
-	sub := SelectedFields{}
+	sub := make(map[string]struct{})
 	for k := range s {
 		if len(k) > len(prefix) && k[:len(prefix)] == prefix && k[len(prefix)] == '.' {
 			sub[k[len(prefix)+1:]] = struct{}{}
@@ -42,27 +43,50 @@ func (s SelectedFields) Sub(prefix string) SelectedFields {
 	return sub
 }
 
-func GetSelectedFields(ctx context.Context) SelectedFields {
-	resctx := graphql.GetFieldContext(ctx)
-	if resctx == nil { // not in a resolver context
+func (s SelectedFields) Pre(prefix string) SelectedFields {
+	if len(s) == 0 {
 		return nil
 	}
-
-	selection := SelectedFields{}
-	collectSelectedFields(
-		graphql.GetOperationContext(ctx),
-		selection,
-		graphql.CollectFields(graphql.GetOperationContext(ctx), resctx.Field.Selections, nil),
-		"",
-	)
-	return selection
+	pre := make(map[string]struct{})
+	for k := range s {
+		pre[prefix+"."+k] = struct{}{}
+	}
+	return pre
 }
 
-func collectSelectedFields(ctx *graphql.OperationContext, selection SelectedFields, fields []graphql.CollectedField, prefix string) {
-	for _, column := range fields {
-		prefixColumn := fieldPath(prefix, column.Name)
-		selection[prefixColumn] = struct{}{}
-		collectSelectedFields(ctx, selection, graphql.CollectFields(ctx, column.Selections, nil), prefixColumn)
+type ctxKey struct{}
+
+var selectedFieldsCtxKey = ctxKey{}
+
+func WithSelectedFields(ctx context.Context, selection SelectedFields) context.Context {
+	return context.WithValue(ctx, selectedFieldsCtxKey, selection)
+}
+
+func GetSelectedFields(ctx context.Context) SelectedFields {
+	// see if we already have a selection set in context
+	if val, ok := ctx.Value(selectedFieldsCtxKey).(SelectedFields); ok {
+		return val
+	}
+	resctx := graphql.GetFieldContext(ctx)
+	if resctx == nil { // not in a resolver context
+		return SelectedFields{}
+	}
+
+	fields := make(map[string]struct{})
+	collectSelectedFields(
+		graphql.GetOperationContext(ctx),
+		fields,
+		resctx.Field.Selections,
+		"",
+	)
+	return fields
+}
+
+func collectSelectedFields(ctx *graphql.OperationContext, selected map[string]struct{}, selection ast.SelectionSet, prefix string) {
+	for _, f := range graphql.CollectFields(ctx, selection, nil) {
+		path := fieldPath(prefix, f.Name)
+		selected[path] = struct{}{}
+		collectSelectedFields(ctx, selected, f.Selections, path)
 	}
 }
 
