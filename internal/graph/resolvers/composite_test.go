@@ -438,7 +438,7 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 	errBoom := errors.New("boom")
 	errNotFound := apierrors.NewNotFound(schema.GroupResource{}, "somename")
 
-	gxrc := model.GetCompositeResourceClaim(&unstructured.Unstructured{}, model.SelectAll)
+	gxrc := model.GetCompositeResourceClaim(&unstructured.Unstructured{}, model.SkipFields(model.FieldUnstructured))
 
 	type args struct {
 		ctx context.Context
@@ -551,7 +551,7 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.xrc, got, cmpopts.IgnoreFields(model.CompositeResourceClaim{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.xrc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -628,11 +628,11 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 
 	kra := &unstructured.Unstructured{}
 	kra.SetKind("A")
-	gkra, _ := model.GetKubernetesResource(kra, model.SelectAll)
+	gkra, _ := model.GetKubernetesResource(kra, model.SkipFields(model.FieldUnstructured))
 
 	krb := &unstructured.Unstructured{}
 	krb.SetKind("B")
-	gkrb, _ := model.GetKubernetesResource(krb, model.SelectAll)
+	gkrb, _ := model.GetKubernetesResource(krb, model.SkipFields(model.FieldUnstructured))
 
 	krc := &unstructured.Unstructured{}
 	krc.SetKind("C")
@@ -764,7 +764,7 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.krc, got, cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.krc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1383,7 +1383,7 @@ func TestCompositeResourceClaimSpecResource(t *testing.T) {
 	errBoom := errors.New("boom")
 	errNotFound := apierrors.NewNotFound(schema.GroupResource{}, "somename")
 
-	gxr := model.GetCompositeResource(&unstructured.Unstructured{}, model.SelectAll)
+	gxr := model.GetCompositeResource(&unstructured.Unstructured{}, model.SkipFields(model.FieldUnstructured))
 
 	type args struct {
 		ctx context.Context
@@ -1496,7 +1496,7 @@ func TestCompositeResourceClaimSpecResource(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.xr, got, cmpopts.IgnoreFields(model.CompositeResource{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.xr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

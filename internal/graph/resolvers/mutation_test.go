@@ -101,7 +101,7 @@ func TestCreateKubernetesResource(t *testing.T) {
 	u.SetName("example")
 	uj, _ := json.Marshal(u)
 
-	kr, _ := model.GetKubernetesResource(u, model.SelectAll)
+	kr, _ := model.GetKubernetesResource(u, model.SkipFields(model.FieldUnstructured))
 
 	type args struct {
 		ctx   context.Context
@@ -246,7 +246,7 @@ func TestCreateKubernetesResource(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.CreateKubernetesResource(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.payload, got, cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.payload, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.CreateKubernetesResource(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -268,7 +268,7 @@ func TestUpdateKubernetesResource(t *testing.T) {
 	u.SetName("example")
 	uj, _ := json.Marshal(u)
 
-	kr, _ := model.GetKubernetesResource(u, model.SelectAll)
+	kr, _ := model.GetKubernetesResource(u, model.SkipFields(model.FieldUnstructured))
 
 	type args struct {
 		ctx   context.Context
@@ -420,7 +420,7 @@ func TestUpdateKubernetesResource(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.UpdateKubernetesResource(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.payload, got, cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.payload, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.UpdateKubernetesResource(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -444,7 +444,7 @@ func TestDeleteKubernetesResource(t *testing.T) {
 	u.SetKind("Example")
 	u.SetName("example")
 
-	kr, _ := model.GetKubernetesResource(u, model.SelectAll)
+	kr, _ := model.GetKubernetesResource(u, model.SkipFields(model.FieldUnstructured))
 
 	cases := map[string]struct {
 		reason  string
@@ -522,7 +522,7 @@ func TestDeleteKubernetesResource(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.DeleteKubernetesResource(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.payload, got, cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.payload, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.DeleteKubernetesResource(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

@@ -50,7 +50,7 @@ func TestObjectMetaOwners(t *testing.T) {
 	own := unstructured.Unstructured{}
 	own.SetAPIVersion("example.org/v1")
 	own.SetKind("AnOwner")
-	gown, _ := model.GetKubernetesResource(&own, model.SelectAll)
+	gown, _ := model.GetKubernetesResource(&own, model.SkipFields(model.FieldUnstructured))
 
 	type args struct {
 		ctx context.Context
@@ -141,7 +141,6 @@ func TestObjectMetaOwners(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.oc, got,
 				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
-				cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"),
 			); diff != "" {
 				t.Errorf("\n%s\nq.Owners(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
@@ -156,7 +155,7 @@ func TestObjectMetaController(t *testing.T) {
 	ctrl := unstructured.Unstructured{}
 	ctrl.SetAPIVersion("example.org/v1")
 	ctrl.SetKind("TheController")
-	gctrl, _ := model.GetKubernetesResource(&ctrl, model.SelectAll)
+	gctrl, _ := model.GetKubernetesResource(&ctrl, model.SkipFields(model.FieldUnstructured))
 
 	// An owner
 	own := unstructured.Unstructured{}
@@ -286,7 +285,6 @@ func TestObjectMetaController(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.kr, got,
 				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
-				cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"),
 			); diff != "" {
 				t.Errorf("\n%s\nq.Controller(...): -want, +got:\n%s\n", tc.reason, diff)
 			}

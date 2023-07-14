@@ -221,10 +221,7 @@ func TestCrossplaneResourceTree(t *testing.T) {
 			}
 
 			diffOptions := []cmp.Option{
-				cmpopts.IgnoreFields(model.CompositeResourceClaim{}, "Unstructured"),
-				cmpopts.IgnoreFields(model.CompositeResource{}, "Unstructured"),
-				cmpopts.IgnoreFields(model.ManagedResource{}, "Unstructured"),
-				cmpopts.IgnoreFields(model.ProviderConfig{}, "Unstructured"),
+
 				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
 			}
 
@@ -238,7 +235,7 @@ func TestCrossplaneResourceTree(t *testing.T) {
 func TestQueryKubernetesResource(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gkr, _ := model.GetKubernetesResource(&unstructured.Unstructured{}, model.SelectAll)
+	gkr, _ := model.GetKubernetesResource(&unstructured.Unstructured{}, model.SkipFields(model.FieldUnstructured))
 
 	type args struct {
 		ctx context.Context
@@ -317,7 +314,7 @@ func TestQueryKubernetesResource(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.KubernetesResource(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.KubernetesResource(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1309,12 +1306,12 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 		},
 	})
 
-	gowned := model.GetCustomResourceDefinition(owned, model.SelectAll)
+	gowned := model.GetCustomResourceDefinition(owned, model.SkipFields(model.FieldUnstructured))
 
 	dangler := xunstructured.NewCRD()
 	dangler.SetName("coolconfig")
 
-	gdangler := model.GetCustomResourceDefinition(dangler, model.SelectAll)
+	gdangler := model.GetCustomResourceDefinition(dangler, model.SkipFields(model.FieldUnstructured))
 
 	type args struct {
 		ctx      context.Context
@@ -1437,7 +1434,6 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.xrdc, got,
 				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
-				cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "Unstructured"),
 			); diff != "" {
 				t.Errorf("\n%s\nq.Configurations(...): -want, +got:\n%s\n", tc.reason, diff)
 			}

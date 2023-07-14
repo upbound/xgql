@@ -385,7 +385,7 @@ func TestProviderActiveRevision(t *testing.T) {
 func TestProviderRevisionStatusObjects(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gcrd := model.GetCustomResourceDefinition(&xunstructured.CustomResourceDefinition{}, model.SelectAll)
+	gcrd := model.GetCustomResourceDefinition(&xunstructured.CustomResourceDefinition{}, model.SkipFields(model.FieldUnstructured))
 
 	type args struct {
 		ctx context.Context
@@ -515,7 +515,6 @@ func TestProviderRevisionStatusObjects(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.krc, got,
 				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
-				cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "Unstructured"),
 			); diff != "" {
 				t.Errorf("\n%s\ns.Objects(...): -want, +got:\n%s\n", tc.reason, diff)
 			}

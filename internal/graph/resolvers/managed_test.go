@@ -59,8 +59,8 @@ func TestManagedResourceDefinition(t *testing.T) {
 	crdDifferingPlural.SetSpecGroup("example.org")
 	crdDifferingPlural.SetSpecNames(kextv1.CustomResourceDefinitionNames{Kind: "Example", Plural: "Examplii"})
 
-	gcrd := model.GetCustomResourceDefinition(crd, model.SelectAll)
-	dcrd := model.GetCustomResourceDefinition(crdDifferingPlural, model.SelectAll)
+	gcrd := model.GetCustomResourceDefinition(crd, model.SkipFields(model.FieldUnstructured))
+	dcrd := model.GetCustomResourceDefinition(crdDifferingPlural, model.SkipFields(model.FieldUnstructured))
 
 	otherGroup := unstructured.NewCRD()
 	otherGroup.SetSpecGroup("example.net")
@@ -232,7 +232,6 @@ func TestManagedResourceDefinition(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.mrd, got,
 				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
-				cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "Unstructured"),
 			); diff != "" {
 				t.Errorf("\n%s\ns.Definition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}

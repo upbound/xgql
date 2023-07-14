@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	corev1 "k8s.io/api/core/v1"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -431,20 +430,6 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 func TestGetKubernetesResource(t *testing.T) {
 	ignore := []cmp.Option{
 		cmp.AllowUnexported(Secret{}, ConfigMap{}, ObjectMeta{}),
-		cmpopts.IgnoreFields(ManagedResource{}, "Unstructured"),
-		cmpopts.IgnoreFields(ProviderConfig{}, "Unstructured"),
-		cmpopts.IgnoreFields(CompositeResource{}, "Unstructured"),
-		cmpopts.IgnoreFields(CompositeResourceClaim{}, "Unstructured"),
-		cmpopts.IgnoreFields(Provider{}, "Unstructured"),
-		cmpopts.IgnoreFields(ProviderRevision{}, "Unstructured"),
-		cmpopts.IgnoreFields(Configuration{}, "Unstructured"),
-		cmpopts.IgnoreFields(ConfigurationRevision{}, "Unstructured"),
-		cmpopts.IgnoreFields(CompositeResourceDefinition{}, "Unstructured"),
-		cmpopts.IgnoreFields(Composition{}, "Unstructured"),
-		cmpopts.IgnoreFields(CustomResourceDefinition{}, "Unstructured"),
-		cmpopts.IgnoreFields(Secret{}, "Unstructured"),
-		cmpopts.IgnoreFields(ConfigMap{}, "Unstructured"),
-		cmpopts.IgnoreFields(GenericResource{}, "Unstructured"),
 	}
 
 	dp := DeletionPolicyDelete
@@ -735,7 +720,7 @@ func TestGetKubernetesResource(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			kr, err := GetKubernetesResource(tc.u, SelectAll)
+			kr, err := GetKubernetesResource(tc.u, SkipFields(FieldUnstructured))
 			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
 				t.Errorf("GetKubernetesResource(...): -want error, +got error:\n%s", diff)
 			}

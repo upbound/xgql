@@ -324,7 +324,7 @@ var _ generated.EventResolver = &event{}
 func TestEventInvolvedObject(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gu, _ := model.GetKubernetesResource(&unstructured.Unstructured{}, model.SelectAll)
+	gu, _ := model.GetKubernetesResource(&unstructured.Unstructured{}, model.SkipFields(model.FieldUnstructured))
 
 	type args struct {
 		ctx context.Context
@@ -412,7 +412,7 @@ func TestEventInvolvedObject(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.InvolvedObject(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.InvolvedObject(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
