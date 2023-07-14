@@ -18,6 +18,7 @@ import (
 	"context"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
@@ -165,6 +166,11 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 	}
 	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
+	// Collect all concurrently.
+	var (
+		mu sync.Mutex
+		wg sync.WaitGroup
+	)
 	for _, ref := range obj.ObjectRefs {
 		// Crossplane lints configuration packages to ensure they only contain XRDs and Compositions
 		// but this isn't enforced at the API level. We filter out anything that
@@ -173,27 +179,36 @@ func (r *configurationRevisionStatus) Objects(ctx context.Context, obj *model.Co
 			continue
 		}
 
-		switch ref.Kind {
-		case extv1.CompositeResourceDefinitionKind:
-			xrd := &extv1.CompositeResourceDefinition{}
-			if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, xrd); err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, errGetXRD))
-				continue
+		ref := ref // So we don't take the address of a range variable.
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			var kr model.KubernetesResource
+			switch ref.Kind {
+			case extv1.CompositeResourceDefinitionKind:
+				xrd := &extv1.CompositeResourceDefinition{}
+				if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, xrd); err != nil {
+					graphql.AddError(ctx, errors.Wrap(err, errGetXRD))
+					return
+				}
+				kr = model.GetCompositeResourceDefinition(xrd, selectedFields)
+			case extv1.CompositionKind:
+				cmp := &extv1.Composition{}
+				if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, cmp); err != nil {
+					graphql.AddError(ctx, errors.Wrap(err, errGetComp))
+					return
+				}
+				kr = model.GetComposition(cmp, selectedFields)
+			default:
+				return
 			}
-
-			out.Nodes = append(out.Nodes, model.GetCompositeResourceDefinition(xrd, selectedFields))
+			mu.Lock()
+			defer mu.Unlock()
+			out.Nodes = append(out.Nodes, kr)
 			out.TotalCount++
-		case extv1.CompositionKind:
-			cmp := &extv1.Composition{}
-			if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, cmp); err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, errGetComp))
-				continue
-			}
-
-			out.Nodes = append(out.Nodes, model.GetComposition(cmp, selectedFields))
-			out.TotalCount++
-		}
+		}()
 	}
+	wg.Wait()
 
 	return *out, nil
 }

@@ -16,6 +16,7 @@ package resolvers
 
 import (
 	"context"
+	"sync"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
@@ -49,25 +50,38 @@ func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta) (model.O
 
 	owners := make([]model.Owner, 0, len(obj.OwnerReferences))
 	selectedFields := GetSelectedFields(ctx).Sub("nodes.resource")
+	// Collect all concurrently.
+	var (
+		mu sync.Mutex
+		wg sync.WaitGroup
+	)
 	for _, ref := range obj.OwnerReferences {
-		u := &kunstructured.Unstructured{}
-		u.SetAPIVersion(ref.APIVersion)
-		u.SetKind(ref.Kind)
+		ref := ref // So we don't reference the loop variable.
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			u := &kunstructured.Unstructured{}
+			u.SetAPIVersion(ref.APIVersion)
+			u.SetKind(ref.Kind)
 
-		nn := types.NamespacedName{Namespace: pointer.StringDeref(obj.Namespace, ""), Name: ref.Name}
-		if err := c.Get(ctx, nn, u); err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, errGetOwner))
-			continue
-		}
+			nn := types.NamespacedName{Namespace: pointer.StringDeref(obj.Namespace, ""), Name: ref.Name}
+			if err := c.Get(ctx, nn, u); err != nil {
+				graphql.AddError(ctx, errors.Wrap(err, errGetOwner))
+				return
+			}
 
-		kr, err := model.GetKubernetesResource(u, selectedFields)
-		if err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, errModelOwner))
-			continue
-		}
+			kr, err := model.GetKubernetesResource(u, selectedFields)
+			if err != nil {
+				graphql.AddError(ctx, errors.Wrap(err, errModelOwner))
+				return
+			}
 
-		owners = append(owners, model.Owner{Controller: ref.Controller, Resource: kr})
+			mu.Lock()
+			defer mu.Unlock()
+			owners = append(owners, model.Owner{Controller: ref.Controller, Resource: kr})
+		}()
 	}
+	wg.Wait()
 
 	return model.OwnerConnection{Nodes: owners, TotalCount: len(owners)}, nil
 }

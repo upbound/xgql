@@ -18,6 +18,7 @@ import (
 	"context"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
@@ -166,6 +167,11 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 	}
 	selectedFields := GetSelectedFields(ctx).Sub(model.FieldNodes)
 
+	// Collect all concurrently.
+	var (
+		mu sync.Mutex
+		wg sync.WaitGroup
+	)
 	for _, ref := range obj.ObjectRefs {
 		// Crossplane lints provider packages to ensure they only contain CRDs,
 		// but this isn't enforced at the API level. We filter out anything that
@@ -177,15 +183,23 @@ func (r *providerRevisionStatus) Objects(ctx context.Context, obj *model.Provide
 			continue
 		}
 
-		crd := xunstructured.NewCRD()
-		if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, crd.GetUnstructured()); err != nil {
-			graphql.AddError(ctx, errors.Wrap(err, errGetCRD))
-			continue
-		}
+		ref := ref // So we don't take the address of a range variable.
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			crd := xunstructured.NewCRD()
+			if err := c.Get(ctx, types.NamespacedName{Name: ref.Name}, crd.GetUnstructured()); err != nil {
+				graphql.AddError(ctx, errors.Wrap(err, errGetCRD))
+				return
+			}
 
-		out.Nodes = append(out.Nodes, model.GetCustomResourceDefinition(crd, selectedFields))
-		out.TotalCount++
+			mu.Lock()
+			defer mu.Unlock()
+			out.Nodes = append(out.Nodes, model.GetCustomResourceDefinition(crd, selectedFields))
+			out.TotalCount++
+		}()
 	}
+	wg.Wait()
 
 	return *out, nil
 }
