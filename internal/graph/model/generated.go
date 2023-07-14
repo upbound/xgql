@@ -63,7 +63,77 @@ type CompositeResource struct {
 	// The observed state of this resource.
 	Status *CompositeResourceStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 	// The definition of this resource.
@@ -89,7 +159,77 @@ type CompositeResourceClaim struct {
 	// The observed state of this resource.
 	Status *CompositeResourceClaimStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 	// The definition of this resource.
@@ -160,7 +300,77 @@ type CompositeResourceDefinition struct {
 	// The observed state of this resource.
 	Status *CompositeResourceDefinitionStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 	// The generated `CustomResourceDefinition` for this XRD
@@ -291,7 +501,77 @@ type Composition struct {
 	// The observed state of this resource.
 	Status *CompositionStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 }
@@ -360,7 +640,77 @@ type ConfigMap struct {
 	// The data stored in this config map.
 	data map[string]string `json:"data,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 }
@@ -384,7 +734,77 @@ type Configuration struct {
 	// The observed state of this resource.
 	Status *ConfigurationStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 	// Revisions of this configuration.
@@ -420,7 +840,77 @@ type ConfigurationRevision struct {
 	// The observed state of this resource.
 	Status *ConfigurationRevisionStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 }
@@ -573,7 +1063,77 @@ type CustomResourceDefinition struct {
 	// The observed state of this resource.
 	Status *CustomResourceDefinitionStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 	// Custom resources defined by this CRD
@@ -725,7 +1285,77 @@ type Event struct {
 	// The time at which this event was most recently recorded.
 	LastTime *time.Time `json:"lastTime,omitempty"`
 	// An unstructured JSON representation of the event.
-	Unstructured      []byte              `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess       `json:"fieldPath"`
 	InvolvedObjectRef v11.ObjectReference `json:"-"`
 }
 
@@ -760,7 +1390,77 @@ type GenericResource struct {
 	// Metadata that is common to all Kubernetes API resources.
 	Metadata ObjectMeta `json:"metadata"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 }
@@ -807,7 +1507,77 @@ type ManagedResource struct {
 	// The observed state of this resource.
 	Status *ManagedResourceStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 	// The definition of this resource.
@@ -921,7 +1691,77 @@ type Provider struct {
 	// The observed state of this resource.
 	Status *ProviderStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 	// Revisions of this provider.
@@ -948,7 +1788,77 @@ type ProviderConfig struct {
 	// The observed state of this resource.
 	Status *ProviderConfigStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 	// The definition of this resource.
@@ -998,7 +1908,77 @@ type ProviderRevision struct {
 	// The observed state of this resource.
 	Status *ProviderRevisionStatus `json:"status,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 }
@@ -1114,7 +2094,77 @@ type Secret struct {
 	// The data stored in this secret. Values are not base64 encoded.
 	data map[string]string `json:"data,omitempty"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
-	Unstructured []byte `json:"unstructured"`
+	SkipUnstructured `json:"unstructured"`
+	// A JSON representation of a field within the underlying Kubernetes resource.
+	//
+	// API conventions describe the syntax as:
+	// > standard JavaScript syntax for accessing that field, assuming the JSON
+	// > object was transformed into a JavaScript object, without the leading dot,
+	// > such as `metadata.name`.
+	//
+	// Valid examples:
+	//
+	// * `metadata.name`
+	// * `spec.containers[0].name`
+	// * `data[.config.yml]`
+	// * `metadata.annotations['crossplane.io/external-name']`
+	// * `spec.items[0][8]`
+	// * `apiVersion`
+	// * `[42]`
+	// * `spec.containers[*].args[*]` - Supports wildcard expansion.
+	//
+	// Invalid examples:
+	//
+	// * `.metadata.name` - Leading period.
+	// * `metadata..name` - Double period.
+	// * `metadata.name.` - Trailing period.
+	// * `spec.containers[]` - Empty brackets.
+	// * `spec.containers.[0].name` - Period before open bracket.
+	//
+	// Wildcards support:
+	//
+	// For an object with the following data:
+	//
+	// ```json
+	// {
+	//   "spec": {
+	//     "containers": [
+	//       {
+	//         "name": "cool",
+	//         "image": "latest",
+	//         "args": [
+	//           "start",
+	//           "now",
+	//           "debug"
+	//         ]
+	//       }
+	//     ]
+	//   }
+	// }
+	// ```
+	//
+	// The wildcard `spec.containers[*].args[*]` will be expanded to:
+	//
+	// ```json
+	// [
+	//   "spec.containers[0].args[0]",
+	//   "spec.containers[0].args[1]",
+	//   "spec.containers[0].args[2]",
+	// ]
+	// ```
+	//
+	// And the following result will be returned:
+	//
+	// ```json
+	// [
+	//   "start",
+	//   "now",
+	//   "debug"
+	// ]
+	// ```
+	//
+	// https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+	PavedAccess `json:"fieldPath"`
 	// Events pertaining to this resource.
 	Events EventConnection `json:"events"`
 }

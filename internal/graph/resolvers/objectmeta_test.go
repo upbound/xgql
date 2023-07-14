@@ -141,7 +141,7 @@ func TestObjectMetaOwners(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.oc, got,
 				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
-				cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"),
+				cmpopts.IgnoreFields(model.GenericResource{}, "PavedAccess"),
 			); diff != "" {
 				t.Errorf("\n%s\nq.Owners(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
@@ -286,7 +286,7 @@ func TestObjectMetaController(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.kr, got,
 				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
-				cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"),
+				cmpopts.IgnoreFields(model.GenericResource{}, "PavedAccess"),
 			); diff != "" {
 				t.Errorf("\n%s\nq.Controller(...): -want, +got:\n%s\n", tc.reason, diff)
 			}

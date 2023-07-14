@@ -229,7 +229,7 @@ func TestProviderConfigDefinition(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.mrd, got,
 				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
-				cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "Unstructured"),
+				cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "PavedAccess"),
 			); diff != "" {
 				t.Errorf("\n%s\ns.Definition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}

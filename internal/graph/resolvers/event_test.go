@@ -28,6 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 
 	"github.com/upbound/xgql/internal/auth"
@@ -154,7 +155,7 @@ func TestEvent(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Resolve(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.ec, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.ec, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.Resolve(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -358,7 +359,7 @@ func TestEventInvolvedObject(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.InvolvedObject(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreFields(model.GenericResource{}, "PavedAccess"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.InvolvedObject(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

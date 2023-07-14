@@ -112,8 +112,10 @@ func GetProvider(p *pkgv1.Provider) Provider {
 			IgnoreCrossplaneConstraints: p.Spec.IgnoreCrossplaneConstraints,
 			SkipDependencyResolution:    p.Spec.SkipDependencyResolution,
 		},
-		Status:       GetProviderStatus(p.Status),
-		Unstructured: unstruct(p),
+		Status: GetProviderStatus(p.Status),
+		PavedAccess: PavedAccess{
+			Paved: paveObject(p),
+		},
 	}
 }
 
@@ -164,8 +166,10 @@ func GetProviderRevision(pr *pkgv1.ProviderRevision) ProviderRevision {
 			IgnoreCrossplaneConstraints: pr.Spec.IgnoreCrossplaneConstraints,
 			SkipDependencyResolution:    pr.Spec.SkipDependencyResolution,
 		},
-		Status:       GetProviderRevisionStatus(pr.Status),
-		Unstructured: unstruct(pr),
+		Status: GetProviderRevisionStatus(pr.Status),
+		PavedAccess: PavedAccess{
+			Paved: paveObject(pr),
+		},
 	}
 }
 
@@ -204,8 +208,10 @@ func GetConfiguration(c *pkgv1.Configuration) Configuration {
 			IgnoreCrossplaneConstraints: c.Spec.IgnoreCrossplaneConstraints,
 			SkipDependencyResolution:    c.Spec.SkipDependencyResolution,
 		},
-		Status:       GetConfigurationStatus(c.Status),
-		Unstructured: unstruct(c),
+		Status: GetConfigurationStatus(c.Status),
+		PavedAccess: PavedAccess{
+			Paved: paveObject(c),
+		},
 	}
 }
 
@@ -245,7 +251,9 @@ func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision) ConfigurationRevi
 			IgnoreCrossplaneConstraints: cr.Spec.IgnoreCrossplaneConstraints,
 			SkipDependencyResolution:    cr.Spec.SkipDependencyResolution,
 		},
-		Status:       GetConfigurationRevisionStatus(cr.Status),
-		Unstructured: unstruct(cr),
+		Status: GetConfigurationRevisionStatus(cr.Status),
+		PavedAccess: PavedAccess{
+			Paved: paveObject(cr),
+		},
 	}
 }

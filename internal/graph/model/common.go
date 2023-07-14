@@ -28,6 +28,7 @@ import (
 	"k8s.io/utils/pointer"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
@@ -117,10 +118,12 @@ func GetGenericResource(u *kunstructured.Unstructured) GenericResource {
 			Namespace:  u.GetNamespace(),
 			Name:       u.GetName(),
 		},
-		APIVersion:   u.GetAPIVersion(),
-		Kind:         u.GetKind(),
-		Metadata:     GetObjectMeta(u),
-		Unstructured: bytesForUnstructured(u),
+		APIVersion: u.GetAPIVersion(),
+		Kind:       u.GetKind(),
+		Metadata:   GetObjectMeta(u),
+		PavedAccess: PavedAccess{
+			Paved: fieldpath.Pave(u.Object),
+		},
 	}
 }
 
@@ -161,10 +164,12 @@ func GetSecret(s *corev1.Secret) Secret {
 			Namespace:  s.GetNamespace(),
 			Name:       s.GetName(),
 		},
-		APIVersion:   corev1.SchemeGroupVersion.String(),
-		Kind:         "Secret",
-		Metadata:     GetObjectMeta(s),
-		Unstructured: unstruct(s),
+		APIVersion: corev1.SchemeGroupVersion.String(),
+		Kind:       "Secret",
+		Metadata:   GetObjectMeta(s),
+		PavedAccess: PavedAccess{
+			Paved: paveObject(s),
+		},
 	}
 
 	if s.Data != nil {
@@ -190,11 +195,13 @@ func GetConfigMap(cm *corev1.ConfigMap) ConfigMap {
 			Namespace:  cm.GetNamespace(),
 			Name:       cm.GetName(),
 		},
-		APIVersion:   corev1.SchemeGroupVersion.String(),
-		Kind:         "ConfigMap",
-		Metadata:     GetObjectMeta(cm),
-		Unstructured: unstruct(cm),
-		data:         cm.Data,
+		APIVersion: corev1.SchemeGroupVersion.String(),
+		Kind:       "ConfigMap",
+		Metadata:   GetObjectMeta(cm),
+		PavedAccess: PavedAccess{
+			Paved: paveObject(cm),
+		},
+		data: cm.Data,
 	}
 }
 
@@ -301,8 +308,10 @@ func GetCustomResourceDefinition(crd *unstructured.CustomResourceDefinition) Cus
 			Scope:    GetResourceScope(crd.GetSpecScope()),
 			Versions: GetCustomResourceDefinitionVersions(crd.GetSpecVersions()),
 		},
-		Status:       GetCustomResourceDefinitionStatus(crd.GetStatus()),
-		Unstructured: bytesForUnstructured(&crd.Unstructured),
+		Status: GetCustomResourceDefinitionStatus(crd.GetStatus()),
+		PavedAccess: PavedAccess{
+			Paved: fieldpath.Pave(crd.Object),
+		},
 	}
 }
 

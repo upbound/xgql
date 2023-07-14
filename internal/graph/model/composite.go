@@ -20,6 +20,7 @@ import (
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 
 	"github.com/upbound/xgql/internal/unstructured"
 )
@@ -74,8 +75,10 @@ func GetCompositeResource(u *kunstructured.Unstructured) CompositeResource {
 			ResourceReferences:               xr.GetResourceReferences(),
 			WriteConnectionSecretToReference: xr.GetWriteConnectionSecretToReference(),
 		},
-		Status:       GetCompositeResourceStatus(xr),
-		Unstructured: bytesForUnstructured(u),
+		Status: GetCompositeResourceStatus(xr),
+		PavedAccess: PavedAccess{
+			Paved: fieldpath.Pave(u.Object),
+		},
 	}
 }
 
@@ -140,7 +143,9 @@ func GetCompositeResourceClaim(u *kunstructured.Unstructured) CompositeResourceC
 			ResourceReference:                xrc.GetResourceReference(),
 			WriteConnectionSecretToReference: delocalize(xrc.GetWriteConnectionSecretToReference(), xrc.GetNamespace()),
 		},
-		Status:       GetCompositeResourceClaimStatus(xrc),
-		Unstructured: bytesForUnstructured(u),
+		Status: GetCompositeResourceClaimStatus(xrc),
+		PavedAccess: PavedAccess{
+			Paved: fieldpath.Pave(u.Object),
+		},
 	}
 }

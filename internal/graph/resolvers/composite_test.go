@@ -31,6 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 
@@ -183,7 +184,7 @@ func TestCompositeResourceDefinition(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Definition(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.xrd, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.xrd, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.Definition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -307,7 +308,7 @@ func TestCompositeResourceSpecComposition(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Composition(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.cmp, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.cmp, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.Composition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -370,7 +371,7 @@ func TestCompositeResourceSpecCompositionRef(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.CompositionRef(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.CompositionRef(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -494,7 +495,7 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.xrc, got, cmpopts.IgnoreFields(model.CompositeResourceClaim{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.xrc, got, cmpopts.IgnoreFields(model.CompositeResourceClaim{}, "PavedAccess"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -559,7 +560,7 @@ func TestCompositeResourceSpecClaimRef(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.ClaimRef(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.ClaimRef(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -707,7 +708,7 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.krc, got, cmpopts.IgnoreFields(model.GenericResource{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.krc, got, cmpopts.IgnoreFields(model.GenericResource{}, "PavedAccess"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -831,7 +832,7 @@ func TestCompositeResourceSpecConnectionSecret(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.ConnectionSecret(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{}), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{}), cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.ConnectionSecret(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -897,7 +898,7 @@ func TestCompositeResourceSpecWriteConnectionSecretToReference(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.WriteConnectionSecretToReference(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.WriteConnectionSecretToReference(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1047,7 +1048,7 @@ func TestCompositeResourceClaimDefinition(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Definition(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.xrd, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.xrd, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.Definition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1171,7 +1172,7 @@ func TestCompositeResourceClaimSpecComposition(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Composition(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.cmp, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.cmp, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.Composition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1234,7 +1235,7 @@ func TestCompositeResourceClaimSpecCompositionRef(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.CompositionRef(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.CompositionRef(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1358,7 +1359,7 @@ func TestCompositeResourceClaimSpecResource(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.xr, got, cmpopts.IgnoreFields(model.CompositeResource{}, "Unstructured"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.xr, got, cmpopts.IgnoreFields(model.CompositeResource{}, "PavedAccess"), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\ns.Claim(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1423,7 +1424,7 @@ func TestCompositeResourceClaimSpecResourceReference(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.ResourceRef(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.ResourceRef(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1547,7 +1548,7 @@ func TestCompositeResourceClaimSpecConnectionSecret(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.ConnectionSecret(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{}), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{}), cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.ConnectionSecret(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1613,7 +1614,7 @@ func TestCompositeResourceClaimSpecWriteConnectionSecretToReference(t *testing.T
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.WriteConnectionSecretToReference(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.ref, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.WriteConnectionSecretToReference(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

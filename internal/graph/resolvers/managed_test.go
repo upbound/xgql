@@ -31,6 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 
 	"github.com/upbound/xgql/internal/auth"
@@ -231,7 +232,7 @@ func TestManagedResourceDefinition(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.mrd, got,
 				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
-				cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "Unstructured"),
+				cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "PavedAccess"),
 			); diff != "" {
 				t.Errorf("\n%s\ns.Definition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
@@ -338,7 +339,7 @@ func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.ConnectionSecret(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{}), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{}), cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.ConnectionSecret(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

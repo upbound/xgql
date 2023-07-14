@@ -10,7 +10,6 @@ require (
 	github.com/epk/smaz v0.0.0-20220720222521-c11a89997fcf
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/go-chi/chi/v5 v5.0.3
-	github.com/go-json-experiment/json v0.0.0-20230321051131-ccbac49a6929
 	github.com/google/addlicense v0.0.0-20210428195630-6d92264d7170
 	github.com/google/go-cmp v0.5.9
 	github.com/pkg/errors v0.9.1
@@ -91,7 +90,6 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/crypto v0.8.0 // indirect
-	golang.org/x/exp v0.0.0-20230315142452-642cacee5cc0 // indirect
 	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
