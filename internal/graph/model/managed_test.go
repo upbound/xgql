@@ -87,7 +87,7 @@ func TestGetManagedResource(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetManagedResource(tc.u, SkipFields(FieldUnstructured))
+			got := GetManagedResource(tc.u, SkipFields(FieldUnstructured, FieldFieldPath))
 
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetManagedResource(...): -want, +got\n:%s", tc.reason, diff)

@@ -89,7 +89,7 @@ func TestGetEvent(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetEvent(tc.s, SkipFields(FieldUnstructured))
+			got := GetEvent(tc.s, SkipFields(FieldUnstructured, FieldFieldPath))
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetEvent(...): -want, +got\n:%s", tc.reason, diff)
 			}

@@ -29,6 +29,7 @@ import (
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 
 	"github.com/upbound/xgql/internal/auth"
@@ -52,7 +53,7 @@ func TestCRDDefinedResources(t *testing.T) {
 
 	gr := unstructured.Unstructured{}
 	ggr := model.GetGenericResource(&gr, model.SelectAll)
-	ggrSkipUnstructured := model.GetGenericResource(&gr, model.SkipFields(model.FieldUnstructured))
+	ggrSkipUnstructured := model.GetGenericResource(&gr, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A selection set with "nodes.unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -346,7 +347,7 @@ func TestCRDDefinedResources(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.DefinedResources(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.krc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.krc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.DefinedResources(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

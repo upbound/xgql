@@ -32,6 +32,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 
 	"github.com/upbound/xgql/internal/auth"
@@ -59,8 +60,8 @@ func TestManagedResourceDefinition(t *testing.T) {
 	crdDifferingPlural.SetSpecGroup("example.org")
 	crdDifferingPlural.SetSpecNames(kextv1.CustomResourceDefinitionNames{Kind: "Example", Plural: "Examplii"})
 
-	gcrd := model.GetCustomResourceDefinition(crd, model.SkipFields(model.FieldUnstructured))
-	dcrd := model.GetCustomResourceDefinition(crdDifferingPlural, model.SkipFields(model.FieldUnstructured))
+	gcrd := model.GetCustomResourceDefinition(crd, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
+	dcrd := model.GetCustomResourceDefinition(crdDifferingPlural, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	otherGroup := unstructured.NewCRD()
 	otherGroup.SetSpecGroup("example.net")
@@ -231,7 +232,7 @@ func TestManagedResourceDefinition(t *testing.T) {
 				t.Errorf("\n%s\ns.Definition(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
 			if diff := cmp.Diff(tc.want.mrd, got,
-				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{}),
 			); diff != "" {
 				t.Errorf("\n%s\ns.Definition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
@@ -243,7 +244,7 @@ func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	gsec := model.GetSecret(&corev1.Secret{}, model.SelectAll)
-	gsecSkipUnstructured := model.GetSecret(&corev1.Secret{}, model.SkipFields(model.FieldUnstructured))
+	gsecSkipUnstructured := model.GetSecret(&corev1.Secret{}, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A selection set with "unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -363,7 +364,7 @@ func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.ConnectionSecret(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{}), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{}), cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.ConnectionSecret(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

@@ -28,6 +28,7 @@ import (
 	"k8s.io/utils/pointer"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
@@ -121,8 +122,8 @@ func GetGenericResource(u *kunstructured.Unstructured, s SelectedFields) Generic
 		Kind:       u.GetKind(),
 		Metadata:   GetObjectMeta(u),
 	}
-	if s.Has(FieldUnstructured) {
-		out.Unstructured = bytesForUnstructured(u)
+	if s.Has(FieldUnstructured) || s.Has(FieldFieldPath) {
+		out.PavedAccess.Paved = fieldpath.Pave(u.Object)
 	}
 	return out
 }
@@ -180,8 +181,8 @@ func GetSecret(s *corev1.Secret, sel SelectedFields) Secret {
 		out.Type = pointer.String(string(s.Type))
 	}
 
-	if sel.Has(FieldUnstructured) {
-		out.Unstructured = unstruct(s)
+	if sel.Has(FieldUnstructured) || sel.Has(FieldFieldPath) {
+		out.PavedAccess.Paved = paveObject(s)
 	}
 
 	return out
@@ -201,8 +202,8 @@ func GetConfigMap(cm *corev1.ConfigMap, s SelectedFields) ConfigMap {
 		Metadata:   GetObjectMeta(cm),
 		data:       cm.Data,
 	}
-	if s.Has(FieldUnstructured) {
-		out.Unstructured = unstruct(cm)
+	if s.Has(FieldUnstructured) || s.Has(FieldFieldPath) {
+		out.PavedAccess.Paved = paveObject(cm)
 	}
 	return out
 }
@@ -312,8 +313,8 @@ func GetCustomResourceDefinition(crd *unstructured.CustomResourceDefinition, s S
 		},
 		Status: GetCustomResourceDefinitionStatus(crd.GetStatus()),
 	}
-	if s.Has(FieldUnstructured) {
-		out.Unstructured = bytesForUnstructured(&crd.Unstructured)
+	if s.Has(FieldUnstructured) || s.Has(FieldFieldPath) {
+		out.PavedAccess.Paved = fieldpath.Pave(crd.Unstructured.Object)
 	}
 	return out
 }

@@ -67,8 +67,8 @@ func GetEvent(e *corev1.Event, s SelectedFields) Event {
 	lt := e.LastTimestamp.Time
 	out.LastTime = &lt
 
-	if s.Has(FieldUnstructured) {
-		out.Unstructured = unstruct(e)
+	if s.Has(FieldUnstructured) || s.Has(FieldFieldPath) {
+		out.PavedAccess.Paved = paveObject(e)
 	}
 
 	return out

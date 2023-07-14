@@ -114,8 +114,8 @@ func GetProvider(p *pkgv1.Provider, s SelectedFields) Provider {
 		},
 		Status: GetProviderStatus(p.Status),
 	}
-	if s.Has(FieldUnstructured) {
-		out.Unstructured = unstruct(p)
+	if s.Has(FieldUnstructured) || s.Has(FieldFieldPath) {
+		out.PavedAccess.Paved = paveObject(p)
 	}
 	return out
 }
@@ -169,8 +169,8 @@ func GetProviderRevision(pr *pkgv1.ProviderRevision, s SelectedFields) ProviderR
 		},
 		Status: GetProviderRevisionStatus(pr.Status),
 	}
-	if s.Has(FieldUnstructured) {
-		out.Unstructured = unstruct(pr)
+	if s.Has(FieldUnstructured) || s.Has(FieldFieldPath) {
+		out.PavedAccess.Paved = paveObject(pr)
 	}
 	return out
 }
@@ -212,8 +212,8 @@ func GetConfiguration(c *pkgv1.Configuration, s SelectedFields) Configuration {
 		},
 		Status: GetConfigurationStatus(c.Status),
 	}
-	if s.Has(FieldUnstructured) {
-		out.Unstructured = unstruct(c)
+	if s.Has(FieldUnstructured) || s.Has(FieldFieldPath) {
+		out.PavedAccess.Paved = paveObject(c)
 	}
 	return out
 }
@@ -256,8 +256,8 @@ func GetConfigurationRevision(cr *pkgv1.ConfigurationRevision, s SelectedFields)
 		},
 		Status: GetConfigurationRevisionStatus(cr.Status),
 	}
-	if s.Has(FieldUnstructured) {
-		out.Unstructured = unstruct(cr)
+	if s.Has(FieldUnstructured) || s.Has(FieldFieldPath) {
+		out.PavedAccess.Paved = paveObject(cr)
 	}
 	return out
 }

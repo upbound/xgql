@@ -16,6 +16,7 @@ package model
 
 const (
 	FieldUnstructured = "unstructured"
+	FieldFieldPath    = "fieldPath"
 	FieldNodes        = "nodes"
 )
 

@@ -100,7 +100,7 @@ func TestGetCompositeResource(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetCompositeResource(tc.u, SkipFields(FieldUnstructured))
+			got := GetCompositeResource(tc.u, SkipFields(FieldUnstructured, FieldFieldPath))
 
 			// metav1.Time trims timestamps to second resolution.
 			if diff := cmp.Diff(tc.want, got,
@@ -179,7 +179,7 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetCompositeResourceClaim(tc.u, SkipFields(FieldUnstructured))
+			got := GetCompositeResourceClaim(tc.u, SkipFields(FieldUnstructured, FieldFieldPath))
 
 			// metav1.Time trims timestamps to second resolution.
 			if diff := cmp.Diff(tc.want, got,

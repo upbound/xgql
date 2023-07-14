@@ -109,7 +109,7 @@ func TestGetGenericResource(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetGenericResource(tc.u, SkipFields(FieldUnstructured))
+			got := GetGenericResource(tc.u, SkipFields(FieldUnstructured, FieldFieldPath))
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetGenericResource(...): -want, +got\n:%s", tc.reason, diff)
 			}
@@ -210,7 +210,7 @@ func TestGetSecret(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetSecret(tc.s, SkipFields(FieldUnstructured))
+			got := GetSecret(tc.s, SkipFields(FieldUnstructured, FieldFieldPath))
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(Secret{}, ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetSecret(...): -want, +got\n:%s", tc.reason, diff)
 			}
@@ -308,7 +308,7 @@ func TestGetConfigMap(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetConfigMap(tc.cm, SkipFields(FieldUnstructured))
+			got := GetConfigMap(tc.cm, SkipFields(FieldUnstructured, FieldFieldPath))
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ConfigMap{}, ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetSecret(...): -want, +got\n:%s", tc.reason, diff)
 			}
@@ -419,7 +419,7 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetCustomResourceDefinition(tc.crd, SkipFields(FieldUnstructured))
+			got := GetCustomResourceDefinition(tc.crd, SkipFields(FieldUnstructured, FieldFieldPath))
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetCustomResourceDefinition(...): -want, +got\n:%s", tc.reason, diff)
 			}
@@ -720,7 +720,7 @@ func TestGetKubernetesResource(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			kr, err := GetKubernetesResource(tc.u, SkipFields(FieldUnstructured))
+			kr, err := GetKubernetesResource(tc.u, SkipFields(FieldUnstructured, FieldFieldPath))
 			if diff := cmp.Diff(tc.want.err, err, test.EquateErrors()); diff != "" {
 				t.Errorf("GetKubernetesResource(...): -want error, +got error:\n%s", diff)
 			}

@@ -30,6 +30,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
@@ -61,7 +62,7 @@ func TestConfigurationRevisions(t *testing.T) {
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
 	gactive := model.GetConfigurationRevision(&active, model.SelectAll)
-	gactiveSkipUnstructured := model.GetConfigurationRevision(&active, model.SkipFields(model.FieldUnstructured))
+	gactiveSkipUnstructured := model.GetConfigurationRevision(&active, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A ConfigurationRevision we control, but that is inactive.
 	inactive := pkgv1.ConfigurationRevision{
@@ -72,7 +73,7 @@ func TestConfigurationRevisions(t *testing.T) {
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
 	}
 	ginactive := model.GetConfigurationRevision(&inactive, model.SelectAll)
-	ginactiveSkipUnstructured := model.GetConfigurationRevision(&inactive, model.SkipFields(model.FieldUnstructured))
+	ginactiveSkipUnstructured := model.GetConfigurationRevision(&inactive, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A ConfigurationRevision which we do not control.
 	other := pkgv1.ConfigurationRevision{ObjectMeta: metav1.ObjectMeta{Name: "not-ours"}}
@@ -201,7 +202,7 @@ func TestConfigurationRevisions(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.Revisions(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.crc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.crc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.Revisions(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -222,7 +223,7 @@ func TestConfigurationActiveRevision(t *testing.T) {
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
 	gactive := model.GetConfigurationRevision(&active, model.SelectAll)
-	gactiveSkipUnstructured := model.GetConfigurationRevision(&active, model.SkipFields(model.FieldUnstructured))
+	gactiveSkipUnstructured := model.GetConfigurationRevision(&active, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A ConfigurationRevision we control, but that is inactive.
 	inactive := pkgv1.ConfigurationRevision{
@@ -374,7 +375,7 @@ func TestConfigurationActiveRevision(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.ActiveRevision(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.pr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.pr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.ActiveRevision(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -385,9 +386,9 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	gxrd := model.GetCompositeResourceDefinition(&extv1.CompositeResourceDefinition{}, model.SelectAll)
-	gxrdSkipUnstructured := model.GetCompositeResourceDefinition(&extv1.CompositeResourceDefinition{}, model.SkipFields(model.FieldUnstructured))
+	gxrdSkipUnstructured := model.GetCompositeResourceDefinition(&extv1.CompositeResourceDefinition{}, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 	gcmp := model.GetComposition(&extv1.Composition{}, model.SelectAll)
-	gcmpSkipUnstructured := model.GetComposition(&extv1.Composition{}, model.SkipFields(model.FieldUnstructured))
+	gcmpSkipUnstructured := model.GetComposition(&extv1.Composition{}, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A selection set with "nodes.unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -626,7 +627,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Objects(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.krc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.krc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.Objects(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

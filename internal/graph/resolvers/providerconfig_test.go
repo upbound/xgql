@@ -29,6 +29,7 @@ import (
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 
 	"github.com/upbound/xgql/internal/auth"
@@ -56,8 +57,8 @@ func TestProviderConfigDefinition(t *testing.T) {
 	crdDifferingPlural.SetSpecGroup("example.org")
 	crdDifferingPlural.SetSpecNames(kextv1.CustomResourceDefinitionNames{Kind: "Example", Plural: "Examplii"})
 
-	gcrd := model.GetCustomResourceDefinition(crd, model.SkipFields(model.FieldUnstructured))
-	dcrd := model.GetCustomResourceDefinition(crdDifferingPlural, model.SkipFields(model.FieldUnstructured))
+	gcrd := model.GetCustomResourceDefinition(crd, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
+	dcrd := model.GetCustomResourceDefinition(crdDifferingPlural, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	otherGroup := unstructured.NewCRD()
 	otherGroup.SetSpecGroup("example.net")
@@ -228,7 +229,7 @@ func TestProviderConfigDefinition(t *testing.T) {
 				t.Errorf("\n%s\ns.Definition(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
 			if diff := cmp.Diff(tc.want.mrd, got,
-				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{}),
 			); diff != "" {
 				t.Errorf("\n%s\ns.Definition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}

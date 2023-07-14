@@ -222,7 +222,7 @@ func TestCrossplaneResourceTree(t *testing.T) {
 
 			diffOptions := []cmp.Option{
 
-				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{}),
 			}
 
 			if diff := cmp.Diff(tc.want.kr, got, diffOptions...); diff != "" {
@@ -235,7 +235,7 @@ func TestCrossplaneResourceTree(t *testing.T) {
 func TestQueryKubernetesResource(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gkr, _ := model.GetKubernetesResource(&unstructured.Unstructured{}, model.SkipFields(model.FieldUnstructured))
+	gkr, _ := model.GetKubernetesResource(&unstructured.Unstructured{}, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	type args struct {
 		ctx context.Context
@@ -314,7 +314,7 @@ func TestQueryKubernetesResource(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.KubernetesResource(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.KubernetesResource(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -326,7 +326,7 @@ func TestQueryKubernetesResources(t *testing.T) {
 
 	kr := unstructured.Unstructured{}
 	gkr, _ := model.GetKubernetesResource(&kr, model.SelectAll)
-	gkrSkipUnstructured, _ := model.GetKubernetesResource(&kr, model.SkipFields(model.FieldUnstructured))
+	gkrSkipUnstructured, _ := model.GetKubernetesResource(&kr, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	group := "example.org"
 	version := "v1"
@@ -613,7 +613,7 @@ func TestQueryKubernetesResources(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.DefinedCompositeResourceClaims(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.krc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.krc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.DefinedCompositeResourceClaims(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -624,7 +624,7 @@ func TestQuerySecret(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	gsec := model.GetSecret(&corev1.Secret{}, model.SelectAll)
-	gsecSkipUnstructured := model.GetSecret(&corev1.Secret{}, model.SkipFields(model.FieldUnstructured))
+	gsecSkipUnstructured := model.GetSecret(&corev1.Secret{}, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A selection set with "unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -725,7 +725,7 @@ func TestQuerySecret(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Secret(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{}), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.sec, got, cmp.AllowUnexported(model.Secret{}), cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.Secret(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -736,7 +736,7 @@ func TestQueryConfigMap(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	gcm := model.GetConfigMap(&corev1.ConfigMap{}, model.SelectAll)
-	gcmSkipUnstructured := model.GetConfigMap(&corev1.ConfigMap{}, model.SkipFields(model.FieldUnstructured))
+	gcmSkipUnstructured := model.GetConfigMap(&corev1.ConfigMap{}, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A selection set with "unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -837,7 +837,7 @@ func TestQueryConfigMap(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.ConfigMap(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.cm, got, cmp.AllowUnexported(model.ConfigMap{}), cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.cm, got, cmp.AllowUnexported(model.ConfigMap{}), cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.ConfigMap(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -849,7 +849,7 @@ func TestQueryProviders(t *testing.T) {
 
 	p := pkgv1.Provider{ObjectMeta: metav1.ObjectMeta{Name: "coolprovider"}}
 	gp := model.GetProvider(&p, model.SelectAll)
-	gpSkipUnstructured := model.GetProvider(&p, model.SkipFields(model.FieldUnstructured))
+	gpSkipUnstructured := model.GetProvider(&p, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A selection set with "nodes.unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -965,7 +965,7 @@ func TestQueryProviders(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.Providers(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.pc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.pc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.Providers(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -994,7 +994,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
 	gactive := model.GetProviderRevision(&active, model.SelectAll)
-	gactiveSkipUnstructured := model.GetProviderRevision(&active, model.SkipFields(model.FieldUnstructured))
+	gactiveSkipUnstructured := model.GetProviderRevision(&active, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A ProviderRevision we control, but that is inactive.
 	inactive := pkgv1.ProviderRevision{
@@ -1009,7 +1009,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
 	}
 	ginactive := model.GetProviderRevision(&inactive, model.SelectAll)
-	ginactiveSkipUnstructured := model.GetProviderRevision(&inactive, model.SkipFields(model.FieldUnstructured))
+	ginactiveSkipUnstructured := model.GetProviderRevision(&inactive, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A ProviderRevision which we do not control.
 	other := pkgv1.ProviderRevision{
@@ -1023,7 +1023,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 		},
 	}
 	gother := model.GetProviderRevision(&other, model.SelectAll)
-	gotherSkipUnstructured := model.GetProviderRevision(&other, model.SkipFields(model.FieldUnstructured))
+	gotherSkipUnstructured := model.GetProviderRevision(&other, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A selection set with "nodes.unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -1249,7 +1249,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.Revisions(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.pc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.pc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.Revisions(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1306,12 +1306,12 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 		},
 	})
 
-	gowned := model.GetCustomResourceDefinition(owned, model.SkipFields(model.FieldUnstructured))
+	gowned := model.GetCustomResourceDefinition(owned, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	dangler := xunstructured.NewCRD()
 	dangler.SetName("coolconfig")
 
-	gdangler := model.GetCustomResourceDefinition(dangler, model.SkipFields(model.FieldUnstructured))
+	gdangler := model.GetCustomResourceDefinition(dangler, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	type args struct {
 		ctx      context.Context
@@ -1433,7 +1433,7 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 				t.Errorf("\n%s\nq.Configurations(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
 			if diff := cmp.Diff(tc.want.xrdc, got,
-				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{}),
 			); diff != "" {
 				t.Errorf("\n%s\nq.Configurations(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
@@ -1446,7 +1446,7 @@ func TestQueryConfigurations(t *testing.T) {
 
 	c := pkgv1.Configuration{ObjectMeta: metav1.ObjectMeta{Name: "coolconfig"}}
 	gc := model.GetConfiguration(&c, model.SelectAll)
-	gcSkipUnstructured := model.GetConfiguration(&c, model.SkipFields(model.FieldUnstructured))
+	gcSkipUnstructured := model.GetConfiguration(&c, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A selection set with "nodes.unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -1562,7 +1562,7 @@ func TestQueryConfigurations(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.Configurations(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.cc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.cc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.Configurations(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1591,7 +1591,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
 	}
 	gactive := model.GetConfigurationRevision(&active, model.SelectAll)
-	gactiveSkipUnstructured := model.GetConfigurationRevision(&active, model.SkipFields(model.FieldUnstructured))
+	gactiveSkipUnstructured := model.GetConfigurationRevision(&active, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A ConfigurationRevision we control, but that is inactive.
 	inactive := pkgv1.ConfigurationRevision{
@@ -1606,7 +1606,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
 	}
 	ginactive := model.GetConfigurationRevision(&inactive, model.SelectAll)
-	ginactiveSkipUnstructured := model.GetConfigurationRevision(&inactive, model.SkipFields(model.FieldUnstructured))
+	ginactiveSkipUnstructured := model.GetConfigurationRevision(&inactive, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A ConfigurationRevision which we do not control.
 	other := pkgv1.ConfigurationRevision{
@@ -1620,7 +1620,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 		},
 	}
 	gother := model.GetConfigurationRevision(&other, model.SelectAll)
-	gotherSkipUnstructured := model.GetConfigurationRevision(&other, model.SkipFields(model.FieldUnstructured))
+	gotherSkipUnstructured := model.GetConfigurationRevision(&other, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 	// A selection set with "nodes.unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
 		&ast.Field{
@@ -1832,7 +1832,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.Revisions(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.pc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.pc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.Revisions(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1874,11 +1874,11 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 		},
 	}}
 	gowned := model.GetCompositeResourceDefinition(&owned, model.SelectAll)
-	gownedSkipUnstructured := model.GetCompositeResourceDefinition(&owned, model.SkipFields(model.FieldUnstructured))
+	gownedSkipUnstructured := model.GetCompositeResourceDefinition(&owned, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	dangler := extv1.CompositeResourceDefinition{ObjectMeta: metav1.ObjectMeta{Name: "coolconfig"}}
 	gdangler := model.GetCompositeResourceDefinition(&dangler, model.SelectAll)
-	gdanglerSkipUnstructured := model.GetCompositeResourceDefinition(&dangler, model.SkipFields(model.FieldUnstructured))
+	gdanglerSkipUnstructured := model.GetCompositeResourceDefinition(&dangler, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A selection set with "nodes.unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -2124,7 +2124,7 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.Configurations(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.xrdc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.xrdc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.Configurations(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -2167,11 +2167,11 @@ func TestQueryCompositions(t *testing.T) {
 		},
 	}}
 	gowned := model.GetComposition(&owned, model.SelectAll)
-	gownedSkipUnstructured := model.GetComposition(&owned, model.SkipFields(model.FieldUnstructured))
+	gownedSkipUnstructured := model.GetComposition(&owned, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	dangler := extv1.Composition{ObjectMeta: metav1.ObjectMeta{Name: "coolconfig"}}
 	gdangler := model.GetComposition(&dangler, model.SelectAll)
-	gdanglerSkipUnstructured := model.GetComposition(&dangler, model.SkipFields(model.FieldUnstructured))
+	gdanglerSkipUnstructured := model.GetComposition(&dangler, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A selection set with "nodes.unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -2417,7 +2417,7 @@ func TestQueryCompositions(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.Configurations(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.cc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.cc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.Configurations(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

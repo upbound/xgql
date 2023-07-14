@@ -144,7 +144,7 @@ func TestCompositeResourceCrd(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.CompositeResourceCrd(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.crd, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.crd, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.CompositeResourceCrd(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -259,7 +259,7 @@ func TestCompositeResourceClaimCrd(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.CompositeResourceClaimCrd(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.crd, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.crd, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.CompositeResourceClaimCrd(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -270,16 +270,16 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	xr := unstructured.Unstructured{}
-	gxr := model.GetCompositeResource(&xr, model.SkipFields(model.FieldUnstructured))
+	gxr := model.GetCompositeResource(&xr, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 	xrReady := unstructured.Unstructured{Object: map[string]interface{}{}}
 	fieldpath.Pave(xrReady.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionTrue}})
-	gxrReady := model.GetCompositeResource(&xrReady, model.SkipFields(model.FieldUnstructured))
+	gxrReady := model.GetCompositeResource(&xrReady, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 	xrNotReady := unstructured.Unstructured{Object: map[string]interface{}{}}
 	fieldpath.Pave(xrNotReady.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionFalse}})
-	gxrNotReady := model.GetCompositeResource(&xrNotReady, model.SkipFields(model.FieldUnstructured))
+	gxrNotReady := model.GetCompositeResource(&xrNotReady, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 	xrReadyUnknown := unstructured.Unstructured{Object: map[string]interface{}{}}
 	fieldpath.Pave(xrReadyUnknown.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionUnknown}})
-	gxrReadyUnknown := model.GetCompositeResource(&xrReadyUnknown, model.SkipFields(model.FieldUnstructured))
+	gxrReadyUnknown := model.GetCompositeResource(&xrReadyUnknown, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	group := "example.org"
 	version := "v1"
@@ -746,7 +746,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 				t.Errorf("\n%s\nq.DefinedCompositeResources(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
 			if diff := cmp.Diff(tc.want.crc, got,
-				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{}),
 			); diff != "" {
 				t.Errorf("\n%s\nq.DefinedCompositeResources(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
@@ -758,16 +758,16 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	xrc := unstructured.Unstructured{}
-	gxrc := model.GetCompositeResourceClaim(&xrc, model.SkipFields(model.FieldUnstructured))
+	gxrc := model.GetCompositeResourceClaim(&xrc, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 	xrcReady := unstructured.Unstructured{Object: map[string]interface{}{}}
 	fieldpath.Pave(xrcReady.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionTrue}})
-	gxrcReady := model.GetCompositeResourceClaim(&xrcReady, model.SkipFields(model.FieldUnstructured))
+	gxrcReady := model.GetCompositeResourceClaim(&xrcReady, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 	xrcNotReady := unstructured.Unstructured{Object: map[string]interface{}{}}
 	fieldpath.Pave(xrcNotReady.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionFalse}})
-	gxrcNotReady := model.GetCompositeResourceClaim(&xrcNotReady, model.SkipFields(model.FieldUnstructured))
+	gxrcNotReady := model.GetCompositeResourceClaim(&xrcNotReady, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 	xrcReadyUnknown := unstructured.Unstructured{Object: map[string]interface{}{}}
 	fieldpath.Pave(xrcReadyUnknown.Object).SetValue("status.conditions", []xpv1.Condition{{Type: xpv1.TypeReady, Status: corev1.ConditionUnknown}})
-	gxrcReadyUnknown := model.GetCompositeResourceClaim(&xrcReadyUnknown, model.SkipFields(model.FieldUnstructured))
+	gxrcReadyUnknown := model.GetCompositeResourceClaim(&xrcReadyUnknown, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	group := "example.org"
 	version := "v1"
@@ -1422,7 +1422,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 				t.Errorf("\n%s\nq.DefinedCompositeResourceClaims(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
 			if diff := cmp.Diff(tc.want.crcc, got,
-				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{}),
 			); diff != "" {
 				t.Errorf("\n%s\nq.DefinedCompositeResourceClaims(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
@@ -1434,7 +1434,7 @@ func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	gcmp := model.GetComposition(&extv1.Composition{}, model.SelectAll)
-	gcmpSkipUnstructured := model.GetComposition(&extv1.Composition{}, model.SkipFields(model.FieldUnstructured))
+	gcmpSkipUnstructured := model.GetComposition(&extv1.Composition{}, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A selection set with "unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -1554,7 +1554,7 @@ func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.DefaultComposition(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.cmp, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.cmp, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.DefaultComposition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -1565,7 +1565,7 @@ func TestCompositeResourceDefinitionSpecEnforcedComposition(t *testing.T) {
 	errBoom := errors.New("boom")
 
 	gcmp := model.GetComposition(&extv1.Composition{}, model.SelectAll)
-	gcmpSkipUnstructured := model.GetComposition(&extv1.Composition{}, model.SkipFields(model.FieldUnstructured))
+	gcmpSkipUnstructured := model.GetComposition(&extv1.Composition{}, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// A selection set with "unstructured" field included.
 	gselectWithUnstructured := ast.SelectionSet{
@@ -1685,7 +1685,7 @@ func TestCompositeResourceDefinitionSpecEnforcedComposition(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.EnforcedComposition(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.cmp, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.cmp, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.EnforcedComposition(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

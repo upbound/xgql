@@ -24,6 +24,91 @@ type ManagedResource implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use `fieldPath` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as `metadata.name`.
+
+  Valid examples:
+
+  * `metadata.name`
+  * `spec.containers[0].name`
+  * `data[.config.yml]`
+  * `metadata.annotations['crossplane.io/external-name']`
+  * `spec.items[0][8]`
+  * `apiVersion`
+  * `[42]`
+  * `spec.containers[*].args[*]` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * `.metadata.name` - Leading period.
+  * `metadata..name` - Double period.
+  * `metadata.name.` - Trailing period.
+  * `spec.containers[]` - Empty brackets.
+  * `spec.containers.[0].name` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ```json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ```
+
+  The wildcard `spec.containers[*].args[*]` will be expanded to:
+
+  ```json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ```
+
+  And the following result will be returned:
+
+  ```json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ```
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)

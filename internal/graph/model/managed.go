@@ -18,6 +18,7 @@ import (
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 
 	"github.com/upbound/xgql/internal/unstructured"
 )
@@ -81,8 +82,8 @@ func GetManagedResource(u *kunstructured.Unstructured, s SelectedFields) Managed
 		},
 		Status: GetManagedResourceStatus(mg),
 	}
-	if s.Has(FieldUnstructured) {
-		out.Unstructured = bytesForUnstructured(u)
+	if s.Has(FieldUnstructured) || s.Has(FieldFieldPath) {
+		out.PavedAccess.Paved = fieldpath.Pave(u.Object)
 	}
 	return out
 }

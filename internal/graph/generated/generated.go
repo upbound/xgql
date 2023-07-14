@@ -71,6 +71,7 @@ type ComplexityRoot struct {
 		APIVersion   func(childComplexity int) int
 		Definition   func(childComplexity int) int
 		Events       func(childComplexity int) int
+		FieldPath    func(childComplexity int, path *string) int
 		ID           func(childComplexity int) int
 		Kind         func(childComplexity int) int
 		Metadata     func(childComplexity int) int
@@ -83,6 +84,7 @@ type ComplexityRoot struct {
 		APIVersion   func(childComplexity int) int
 		Definition   func(childComplexity int) int
 		Events       func(childComplexity int) int
+		FieldPath    func(childComplexity int, path *string) int
 		ID           func(childComplexity int) int
 		Kind         func(childComplexity int) int
 		Metadata     func(childComplexity int) int
@@ -131,6 +133,7 @@ type ComplexityRoot struct {
 		DefinedCompositeResourceClaims func(childComplexity int, version *string, namespace *string, options *model.DefinedCompositeResourceClaimOptionsInput) int
 		DefinedCompositeResources      func(childComplexity int, version *string, options *model.DefinedCompositeResourceOptionsInput) int
 		Events                         func(childComplexity int) int
+		FieldPath                      func(childComplexity int, path *string) int
 		ID                             func(childComplexity int) int
 		Kind                           func(childComplexity int) int
 		Metadata                       func(childComplexity int) int
@@ -203,6 +206,7 @@ type ComplexityRoot struct {
 	Composition struct {
 		APIVersion   func(childComplexity int) int
 		Events       func(childComplexity int) int
+		FieldPath    func(childComplexity int, path *string) int
 		ID           func(childComplexity int) int
 		Kind         func(childComplexity int) int
 		Metadata     func(childComplexity int) int
@@ -237,6 +241,7 @@ type ComplexityRoot struct {
 		APIVersion   func(childComplexity int) int
 		Data         func(childComplexity int, keys []string) int
 		Events       func(childComplexity int) int
+		FieldPath    func(childComplexity int, path *string) int
 		ID           func(childComplexity int) int
 		Kind         func(childComplexity int) int
 		Metadata     func(childComplexity int) int
@@ -247,6 +252,7 @@ type ComplexityRoot struct {
 		APIVersion     func(childComplexity int) int
 		ActiveRevision func(childComplexity int) int
 		Events         func(childComplexity int) int
+		FieldPath      func(childComplexity int, path *string) int
 		ID             func(childComplexity int) int
 		Kind           func(childComplexity int) int
 		Metadata       func(childComplexity int) int
@@ -264,6 +270,7 @@ type ComplexityRoot struct {
 	ConfigurationRevision struct {
 		APIVersion   func(childComplexity int) int
 		Events       func(childComplexity int) int
+		FieldPath    func(childComplexity int, path *string) int
 		ID           func(childComplexity int) int
 		Kind         func(childComplexity int) int
 		Metadata     func(childComplexity int) int
@@ -328,6 +335,7 @@ type ComplexityRoot struct {
 		APIVersion       func(childComplexity int) int
 		DefinedResources func(childComplexity int, version *string) int
 		Events           func(childComplexity int) int
+		FieldPath        func(childComplexity int, path *string) int
 		ID               func(childComplexity int) int
 		Kind             func(childComplexity int) int
 		Metadata         func(childComplexity int) int
@@ -378,6 +386,7 @@ type ComplexityRoot struct {
 	Event struct {
 		APIVersion     func(childComplexity int) int
 		Count          func(childComplexity int) int
+		FieldPath      func(childComplexity int, path *string) int
 		FirstTime      func(childComplexity int) int
 		ID             func(childComplexity int) int
 		InvolvedObject func(childComplexity int) int
@@ -403,6 +412,7 @@ type ComplexityRoot struct {
 	GenericResource struct {
 		APIVersion   func(childComplexity int) int
 		Events       func(childComplexity int) int
+		FieldPath    func(childComplexity int, path *string) int
 		ID           func(childComplexity int) int
 		Kind         func(childComplexity int) int
 		Metadata     func(childComplexity int) int
@@ -426,6 +436,7 @@ type ComplexityRoot struct {
 		APIVersion   func(childComplexity int) int
 		Definition   func(childComplexity int) int
 		Events       func(childComplexity int) int
+		FieldPath    func(childComplexity int, path *string) int
 		ID           func(childComplexity int) int
 		Kind         func(childComplexity int) int
 		Metadata     func(childComplexity int) int
@@ -493,6 +504,7 @@ type ComplexityRoot struct {
 		APIVersion     func(childComplexity int) int
 		ActiveRevision func(childComplexity int) int
 		Events         func(childComplexity int) int
+		FieldPath      func(childComplexity int, path *string) int
 		ID             func(childComplexity int) int
 		Kind           func(childComplexity int) int
 		Metadata       func(childComplexity int) int
@@ -506,6 +518,7 @@ type ComplexityRoot struct {
 		APIVersion   func(childComplexity int) int
 		Definition   func(childComplexity int) int
 		Events       func(childComplexity int) int
+		FieldPath    func(childComplexity int, path *string) int
 		ID           func(childComplexity int) int
 		Kind         func(childComplexity int) int
 		Metadata     func(childComplexity int) int
@@ -530,6 +543,7 @@ type ComplexityRoot struct {
 	ProviderRevision struct {
 		APIVersion   func(childComplexity int) int
 		Events       func(childComplexity int) int
+		FieldPath    func(childComplexity int, path *string) int
 		ID           func(childComplexity int) int
 		Kind         func(childComplexity int) int
 		Metadata     func(childComplexity int) int
@@ -596,6 +610,7 @@ type ComplexityRoot struct {
 		APIVersion   func(childComplexity int) int
 		Data         func(childComplexity int, keys []string) int
 		Events       func(childComplexity int) int
+		FieldPath    func(childComplexity int, path *string) int
 		ID           func(childComplexity int) int
 		Kind         func(childComplexity int) int
 		Metadata     func(childComplexity int) int
@@ -769,6 +784,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CompositeResource.Events(childComplexity), true
 
+	case "CompositeResource.fieldPath":
+		if e.complexity.CompositeResource.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_CompositeResource_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.CompositeResource.FieldPath(childComplexity, args["path"].(*string)), true
+
 	case "CompositeResource.id":
 		if e.complexity.CompositeResource.ID == nil {
 			break
@@ -831,6 +858,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CompositeResourceClaim.Events(childComplexity), true
+
+	case "CompositeResourceClaim.fieldPath":
+		if e.complexity.CompositeResourceClaim.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_CompositeResourceClaim_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.CompositeResourceClaim.FieldPath(childComplexity, args["path"].(*string)), true
 
 	case "CompositeResourceClaim.id":
 		if e.complexity.CompositeResourceClaim.ID == nil {
@@ -1030,6 +1069,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CompositeResourceDefinition.Events(childComplexity), true
+
+	case "CompositeResourceDefinition.fieldPath":
+		if e.complexity.CompositeResourceDefinition.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_CompositeResourceDefinition_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.CompositeResourceDefinition.FieldPath(childComplexity, args["path"].(*string)), true
 
 	case "CompositeResourceDefinition.id":
 		if e.complexity.CompositeResourceDefinition.ID == nil {
@@ -1325,6 +1376,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Composition.Events(childComplexity), true
 
+	case "Composition.fieldPath":
+		if e.complexity.Composition.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_Composition_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Composition.FieldPath(childComplexity, args["path"].(*string)), true
+
 	case "Composition.id":
 		if e.complexity.Composition.ID == nil {
 			break
@@ -1463,6 +1526,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ConfigMap.Events(childComplexity), true
 
+	case "ConfigMap.fieldPath":
+		if e.complexity.ConfigMap.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_ConfigMap_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ConfigMap.FieldPath(childComplexity, args["path"].(*string)), true
+
 	case "ConfigMap.id":
 		if e.complexity.ConfigMap.ID == nil {
 			break
@@ -1511,6 +1586,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Configuration.Events(childComplexity), true
+
+	case "Configuration.fieldPath":
+		if e.complexity.Configuration.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_Configuration_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Configuration.FieldPath(childComplexity, args["path"].(*string)), true
 
 	case "Configuration.id":
 		if e.complexity.Configuration.ID == nil {
@@ -1588,6 +1675,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ConfigurationRevision.Events(childComplexity), true
+
+	case "ConfigurationRevision.fieldPath":
+		if e.complexity.ConfigurationRevision.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_ConfigurationRevision_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ConfigurationRevision.FieldPath(childComplexity, args["path"].(*string)), true
 
 	case "ConfigurationRevision.id":
 		if e.complexity.ConfigurationRevision.ID == nil {
@@ -1853,6 +1952,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CustomResourceDefinition.Events(childComplexity), true
 
+	case "CustomResourceDefinition.fieldPath":
+		if e.complexity.CustomResourceDefinition.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_CustomResourceDefinition_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.CustomResourceDefinition.FieldPath(childComplexity, args["path"].(*string)), true
+
 	case "CustomResourceDefinition.id":
 		if e.complexity.CustomResourceDefinition.ID == nil {
 			break
@@ -2035,6 +2146,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Event.Count(childComplexity), true
 
+	case "Event.fieldPath":
+		if e.complexity.Event.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_Event_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Event.FieldPath(childComplexity, args["path"].(*string)), true
+
 	case "Event.firstTime":
 		if e.complexity.Event.FirstTime == nil {
 			break
@@ -2147,6 +2270,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GenericResource.Events(childComplexity), true
 
+	case "GenericResource.fieldPath":
+		if e.complexity.GenericResource.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_GenericResource_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.GenericResource.FieldPath(childComplexity, args["path"].(*string)), true
+
 	case "GenericResource.id":
 		if e.complexity.GenericResource.ID == nil {
 			break
@@ -2223,6 +2358,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ManagedResource.Events(childComplexity), true
+
+	case "ManagedResource.fieldPath":
+		if e.complexity.ManagedResource.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_ManagedResource_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ManagedResource.FieldPath(childComplexity, args["path"].(*string)), true
 
 	case "ManagedResource.id":
 		if e.complexity.ManagedResource.ID == nil {
@@ -2529,6 +2676,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Provider.Events(childComplexity), true
 
+	case "Provider.fieldPath":
+		if e.complexity.Provider.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_Provider_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Provider.FieldPath(childComplexity, args["path"].(*string)), true
+
 	case "Provider.id":
 		if e.complexity.Provider.ID == nil {
 			break
@@ -2598,6 +2757,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProviderConfig.Events(childComplexity), true
+
+	case "ProviderConfig.fieldPath":
+		if e.complexity.ProviderConfig.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_ProviderConfig_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProviderConfig.FieldPath(childComplexity, args["path"].(*string)), true
 
 	case "ProviderConfig.id":
 		if e.complexity.ProviderConfig.ID == nil {
@@ -2682,6 +2853,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProviderRevision.Events(childComplexity), true
+
+	case "ProviderRevision.fieldPath":
+		if e.complexity.ProviderRevision.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_ProviderRevision_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProviderRevision.FieldPath(childComplexity, args["path"].(*string)), true
 
 	case "ProviderRevision.id":
 		if e.complexity.ProviderRevision.ID == nil {
@@ -3058,6 +3241,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Secret.Events(childComplexity), true
 
+	case "Secret.fieldPath":
+		if e.complexity.Secret.FieldPath == nil {
+			break
+		}
+
+		args, err := ec.field_Secret_fieldPath_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Secret.FieldPath(childComplexity, args["path"].(*string)), true
+
 	case "Secret.id":
 		if e.complexity.Secret.ID == nil {
 			break
@@ -3263,6 +3458,91 @@ type CompositeResourceDefinition implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3580,6 +3860,91 @@ type Composition implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3658,6 +4023,91 @@ interface KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection!
@@ -3705,6 +4155,91 @@ type GenericResource implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -3974,6 +4509,91 @@ type Event implements Node {
 
   "An unstructured JSON representation of the event."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 }
 
 """
@@ -4036,6 +4656,91 @@ type Secret implements Node & KubernetesResource {
   An unstructured JSON representation of the underlying Kubernetes resource.
   """
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   """
   Events pertaining to this resource.
@@ -4077,6 +4782,91 @@ type ConfigMap implements Node & KubernetesResource {
   An unstructured JSON representation of the underlying Kubernetes resource.
   """
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   # TODO(negz): Support binaryData too? What would the return value be?
 
@@ -4141,6 +4931,91 @@ type CustomResourceDefinition implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4313,6 +5188,91 @@ type CompositeResource implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4415,6 +5375,91 @@ type CompositeResourceClaim implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4511,6 +5556,91 @@ type Configuration implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4629,6 +5759,91 @@ type ConfigurationRevision implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -4726,6 +5941,8 @@ directive @goField(
   forceResolver: Boolean
   name: String
   omittable: Boolean
+  type: String
+  embed: Boolean
 ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
 directive @goTag(
@@ -4759,6 +5976,91 @@ type ManagedResource implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -5017,6 +6319,91 @@ type Provider implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -5134,6 +6521,91 @@ type ProviderRevision implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -5243,6 +6715,91 @@ type ProviderConfig implements Node & KubernetesResource {
 
   "An unstructured JSON representation of the underlying Kubernetes resource."
   unstructured: JSON!
+    @deprecated(reason: "Use ` + "`" + `fieldPath` + "`" + ` instead")
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.SkipUnstructured"
+      embed: true
+    )
+
+  """
+  A JSON representation of a field within the underlying Kubernetes resource.
+
+  API conventions describe the syntax as:
+  > standard JavaScript syntax for accessing that field, assuming the JSON
+  > object was transformed into a JavaScript object, without the leading dot,
+  > such as ` + "`" + `metadata.name` + "`" + `.
+
+  Valid examples:
+
+  * ` + "`" + `metadata.name` + "`" + `
+  * ` + "`" + `spec.containers[0].name` + "`" + `
+  * ` + "`" + `data[.config.yml]` + "`" + `
+  * ` + "`" + `metadata.annotations['crossplane.io/external-name']` + "`" + `
+  * ` + "`" + `spec.items[0][8]` + "`" + `
+  * ` + "`" + `apiVersion` + "`" + `
+  * ` + "`" + `[42]` + "`" + `
+  * ` + "`" + `spec.containers[*].args[*]` + "`" + ` - Supports wildcard expansion.
+
+  Invalid examples:
+
+  * ` + "`" + `.metadata.name` + "`" + ` - Leading period.
+  * ` + "`" + `metadata..name` + "`" + ` - Double period.
+  * ` + "`" + `metadata.name.` + "`" + ` - Trailing period.
+  * ` + "`" + `spec.containers[]` + "`" + ` - Empty brackets.
+  * ` + "`" + `spec.containers.[0].name` + "`" + ` - Period before open bracket.
+
+  Wildcards support:
+
+  For an object with the following data:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  {
+    "spec": {
+      "containers": [
+        {
+          "name": "cool",
+          "image": "latest",
+          "args": [
+            "start",
+            "now",
+            "debug"
+          ]
+        }
+      ]
+    }
+  }
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  The wildcard ` + "`" + `spec.containers[*].args[*]` + "`" + ` will be expanded to:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "spec.containers[0].args[0]",
+    "spec.containers[0].args[1]",
+    "spec.containers[0].args[2]",
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  And the following result will be returned:
+
+  ` + "`" + `` + "`" + `` + "`" + `json
+  [
+    "start",
+    "now",
+    "debug"
+  ]
+  ` + "`" + `` + "`" + `` + "`" + `
+
+  https://github.com/kubernetes/community/blob/61f3d0/contributors/devel/sig-architecture/api-conventions.md#selecting-fields
+  """
+  fieldPath(
+    "A path to a field within a Kubernetes object."
+    path: String
+  ): JSON!
+    @goField(
+      type: "github.com/upbound/xgql/internal/graph/model.PavedAccess"
+      embed: true
+    )
 
   "Events pertaining to this resource."
   events: EventConnection! @goField(forceResolver: true)
@@ -5530,6 +7087,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_CompositeResourceClaim_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_CompositeResourceDefinition_definedCompositeResourceClaims_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -5587,6 +7159,51 @@ func (ec *executionContext) field_CompositeResourceDefinition_definedCompositeRe
 	return args, nil
 }
 
+func (ec *executionContext) field_CompositeResourceDefinition_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_CompositeResource_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Composition_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_ConfigMap_data_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -5602,6 +7219,51 @@ func (ec *executionContext) field_ConfigMap_data_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_ConfigMap_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ConfigurationRevision_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Configuration_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_CustomResourceDefinition_definedResources_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -5614,6 +7276,66 @@ func (ec *executionContext) field_CustomResourceDefinition_definedResources_args
 		}
 	}
 	args["version"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_CustomResourceDefinition_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Event_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_GenericResource_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ManagedResource_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
 	return args, nil
 }
 
@@ -5698,6 +7420,51 @@ func (ec *executionContext) field_ObjectMeta_labels_args(ctx context.Context, ra
 		}
 	}
 	args["keys"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ProviderConfig_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ProviderRevision_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Provider_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
 	return args, nil
 }
 
@@ -5974,6 +7741,21 @@ func (ec *executionContext) field_Secret_data_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["keys"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Secret_fieldPath_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["path"] = arg0
 	return args, nil
 }
 
@@ -6340,7 +8122,7 @@ func (ec *executionContext) _CompositeResource_unstructured(ctx context.Context,
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6361,11 +8143,66 @@ func (ec *executionContext) fieldContext_CompositeResource_unstructured(ctx cont
 	fc = &graphql.FieldContext{
 		Object:     "CompositeResource",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CompositeResource_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResource) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CompositeResource_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CompositeResource_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CompositeResource",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_CompositeResource_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -6470,6 +8307,8 @@ func (ec *executionContext) fieldContext_CompositeResource_definition(ctx contex
 				return ec.fieldContext_CompositeResourceDefinition_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_CompositeResourceDefinition_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_CompositeResourceDefinition_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_CompositeResourceDefinition_events(ctx, field)
 			case "compositeResourceCRD":
@@ -6810,7 +8649,7 @@ func (ec *executionContext) _CompositeResourceClaim_unstructured(ctx context.Con
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6831,11 +8670,66 @@ func (ec *executionContext) fieldContext_CompositeResourceClaim_unstructured(ctx
 	fc = &graphql.FieldContext{
 		Object:     "CompositeResourceClaim",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CompositeResourceClaim_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceClaim) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CompositeResourceClaim_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CompositeResourceClaim_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CompositeResourceClaim",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_CompositeResourceClaim_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -6940,6 +8834,8 @@ func (ec *executionContext) fieldContext_CompositeResourceClaim_definition(ctx c
 				return ec.fieldContext_CompositeResourceDefinition_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_CompositeResourceDefinition_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_CompositeResourceDefinition_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_CompositeResourceDefinition_events(ctx, field)
 			case "compositeResourceCRD":
@@ -7007,6 +8903,8 @@ func (ec *executionContext) fieldContext_CompositeResourceClaimConnection_nodes(
 				return ec.fieldContext_CompositeResourceClaim_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_CompositeResourceClaim_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_CompositeResourceClaim_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_CompositeResourceClaim_events(ctx, field)
 			case "definition":
@@ -7153,6 +9051,8 @@ func (ec *executionContext) fieldContext_CompositeResourceClaimSpec_composition(
 				return ec.fieldContext_Composition_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_Composition_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_Composition_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_Composition_events(ctx, field)
 			}
@@ -7302,6 +9202,8 @@ func (ec *executionContext) fieldContext_CompositeResourceClaimSpec_resource(ctx
 				return ec.fieldContext_CompositeResource_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_CompositeResource_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_CompositeResource_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_CompositeResource_events(ctx, field)
 			case "definition":
@@ -7412,6 +9314,8 @@ func (ec *executionContext) fieldContext_CompositeResourceClaimSpec_connectionSe
 				return ec.fieldContext_Secret_data(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_Secret_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_Secret_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_Secret_events(ctx, field)
 			}
@@ -7616,6 +9520,8 @@ func (ec *executionContext) fieldContext_CompositeResourceConnection_nodes(ctx c
 				return ec.fieldContext_CompositeResource_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_CompositeResource_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_CompositeResource_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_CompositeResource_events(ctx, field)
 			case "definition":
@@ -8035,7 +9941,7 @@ func (ec *executionContext) _CompositeResourceDefinition_unstructured(ctx contex
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8056,11 +9962,66 @@ func (ec *executionContext) fieldContext_CompositeResourceDefinition_unstructure
 	fc = &graphql.FieldContext{
 		Object:     "CompositeResourceDefinition",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CompositeResourceDefinition_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.CompositeResourceDefinition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CompositeResourceDefinition_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CompositeResourceDefinition_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CompositeResourceDefinition",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_CompositeResourceDefinition_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -8165,6 +10126,8 @@ func (ec *executionContext) fieldContext_CompositeResourceDefinition_compositeRe
 				return ec.fieldContext_CustomResourceDefinition_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_CustomResourceDefinition_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_CustomResourceDefinition_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_CustomResourceDefinition_events(ctx, field)
 			case "definedResources":
@@ -8226,6 +10189,8 @@ func (ec *executionContext) fieldContext_CompositeResourceDefinition_compositeRe
 				return ec.fieldContext_CustomResourceDefinition_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_CustomResourceDefinition_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_CustomResourceDefinition_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_CustomResourceDefinition_events(ctx, field)
 			case "definedResources":
@@ -8409,6 +10374,8 @@ func (ec *executionContext) fieldContext_CompositeResourceDefinitionConnection_n
 				return ec.fieldContext_CompositeResourceDefinition_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_CompositeResourceDefinition_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_CompositeResourceDefinition_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_CompositeResourceDefinition_events(ctx, field)
 			case "compositeResourceCRD":
@@ -9064,6 +11031,8 @@ func (ec *executionContext) fieldContext_CompositeResourceDefinitionSpec_default
 				return ec.fieldContext_Composition_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_Composition_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_Composition_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_Composition_events(ctx, field)
 			}
@@ -9123,6 +11092,8 @@ func (ec *executionContext) fieldContext_CompositeResourceDefinitionSpec_enforce
 				return ec.fieldContext_Composition_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_Composition_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_Composition_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_Composition_events(ctx, field)
 			}
@@ -9510,6 +11481,8 @@ func (ec *executionContext) fieldContext_CompositeResourceSpec_composition(ctx c
 				return ec.fieldContext_Composition_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_Composition_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_Composition_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_Composition_events(ctx, field)
 			}
@@ -9659,6 +11632,8 @@ func (ec *executionContext) fieldContext_CompositeResourceSpec_claim(ctx context
 				return ec.fieldContext_CompositeResourceClaim_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_CompositeResourceClaim_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_CompositeResourceClaim_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_CompositeResourceClaim_events(ctx, field)
 			case "definition":
@@ -9769,6 +11744,8 @@ func (ec *executionContext) fieldContext_CompositeResourceSpec_connectionSecret(
 				return ec.fieldContext_Secret_data(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_Secret_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_Secret_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_Secret_events(ctx, field)
 			}
@@ -10325,7 +12302,7 @@ func (ec *executionContext) _Composition_unstructured(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10346,11 +12323,66 @@ func (ec *executionContext) fieldContext_Composition_unstructured(ctx context.Co
 	fc = &graphql.FieldContext{
 		Object:     "Composition",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Composition_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.Composition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Composition_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Composition_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Composition",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Composition_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -10455,6 +12487,8 @@ func (ec *executionContext) fieldContext_CompositionConnection_nodes(ctx context
 				return ec.fieldContext_Composition_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_Composition_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_Composition_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_Composition_events(ctx, field)
 			}
@@ -11137,7 +13171,7 @@ func (ec *executionContext) _ConfigMap_unstructured(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11158,11 +13192,66 @@ func (ec *executionContext) fieldContext_ConfigMap_unstructured(ctx context.Cont
 	fc = &graphql.FieldContext{
 		Object:     "ConfigMap",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ConfigMap_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.ConfigMap) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ConfigMap_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ConfigMap_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ConfigMap",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ConfigMap_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -11540,7 +13629,7 @@ func (ec *executionContext) _Configuration_unstructured(ctx context.Context, fie
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11561,11 +13650,66 @@ func (ec *executionContext) fieldContext_Configuration_unstructured(ctx context.
 	fc = &graphql.FieldContext{
 		Object:     "Configuration",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Configuration_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.Configuration) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Configuration_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Configuration_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Configuration",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Configuration_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -11720,6 +13864,8 @@ func (ec *executionContext) fieldContext_Configuration_activeRevision(ctx contex
 				return ec.fieldContext_ConfigurationRevision_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_ConfigurationRevision_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_ConfigurationRevision_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_ConfigurationRevision_events(ctx, field)
 			}
@@ -11779,6 +13925,8 @@ func (ec *executionContext) fieldContext_ConfigurationConnection_nodes(ctx conte
 				return ec.fieldContext_Configuration_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_Configuration_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_Configuration_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_Configuration_events(ctx, field)
 			case "revisions":
@@ -12165,7 +14313,7 @@ func (ec *executionContext) _ConfigurationRevision_unstructured(ctx context.Cont
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12186,11 +14334,66 @@ func (ec *executionContext) fieldContext_ConfigurationRevision_unstructured(ctx 
 	fc = &graphql.FieldContext{
 		Object:     "ConfigurationRevision",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ConfigurationRevision_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.ConfigurationRevision) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ConfigurationRevision_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ConfigurationRevision_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ConfigurationRevision",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ConfigurationRevision_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -12295,6 +14498,8 @@ func (ec *executionContext) fieldContext_ConfigurationRevisionConnection_nodes(c
 				return ec.fieldContext_ConfigurationRevision_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_ConfigurationRevision_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_ConfigurationRevision_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_ConfigurationRevision_events(ctx, field)
 			}
@@ -13798,7 +16003,7 @@ func (ec *executionContext) _CustomResourceDefinition_unstructured(ctx context.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13819,11 +16024,66 @@ func (ec *executionContext) fieldContext_CustomResourceDefinition_unstructured(c
 	fc = &graphql.FieldContext{
 		Object:     "CustomResourceDefinition",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CustomResourceDefinition_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.CustomResourceDefinition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CustomResourceDefinition_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CustomResourceDefinition_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CustomResourceDefinition",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_CustomResourceDefinition_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -13989,6 +16249,8 @@ func (ec *executionContext) fieldContext_CustomResourceDefinitionConnection_node
 				return ec.fieldContext_CustomResourceDefinition_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_CustomResourceDefinition_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_CustomResourceDefinition_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_CustomResourceDefinition_events(ctx, field)
 			case "definedResources":
@@ -15310,7 +17572,7 @@ func (ec *executionContext) _Event_unstructured(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15331,11 +17593,66 @@ func (ec *executionContext) fieldContext_Event_unstructured(ctx context.Context,
 	fc = &graphql.FieldContext{
 		Object:     "Event",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Event_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Event_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Event_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Event",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Event_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -15402,6 +17719,8 @@ func (ec *executionContext) fieldContext_EventConnection_nodes(ctx context.Conte
 				return ec.fieldContext_Event_lastTime(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_Event_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_Event_fieldPath(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Event", field.Name)
 		},
@@ -15710,7 +18029,7 @@ func (ec *executionContext) _GenericResource_unstructured(ctx context.Context, f
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15731,11 +18050,66 @@ func (ec *executionContext) fieldContext_GenericResource_unstructured(ctx contex
 	fc = &graphql.FieldContext{
 		Object:     "GenericResource",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GenericResource_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.GenericResource) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GenericResource_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GenericResource_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GenericResource",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_GenericResource_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16273,7 +18647,7 @@ func (ec *executionContext) _ManagedResource_unstructured(ctx context.Context, f
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -16294,11 +18668,66 @@ func (ec *executionContext) fieldContext_ManagedResource_unstructured(ctx contex
 	fc = &graphql.FieldContext{
 		Object:     "ManagedResource",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ManagedResource_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.ManagedResource) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ManagedResource_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ManagedResource_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ManagedResource",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ManagedResource_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -16444,6 +18873,8 @@ func (ec *executionContext) fieldContext_ManagedResourceSpec_connectionSecret(ct
 				return ec.fieldContext_Secret_data(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_Secret_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_Secret_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_Secret_events(ctx, field)
 			}
@@ -18137,7 +20568,7 @@ func (ec *executionContext) _Provider_unstructured(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -18158,11 +20589,66 @@ func (ec *executionContext) fieldContext_Provider_unstructured(ctx context.Conte
 	fc = &graphql.FieldContext{
 		Object:     "Provider",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Provider_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.Provider) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Provider_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Provider_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Provider",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Provider_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -18317,6 +20803,8 @@ func (ec *executionContext) fieldContext_Provider_activeRevision(ctx context.Con
 				return ec.fieldContext_ProviderRevision_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_ProviderRevision_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_ProviderRevision_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_ProviderRevision_events(ctx, field)
 			}
@@ -18589,7 +21077,7 @@ func (ec *executionContext) _ProviderConfig_unstructured(ctx context.Context, fi
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -18610,11 +21098,66 @@ func (ec *executionContext) fieldContext_ProviderConfig_unstructured(ctx context
 	fc = &graphql.FieldContext{
 		Object:     "ProviderConfig",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProviderConfig_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.ProviderConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProviderConfig_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProviderConfig_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProviderConfig",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProviderConfig_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -18898,6 +21441,8 @@ func (ec *executionContext) fieldContext_ProviderConnection_nodes(ctx context.Co
 				return ec.fieldContext_Provider_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_Provider_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_Provider_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_Provider_events(ctx, field)
 			case "revisions":
@@ -19284,7 +21829,7 @@ func (ec *executionContext) _ProviderRevision_unstructured(ctx context.Context, 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -19305,11 +21850,66 @@ func (ec *executionContext) fieldContext_ProviderRevision_unstructured(ctx conte
 	fc = &graphql.FieldContext{
 		Object:     "ProviderRevision",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProviderRevision_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.ProviderRevision) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProviderRevision_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProviderRevision_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProviderRevision",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProviderRevision_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -19414,6 +22014,8 @@ func (ec *executionContext) fieldContext_ProviderRevisionConnection_nodes(ctx co
 				return ec.fieldContext_ProviderRevision_status(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_ProviderRevision_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_ProviderRevision_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_ProviderRevision_events(ctx, field)
 			}
@@ -20609,6 +23211,8 @@ func (ec *executionContext) fieldContext_Query_secret(ctx context.Context, field
 				return ec.fieldContext_Secret_data(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_Secret_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_Secret_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_Secret_events(ctx, field)
 			}
@@ -20677,6 +23281,8 @@ func (ec *executionContext) fieldContext_Query_configMap(ctx context.Context, fi
 				return ec.fieldContext_ConfigMap_data(ctx, field)
 			case "unstructured":
 				return ec.fieldContext_ConfigMap_unstructured(ctx, field)
+			case "fieldPath":
+				return ec.fieldContext_ConfigMap_fieldPath(ctx, field)
 			case "events":
 				return ec.fieldContext_ConfigMap_events(ctx, field)
 			}
@@ -21601,7 +24207,7 @@ func (ec *executionContext) _Secret_unstructured(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Unstructured, nil
+		return obj.Unstructured(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -21622,11 +24228,66 @@ func (ec *executionContext) fieldContext_Secret_unstructured(ctx context.Context
 	fc = &graphql.FieldContext{
 		Object:     "Secret",
 		Field:      field,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type JSON does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Secret_fieldPath(ctx context.Context, field graphql.CollectedField, obj *model.Secret) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Secret_fieldPath(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldPath(fc.Args["path"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]byte)
+	fc.Result = res
+	return ec.marshalNJSON2ᚕbyte(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Secret_fieldPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Secret",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type JSON does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Secret_fieldPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -24260,6 +26921,11 @@ func (ec *executionContext) _CompositeResource(ctx context.Context, sel ast.Sele
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "fieldPath":
+			out.Values[i] = ec._CompositeResource_fieldPath(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "events":
 			field := field
 
@@ -24392,6 +27058,11 @@ func (ec *executionContext) _CompositeResourceClaim(ctx context.Context, sel ast
 			out.Values[i] = ec._CompositeResourceClaim_status(ctx, field, obj)
 		case "unstructured":
 			out.Values[i] = ec._CompositeResourceClaim_unstructured(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "fieldPath":
+			out.Values[i] = ec._CompositeResourceClaim_fieldPath(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -24953,6 +27624,11 @@ func (ec *executionContext) _CompositeResourceDefinition(ctx context.Context, se
 			out.Values[i] = ec._CompositeResourceDefinition_status(ctx, field, obj)
 		case "unstructured":
 			out.Values[i] = ec._CompositeResourceDefinition_unstructured(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "fieldPath":
+			out.Values[i] = ec._CompositeResourceDefinition_fieldPath(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -25876,6 +28552,11 @@ func (ec *executionContext) _Composition(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "fieldPath":
+			out.Values[i] = ec._Composition_fieldPath(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "events":
 			field := field
 
@@ -26147,6 +28828,11 @@ func (ec *executionContext) _ConfigMap(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "fieldPath":
+			out.Values[i] = ec._ConfigMap_fieldPath(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "events":
 			field := field
 
@@ -26246,6 +28932,11 @@ func (ec *executionContext) _Configuration(ctx context.Context, sel ast.Selectio
 			out.Values[i] = ec._Configuration_status(ctx, field, obj)
 		case "unstructured":
 			out.Values[i] = ec._Configuration_unstructured(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "fieldPath":
+			out.Values[i] = ec._Configuration_fieldPath(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -26458,6 +29149,11 @@ func (ec *executionContext) _ConfigurationRevision(ctx context.Context, sel ast.
 			out.Values[i] = ec._ConfigurationRevision_status(ctx, field, obj)
 		case "unstructured":
 			out.Values[i] = ec._ConfigurationRevision_unstructured(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "fieldPath":
+			out.Values[i] = ec._ConfigurationRevision_fieldPath(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -26946,6 +29642,11 @@ func (ec *executionContext) _CustomResourceDefinition(ctx context.Context, sel a
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "fieldPath":
+			out.Values[i] = ec._CustomResourceDefinition_fieldPath(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "events":
 			field := field
 
@@ -27425,6 +30126,11 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "fieldPath":
+			out.Values[i] = ec._Event_fieldPath(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -27558,6 +30264,11 @@ func (ec *executionContext) _GenericResource(ctx context.Context, sel ast.Select
 			}
 		case "unstructured":
 			out.Values[i] = ec._GenericResource_unstructured(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "fieldPath":
+			out.Values[i] = ec._GenericResource_fieldPath(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -27776,6 +30487,11 @@ func (ec *executionContext) _ManagedResource(ctx context.Context, sel ast.Select
 			out.Values[i] = ec._ManagedResource_status(ctx, field, obj)
 		case "unstructured":
 			out.Values[i] = ec._ManagedResource_unstructured(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "fieldPath":
+			out.Values[i] = ec._ManagedResource_fieldPath(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -28391,6 +31107,11 @@ func (ec *executionContext) _Provider(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "fieldPath":
+			out.Values[i] = ec._Provider_fieldPath(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "events":
 			field := field
 
@@ -28554,6 +31275,11 @@ func (ec *executionContext) _ProviderConfig(ctx context.Context, sel ast.Selecti
 			out.Values[i] = ec._ProviderConfig_status(ctx, field, obj)
 		case "unstructured":
 			out.Values[i] = ec._ProviderConfig_unstructured(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "fieldPath":
+			out.Values[i] = ec._ProviderConfig_fieldPath(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -28807,6 +31533,11 @@ func (ec *executionContext) _ProviderRevision(ctx context.Context, sel ast.Selec
 			out.Values[i] = ec._ProviderRevision_status(ctx, field, obj)
 		case "unstructured":
 			out.Values[i] = ec._ProviderRevision_unstructured(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "fieldPath":
+			out.Values[i] = ec._ProviderRevision_fieldPath(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -29498,6 +32229,11 @@ func (ec *executionContext) _Secret(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Secret_data(ctx, field, obj)
 		case "unstructured":
 			out.Values[i] = ec._Secret_unstructured(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "fieldPath":
+			out.Values[i] = ec._Secret_fieldPath(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}

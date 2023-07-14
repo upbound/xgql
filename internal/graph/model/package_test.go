@@ -109,7 +109,7 @@ func TestGetProvider(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetProvider(tc.cfg, SkipFields(FieldUnstructured))
+			got := GetProvider(tc.cfg, SkipFields(FieldUnstructured, FieldFieldPath))
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetProvider(...): -want, +got\n:%s", tc.reason, diff)
 			}
@@ -211,7 +211,7 @@ func TestGetProviderRevision(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetProviderRevision(tc.cfg, SkipFields(FieldUnstructured))
+			got := GetProviderRevision(tc.cfg, SkipFields(FieldUnstructured, FieldFieldPath))
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetProviderRevision(...): -want, +got\n:%s", tc.reason, diff)
 			}
@@ -301,7 +301,7 @@ func TestGetConfiguration(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetConfiguration(tc.cfg, SkipFields(FieldUnstructured))
+			got := GetConfiguration(tc.cfg, SkipFields(FieldUnstructured, FieldFieldPath))
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetConfiguration(...): -want, +got\n:%s", tc.reason, diff)
 			}
@@ -403,7 +403,7 @@ func TestGetConfigurationRevision(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetConfigurationRevision(tc.cfg, SkipFields(FieldUnstructured))
+			got := GetConfigurationRevision(tc.cfg, SkipFields(FieldUnstructured, FieldFieldPath))
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetConfigurationRevision(...): -want, +got\n:%s", tc.reason, diff)
 			}

@@ -15,35 +15,11 @@
 package model
 
 import (
-	"github.com/go-json-experiment/json"
-
 	"github.com/pkg/errors"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
-
-// unstruct returns the supplied object as unstructured JSON bytes. It panics if
-// the object cannot be marshalled as JSON, which _should_ only happen if this
-// program is fundamentally broken - e.g. trying to use a weird runtime.Object.
-func unstruct(obj runtime.Object) []byte {
-	out, err := json.Marshal(obj)
-	if err != nil {
-		panic(err)
-	}
-	return out
-}
-
-// bytesForUnstructured returns the supplied unstructured.Unstructured as JSON
-// bytes. It panics if the object cannot be marshalled as JSON, which _should_
-// only happen if this program is fundamentally broken.
-func bytesForUnstructured(u *kunstructured.Unstructured) []byte {
-	out, err := json.Marshal(u.Object)
-	if err != nil {
-		panic(err)
-	}
-	return out
-}
 
 func convert(from *kunstructured.Unstructured, to runtime.Object) error {
 	c := runtime.DefaultUnstructuredConverter

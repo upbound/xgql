@@ -140,8 +140,8 @@ func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition, s Se
 		},
 		Status: GetCompositeResourceDefinitionStatus(xrd.Status),
 	}
-	if s.Has(FieldUnstructured) {
-		out.Unstructured = unstruct(xrd)
+	if s.Has(FieldUnstructured) || s.Has(FieldFieldPath) {
+		out.PavedAccess.Paved = paveObject(xrd)
 	}
 	return out
 }
@@ -174,8 +174,8 @@ func GetComposition(cmp *extv1.Composition, s SelectedFields) Composition {
 		},
 		Status: GetCompositionStatus(cmp.Status),
 	}
-	if s.Has(FieldUnstructured) {
-		out.Unstructured = unstruct(cmp)
+	if s.Has(FieldUnstructured) || s.Has(FieldFieldPath) {
+		out.PavedAccess.Paved = paveObject(cmp)
 	}
 	return out
 }

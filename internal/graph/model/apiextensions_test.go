@@ -161,7 +161,7 @@ func TestGetCompositeResourceDefinition(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetCompositeResourceDefinition(tc.xrd, SkipFields(FieldUnstructured))
+			got := GetCompositeResourceDefinition(tc.xrd, SkipFields(FieldUnstructured, FieldFieldPath))
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetCompositeResourceDefinition(...): -want, +got\n:%s", tc.reason, diff)
 			}
@@ -240,7 +240,7 @@ func TestGetComposition(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			got := GetComposition(tc.xrd, SkipFields(FieldUnstructured))
+			got := GetComposition(tc.xrd, SkipFields(FieldUnstructured, FieldFieldPath))
 			if diff := cmp.Diff(tc.want, got, cmp.AllowUnexported(ObjectMeta{})); diff != "" {
 				t.Errorf("\n%s\nGetComposition(...): -want, +got\n:%s", tc.reason, diff)
 			}

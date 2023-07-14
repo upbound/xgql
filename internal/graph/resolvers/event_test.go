@@ -29,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 
 	"github.com/upbound/xgql/internal/auth"
@@ -144,7 +145,7 @@ func TestEvent(t *testing.T) {
 			},
 			want: want{
 				ec: model.EventConnection{
-					Nodes:      []model.Event{model.GetEvent(&related, model.SkipFields(model.FieldUnstructured)), model.GetEvent(&unrelated, model.SkipFields(model.FieldUnstructured))},
+					Nodes:      []model.Event{model.GetEvent(&related, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath)), model.GetEvent(&unrelated, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))},
 					TotalCount: 2,
 				},
 			},
@@ -186,7 +187,7 @@ func TestEvent(t *testing.T) {
 			},
 			want: want{
 				ec: model.EventConnection{
-					Nodes:      []model.Event{model.GetEvent(&related, model.SkipFields(model.FieldUnstructured))},
+					Nodes:      []model.Event{model.GetEvent(&related, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))},
 					TotalCount: 1,
 				},
 			},
@@ -208,7 +209,7 @@ func TestEvent(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.Resolve(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.ec, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.ec, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.Resolve(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -324,7 +325,7 @@ var _ generated.EventResolver = &event{}
 func TestEventInvolvedObject(t *testing.T) {
 	errBoom := errors.New("boom")
 
-	gu, _ := model.GetKubernetesResource(&unstructured.Unstructured{}, model.SkipFields(model.FieldUnstructured))
+	gu, _ := model.GetKubernetesResource(&unstructured.Unstructured{}, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	type args struct {
 		ctx context.Context
@@ -412,7 +413,7 @@ func TestEventInvolvedObject(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\ns.InvolvedObject(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.kr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\ns.InvolvedObject(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})

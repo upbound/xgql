@@ -28,6 +28,7 @@ import (
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 
 	"github.com/upbound/xgql/internal/auth"
@@ -50,7 +51,7 @@ func TestObjectMetaOwners(t *testing.T) {
 	own := unstructured.Unstructured{}
 	own.SetAPIVersion("example.org/v1")
 	own.SetKind("AnOwner")
-	gown, _ := model.GetKubernetesResource(&own, model.SkipFields(model.FieldUnstructured))
+	gown, _ := model.GetKubernetesResource(&own, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	type args struct {
 		ctx context.Context
@@ -140,7 +141,7 @@ func TestObjectMetaOwners(t *testing.T) {
 				t.Errorf("\n%s\nq.Owners(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
 			if diff := cmp.Diff(tc.want.oc, got,
-				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{}),
 			); diff != "" {
 				t.Errorf("\n%s\nq.Owners(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
@@ -155,7 +156,7 @@ func TestObjectMetaController(t *testing.T) {
 	ctrl := unstructured.Unstructured{}
 	ctrl.SetAPIVersion("example.org/v1")
 	ctrl.SetKind("TheController")
-	gctrl, _ := model.GetKubernetesResource(&ctrl, model.SkipFields(model.FieldUnstructured))
+	gctrl, _ := model.GetKubernetesResource(&ctrl, model.SkipFields(model.FieldUnstructured, model.FieldFieldPath))
 
 	// An owner
 	own := unstructured.Unstructured{}
@@ -284,7 +285,7 @@ func TestObjectMetaController(t *testing.T) {
 				t.Errorf("\n%s\nq.Controller(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
 			if diff := cmp.Diff(tc.want.kr, got,
-				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
+				cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{}),
 			); diff != "" {
 				t.Errorf("\n%s\nq.Controller(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
