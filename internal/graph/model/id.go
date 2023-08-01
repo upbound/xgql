@@ -20,7 +20,8 @@ import (
 	"strings"
 
 	"github.com/epk/smaz"
-	"github.com/pkg/errors"
+
+	"github.com/crossplane/crossplane-runtime/pkg/errors"
 )
 
 // Reference ID separator.

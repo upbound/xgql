@@ -21,12 +21,12 @@ import (
 	"sync"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/crossplane/crossplane-runtime/pkg/errors"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
 	"github.com/upbound/xgql/internal/auth"

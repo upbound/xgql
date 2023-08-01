@@ -19,12 +19,13 @@ import (
 	"syscall"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/pkg/errors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	meta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
+
+	"github.com/crossplane/crossplane-runtime/pkg/errors"
 )
 
 const (

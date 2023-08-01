@@ -15,10 +15,11 @@
 package model
 
 import (
-	"github.com/pkg/errors"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	"github.com/crossplane/crossplane-runtime/pkg/errors"
 )
 
 func convert(from *kunstructured.Unstructured, to runtime.Object) error {

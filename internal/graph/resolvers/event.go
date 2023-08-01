@@ -19,10 +19,11 @@ import (
 	"sort"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
+
+	"github.com/crossplane/crossplane-runtime/pkg/errors"
 
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/graph/model"

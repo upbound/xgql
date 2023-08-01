@@ -12,7 +12,6 @@ require (
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/google/addlicense v0.0.0-20210428195630-6d92264d7170
 	github.com/google/go-cmp v0.5.9
-	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.16.0
 	github.com/vektah/gqlparser/v2 v2.5.8
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.42.0
@@ -32,6 +31,8 @@ require (
 	k8s.io/utils v0.0.0-20230505201702-9f6742963106
 	sigs.k8s.io/controller-runtime v0.15.0
 )
+
+require github.com/pkg/errors v0.9.1 // indirect
 
 require (
 	cloud.google.com/go/compute v1.20.1 // indirect
