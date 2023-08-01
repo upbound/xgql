@@ -32,7 +32,6 @@ import (
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
 
 	"github.com/upbound/xgql/internal/auth"
-	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/model"
 	xunstructured "github.com/upbound/xgql/internal/unstructured"
 )
@@ -161,15 +160,13 @@ func (r *query) KubernetesResources(ctx context.Context, apiVersion, kind string
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	gopts := []clients.GetOption{}
 	lopts := []client.ListOption{}
 	if namespace != nil {
-		gopts = []clients.GetOption{clients.ForNamespace(*namespace)}
 		lopts = []client.ListOption{client.InNamespace(*namespace)}
 	}
 
 	creds, _ := auth.FromContext(ctx)
-	c, err := r.clients.Get(creds, gopts...)
+	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return model.KubernetesResourceConnection{}, nil

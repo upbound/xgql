@@ -455,12 +455,12 @@ func TestQueryKubernetesResources(t *testing.T) {
 		"WithNamespace": {
 			reason: "We should successfully list, model, and return resources from within a specific namespace.",
 			clients: ClientCacheFn(func(_ auth.Credentials, o ...clients.GetOption) (client.Client, error) {
-				if len(o) != 1 {
-					t.Errorf("Expected 1 GetOption, got %d", len(o))
-				}
 				return &test.MockClient{
-					MockList: test.NewMockListFn(nil, func(obj client.ObjectList) error {
-						u := *obj.(*unstructured.UnstructuredList)
+					MockList: func(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
+						if len(opts) != 1 {
+							t.Errorf("Expected 1 ListOption, got %d", len(opts))
+						}
+						u := *list.(*unstructured.UnstructuredList)
 
 						// Ensure we're being asked to list the expected GVK.
 						got := u.GetObjectKind().GroupVersionKind()
@@ -469,9 +469,10 @@ func TestQueryKubernetesResources(t *testing.T) {
 							t.Errorf("-want GVK, +got GVK:\n%s", diff)
 						}
 
-						*obj.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{kr}}
+						*list.(*unstructured.UnstructuredList) = unstructured.UnstructuredList{Items: []unstructured.Unstructured{kr}}
 						return nil
-					}),
+
+					},
 				}, nil
 			}),
 			args: args{
