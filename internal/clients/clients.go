@@ -116,6 +116,7 @@ func Anonymize(cfg *rest.Config) *rest.Config {
 // type the client is asked to get or list. Clients (and their caches) expire
 // and are garbage collected if they are unused for five minutes.
 type Cache struct {
+	// a context that will be valid for the lifetime of Cache.
 	ctx    context.Context
 	active map[string]*session
 	mx     sync.RWMutex
@@ -248,13 +249,11 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	if err != nil {
 		return nil, errors.Wrap(err, errNewHTTPClient)
 	}
-
-	caopt := cache.Options{
+	ca, err := c.newCache(cfg, cache.Options{
 		HTTPClient: hc,
 		Scheme:     c.scheme,
 		Mapper:     c.mapper,
-	}
-	ca, err := c.newCache(cfg, caopt)
+	})
 	if err != nil {
 		return nil, errors.Wrap(err, errNewCache)
 	}
