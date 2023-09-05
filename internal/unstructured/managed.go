@@ -145,3 +145,17 @@ func (u *Managed) GetPublishConnectionDetailsTo() *xpv1.PublishConnectionDetails
 func (u *Managed) SetPublishConnectionDetailsTo(ref *xpv1.PublishConnectionDetailsTo) {
 	_ = fieldpath.Pave(u.Object).SetValue("spec.publishConnectionDetailsTo", ref)
 }
+
+// GetManagementPolicies of this managed resource.
+func (u *Managed) GetManagementPolicies() xpv1.ManagementPolicies {
+	out := xpv1.ManagementPolicies{}
+	if err := fieldpath.Pave(u.Object).GetValueInto("spec.managementPolicies", out); err != nil {
+		return nil
+	}
+	return out
+}
+
+// SetManagementPolicies of this managed resource.
+func (u *Managed) SetManagementPolicies(p xpv1.ManagementPolicies) {
+	_ = fieldpath.Pave(u.Object).SetValue("spec.managementPolicies", p)
+}

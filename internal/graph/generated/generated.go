@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -621,6 +622,10 @@ type ComplexityRoot struct {
 	SecretReference struct {
 		Name      func(childComplexity int) int
 		Namespace func(childComplexity int) int
+	}
+
+	Subscription struct {
+		__resolve_liveQuery func(childComplexity int, throttle *int) int
 	}
 
 	TypeReference struct {
@@ -3302,6 +3307,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SecretReference.Namespace(childComplexity), true
 
+	case "Subscription.liveQuery":
+		if e.complexity.Subscription.__resolve_liveQuery == nil {
+			break
+		}
+
+		args, err := ec.field_Subscription_liveQuery_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Subscription.__resolve_liveQuery(childComplexity, args["throttle"].(*int)), true
+
 	case "TypeReference.apiVersion":
 		if e.complexity.TypeReference.APIVersion == nil {
 			break
@@ -3379,6 +3396,23 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
 			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
 			var buf bytes.Buffer
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
+	case ast.Subscription:
+		next := ec._Subscription(ctx, rc.Operation.SelectionSet)
+
+		var buf bytes.Buffer
+		return func(ctx context.Context) *graphql.Response {
+			buf.Reset()
+			data := next(ctx)
+
+			if data == nil {
+				return nil
+			}
 			data.MarshalGQL(&buf)
 
 			return &graphql.Response{
@@ -4651,6 +4685,7 @@ type Secret implements Node & KubernetesResource {
   """
   data("Data keys for which to return values." keys: [String!]): StringMap
     @goField(name: "data")
+    @goTag(key: "json", value: "-")
 
   """
   An unstructured JSON representation of the underlying Kubernetes resource.
@@ -4777,6 +4812,7 @@ type ConfigMap implements Node & KubernetesResource {
   """
   data("Data keys for which to return values." keys: [String!]): StringMap
     @goField(name: "data")
+    @goTag(key: "json", value: "-")
 
   """
   An unstructured JSON representation of the underlying Kubernetes resource.
@@ -7080,6 +7116,19 @@ type CompositionConnection {
   totalCount: Int!
 }
 `, BuiltIn: false},
+	{Name: "../../../live_query/live_query.graphql", Input: `type Subscription {
+	"""
+	A live query that is updated when the underlying data changes.
+	First, the initial data is sent.
+	Then, once the underlying data changes, the "patches" extension is updated with a list of patches to apply to the data.
+	"""
+	liveQuery(
+		"""
+		Propose a desired throttle interval ot the server to receive updates to at most once per \"throttle\" milliseconds.
+		"""
+		throttle: Int = 200
+	): Query
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -7756,6 +7805,21 @@ func (ec *executionContext) field_Secret_fieldPath_args(ctx context.Context, raw
 		}
 	}
 	args["path"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Subscription_liveQuery_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["throttle"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("throttle"))
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["throttle"] = arg0
 	return args, nil
 }
 
@@ -24430,6 +24494,104 @@ func (ec *executionContext) fieldContext_SecretReference_namespace(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _Subscription_liveQuery(ctx context.Context, field graphql.CollectedField) (ret func(ctx context.Context) graphql.Marshaler) {
+	fc, err := ec.fieldContext_Subscription_liveQuery(ctx, field)
+	if err != nil {
+		return nil
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = nil
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.__resolve_liveQuery(ctx, fc.Args["throttle"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	if resTmp == nil {
+		return nil
+	}
+	return func(ctx context.Context) graphql.Marshaler {
+		select {
+		case res, ok := <-resTmp.(<-chan graphql.Marshaler):
+			if !ok {
+				return nil
+			}
+			return graphql.WriterFunc(func(w io.Writer) {
+				w.Write([]byte{'{'})
+				graphql.MarshalString(field.Alias).MarshalGQL(w)
+				w.Write([]byte{':'})
+				ec.marshalOQuery2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐMarshaler(ctx, field.Selections, res).MarshalGQL(w)
+				w.Write([]byte{'}'})
+			})
+		case <-ctx.Done():
+			return nil
+		}
+	}
+}
+
+func (ec *executionContext) fieldContext_Subscription_liveQuery(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Subscription",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "kubernetesResource":
+				return ec.fieldContext_Query_kubernetesResource(ctx, field)
+			case "kubernetesResources":
+				return ec.fieldContext_Query_kubernetesResources(ctx, field)
+			case "events":
+				return ec.fieldContext_Query_events(ctx, field)
+			case "secret":
+				return ec.fieldContext_Query_secret(ctx, field)
+			case "configMap":
+				return ec.fieldContext_Query_configMap(ctx, field)
+			case "providers":
+				return ec.fieldContext_Query_providers(ctx, field)
+			case "providerRevisions":
+				return ec.fieldContext_Query_providerRevisions(ctx, field)
+			case "customResourceDefinitions":
+				return ec.fieldContext_Query_customResourceDefinitions(ctx, field)
+			case "configurations":
+				return ec.fieldContext_Query_configurations(ctx, field)
+			case "configurationRevisions":
+				return ec.fieldContext_Query_configurationRevisions(ctx, field)
+			case "compositeResourceDefinitions":
+				return ec.fieldContext_Query_compositeResourceDefinitions(ctx, field)
+			case "compositions":
+				return ec.fieldContext_Query_compositions(ctx, field)
+			case "crossplaneResourceTree":
+				return ec.fieldContext_Query_crossplaneResourceTree(ctx, field)
+			case "__schema":
+				return ec.fieldContext_Query___schema(ctx, field)
+			case "__type":
+				return ec.fieldContext_Query___type(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Query", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Subscription_liveQuery_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _TypeReference_apiVersion(ctx context.Context, field graphql.CollectedField, obj *model.TypeReference) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_TypeReference_apiVersion(ctx, field)
 	if err != nil {
@@ -32340,6 +32502,26 @@ func (ec *executionContext) _SecretReference(ctx context.Context, sel ast.Select
 	return out
 }
 
+var subscriptionImplementors = []string{"Subscription"}
+
+func (ec *executionContext) _Subscription(ctx context.Context, sel ast.SelectionSet) func(ctx context.Context) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, subscriptionImplementors)
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Subscription",
+	})
+	if len(fields) != 1 {
+		ec.Errorf(ctx, "must subscribe to exactly one stream")
+		return nil
+	}
+
+	switch fields[0].Name {
+	case "liveQuery":
+		return ec._Subscription_liveQuery(ctx, fields[0])
+	default:
+		panic("unknown field " + strconv.Quote(fields[0].Name))
+	}
+}
+
 var typeReferenceImplementors = []string{"TypeReference"}
 
 func (ec *executionContext) _TypeReference(ctx context.Context, sel ast.SelectionSet, obj *model.TypeReference) graphql.Marshaler {
@@ -34547,6 +34729,13 @@ func (ec *executionContext) marshalOProviderStatus2ᚖgithubᚗcomᚋupboundᚋx
 		return graphql.Null
 	}
 	return ec._ProviderStatus(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOQuery2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐMarshaler(ctx context.Context, sel ast.SelectionSet, v graphql.Marshaler) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalORevisionActivationPolicy2ᚖgithubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐRevisionActivationPolicy(ctx context.Context, v interface{}) (*model.RevisionActivationPolicy, error) {

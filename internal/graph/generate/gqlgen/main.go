@@ -28,6 +28,7 @@ import (
 	"github.com/99designs/gqlgen/api"
 	"github.com/99designs/gqlgen/codegen/config"
 	"github.com/99designs/gqlgen/plugin/modelgen"
+	"github.com/upbound/xgql/internal/graph/extensions/live_query"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
@@ -106,7 +107,7 @@ func main() {
 		FieldHook: goTypeFieldHook,
 	}
 
-	err = api.Generate(cfg, api.ReplacePlugin(&p))
+	err = api.Generate(cfg, api.PrependPlugin(live_query.LiveQuery{}), api.ReplacePlugin(&p))
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())

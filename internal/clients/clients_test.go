@@ -85,6 +85,9 @@ func TestGet(t *testing.T) {
 				WithNewClientFn(NewClientFn(func(cfg *rest.Config, o client.Options) (client.Client, error) {
 					return nil, errBoom
 				})),
+				WithNewCacheFn(NewCacheFn(func(cfg *rest.Config, o cache.Options) (cache.Cache, error) {
+					return nil, nil
+				})),
 			),
 			want: want{
 				err: errors.Wrap(errBoom, errNewClient),
@@ -93,9 +96,6 @@ func TestGet(t *testing.T) {
 		"NewCacheError": {
 			reason: "Errors creating a new controller-runtime cache should be returned.",
 			c: NewCache(runtime.NewScheme(), &rest.Config{},
-				WithNewClientFn(NewClientFn(func(cfg *rest.Config, o client.Options) (client.Client, error) {
-					return nil, nil
-				})),
 				WithNewCacheFn(NewCacheFn(func(cfg *rest.Config, o cache.Options) (cache.Cache, error) {
 					return nil, errBoom
 				})),

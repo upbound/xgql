@@ -671,6 +671,7 @@ type Secret implements Node & KubernetesResource {
   """
   data("Data keys for which to return values." keys: [String!]): StringMap
     @goField(name: "data")
+    @goTag(key: "json", value: "-")
 
   """
   An unstructured JSON representation of the underlying Kubernetes resource.
@@ -797,6 +798,7 @@ type ConfigMap implements Node & KubernetesResource {
   """
   data("Data keys for which to return values." keys: [String!]): StringMap
     @goField(name: "data")
+    @goTag(key: "json", value: "-")
 
   """
   An unstructured JSON representation of the underlying Kubernetes resource.
