@@ -62,7 +62,8 @@ func importType(typeRef string) types.Type {
 }
 
 // goTypeFieldHook is a mutation function for modelgen plugin.
-// It extends gqlgens `goField` directive to allow overriding field type make the field embedded.
+// It extends gqlgens `goField` directive, allowing to override
+// field type or make the field embedded.
 //
 // For a brief explanation of Field Mutate Hooks read [GQLGen Recipes].
 //
@@ -76,9 +77,11 @@ func goTypeFieldHook(td *ast.Definition, fd *ast.FieldDefinition, f *modelgen.Fi
 
 	c := fd.Directives.ForName("goField")
 	if c != nil {
+		// override field type with "type".
 		if typeRef := c.Arguments.ForName("type"); typeRef != nil {
 			f.Type = importType(typeRef.Value.Raw)
 		}
+		// reset field name if marked with "embed".
 		if embed := c.Arguments.ForName("embed"); embed != nil {
 			if do, err := embed.Value.Value(nil); err == nil && do.(bool) {
 				f.GoName = ""
