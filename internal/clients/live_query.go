@@ -27,7 +27,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 
-	"github.com/upbound/xgql/internal/graph/extensions/live_query/runtime"
+	"github.com/upbound/xgql/internal/graph/extensions/live_query"
 )
 
 // WithLiveQueries wraps NewCacheFn with a cache.Cache that tracks objects and lists
@@ -54,7 +54,10 @@ type liveQueryCache struct {
 	scheme *kruntime.Scheme
 }
 
-func (c *liveQueryCache) trackObject(ctx context.Context, lq *runtime.LiveQuery, co client.Object) error {
+func (c *liveQueryCache) trackObject(ctx context.Context, co client.Object) error {
+	if !live_query.IsLive(ctx) {
+		return nil
+	}
 	i, err := c.Cache.GetInformer(ctx, co)
 	if err != nil {
 		return err
@@ -63,7 +66,7 @@ func (c *liveQueryCache) trackObject(ctx context.Context, lq *runtime.LiveQuery,
 	r, err = i.AddEventHandler(toolscache.FilteringResourceEventHandler{
 		FilterFunc: func(obj interface{}) bool {
 			// If the context is done, remove the handler.
-			if lq.IsDone() {
+			if !live_query.IsLive(ctx) {
 				_ = i.RemoveEventHandler(r)
 				return false
 			}
@@ -75,13 +78,13 @@ func (c *liveQueryCache) trackObject(ctx context.Context, lq *runtime.LiveQuery,
 		},
 		Handler: toolscache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				lq.Notify()
+				live_query.NotifyChanged(ctx)
 			},
 			UpdateFunc: func(oldObj, newObj interface{}) {
-				lq.Notify()
+				live_query.NotifyChanged(ctx)
 			},
 			DeleteFunc: func(obj interface{}) {
-				lq.Notify()
+				live_query.NotifyChanged(ctx)
 			},
 		},
 	})
@@ -113,7 +116,10 @@ func (c *liveQueryCache) getInformerForListObject(ctx context.Context, list clie
 	return c.Cache.GetInformerForKind(ctx, gvk)
 }
 
-func (c *liveQueryCache) trackObjectList(ctx context.Context, lq *runtime.LiveQuery, list client.ObjectList) error {
+func (c *liveQueryCache) trackObjectList(ctx context.Context, list client.ObjectList) error {
+	if !live_query.IsLive(ctx) {
+		return nil
+	}
 	i, err := c.getInformerForListObject(ctx, list)
 	if err != nil {
 		return err
@@ -121,7 +127,7 @@ func (c *liveQueryCache) trackObjectList(ctx context.Context, lq *runtime.LiveQu
 	var r toolscache.ResourceEventHandlerRegistration
 	r, err = i.AddEventHandler(toolscache.FilteringResourceEventHandler{
 		FilterFunc: func(obj interface{}) bool {
-			if lq.IsDone() {
+			if live_query.IsLive(ctx) {
 				_ = i.RemoveEventHandler(r)
 				return false
 			}
@@ -129,13 +135,13 @@ func (c *liveQueryCache) trackObjectList(ctx context.Context, lq *runtime.LiveQu
 		},
 		Handler: toolscache.ResourceEventHandlerFuncs{
 			AddFunc: func(_ interface{}) {
-				lq.Notify()
+				live_query.NotifyChanged(ctx)
 			},
 			UpdateFunc: func(_, _ interface{}) {
-				lq.Notify()
+				live_query.NotifyChanged(ctx)
 			},
 			DeleteFunc: func(_ interface{}) {
-				lq.Notify()
+				live_query.NotifyChanged(ctx)
 			},
 		},
 	})
@@ -148,10 +154,7 @@ func (c *liveQueryCache) Get(ctx context.Context, key client.ObjectKey, obj clie
 	if err := c.Cache.Get(ctx, key, obj, opts...); err != nil {
 		return err
 	}
-	if lq := runtime.GetLiveQuery(ctx); lq != nil {
-		return c.trackObject(ctx, lq, obj)
-	}
-	return nil
+	return c.trackObject(ctx, obj)
 }
 
 // List implements cache.Cache. It wraps an underlying cache.Cache and sets up an Informer
@@ -160,8 +163,5 @@ func (c *liveQueryCache) List(ctx context.Context, list client.ObjectList, opts 
 	if err := c.Cache.List(ctx, list, opts...); err != nil {
 		return err
 	}
-	if lq := runtime.GetLiveQuery(ctx); lq != nil {
-		return c.trackObjectList(ctx, lq, list)
-	}
-	return nil
+	return c.trackObjectList(ctx, list)
 }

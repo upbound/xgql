@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/upbound/xgql/internal/graph/extensions/live_query/runtime"
+	"github.com/upbound/xgql/internal/graph/extensions/live_query"
 )
 
 func (ec *executionContext) __resolve_liveQuery(ctx context.Context, throttle *int) (<-chan graphql.Marshaler, error) {
@@ -15,7 +15,7 @@ func (ec *executionContext) __resolve_liveQuery(ctx context.Context, throttle *i
 	sel := graphql.GetFieldContext(ctx).Field.Selections
 	go func() {
 		defer close(out)
-		lqx, needsRefresh := runtime.WithLiveQuery(ctx)
+		lqx, needsRefresh := live_query.WithLiveQuery(ctx)
 		// resolve once with live query context.
 		out <- ec._Query(lqx, sel)
 		d := 200 * time.Millisecond
