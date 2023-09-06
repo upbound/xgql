@@ -17,6 +17,7 @@ package resolvers
 import (
 	"context"
 	"sort"
+	"sync"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/pkg/errors"
@@ -51,7 +52,7 @@ type query struct {
 }
 
 // Recursively collect `CrossplaneResourceTreeNode`s from the given KubernetesResource
-func (r *query) getAllDescendant(ctx context.Context, res model.KubernetesResource, parentID *model.ReferenceID) ([]model.CrossplaneResourceTreeNode, error) { //nolint:gocyclo
+func (r *query) getAllDescendant(ctx context.Context, res model.KubernetesResource, parentID *model.ReferenceID) []model.CrossplaneResourceTreeNode { //nolint:gocyclo
 	// This isn't _really_ that complex; it's a long but simple switch.
 
 	switch typedRes := res.(type) {
@@ -61,40 +62,53 @@ func (r *query) getAllDescendant(ctx context.Context, res model.KubernetesResour
 		compositeResolver := compositeResourceSpec{clients: r.clients}
 		resources, err := compositeResolver.Resources(ctx, &typedRes.Spec)
 		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
-			return nil, err
+			return nil
 		}
 
-		for _, childRes := range resources.Nodes {
-			childList, err := r.getAllDescendant(ctx, childRes, &typedRes.ID)
-			if err != nil || len(graphql.GetErrors(ctx)) > 0 {
-				return nil, err
-			}
+		// Collect all concurrently.
+		var (
+			wg sync.WaitGroup
+		)
+		childLists := make([][]model.CrossplaneResourceTreeNode, len(resources.Nodes))
+		for i, childRes := range resources.Nodes {
+			i, childRes := i, childRes // So we don't capture the loop variable.
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				childLists[i] = r.getAllDescendant(ctx, childRes, &typedRes.ID)
+			}()
+		}
+		wg.Wait()
 
+		if len(graphql.GetErrors(ctx)) > 0 {
+			return nil
+		}
+
+		for _, childList := range childLists {
 			list = append(list, childList...)
 		}
-
-		return list, nil
+		return list
 	case model.CompositeResourceClaim:
 		list := []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
 
 		claimResolver := compositeResourceClaimSpec{clients: r.clients}
 		composite, err := claimResolver.Resource(ctx, &typedRes.Spec)
 		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
-			return nil, err
+			return nil
 		}
 
 		if composite == nil {
-			return list, nil
+			return list
 		}
 
-		childList, err := r.getAllDescendant(ctx, *composite, &typedRes.ID)
+		childList := r.getAllDescendant(ctx, *composite, &typedRes.ID)
 		if err != nil || len(graphql.GetErrors(ctx)) > 0 {
-			return nil, err
+			return nil
 		}
 
-		return append(list, childList...), nil
+		return append(list, childList...)
 	default:
-		return []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}, nil
+		return []model.CrossplaneResourceTreeNode{{ParentID: parentID, Resource: typedRes}}
 	}
 }
 
@@ -107,9 +121,9 @@ func (r *query) CrossplaneResourceTree(ctx context.Context, id model.ReferenceID
 		return model.CrossplaneResourceTreeConnection{}, err
 	}
 
-	list, err := r.getAllDescendant(ctx, rootRes, nil)
-	if err != nil || len(graphql.GetErrors(ctx)) > 0 {
-		return model.CrossplaneResourceTreeConnection{}, err
+	list := r.getAllDescendant(ctx, rootRes, nil)
+	if len(graphql.GetErrors(ctx)) > 0 {
+		return model.CrossplaneResourceTreeConnection{}, nil
 	}
 
 	return model.CrossplaneResourceTreeConnection{Nodes: list, TotalCount: len(list)}, nil

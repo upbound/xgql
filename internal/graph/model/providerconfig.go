@@ -17,6 +17,7 @@ package model
 import (
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/upbound/xgql/internal/unstructured"
@@ -47,10 +48,12 @@ func GetProviderConfig(u *kunstructured.Unstructured) ProviderConfig {
 			Name:       pc.GetName(),
 		},
 
-		APIVersion:   pc.GetAPIVersion(),
-		Kind:         pc.GetKind(),
-		Metadata:     GetObjectMeta(pc),
-		Status:       GetProviderConfigStatus(pc),
-		Unstructured: bytesForUnstructured(u),
+		APIVersion: pc.GetAPIVersion(),
+		Kind:       pc.GetKind(),
+		Metadata:   GetObjectMeta(pc),
+		Status:     GetProviderConfigStatus(pc),
+		PavedAccess: PavedAccess{
+			Paved: fieldpath.Pave(u.Object),
+		},
 	}
 }

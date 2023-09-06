@@ -30,6 +30,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
@@ -163,7 +164,7 @@ func TestProviderRevisions(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.Revisions(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.pc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.pc, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.Revisions(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -307,7 +308,7 @@ func TestProviderActiveRevision(t *testing.T) {
 			if diff := cmp.Diff(tc.want.errs, errs, test.EquateErrors()); diff != "" {
 				t.Errorf("\n%s\nq.ActiveRevision(...): -want GraphQL errors, +got GraphQL errors:\n%s\n", tc.reason, diff)
 			}
-			if diff := cmp.Diff(tc.want.pr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{})); diff != "" {
+			if diff := cmp.Diff(tc.want.pr, got, cmpopts.IgnoreUnexported(model.ObjectMeta{}, fieldpath.Paved{})); diff != "" {
 				t.Errorf("\n%s\nq.ActiveRevision(...): -want, +got:\n%s\n", tc.reason, diff)
 			}
 		})
@@ -447,7 +448,7 @@ func TestProviderRevisionStatusObjects(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want.krc, got,
 				cmpopts.IgnoreUnexported(model.ObjectMeta{}),
-				cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "Unstructured"),
+				cmpopts.IgnoreFields(model.CustomResourceDefinition{}, "PavedAccess"),
 			); diff != "" {
 				t.Errorf("\n%s\ns.Objects(...): -want, +got:\n%s\n", tc.reason, diff)
 			}

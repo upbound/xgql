@@ -18,6 +18,7 @@ import (
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 
 	"github.com/upbound/xgql/internal/unstructured"
 )
@@ -79,7 +80,9 @@ func GetManagedResource(u *kunstructured.Unstructured) ManagedResource {
 			ProviderConfigRef:                GetProviderConfigReference(mg.GetProviderConfigReference()),
 			DeletionPolicy:                   GetDeletionPolicy(mg.GetDeletionPolicy()),
 		},
-		Status:       GetManagedResourceStatus(mg),
-		Unstructured: bytesForUnstructured(u),
+		Status: GetManagedResourceStatus(mg),
+		PavedAccess: PavedAccess{
+			Paved: fieldpath.Pave(u.Object),
+		},
 	}
 }

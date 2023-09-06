@@ -42,11 +42,13 @@ func GetEvent(e *corev1.Event) Event {
 			Namespace:  e.GetNamespace(),
 			Name:       e.GetName(),
 		},
-		APIVersion:        e.APIVersion,
-		Kind:              e.Kind,
-		Metadata:          GetObjectMeta(e),
-		Type:              GetEventType(e.Type),
-		Unstructured:      unstruct(e),
+		APIVersion: e.APIVersion,
+		Kind:       e.Kind,
+		Metadata:   GetObjectMeta(e),
+		Type:       GetEventType(e.Type),
+		PavedAccess: PavedAccess{
+			Paved: paveObject(e),
+		},
 		InvolvedObjectRef: e.InvolvedObject,
 	}
 

@@ -19,7 +19,7 @@
 // https://github.com/golang/go/wiki/Modules#how-can-i-track-tool-dependencies-for-a-module
 
 // Generate xgql models, bindings, etc per gqlgen.yaml.
-//go:generate go run -tags generate github.com/99designs/gqlgen
+//go:generate go run -tags generate ./graph/generate/gqlgen
 
 // Add license headers to all files.
 //go:generate go run -tags generate github.com/google/addlicense -v -c "Upbound Inc" . ../cmd
