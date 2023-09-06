@@ -26,15 +26,19 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/plugin"
 	"github.com/vektah/gqlparser/v2/ast"
-	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 const (
-	extName          = "LiveQuery"
-	fieldName        = "liveQuery"
-	typeQuery        = "Query"
+	// extName is the name of the extension
+	extName = "LiveQuery"
+	// fieldName is the field name exposing live queries.
+	fieldName = "liveQuery"
+	// typeQuery is the schema type that will be made subscribeable.
+	typeQuery = "Query"
+	// typeSubscription is the schema type that will expose "liveQuery" field.
 	typeSubscription = "Subscription"
-	argThrottle      = "throttle"
+	// argThrottle is the name of the "trottle" argument for the "liveQuery" field.
+	argThrottle = "throttle"
 )
 
 // LiveQuery is a graphql.HandlerExtension that enables live queries.
@@ -53,11 +57,14 @@ var _ interface {
 	graphql.OperationInterceptor
 } = LiveQuery{}
 
+// Name implements plugin.Plugin.
 func (LiveQuery) Name() string {
 	return extName
 }
 
+// MutateConfig implements plugin.ConfigMutator
 func (LiveQuery) MutateConfig(cfg *config.Config) error {
+	// make Query type resolveable as graphql.Marshaler.
 	builtins := config.TypeMap{
 		typeQuery: {
 			Model: config.StringList{
@@ -66,11 +73,12 @@ func (LiveQuery) MutateConfig(cfg *config.Config) error {
 		},
 	}
 
-	for typeName, entry := range builtins {
+	for typeName, typeEntry := range builtins {
+		// TODO(avalanche123): extend query type models list if already exists.
 		if cfg.Models.Exists(typeName) {
 			return fmt.Errorf("%v already exists which must be reserved when LiveQuery is enabled", typeName)
 		}
-		cfg.Models[typeName] = entry
+		cfg.Models[typeName] = typeEntry
 	}
 
 	return nil
@@ -79,6 +87,7 @@ func (LiveQuery) MutateConfig(cfg *config.Config) error {
 //go:embed resolve_live_query.gotpl
 var liveQueryTemplate string
 
+// GenerateCode implements plugin.CodeGenerator.
 func (LiveQuery) GenerateCode(cfg *codegen.Data) error {
 	for _, object := range cfg.Objects {
 		if object.Name != typeSubscription {
@@ -108,25 +117,25 @@ func (LiveQuery) GenerateCode(cfg *codegen.Data) error {
 	return nil
 }
 
+// InjectSourceLate implements plugin.LateSourceInjector.
 func (LiveQuery) InjectSourceLate(schema *ast.Schema) *ast.Source {
 	if schema.Query == nil {
 		return nil
 	}
-
-	subscriptionDefinition := `type Subscription {
-	"""
-	A live query that is updated when the underlying data changes.
-	First, the initial data is sent.
-	Then, once the underlying data changes, the "patches" extension is updated with a list of patches to apply to the data.
-	"""
-	liveQuery(
+	// subscriptionDefinition is the subscription type with a "liveQuery" field.
+	subscriptionDefinition := `type ` + typeSubscription + ` {
 		"""
-		Propose a desired throttle interval ot the server to receive updates to at most once per \"throttle\" milliseconds.
+		A live query that is updated when the underlying data changes.
+		First, the initial data is sent.
+		Then, once the underlying data changes, the "patches" extension is updated with a list of patches to apply to the data.
 		"""
-		throttle: Int = 200
-	): Query
-}`
-
+		` + fieldName + `(
+			"""
+			Propose a desired throttle interval ot the server to receive updates to at most once per \"throttle\" milliseconds.
+			"""
+			` + argThrottle + `: Int = 200
+		): ` + typeQuery + `
+	}`
 	if schema.Subscription != nil {
 		subscriptionDefinition = `extend ` + subscriptionDefinition
 	}
@@ -136,10 +145,12 @@ func (LiveQuery) InjectSourceLate(schema *ast.Schema) *ast.Source {
 	}
 }
 
+// ExtensionName implements graphql.HandlerExtension
 func (LiveQuery) ExtensionName() string {
 	return extName
 }
 
+// Validate implements graphql.HandlerExtension
 func (l LiveQuery) Validate(s graphql.ExecutableSchema) error {
 	subscriptionType, ok := s.Schema().Types[typeSubscription]
 	if !ok {
@@ -160,6 +171,12 @@ func (l LiveQuery) Validate(s graphql.ExecutableSchema) error {
 	return nil
 }
 
+type patch struct {
+	Revision  int         `json:"revision"`
+	JSONPatch []Operation `json:"jsonPatch,omitempty"`
+}
+
+// InterceptOperation implements graphql.OperationInterceptor
 func (l LiveQuery) InterceptOperation(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
 	oc := graphql.GetOperationContext(ctx)
 	if oc.Operation.Operation != ast.Subscription {
@@ -176,8 +193,8 @@ func (l LiveQuery) InterceptOperation(ctx context.Context, next graphql.Operatio
 	ctx, cancel := context.WithCancel(ctx)
 	handler := next(ctx)
 	var (
-		prevResponse bytes.Buffer
-		revision     int
+		prevData bytes.Buffer
+		revision int
 	)
 	return func(ctx context.Context) *graphql.Response {
 		for {
@@ -186,24 +203,29 @@ func (l LiveQuery) InterceptOperation(ctx context.Context, next graphql.Operatio
 				cancel()
 				return nil
 			}
-			if prevResponse.Len() == 0 {
-				revision++
-				_, _ = prevResponse.Write(resp.Data)
-				return resp
+			data := resp.Data
+			// Compare new data with previous response.
+			if prevData.Len() > 0 {
+				diff, err := CreateJSONPatch(prevData.Bytes(), resp.Data)
+				if err != nil {
+					cancel()
+					panic(err)
+				}
+				// response is the same, skip it.
+				if len(diff) == 0 {
+					continue
+				}
+				// reset data and add patch extension.
+				resp.Data = nil
+				resp.Extensions["patch"] = patch{
+					Revision:  revision,
+					JSONPatch: diff,
+				}
 			}
-
-			diff, err := CreateJSONPatch(prevResponse.Bytes(), resp.Data)
-			if err != nil {
-				resp.Errors = append(resp.Errors, gqlerror.Wrap(err))
-				return nil
-			}
-			if diff == nil {
-				continue
-			}
-			prevResponse.Reset()
-			_, _ = prevResponse.Write(resp.Data)
-			resp.Data = nil
-			resp.Extensions["patch"] = diff
+			revision++
+			// keep current data as previous response.
+			prevData.Reset()
+			_, _ = prevData.Write(data)
 			return resp
 		}
 	}

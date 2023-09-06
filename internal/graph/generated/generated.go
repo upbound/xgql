@@ -7117,18 +7117,18 @@ type CompositionConnection {
 }
 `, BuiltIn: false},
 	{Name: "../../../live_query/live_query.graphql", Input: `type Subscription {
-	"""
-	A live query that is updated when the underlying data changes.
-	First, the initial data is sent.
-	Then, once the underlying data changes, the "patches" extension is updated with a list of patches to apply to the data.
-	"""
-	liveQuery(
 		"""
-		Propose a desired throttle interval ot the server to receive updates to at most once per \"throttle\" milliseconds.
+		A live query that is updated when the underlying data changes.
+		First, the initial data is sent.
+		Then, once the underlying data changes, the "patches" extension is updated with a list of patches to apply to the data.
 		"""
-		throttle: Int = 200
-	): Query
-}`, BuiltIn: false},
+		liveQuery(
+			"""
+			Propose a desired throttle interval ot the server to receive updates to at most once per \"throttle\" milliseconds.
+			"""
+			throttle: Int = 200
+		): Query
+	}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 

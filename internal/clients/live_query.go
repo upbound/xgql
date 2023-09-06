@@ -30,6 +30,8 @@ import (
 	"github.com/upbound/xgql/internal/graph/extensions/live_query/runtime"
 )
 
+// WithLiveQueries wraps NewCacheFn with a cache.Cache that tracks objects and lists
+// and notifies the live query in request context of changes.
 func WithLiveQueries(fn NewCacheFn) NewCacheFn {
 	return func(cfg *rest.Config, o cache.Options) (cache.Cache, error) {
 		c, err := fn(cfg, o)

@@ -28,14 +28,14 @@ import (
 type Op string
 
 const (
-	// OpAdd contains "path" and "value" members.
-	OpAdd Op = "add"
-	// OpRemove contains "path" member.
-	OpRemove Op = "remove"
-	// OpReplace contains "path" and "value" members.
-	OpReplace Op = "replace"
-	// OpMove contains "path" and "from" members.
-	OpMove Op = "move"
+	// Add contains "path" and "value" members.
+	Add Op = "add"
+	// Remove contains "path" member.
+	Remove Op = "remove"
+	// Replace contains "path" and "value" members.
+	Replace Op = "replace"
+	// Move contains "path" and "from" members.
+	Move Op = "move"
 )
 
 // Operation is a single JSON Patch operation.
@@ -71,20 +71,23 @@ func (r *JSONPatchReporter) Report(rs cmp.Result) {
 	switch s := ps.(type) {
 	case cmp.MapIndex, cmp.TypeAssertion:
 		switch {
+		// value did not exist.
 		case !vx.IsValid():
 			op = Operation{
-				Op:    OpAdd,
+				Op:    Add,
 				Path:  pathAsJSONPointer(r.path),
 				Value: vy.Interface(),
 			}
+		// value does not exist.
 		case !vy.IsValid():
 			op = Operation{
-				Op:   OpRemove,
+				Op:   Remove,
 				Path: pathAsJSONPointer(r.path),
 			}
+		// value replaced.
 		default:
 			op = Operation{
-				Op:    OpReplace,
+				Op:    Replace,
 				Path:  pathAsJSONPointer(r.path),
 				Value: vy.Interface(),
 			}
@@ -95,27 +98,27 @@ func (r *JSONPatchReporter) Report(rs cmp.Result) {
 		// value was updated.
 		case kx == ky:
 			op = Operation{
-				Op:    OpReplace,
+				Op:    Replace,
 				Path:  pathAsJSONPointer(r.path),
 				Value: vy.Interface(),
 			}
 		// value did not exist before.
 		case kx == -1:
 			op = Operation{
-				Op:    OpAdd,
+				Op:    Add,
 				Path:  pathAsJSONPointer(r.path[:len(r.path)-1]) + "/" + strconv.Itoa(ky),
 				Value: vy.Interface(),
 			}
 		// value was removed.
 		case ky == -1:
 			op = Operation{
-				Op:   OpRemove,
+				Op:   Remove,
 				Path: pathAsJSONPointer(r.path[:len(r.path)-1]) + "/" + strconv.Itoa(kx),
 			}
 		// value was moved.
 		default:
 			op = Operation{
-				Op:   OpMove,
+				Op:   Move,
 				Path: pathAsJSONPointer(r.path[:len(r.path)-1]) + "/" + strconv.Itoa(ky),
 				From: pathAsJSONPointer(r.path[:len(r.path)-1]) + "/" + strconv.Itoa(kx),
 			}
@@ -162,7 +165,7 @@ func assert(ok bool) {
 	}
 }
 
-func parseJSON(in []byte) (out interface{}) {
+func parseJSON(in []byte) (out any) {
 	if err := json.Unmarshal(in, &out); err != nil {
 		panic(err) // should never occur given previous filter to ensure valid JSON
 	}
@@ -174,7 +177,7 @@ func CreateJSONPatch(x, y []byte) ([]Operation, error) {
 		return nil, fmt.Errorf("invalid JSON")
 	}
 	r := &JSONPatchReporter{}
-	if cmp.Equal(x, y, cmp.Transformer("ParseJSON", parseJSON), cmp.Reporter(r)) {
+	if cmp.Equal(parseJSON(x), parseJSON(y), cmp.Reporter(r)) {
 		return nil, nil
 	}
 	return r.GetPatch(), nil
