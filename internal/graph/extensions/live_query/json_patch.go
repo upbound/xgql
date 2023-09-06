@@ -172,6 +172,7 @@ func parseJSON(in []byte) (out any) {
 	return out
 }
 
+// CreateJSONPatch creates a JSON patch between two json values.
 func CreateJSONPatch(x, y []byte) ([]Operation, error) {
 	if !json.Valid(x) || !json.Valid(y) {
 		return nil, fmt.Errorf("invalid JSON")

@@ -142,6 +142,8 @@ func (c *liveQueryCache) trackObjectList(ctx context.Context, lq *runtime.LiveQu
 	return err
 }
 
+// Get implements cache.Cache. It wraps an underlying cache.Cache and sets up an Informer
+// event handler that marks current live query as dirty if the current context has a live query.
 func (c *liveQueryCache) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
 	if err := c.Cache.Get(ctx, key, obj, opts...); err != nil {
 		return err
@@ -152,6 +154,8 @@ func (c *liveQueryCache) Get(ctx context.Context, key client.ObjectKey, obj clie
 	return nil
 }
 
+// List implements cache.Cache. It wraps an underlying cache.Cache and sets up an Informer
+// event handler that marks current live query as dirty if the current context has a live query.
 func (c *liveQueryCache) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
 	if err := c.Cache.List(ctx, list, opts...); err != nil {
 		return err

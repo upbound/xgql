@@ -25,25 +25,40 @@ import (
 type QueryResolveFn func(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler
 type CancelFn func()
 
+// LiveQuery is set in context in generated liveQuery resolver.
+// Resolvers that need to refresh the query can use GetLiveQuery() to
+// check if the current response is a live query.
+// They can then use LiveQuery.IsDone() and LiveQuery.Notify() to
+// check if the live query is still running and trigger a live query refresh
+// accordingly.
 type LiveQuery struct {
 	ctx     context.Context
 	isDirty uint32
 }
 
+// IsDone returns true if live query finished. This is useful for stopping
+// async listeners for discarded queries.
 func (l *LiveQuery) IsDone() bool {
 	return l.ctx.Err() != nil
 }
 
+// Notify marks live query as dirty, triggering a live query refresh on next
+// throttle interval.
 func (l *LiveQuery) Notify() {
 	atomic.StoreUint32(&l.isDirty, 1)
 }
 
+// NeedsRefresh is a func that can be used to check if live query needs to be
+// refreshed. It is used in generated live query resolver.
 type NeedsRefresh func() bool
 
 type liveQueryKey struct{}
 
 var liveQueryCtxKey = liveQueryKey{}
 
+// WithLiveQuery sets LiveQuery on derived context and returns a callable for
+// checking if live query needs to be refreshed. This is used in generated
+// live query resolver to set up periodic live query refresh if changes occurred.
 func WithLiveQuery(ctx context.Context) (context.Context, NeedsRefresh) {
 	lq := &LiveQuery{ctx: ctx}
 	return context.WithValue(ctx, liveQueryCtxKey, lq), func() bool {
@@ -51,6 +66,7 @@ func WithLiveQuery(ctx context.Context) (context.Context, NeedsRefresh) {
 	}
 }
 
+// GetLiveQuery returns live query from context or nil if isn't set.
 func GetLiveQuery(ctx context.Context) *LiveQuery {
 	if lq, ok := ctx.Value(liveQueryCtxKey).(*LiveQuery); ok {
 		return lq
