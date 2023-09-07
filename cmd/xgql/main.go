@@ -51,6 +51,7 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -61,6 +62,7 @@ import (
 	"github.com/upbound/xgql/internal"
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/clients"
+	"github.com/upbound/xgql/internal/graph/extensions/live_query"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/present"
 	"github.com/upbound/xgql/internal/graph/resolvers"
@@ -91,10 +93,6 @@ var noCache = []client.Object{
 	&appsv1.DaemonSet{},
 	&rbacv1.RoleBinding{},
 	&rbacv1.ClusterRoleBinding{},
-
-	// We don't cache secrets because there's a high risk that the caller won't
-	// have access to list and watch secrets across all namespaces.
-	&corev1.Secret{},
 }
 
 func main() {
@@ -186,6 +184,9 @@ func main() {
 	cfg, err := clients.Config()
 	kingpin.FatalIfError(err, "cannot create client config")
 
+	httpClient, err := rest.HTTPClientFor(cfg)
+	kingpin.FatalIfError(err, "cannot create HTTP client")
+
 	// Our Kubernetes clients need to know what REST API resources are offered
 	// by the API server. The discovery process takes a few ms and makes many
 	// API server calls. Kubernetes allows any authenticated user to access the
@@ -193,21 +194,25 @@ func main() {
 	// a global REST mapper using our own credentials for all clients to share.
 	// Discovery happens once at startup, and then once any time a client asks
 	// for an unknown kind of API resource (subject to caching/rate limiting).
-	rm, err := clients.RESTMapper(cfg)
+	rm, err := clients.RESTMapper(cfg, httpClient)
 	kingpin.FatalIfError(err, "cannot create REST mapper")
 
 	ca := clients.NewCache(s,
 		clients.Anonymize(cfg),
+		clients.WithHTTPClient(httpClient),
 		clients.WithRESTMapper(rm),
 		clients.DoNotCache(noCache),
 		clients.WithLogger(log),
 		clients.WithExpiry(*cacheExpiry),
+		clients.UseNewCacheMiddleware(clients.WithLiveQueries),
 	)
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
 	srv.SetErrorPresenter(present.Error)
 	srv.Use(opentelemetry.MetricEmitter{})
 	srv.Use(opentelemetry.Tracer{})
 	srv.Use(apollotracing.Tracer{})
+	srv.Use(live_query.LiveQuery{})
+	srv.AroundOperations(auth.OperationMiddleware)
 
 	rt.Handle("/query", otelhttp.NewHandler(srv, "/query"))
 	rt.Handle("/metrics", promhttp.Handler())

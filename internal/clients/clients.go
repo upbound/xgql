@@ -19,13 +19,14 @@ import (
 	"context"
 	"crypto/rand"
 	"io"
+	"net/http"
 	"sync"
 	"time"
 
 	"github.com/pkg/errors"
-	"golang.org/x/time/rate"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -50,6 +51,10 @@ type NewCacheFn func(cfg *rest.Config, o cache.Options) (cache.Cache, error)
 
 // A NewClientFn creates a new controller-runtime client.
 type NewClientFn func(cfg *rest.Config, o client.Options) (client.Client, error)
+
+// A NewCacheMiddlewareFn can be used to wrap a new cache function with
+// middleware.
+type NewCacheMiddlewareFn func(NewCacheFn) NewCacheFn
 
 // The default new cache and new controller functions.
 var (
@@ -79,12 +84,12 @@ func Config() (*rest.Config, error) {
 // discovery process may burst up to 100 API server requests per second, and
 // average 20 requests per second. Rediscovery may not happen more frequently
 // than once every 20 seconds.
-func RESTMapper(cfg *rest.Config) (meta.RESTMapper, error) {
+func RESTMapper(cfg *rest.Config, httpClient *http.Client) (meta.RESTMapper, error) {
 	dcfg := rest.CopyConfig(cfg)
 	dcfg.QPS = 50
 	dcfg.Burst = 300
 
-	return apiutil.NewDynamicRESTMapper(dcfg, apiutil.WithLimiter(rate.NewLimiter(rate.Limit(0.05), 1)))
+	return apiutil.NewDynamicRESTMapper(dcfg, httpClient)
 }
 
 // Anonymize the supplied config by returning a copy with all authentication
@@ -114,11 +119,12 @@ type Cache struct {
 	active map[string]*session
 	mx     sync.RWMutex
 
-	cfg     *rest.Config
-	scheme  *runtime.Scheme
-	mapper  meta.RESTMapper
-	nocache []client.Object
-	expiry  time.Duration
+	cfg        *rest.Config
+	httpClient *http.Client
+	scheme     *runtime.Scheme
+	mapper     meta.RESTMapper
+	nocache    []client.Object
+	expiry     time.Duration
 
 	newCache  NewCacheFn
 	newClient NewClientFn
@@ -146,6 +152,14 @@ func WithRESTMapper(m meta.RESTMapper) CacheOption {
 	}
 }
 
+// WithHTTPClient configures the HTTP client used by cached clients. A client
+// is created for each new client by default.
+func WithHTTPClient(hc *http.Client) CacheOption {
+	return func(c *Cache) {
+		c.httpClient = hc
+	}
+}
+
 // WithExpiry configures the duration until each client expires. Each time any
 // of a client's methods are called the expiry time is reset to this value. When
 // a client expires its cache will be garbage collected.
@@ -162,6 +176,17 @@ func WithExpiry(d time.Duration) CacheOption {
 func DoNotCache(o []client.Object) CacheOption {
 	return func(c *Cache) {
 		c.nocache = o
+	}
+}
+
+// UseNewCacheMiddleware configures the cache to use the supplied middleware
+// functions when creating new caches. This can be used to wrap the cache's
+// default new cache function with additional functionality.
+func UseNewCacheMiddleware(fns ...NewCacheMiddlewareFn) CacheOption {
+	return func(c *Cache) {
+		for _, fn := range fns {
+			c.newCache = fn(c.newCache)
+		}
 	}
 }
 
@@ -237,31 +262,36 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	started := time.Now()
 	cfg := cr.Inject(c.cfg)
 
-	wc, err := c.newClient(cfg, client.Options{Scheme: c.scheme, Mapper: c.mapper})
-	if err != nil {
-		return nil, errors.Wrap(err, errNewClient)
+	caopt := cache.Options{
+		HTTPClient: c.httpClient,
+		Scheme:     c.scheme,
+		Mapper:     c.mapper,
 	}
-
-	ca, err := c.newCache(cfg, cache.Options{Scheme: c.scheme, Mapper: c.mapper, Namespace: opts.Namespace})
+	if opts.Namespace != "" {
+		caopt.Namespaces = []string{opts.Namespace}
+	}
+	ca, err := c.newCache(cfg, caopt)
 	if err != nil {
 		return nil, errors.Wrap(err, errNewCache)
 	}
 
-	dci := client.NewDelegatingClientInput{
-		CacheReader:     ca,
-		Client:          wc,
-		UncachedObjects: c.nocache,
-
-		// TODO(negz): Don't cache unstructured objects? Doing so allows us to
-		// cache object types that aren't known at build time, like managed
-		// resources and composite resources. On the other hand it could lead to
-		// the cache starting a watch on any kind of resource it encounters,
-		// e.g. arbitrary owner references.
-		CacheUnstructured: true,
-	}
-	dc, err := client.NewDelegatingClient(dci)
+	wc, err := c.newClient(cfg, client.Options{
+		HTTPClient: c.httpClient,
+		Scheme:     c.scheme,
+		Mapper:     c.mapper,
+		Cache: &client.CacheOptions{
+			Reader:     ca,
+			DisableFor: c.nocache,
+			// TODO(negz): Don't cache unstructured objects? Doing so allows us to
+			// cache object types that aren't known at build time, like managed
+			// resources and composite resources. On the other hand it could lead to
+			// the cache starting a watch on any kind of resource it encounters,
+			// e.g. arbitrary owner references.
+			Unstructured: true,
+		},
+	})
 	if err != nil {
-		return nil, errors.Wrap(err, errDelegClient)
+		return nil, errors.Wrap(err, errNewClient)
 	}
 
 	// We use a distinct s.expiry ticker rather than a context deadline or timeout
@@ -270,7 +300,7 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	expiration := &tickerExpiration{t: time.NewTicker(c.expiry)}
 	newExpiry := time.Now().Add(c.expiry)
 	ctx, cancel := context.WithCancel(context.Background())
-	sn = &session{client: dc, cancel: cancel, expiry: c.expiry, expiration: expiration, log: log}
+	sn = &session{client: wc, cancel: cancel, expiry: c.expiry, expiration: expiration, log: log}
 
 	c.mx.Lock()
 	c.active[id] = sn
@@ -470,4 +500,14 @@ func (s *session) RESTMapper() meta.RESTMapper {
 // SubResource returns the underlying client's SubResource client, unwrapped.
 func (s *session) SubResource(subResource string) client.SubResourceClient {
 	return s.client.SubResource(subResource)
+}
+
+// GroupVersionKindFor returne the underlying client's GroupVersionKindFor.
+func (s *session) GroupVersionKindFor(obj runtime.Object) (schema.GroupVersionKind, error) {
+	return s.client.GroupVersionKindFor(obj)
+}
+
+// IsObjectNamespaced returne the underlying client's IsObjectNamespaced.
+func (s *session) IsObjectNamespaced(obj runtime.Object) (bool, error) {
+	return s.client.IsObjectNamespaced(obj)
 }

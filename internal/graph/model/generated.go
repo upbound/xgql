@@ -638,7 +638,7 @@ type ConfigMap struct {
 	// Metadata that is common to all Kubernetes API resources.
 	Metadata ObjectMeta `json:"metadata"`
 	// The data stored in this config map.
-	data map[string]string `json:"data,omitempty"`
+	data map[string]string `json:"-"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	SkipUnstructured `json:"unstructured"`
 	// A JSON representation of a field within the underlying Kubernetes resource.
@@ -2092,7 +2092,7 @@ type Secret struct {
 	// Type of this secret.
 	Type *string `json:"type,omitempty"`
 	// The data stored in this secret. Values are not base64 encoded.
-	data map[string]string `json:"data,omitempty"`
+	data map[string]string `json:"-"`
 	// An unstructured JSON representation of the underlying Kubernetes resource.
 	SkipUnstructured `json:"unstructured"`
 	// A JSON representation of a field within the underlying Kubernetes resource.
