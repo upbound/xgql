@@ -226,7 +226,7 @@ func ForNamespace(n string) GetOption {
 }
 
 // Get a client that uses the specified bearer token.
-func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) {
+func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) { //nolint:gocyclo
 	opts := &getOptions{}
 	for _, fn := range o {
 		fn(opts)
@@ -257,6 +257,7 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	if err != nil {
 		return nil, errors.Wrap(err, errNewHTTPClient)
 	}
+
 	caopt := cache.Options{
 		HTTPClient: hc,
 		Scheme:     c.scheme,
@@ -298,6 +299,12 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	sn = &session{client: wc, cancel: cancel, expiry: c.expiry, expiration: expiration, log: log}
 
 	c.mx.Lock()
+	// another gorouting might have set the session.
+	if sn, ok := c.active[id]; ok {
+		c.mx.Unlock()
+		log.Debug("Used existing client")
+		return sn, nil
+	}
 	c.active[id] = sn
 	c.mx.Unlock()
 
