@@ -42,6 +42,7 @@ import (
 const (
 	errNewClient        = "cannot create new write client"
 	errNewCache         = "cannot create new read cache"
+	errNewHTTPClient    = "cannot create new HTTP client"
 	errDelegClient      = "cannot create cache-backed client"
 	errWaitForCacheSync = "cannot sync client cache"
 )
@@ -119,12 +120,11 @@ type Cache struct {
 	active map[string]*session
 	mx     sync.RWMutex
 
-	cfg        *rest.Config
-	httpClient *http.Client
-	scheme     *runtime.Scheme
-	mapper     meta.RESTMapper
-	nocache    []client.Object
-	expiry     time.Duration
+	cfg     *rest.Config
+	scheme  *runtime.Scheme
+	mapper  meta.RESTMapper
+	nocache []client.Object
+	expiry  time.Duration
 
 	newCache  NewCacheFn
 	newClient NewClientFn
@@ -149,14 +149,6 @@ func WithLogger(l logging.Logger) CacheOption {
 func WithRESTMapper(m meta.RESTMapper) CacheOption {
 	return func(c *Cache) {
 		c.mapper = m
-	}
-}
-
-// WithHTTPClient configures the HTTP client used by cached clients. A client
-// is created for each new client by default.
-func WithHTTPClient(hc *http.Client) CacheOption {
-	return func(c *Cache) {
-		c.httpClient = hc
 	}
 }
 
@@ -234,7 +226,7 @@ func ForNamespace(n string) GetOption {
 }
 
 // Get a client that uses the specified bearer token.
-func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) {
+func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) { //nolint:gocyclo
 	opts := &getOptions{}
 	for _, fn := range o {
 		fn(opts)
@@ -261,9 +253,13 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 
 	started := time.Now()
 	cfg := cr.Inject(c.cfg)
+	hc, err := rest.HTTPClientFor(cfg)
+	if err != nil {
+		return nil, errors.Wrap(err, errNewHTTPClient)
+	}
 
 	caopt := cache.Options{
-		HTTPClient: c.httpClient,
+		HTTPClient: hc,
 		Scheme:     c.scheme,
 		Mapper:     c.mapper,
 	}
@@ -276,7 +272,7 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	}
 
 	wc, err := c.newClient(cfg, client.Options{
-		HTTPClient: c.httpClient,
+		HTTPClient: hc,
 		Scheme:     c.scheme,
 		Mapper:     c.mapper,
 		Cache: &client.CacheOptions{
@@ -303,6 +299,12 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	sn = &session{client: wc, cancel: cancel, expiry: c.expiry, expiration: expiration, log: log}
 
 	c.mx.Lock()
+	// another gorouting might have set the session.
+	if sn, ok := c.active[id]; ok {
+		c.mx.Unlock()
+		log.Debug("Used existing client")
+		return sn, nil
+	}
 	c.active[id] = sn
 	c.mx.Unlock()
 

@@ -31,6 +31,9 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/apollotracing"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/lru"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	google "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"github.com/go-chi/chi/v5"
@@ -199,14 +202,28 @@ func main() {
 
 	ca := clients.NewCache(s,
 		clients.Anonymize(cfg),
-		clients.WithHTTPClient(httpClient),
 		clients.WithRESTMapper(rm),
 		clients.DoNotCache(noCache),
 		clients.WithLogger(log),
 		clients.WithExpiry(*cacheExpiry),
 		clients.UseNewCacheMiddleware(clients.WithLiveQueries),
 	)
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
+	srv := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
+
+	srv.AddTransport(transport.Websocket{
+		PingPongInterval: 10 * time.Second,
+	})
+	srv.AddTransport(transport.Options{})
+	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{})
+
+	srv.SetQueryCache(lru.New(1000))
+
+	srv.Use(extension.Introspection{})
+	srv.Use(extension.AutomaticPersistedQuery{
+		Cache: lru.New(100),
+	})
 	srv.SetErrorPresenter(present.Error)
 	srv.Use(opentelemetry.MetricEmitter{})
 	srv.Use(opentelemetry.Tracer{})
