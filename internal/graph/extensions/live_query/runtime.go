@@ -16,6 +16,7 @@ package live_query
 
 import (
 	"context"
+	"sync"
 	"sync/atomic"
 )
 
@@ -26,6 +27,9 @@ import (
 type liveQuery struct {
 	doneCh     <-chan struct{}
 	hasChanges uint32
+
+	mu   sync.Mutex
+	cond *sync.Cond
 }
 
 // HasChangesFn is a func that can be used to check if live query needs to be
@@ -41,8 +45,17 @@ var liveQueryCtxKey = liveQueryKey{}
 // live query resolver to set up periodic live query refresh if changes occurred.
 func WithLiveQuery(ctx context.Context) (context.Context, HasChangesFn) {
 	lq := &liveQuery{doneCh: ctx.Done()}
+	lq.cond = sync.NewCond(&lq.mu)
 	return context.WithValue(ctx, liveQueryCtxKey, lq), func() bool {
-		return atomic.CompareAndSwapUint32(&lq.hasChanges, 1, 0)
+		if atomic.CompareAndSwapUint32(&lq.hasChanges, 1, 0) {
+			return true
+		}
+		lq.mu.Lock()
+		defer lq.mu.Unlock()
+		for !atomic.CompareAndSwapUint32(&lq.hasChanges, 1, 0) {
+			lq.cond.Wait()
+		}
+		return true
 	}
 }
 
@@ -63,5 +76,6 @@ func IsLive(ctx context.Context) bool {
 func NotifyChanged(ctx context.Context) {
 	if lq, ok := ctx.Value(liveQueryCtxKey).(*liveQuery); ok {
 		atomic.StoreUint32(&lq.hasChanges, 1)
+		lq.cond.Broadcast()
 	}
 }

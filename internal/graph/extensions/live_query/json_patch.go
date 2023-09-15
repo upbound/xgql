@@ -40,10 +40,10 @@ const (
 
 // Operation is a single JSON Patch operation.
 type Operation struct {
-	Op    Op          `json:"op"`
-	Path  string      `json:"path"`
-	From  string      `json:"from,omitempty"`
-	Value interface{} `json:"value,omitempty"`
+	Op    Op     `json:"op"`
+	Path  string `json:"path"`
+	From  string `json:"from,omitempty"`
+	Value any    `json:"value,omitempty"`
 }
 
 // JSONPatchReporter is a simple custom reporter that records the operations needed to
@@ -51,6 +51,8 @@ type Operation struct {
 type JSONPatchReporter struct {
 	path  cmp.Path
 	patch []Operation
+
+	moved map[string]string
 }
 
 // PushStep implements cmp.Reporter.
@@ -67,66 +69,41 @@ func (r *JSONPatchReporter) Report(rs cmp.Result) {
 	assert(len(r.path) > 0)
 	ps := r.path.Last()
 	vx, vy := ps.Values()
-	var op Operation
 	switch s := ps.(type) {
 	case cmp.MapIndex, cmp.TypeAssertion:
 		switch {
 		// value did not exist.
 		case !vx.IsValid():
-			op = Operation{
-				Op:    Add,
-				Path:  pathAsJSONPointer(r.path),
-				Value: vy.Interface(),
-			}
+			r.op(Add, r.toJSONPointer(r.path), vy.Interface(), "")
 		// value does not exist.
 		case !vy.IsValid():
-			op = Operation{
-				Op:   Remove,
-				Path: pathAsJSONPointer(r.path),
-			}
+			r.op(Remove, r.toJSONPointer(r.path), nil, "")
 		// value replaced.
 		default:
-			op = Operation{
-				Op:    Replace,
-				Path:  pathAsJSONPointer(r.path),
-				Value: vy.Interface(),
-			}
+			r.op(Replace, r.toJSONPointer(r.path), vy.Interface(), "")
 		}
 	case cmp.SliceIndex:
 		kx, ky := s.SplitKeys()
 		switch {
 		// value was updated.
 		case kx == ky:
-			op = Operation{
-				Op:    Replace,
-				Path:  pathAsJSONPointer(r.path),
-				Value: vy.Interface(),
-			}
+			r.op(Replace, r.toJSONPointer(r.path), vy.Interface(), "")
 		// value did not exist before.
 		case kx == -1:
-			op = Operation{
-				Op:    Add,
-				Path:  pathAsJSONPointer(r.path[:len(r.path)-1]) + "/" + strconv.Itoa(ky),
-				Value: vy.Interface(),
-			}
+			r.op(Add, r.toJSONPointer(r.path[:len(r.path)-1])+"/"+strconv.Itoa(ky), vy.Interface(), "")
 		// value was removed.
 		case ky == -1:
-			op = Operation{
-				Op:   Remove,
-				Path: pathAsJSONPointer(r.path[:len(r.path)-1]) + "/" + strconv.Itoa(kx),
-			}
+			r.op(Remove, r.toJSONPointer(r.path[:len(r.path)-1])+"/"+strconv.Itoa(kx), nil, "")
 		// value was moved.
 		default:
-			op = Operation{
-				Op:   Move,
-				Path: pathAsJSONPointer(r.path[:len(r.path)-1]) + "/" + strconv.Itoa(ky),
-				From: pathAsJSONPointer(r.path[:len(r.path)-1]) + "/" + strconv.Itoa(kx),
-			}
+			r.move(
+				r.toJSONPointer(r.path[:len(r.path)-1])+"/"+strconv.Itoa(kx),
+				r.toJSONPointer(r.path[:len(r.path)-1])+"/"+strconv.Itoa(kx),
+			)
 		}
 	default:
 		panic(fmt.Sprintf("unknown path step type %T", s))
 	}
-	r.patch = append(r.patch, op)
 }
 
 // PopStep implements cmp.Reporter.
@@ -140,7 +117,24 @@ func (r *JSONPatchReporter) GetPatch() []Operation {
 
 var jsonPointerEscaper = strings.NewReplacer("~", "~0", "/", "~1")
 
-func pathAsJSONPointer(path cmp.Path) string {
+func (r *JSONPatchReporter) op(op Op, path string, value any, from string) {
+	r.patch = append(r.patch, Operation{op, path, from, value})
+}
+
+func (r *JSONPatchReporter) move(from, to string) {
+	if r.moved == nil {
+		r.moved = make(map[string]string)
+	}
+	if prev, moved := r.moved[from]; moved {
+		assert(prev == to)
+	} else {
+		r.moved[from] = to
+		// record move patch
+		r.op(Move, from, nil, to)
+	}
+}
+
+func (r *JSONPatchReporter) toJSONPointer(path cmp.Path) string {
 	var sb strings.Builder
 	for _, ps := range path {
 		switch s := ps.(type) {
@@ -150,8 +144,17 @@ func pathAsJSONPointer(path cmp.Path) string {
 			sb.WriteString("/")
 			sb.WriteString(jsonPointerEscaper.Replace(s.Key().String()))
 		case cmp.SliceIndex:
+			if s.Key() < 0 {
+				kx, ky := s.SplitKeys()
+				// insertions and deletions are handled above
+				assert(kx > 0 && ky > 0)
+				from := sb.String() + "/" + strconv.Itoa(kx)
+				sb.WriteString("/")
+				sb.WriteString(strconv.Itoa(ky))
+				r.move(from, sb.String())
+				continue
+			}
 			// split keys for slices must be handled at a higher level.
-			assert(s.Key() >= 0)
 			sb.WriteString("/")
 			sb.WriteString(strconv.Itoa(s.Key()))
 		}
@@ -165,7 +168,7 @@ func assert(ok bool) {
 	}
 }
 
-func parseJSON(in []byte) (out any) {
+func parseJSON(in []byte) (out map[string]any) {
 	if err := json.Unmarshal(in, &out); err != nil {
 		panic(err) // should never occur given previous filter to ensure valid JSON
 	}

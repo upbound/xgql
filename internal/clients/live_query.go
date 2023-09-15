@@ -127,7 +127,7 @@ func (c *liveQueryCache) trackObjectList(ctx context.Context, list client.Object
 	var r toolscache.ResourceEventHandlerRegistration
 	r, err = i.AddEventHandler(toolscache.FilteringResourceEventHandler{
 		FilterFunc: func(obj interface{}) bool {
-			if live_query.IsLive(ctx) {
+			if !live_query.IsLive(ctx) {
 				_ = i.RemoveEventHandler(r)
 				return false
 			}
