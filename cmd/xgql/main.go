@@ -38,6 +38,7 @@ import (
 	google "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -211,7 +212,12 @@ func main() {
 	srv := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
 
 	srv.AddTransport(transport.Websocket{
+		Upgrader: websocket.Upgrader{
+			// Enable per message compression.
+			EnableCompression: true,
+		},
 		PingPongInterval: 10 * time.Second,
+		InitFunc:         auth.WebsocketInit,
 	})
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
@@ -229,7 +235,6 @@ func main() {
 	srv.Use(opentelemetry.Tracer{})
 	srv.Use(apollotracing.Tracer{})
 	srv.Use(live_query.LiveQuery{})
-	srv.AroundOperations(auth.OperationMiddleware)
 
 	rt.Handle("/query", otelhttp.NewHandler(srv, "/query"))
 	rt.Handle("/metrics", promhttp.Handler())

@@ -21,7 +21,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"k8s.io/client-go/rest"
 )
@@ -143,27 +142,24 @@ func Middleware(next http.Handler) http.Handler {
 	})
 }
 
-func OperationMiddleware(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
-	if initPayload := transport.GetInitPayload(ctx); initPayload != nil {
-		r := &http.Request{
-			Header: make(http.Header),
-		}
-		for k := range initPayload {
-			s := initPayload.GetString(k)
-			if s == "" {
-				continue
-			}
-			r.Header.Add(k, s)
-		}
-		bu, bp, _ := r.BasicAuth()
-		ctx = context.WithValue(ctx, key, Credentials{
-			BasicUsername: bu,
-			BasicPassword: bp,
-			BearerToken:   ExtractBearerToken(r),
-			Impersonate:   ExtractImpersonation(r),
-		})
+func WebsocketInit(ctx context.Context, initPayload transport.InitPayload) (context.Context, error) {
+	r := &http.Request{
+		Header: make(http.Header),
 	}
-	return next(ctx)
+	for k := range initPayload {
+		s := initPayload.GetString(k)
+		if s == "" {
+			continue
+		}
+		r.Header.Add(k, s)
+	}
+	bu, bp, _ := r.BasicAuth()
+	return context.WithValue(ctx, key, Credentials{
+		BasicUsername: bu,
+		BasicPassword: bp,
+		BearerToken:   ExtractBearerToken(r),
+		Impersonate:   ExtractImpersonation(r),
+	}), nil
 }
 
 // FromContext extracts credentials from the supplied context.
