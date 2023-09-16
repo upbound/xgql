@@ -15,10 +15,10 @@
 package live_query
 
 import (
-	"bytes"
 	"context"
 	_ "embed"
 	"fmt"
+	"strings"
 
 	"github.com/99designs/gqlgen/codegen"
 	"github.com/99designs/gqlgen/codegen/config"
@@ -193,7 +193,7 @@ func (l LiveQuery) InterceptOperation(ctx context.Context, next graphql.Operatio
 	ctx, cancel := context.WithCancel(ctx)
 	handler := next(ctx)
 	var (
-		prevData bytes.Buffer
+		prevData strings.Builder
 		revision int
 	)
 	return func(ctx context.Context) *graphql.Response {
@@ -206,7 +206,7 @@ func (l LiveQuery) InterceptOperation(ctx context.Context, next graphql.Operatio
 			data := resp.Data
 			// Compare new data with previous response.
 			if prevData.Len() > 0 {
-				diff, err := CreateJSONPatch(prevData.Bytes(), resp.Data)
+				diff, err := CreateJSONPatch(prevData.String(), string(data))
 				if err != nil {
 					cancel()
 					panic(err)
