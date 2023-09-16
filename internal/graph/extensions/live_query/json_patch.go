@@ -58,7 +58,7 @@ func CreateJSONPatch(x, y string) ([]Operation, error) {
 	}
 	var patch []Operation
 	if err := json.Unmarshal([]byte(raw), &patch); err != nil {
-		return nil, nil
+		return nil, err
 	}
 	for i := 1; i < len(patch); i++ {
 		// previous operation and operation
