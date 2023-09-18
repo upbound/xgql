@@ -60,6 +60,7 @@ func WithLiveQuery(ctx context.Context) (context.Context, HasChangesFn) {
 }
 
 // IsLive returns true if this is a live query context and query is active.
+// TODO(avalanche123): add tests.
 func IsLive(ctx context.Context) bool {
 	if lq, ok := ctx.Value(liveQueryCtxKey).(*liveQuery); ok {
 		select {
@@ -73,6 +74,7 @@ func IsLive(ctx context.Context) bool {
 }
 
 // NotifyChanged notifies live query of a change.
+// TODO(avalanche123): add tests.
 func NotifyChanged(ctx context.Context) {
 	if lq, ok := ctx.Value(liveQueryCtxKey).(*liveQuery); ok {
 		atomic.StoreUint32(&lq.hasChanges, 1)
