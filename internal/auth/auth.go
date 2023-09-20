@@ -143,6 +143,13 @@ func Middleware(next http.Handler) http.Handler {
 }
 
 func WebsocketInit(ctx context.Context, initPayload transport.InitPayload) (context.Context, error) {
+	// don't re-initialize credentials from the init payload if present in request headers.
+	if cr, ok := FromContext(ctx); ok {
+		if cr.BasicUsername != "" || cr.BasicPassword != "" || cr.BearerToken != "" ||
+			cr.Impersonate.Username != "" || len(cr.Impersonate.Groups) > 0 || len(cr.Impersonate.Extra) > 0 {
+			return ctx, nil
+		}
+	}
 	r := &http.Request{
 		Header: make(http.Header),
 	}
