@@ -58,6 +58,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -124,8 +125,10 @@ func main() {
 	zl := zap.New(zap.UseDevMode(*debug))
 	if *debug {
 		klog.SetLogger(zap.New(zap.UseDevMode(*debug)))
+		ctrl.SetLogger(zap.New(zap.UseDevMode(*debug)))
 	} else {
 		klog.SetLogger(zap.New(zap.Level(zapcore.ErrorLevel)))
+		ctrl.SetLogger(zap.New(zap.Level(zapcore.ErrorLevel)))
 	}
 	log := logging.NewLogrLogger(zl.WithName("xgql"))
 
