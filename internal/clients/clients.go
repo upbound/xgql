@@ -25,7 +25,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -117,6 +116,7 @@ func Anonymize(cfg *rest.Config) *rest.Config {
 // type the client is asked to get or list. Clients (and their caches) expire
 // and are garbage collected if they are unused for five minutes.
 type Cache struct {
+	ctx    context.Context
 	active map[string]*session
 	mx     sync.RWMutex
 
@@ -190,6 +190,7 @@ func NewCache(s *runtime.Scheme, c *rest.Config, o ...CacheOption) *Cache {
 	_, _ = io.ReadFull(rand.Reader, salt)
 
 	ch := &Cache{
+		ctx:    context.Background(),
 		active: make(map[string]*session),
 
 		cfg:    c,
@@ -247,8 +248,11 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	c.mx.RUnlock()
 
 	if ok {
-		log.Debug("Used existing client")
-		return sn, nil
+		log.Debug("Used existing client",
+			"new-expiry", time.Now().Add(c.expiry),
+		)
+		sn.expiration.Reset(c.expiry)
+		return sn.client, nil
 	}
 
 	started := time.Now()
@@ -295,15 +299,18 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	// is possible to 'reset' (i.e. extend) a ticker.
 	expiration := &tickerExpiration{t: time.NewTicker(c.expiry)}
 	newExpiry := time.Now().Add(c.expiry)
-	ctx, cancel := context.WithCancel(context.Background())
-	sn = &session{client: wc, cancel: cancel, expiry: c.expiry, expiration: expiration, log: log}
+	ctx, cancel := context.WithCancel(c.ctx)
+	sn = &session{client: wc, cancel: cancel, expiration: expiration}
 
 	c.mx.Lock()
 	// another gorouting might have set the session.
 	if sn, ok := c.active[id]; ok {
 		c.mx.Unlock()
-		log.Debug("Used existing client")
-		return sn, nil
+		log.Debug("Used existing client",
+			"duration", time.Since(started),
+			"new-expiry", newExpiry,
+		)
+		return sn.client, nil
 	}
 	c.active[id] = sn
 	c.mx.Unlock()
@@ -324,13 +331,11 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 		case <-expiration.C():
 			// We expired, and should remove ourself from the session cache.
 			log.Debug("Client expired")
-			c.remove(id)
 		case <-ctx.Done():
 			log.Debug("Client stopped")
-			// We're done for some other reason (e.g. the cache crashed). We assume
-			// whatever cancelled our context did so by calling done() - we just need
-			// to let this goroutine finish.
+			// We're done for some other reason (e.g. the cache crashed).
 		}
+		c.remove(id)
 	}()
 
 	if !ca.WaitForCacheSync(ctx) {
@@ -343,7 +348,7 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 		"new-expiry", newExpiry,
 	)
 
-	return sn, nil
+	return sn.client, nil
 }
 
 func (c *Cache) remove(id string) {
@@ -373,143 +378,5 @@ func (e *tickerExpiration) C() <-chan time.Time   { return e.t.C }
 type session struct {
 	client     client.Client
 	cancel     context.CancelFunc
-	expiry     time.Duration
 	expiration expiration
-
-	log logging.Logger
-}
-
-func (s *session) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
-	t := time.Now()
-	s.expiration.Reset(s.expiry)
-	err := s.client.Get(ctx, key, obj)
-	s.log.Debug("Client called",
-		"operation", "Get",
-		"duration", time.Since(t),
-		"new-expiry", t.Add(s.expiry),
-	)
-	return err
-}
-
-func (s *session) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
-	t := time.Now()
-	s.expiration.Reset(s.expiry)
-	err := s.client.List(ctx, list, opts...)
-	s.log.Debug("Client called",
-		"operation", "List",
-		"duration", time.Since(t),
-		"new-expiry", t.Add(s.expiry),
-	)
-	return err
-}
-
-func (s *session) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
-	t := time.Now()
-	s.expiration.Reset(s.expiry)
-	err := s.client.Create(ctx, obj, opts...)
-	s.log.Debug("Client called",
-		"operation", "Create",
-		"duration", time.Since(t),
-		"new-expiry", t.Add(s.expiry),
-	)
-	return err
-}
-
-func (s *session) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
-	t := time.Now()
-	s.expiration.Reset(s.expiry)
-	err := s.client.Delete(ctx, obj, opts...)
-	s.log.Debug("Client called",
-		"operation", "Delete",
-		"duration", time.Since(t),
-		"new-expiry", t.Add(s.expiry),
-	)
-	return err
-}
-
-func (s *session) Update(ctx context.Context, obj client.Object, opts ...client.UpdateOption) error {
-	t := time.Now()
-	s.expiration.Reset(s.expiry)
-	err := s.client.Update(ctx, obj, opts...)
-	s.log.Debug("Client called",
-		"operation", "Update",
-		"duration", time.Since(t),
-		"new-expiry", t.Add(s.expiry),
-	)
-	return err
-}
-
-func (s *session) Patch(ctx context.Context, obj client.Object, patch client.Patch, opts ...client.PatchOption) error {
-	t := time.Now()
-	s.expiration.Reset(s.expiry)
-	err := s.client.Patch(ctx, obj, patch, opts...)
-	s.log.Debug("Client called",
-		"operation", "Patch",
-		"duration", time.Since(t),
-		"new-expiry", t.Add(s.expiry),
-	)
-	return err
-}
-
-func (s *session) DeleteAllOf(ctx context.Context, obj client.Object, opts ...client.DeleteAllOfOption) error {
-	t := time.Now()
-	s.expiration.Reset(s.expiry)
-	err := s.client.DeleteAllOf(ctx, obj, opts...)
-	s.log.Debug("Client called",
-		"operation", "DeleteallOf",
-		"duration", time.Since(t),
-		"new-expiry", t.Add(s.expiry),
-	)
-	return err
-}
-
-func (s *session) Status() client.StatusWriter {
-	t := time.Now()
-	s.expiration.Reset(s.expiry)
-	sw := s.client.Status()
-	s.log.Debug("Client called",
-		"operation", "Status",
-		"duration", time.Since(t),
-		"new-expiry", t.Add(s.expiry),
-	)
-	return sw
-}
-
-func (s *session) Scheme() *runtime.Scheme {
-	t := time.Now()
-	s.expiration.Reset(s.expiry)
-	sc := s.client.Scheme()
-	s.log.Debug("Client called",
-		"operation", "Scheme",
-		"duration", time.Since(t),
-		"new-expiry", t.Add(s.expiry),
-	)
-	return sc
-}
-
-func (s *session) RESTMapper() meta.RESTMapper {
-	t := time.Now()
-	s.expiration.Reset(s.expiry)
-	rm := s.client.RESTMapper()
-	s.log.Debug("Client called",
-		"operation", "Scheme",
-		"duration", time.Since(t),
-		"new-expiry", t.Add(s.expiry),
-	)
-	return rm
-}
-
-// SubResource returns the underlying client's SubResource client, unwrapped.
-func (s *session) SubResource(subResource string) client.SubResourceClient {
-	return s.client.SubResource(subResource)
-}
-
-// GroupVersionKindFor returne the underlying client's GroupVersionKindFor.
-func (s *session) GroupVersionKindFor(obj runtime.Object) (schema.GroupVersionKind, error) {
-	return s.client.GroupVersionKindFor(obj)
-}
-
-// IsObjectNamespaced returne the underlying client's IsObjectNamespaced.
-func (s *session) IsObjectNamespaced(obj runtime.Object) (bool, error) {
-	return s.client.IsObjectNamespaced(obj)
 }
