@@ -18,9 +18,10 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
-	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/crossplane/crossplane-runtime/pkg/errors"
+	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 )
 
 // SkipUnstructured is a marker type. It is used in the schema via a `@goType` directive

@@ -25,7 +25,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/pkg/errors"
+
+	"github.com/crossplane/crossplane-runtime/pkg/errors"
 
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/graph/model"
