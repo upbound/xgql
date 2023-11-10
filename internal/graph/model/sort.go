@@ -47,14 +47,6 @@ func (c *KubernetesResourceConnection) Swap(i, j int) {
 
 func (c *EventConnection) Len() int { return c.TotalCount }
 func (c *EventConnection) Less(i, j int) bool {
-
-	// We sort events by time, where possible.
-	it := c.Nodes[i].LastTime
-	jt := c.Nodes[j].LastTime
-	if it != nil && jt != nil {
-		return it.Before(*jt)
-	}
-
 	return join(c.Nodes[i].ID) < join(c.Nodes[j].ID)
 }
 func (c *EventConnection) Swap(i, j int) {
