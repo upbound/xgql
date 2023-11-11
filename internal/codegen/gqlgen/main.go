@@ -28,7 +28,7 @@ import (
 	"github.com/99designs/gqlgen/api"
 	"github.com/99designs/gqlgen/codegen/config"
 	"github.com/99designs/gqlgen/plugin/modelgen"
-	"github.com/upbound/xgql/internal/graph/extensions/live_query"
+	"github.com/upbound/xgql/internal/codegen/gqlgen/extensions/live_query"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 

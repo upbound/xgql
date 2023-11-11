@@ -72,10 +72,10 @@ import (
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/cache"
 	"github.com/upbound/xgql/internal/clients"
-	"github.com/upbound/xgql/internal/graph/extensions/live_query"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/present"
 	"github.com/upbound/xgql/internal/graph/resolvers"
+	"github.com/upbound/xgql/internal/live_query"
 	"github.com/upbound/xgql/internal/opentelemetry"
 	"github.com/upbound/xgql/internal/request"
 	hprobe "github.com/upbound/xgql/internal/server/health"
@@ -220,7 +220,7 @@ func main() { //nolint:gocyclo
 		camid = append(camid, cache.WithBBoltCache(*cacheFile))
 	}
 	// enable live queries
-	camid = append(camid, clients.WithLiveQueries)
+	camid = append(camid, cache.WithLiveQueries)
 
 	caopts := []clients.CacheOption{
 		clients.WithRESTMapper(rm),
