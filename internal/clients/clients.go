@@ -116,6 +116,7 @@ func Anonymize(cfg *rest.Config) *rest.Config {
 // type the client is asked to get or list. Clients (and their caches) expire
 // and are garbage collected if they are unused for five minutes.
 type Cache struct {
+	// a context that will be valid for the lifetime of Cache.
 	ctx    context.Context
 	active map[string]*session
 	mx     sync.RWMutex
@@ -212,36 +213,18 @@ func NewCache(s *runtime.Scheme, c *rest.Config, o ...CacheOption) *Cache {
 }
 
 type getOptions struct {
-	Namespace string
 }
 
 // A GetOption modifies the kind of client returned.
 type GetOption func(o *getOptions)
 
-// ForNamespace returns a client backed by a cache scoped to the supplied
-// namespace.
-func ForNamespace(n string) GetOption {
-	return func(o *getOptions) {
-		o.Namespace = n
-	}
-}
-
 // Get a client that uses the specified bearer token.
 func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) { //nolint:gocyclo
-	opts := &getOptions{}
-	for _, fn := range o {
-		fn(opts)
-	}
-
 	extra := bytes.Buffer{}
 	extra.Write(c.salt)
-	extra.WriteString(opts.Namespace)
 	id := cr.Hash(extra.Bytes())
 
 	log := c.log.WithValues("client-id", id)
-	if opts.Namespace != "" {
-		log = log.WithValues("namespace", opts.Namespace)
-	}
 
 	c.mx.RLock()
 	sn, ok := c.active[id]
@@ -261,16 +244,11 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	if err != nil {
 		return nil, errors.Wrap(err, errNewHTTPClient)
 	}
-
-	caopt := cache.Options{
+	ca, err := c.newCache(cfg, cache.Options{
 		HTTPClient: hc,
 		Scheme:     c.scheme,
 		Mapper:     c.mapper,
-	}
-	if opts.Namespace != "" {
-		caopt.Namespaces = []string{opts.Namespace}
-	}
-	ca, err := c.newCache(cfg, caopt)
+	})
 	if err != nil {
 		return nil, errors.Wrap(err, errNewCache)
 	}

@@ -68,6 +68,7 @@ import (
 
 	"github.com/upbound/xgql/internal"
 	"github.com/upbound/xgql/internal/auth"
+	"github.com/upbound/xgql/internal/cache"
 	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/extensions/live_query"
 	"github.com/upbound/xgql/internal/graph/generated"
@@ -102,7 +103,7 @@ var noCache = []client.Object{
 	&rbacv1.ClusterRoleBinding{},
 }
 
-func main() {
+func main() { //nolint:gocyclo
 	var (
 		app         = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
 		debug       = app.Flag("debug", "Enable debug logging.").Short('d').Bool()
@@ -118,6 +119,7 @@ func main() {
 		healthPort  = app.Flag("health-port", "Port used for readyz and livez requests.").Default("8088").Int()
 		cacheExpiry = app.Flag("cache-expiry", "The duration since last activity by a user until that users client expires.").Default("336h").Duration()
 		profiling   = app.Flag("profiling", "Enable profiling via web interface host:port/debug/pprof/.").Default("true").Bool()
+		cacheFile   = app.Flag("cache-file", "Path to the file used to persist client caches, set to reduce memory usage.").Default("").String()
 	)
 	app.Version(version.Version)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
@@ -181,12 +183,6 @@ func main() {
 	//nolint:reassign
 	utilruntime.ErrorHandlers = []func(error){func(err error) { log.Debug("Kubernetes runtime error", "err", err) }}
 
-	rt := chi.NewRouter()
-	rt.Use(middleware.RequestLogger(&request.Formatter{Log: log}))
-	rt.Use(middleware.Compress(5)) // Chi recommends compression level 5.
-	rt.Use(auth.Middleware)
-	rt.Use(version.Middleware)
-
 	s := runtime.NewScheme()
 	kingpin.FatalIfError(corev1.AddToScheme(s), "cannot add Kubernetes core/v1 to scheme")
 	kingpin.FatalIfError(kextv1.AddToScheme(s), "cannot add Kubernetes apiextensions/v1 to scheme")
@@ -211,14 +207,22 @@ func main() {
 	rm, err := clients.RESTMapper(cfg, httpClient)
 	kingpin.FatalIfError(err, "cannot create REST mapper")
 
-	ca := clients.NewCache(s,
-		clients.Anonymize(cfg),
+	var camid []clients.NewCacheMiddlewareFn
+	// wrap client.Cache in cache.*BBoltCache if cacheFile is specified.
+	if *cacheFile != "" {
+		camid = append(camid, cache.WithBBoltCache(*cacheFile))
+	}
+	// enable live queries
+	camid = append(camid, clients.WithLiveQueries)
+
+	caopts := []clients.CacheOption{
 		clients.WithRESTMapper(rm),
 		clients.DoNotCache(noCache),
 		clients.WithLogger(log),
 		clients.WithExpiry(*cacheExpiry),
-		clients.UseNewCacheMiddleware(clients.WithLiveQueries),
-	)
+		clients.UseNewCacheMiddleware(camid...),
+	}
+	ca := clients.NewCache(s, clients.Anonymize(cfg), caopts...)
 	srv := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
 
 	srv.AddTransport(transport.Websocket{
@@ -240,11 +244,24 @@ func main() {
 	srv.Use(extension.AutomaticPersistedQuery{
 		Cache: lru.New(100),
 	})
+
 	srv.SetErrorPresenter(present.Error)
 	srv.Use(opentelemetry.MetricEmitter{})
 	srv.Use(opentelemetry.Tracer{})
 	srv.Use(apollotracing.Tracer{})
 	srv.Use(live_query.LiveQuery{})
+
+	rt := chi.NewRouter()
+	// if bbolt cache is enabled, add up bolt transaction request middleware
+	// to coalesce all concurrent reads from bolt db into a single transaction
+	// in the context of a given request.
+	if *cacheFile != "" {
+		rt.Use(cache.BoltTxMiddleware)
+	}
+	rt.Use(middleware.RequestLogger(&request.Formatter{Log: log}))
+	rt.Use(middleware.Compress(5)) // Chi recommends compression level 5.
+	rt.Use(auth.Middleware)
+	rt.Use(version.Middleware)
 
 	rt.Handle("/query", otelhttp.NewHandler(srv, "/query"))
 	rt.Handle("/metrics", promhttp.Handler())

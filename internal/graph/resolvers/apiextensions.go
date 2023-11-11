@@ -30,7 +30,6 @@ import (
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 
 	"github.com/upbound/xgql/internal/auth"
-	"github.com/upbound/xgql/internal/clients"
 	"github.com/upbound/xgql/internal/graph/model"
 	"github.com/upbound/xgql/internal/unstructured"
 )
@@ -164,15 +163,13 @@ func (r *xrd) DefinedCompositeResourceClaims(ctx context.Context, obj *model.Com
 
 	options.DeprecationPatch(version, namespace)
 
-	gopts := []clients.GetOption{}
 	lopts := []client.ListOption{}
 	if options.Namespace != nil {
-		gopts = []clients.GetOption{clients.ForNamespace(*options.Namespace)}
 		lopts = []client.ListOption{client.InNamespace(*options.Namespace)}
 	}
 
 	creds, _ := auth.FromContext(ctx)
-	c, err := r.clients.Get(creds, gopts...)
+	c, err := r.clients.Get(creds)
 	if err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errGetClient))
 		return model.CompositeResourceClaimConnection{}, nil
