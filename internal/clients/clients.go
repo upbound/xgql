@@ -220,11 +220,6 @@ type GetOption func(o *getOptions)
 
 // Get a client that uses the specified bearer token.
 func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) { //nolint:gocyclo
-	opts := &getOptions{}
-	for _, fn := range o {
-		fn(opts)
-	}
-
 	extra := bytes.Buffer{}
 	extra.Write(c.salt)
 	id := cr.Hash(extra.Bytes())
