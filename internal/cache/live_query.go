@@ -101,18 +101,17 @@ func (c *liveQueryCache) trackObject(ctx context.Context, object runtime.Object)
 		// We need the non-list GVK, so chop off the "List" from the end of the kind.
 		gvk.Kind = strings.TrimSuffix(gvk.Kind, "List")
 	}
+	i, err := c.getInformer(ctx, object, gvk)
+	if err != nil {
+		return err
+	}
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	// register event handler for the GVK that if we aren't watching it already.
-	if !c.handles.Contains(gvk) {
-		i, err := c.getInformer(ctx, object, gvk)
-		if err != nil {
-			return err
-		}
+	if c.handles.Add(gvk) {
 		if _, err := i.AddEventHandler(c); err != nil {
+			c.handles.Remove(gvk)
 			return err
-		} else {
-			c.handles.Add(gvk)
 		}
 	}
 	// register live query tracker if we're not tracking it already.
