@@ -67,14 +67,18 @@ func (lq *liveQuery) debounce() { //nolint:gocyclo
 			switch a {
 			case fire:
 				if armed {
-					timer = lq.clock.After(lq.throttle)
+					if timer == nil {
+						timer = lq.clock.After(lq.throttle)
+					}
 					continue
 				}
 				fired = true
 				continue
 			case rearm:
 				if fired {
-					timer = lq.clock.After(lq.throttle)
+					if timer == nil {
+						timer = lq.clock.After(lq.throttle)
+					}
 					continue
 				}
 				armed = true
