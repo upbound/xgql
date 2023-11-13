@@ -124,13 +124,9 @@ func (l LiveQuery) InterceptOperation(ctx context.Context, next graphql.Operatio
 		return next(ctx)
 	}
 	throttle := time.Duration(lqs.Throttle) * time.Millisecond
+	lq, ctx := withLiveQuery(ctx, throttle)
 	handler := next(ctx)
-	var lq *liveQuery
 	return func(ctx context.Context) *graphql.Response {
-		// create live query context if not exists.
-		if lq == nil {
-			lq, ctx = withLiveQuery(ctx, throttle)
-		}
 		for {
 			// create the handler when live query is ready.
 			if handler == nil {
