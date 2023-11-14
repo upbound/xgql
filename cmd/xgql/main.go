@@ -31,6 +31,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/apollotracing"
+	gqldebug "github.com/99designs/gqlgen/graphql/handler/debug"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
@@ -112,7 +113,7 @@ func main() { //nolint:gocyclo
 		tlsKey      = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
 		insecure    = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
 		play        = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
-		tracer      = app.Flag("trace-backend", "Tracer to use.").Default("jaeger").Enum("jaeger", "gcp")
+		tracer      = app.Flag("trace-backend", "Tracer to use.").Default("jaeger").Enum("jaeger", "gcp", "stdout")
 		ratio       = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
 		agent       = app.Flag("trace-agent", "Address of the Jaeger trace agent as [host]:[port]").TCP()
 		health      = app.Flag("health", "Enable health endpoints.").Default("true").Bool()
@@ -249,6 +250,9 @@ func main() { //nolint:gocyclo
 	srv.Use(opentelemetry.MetricEmitter{})
 	srv.Use(opentelemetry.Tracer{})
 	srv.Use(apollotracing.Tracer{})
+	if *tracer == "stdout" {
+		srv.Use(&gqldebug.Tracer{})
+	}
 	srv.Use(live_query.LiveQuery{})
 
 	rt := chi.NewRouter()
