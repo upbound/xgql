@@ -16,6 +16,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"io"
 	stdlog "log"
@@ -107,7 +108,7 @@ var noCache = []client.Object{
 func main() { //nolint:gocyclo
 	var (
 		app         = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
-		debug       = app.Flag("debug", "Enable debug logging.").Short('d').Bool()
+		debug       = app.Flag("debug", "Enable debug logging.").Short('d').Counter()
 		listen      = app.Flag("listen", "Address at which to listen for TLS connections. Requires TLS cert and key.").Default(":8443").String()
 		tlsCert     = app.Flag("tls-cert", "Path to the TLS certificate file used to serve TLS connections.").ExistingFile()
 		tlsKey      = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
@@ -125,10 +126,14 @@ func main() { //nolint:gocyclo
 	app.Version(version.Version)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	zl := zap.New(zap.UseDevMode(*debug))
-	if *debug {
-		klog.SetLogger(zap.New(zap.UseDevMode(*debug)))
-		ctrl.SetLogger(zap.New(zap.UseDevMode(*debug)))
+	fs := flag.NewFlagSet("klog", flag.ExitOnError)
+	klog.InitFlags(fs)
+	kingpin.FatalIfError(fs.Parse([]string{fmt.Sprintf("--v=%d", *debug)}), "cannot parse klog flags")
+
+	zl := zap.New(zap.UseDevMode(*debug > 0))
+	if *debug > 0 {
+		klog.SetLogger(zap.New(zap.UseDevMode(*debug > 0)))
+		ctrl.SetLogger(zap.New(zap.UseDevMode(*debug > 0)))
 	} else {
 		klog.SetLogger(zap.New(zap.Level(zapcore.ErrorLevel)))
 		ctrl.SetLogger(zap.New(zap.Level(zapcore.ErrorLevel)))
