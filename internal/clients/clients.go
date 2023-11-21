@@ -231,7 +231,7 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	c.mx.RUnlock()
 
 	if ok {
-		log.Debug("Used existing client",
+		log.Debug("Used existing cached client",
 			"new-expiry", time.Now().Add(c.expiry),
 		)
 		sn.expiration.Reset(c.expiry)
@@ -284,7 +284,7 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	// another gorouting might have set the session.
 	if sn, ok := c.active[id]; ok {
 		c.mx.Unlock()
-		log.Debug("Used existing client",
+		log.Debug("Used existing cached client",
 			"duration", time.Since(started),
 			"new-expiry", newExpiry,
 		)
@@ -321,7 +321,7 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 		return nil, errors.New(errWaitForCacheSync)
 	}
 
-	log.Debug("Created client",
+	log.Debug("Created cached client",
 		"duration", time.Since(started),
 		"new-expiry", newExpiry,
 	)
