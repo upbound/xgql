@@ -72,10 +72,10 @@ import (
 	"github.com/upbound/xgql/internal/auth"
 	"github.com/upbound/xgql/internal/cache"
 	"github.com/upbound/xgql/internal/clients"
-	"github.com/upbound/xgql/internal/graph/extensions/live_query"
 	"github.com/upbound/xgql/internal/graph/generated"
 	"github.com/upbound/xgql/internal/graph/present"
 	"github.com/upbound/xgql/internal/graph/resolvers"
+	"github.com/upbound/xgql/internal/live_query"
 	"github.com/upbound/xgql/internal/opentelemetry"
 	"github.com/upbound/xgql/internal/request"
 	hprobe "github.com/upbound/xgql/internal/server/health"
@@ -107,21 +107,22 @@ var noCache = []client.Object{
 
 func main() { //nolint:gocyclo
 	var (
-		app         = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
-		debug       = app.Flag("debug", "Enable debug logging.").Short('d').Counter()
-		listen      = app.Flag("listen", "Address at which to listen for TLS connections. Requires TLS cert and key.").Default(":8443").String()
-		tlsCert     = app.Flag("tls-cert", "Path to the TLS certificate file used to serve TLS connections.").ExistingFile()
-		tlsKey      = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
-		insecure    = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
-		play        = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
-		tracer      = app.Flag("trace-backend", "Tracer to use.").Default("jaeger").Enum("jaeger", "gcp", "stdout")
-		ratio       = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
-		agent       = app.Flag("trace-agent", "Address of the Jaeger trace agent as [host]:[port]").TCP()
-		health      = app.Flag("health", "Enable health endpoints.").Default("true").Bool()
-		healthPort  = app.Flag("health-port", "Port used for readyz and livez requests.").Default("8088").Int()
-		cacheExpiry = app.Flag("cache-expiry", "The duration since last activity by a user until that users client expires.").Default("336h").Duration()
-		profiling   = app.Flag("profiling", "Enable profiling via web interface host:port/debug/pprof/.").Default("true").Bool()
-		cacheFile   = app.Flag("cache-file", "Path to the file used to persist client caches, set to reduce memory usage.").Default("").String()
+		app             = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
+		debug           = app.Flag("debug", "Enable debug logging.").Short('d').Counter()
+		listen          = app.Flag("listen", "Address at which to listen for TLS connections. Requires TLS cert and key.").Default(":8443").String()
+		tlsCert         = app.Flag("tls-cert", "Path to the TLS certificate file used to serve TLS connections.").ExistingFile()
+		tlsKey          = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
+		insecure        = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
+		play            = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
+		tracer          = app.Flag("trace-backend", "Tracer to use.").Default("jaeger").Enum("jaeger", "gcp", "stdout")
+		ratio           = app.Flag("trace-ratio", "Ratio of queries that should be traced.").Default("0.01").Float()
+		agent           = app.Flag("trace-agent", "Address of the Jaeger trace agent as [host]:[port]").TCP()
+		health          = app.Flag("health", "Enable health endpoints.").Default("true").Bool()
+		healthPort      = app.Flag("health-port", "Port used for readyz and livez requests.").Default("8088").Int()
+		cacheExpiry     = app.Flag("cache-expiry", "The duration since last activity by a user until that users client expires.").Default("336h").Duration()
+		profiling       = app.Flag("profiling", "Enable profiling via web interface host:port/debug/pprof/.").Default("true").Bool()
+		cacheFile       = app.Flag("cache-file", "Path to the file used to persist client caches, set to reduce memory usage.").Default("").String()
+		noApolloTracing = app.Flag("disable-apollo-tracing", "Disable apollo tracing.").Bool()
 	)
 	app.Version(version.Version)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
@@ -219,7 +220,7 @@ func main() { //nolint:gocyclo
 		camid = append(camid, cache.WithBBoltCache(*cacheFile))
 	}
 	// enable live queries
-	camid = append(camid, clients.WithLiveQueries)
+	camid = append(camid, cache.WithLiveQueries)
 
 	caopts := []clients.CacheOption{
 		clients.WithRESTMapper(rm),
@@ -254,7 +255,9 @@ func main() { //nolint:gocyclo
 	srv.SetErrorPresenter(present.Error)
 	srv.Use(opentelemetry.MetricEmitter{})
 	srv.Use(opentelemetry.Tracer{})
-	srv.Use(apollotracing.Tracer{})
+	if !*noApolloTracing {
+		srv.Use(apollotracing.Tracer{})
+	}
 	if *tracer == "stdout" {
 		srv.Use(&gqldebug.Tracer{})
 	}

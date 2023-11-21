@@ -44,16 +44,8 @@ type Operation struct {
 
 // CreateJSONPatch creates a JSON patch between two json values.
 // TODO(avalanche123): add tests for json patch generation.
-func CreateJSONPatch(x, y string) ([]Operation, error) {
-	xn, err := jd.ReadJsonString(x)
-	if err != nil {
-		return nil, err
-	}
-	yn, err := jd.ReadJsonString(y)
-	if err != nil {
-		return nil, err
-	}
-	raw, err := xn.Diff(yn).RenderPatch()
+func CreateJSONPatch(x, y jd.JsonNode) ([]Operation, error) {
+	raw, err := x.Diff(y).RenderPatch()
 	if err != nil {
 		return nil, err
 	}
