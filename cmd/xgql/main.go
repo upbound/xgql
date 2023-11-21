@@ -256,6 +256,7 @@ func main() { //nolint:gocyclo
 	srv.Use(live_query.LiveQuery{})
 
 	rt := chi.NewRouter()
+	rt.Use(middleware.RequestID)
 	// if bbolt cache is enabled, add up bolt transaction request middleware
 	// to coalesce all concurrent reads from bolt db into a single transaction
 	// in the context of a given request.
