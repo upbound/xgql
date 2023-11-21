@@ -216,7 +216,7 @@ func main() { //nolint:gocyclo
 	var camid []clients.NewCacheMiddlewareFn
 	// wrap client.Cache in cache.*BBoltCache if cacheFile is specified.
 	if *cacheFile != "" {
-		camid = append(camid, cache.WithBBoltCache(*cacheFile))
+		camid = append(camid, cache.WithBBoltCache(*cacheFile, cache.WithLogger(log)))
 	}
 	// enable live queries
 	camid = append(camid, clients.WithLiveQueries)

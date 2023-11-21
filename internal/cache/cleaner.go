@@ -24,6 +24,8 @@ import (
 	"time"
 
 	"k8s.io/utils/clock"
+
+	"github.com/crossplane/crossplane-runtime/pkg/logging"
 )
 
 // Cleaner cleans up objects after a given duration.
@@ -86,15 +88,33 @@ type cleaner[T any, K cmp.Ordered] struct {
 	keyFn   func(T) K
 	cleanFn func([]T) error
 
+	tick    time.Duration
 	clock   clock.Clock
 	signal  chan struct{}
 	running atomic.Bool
 	mu      sync.Mutex
 	exps    []expKey[K]
 	refs    map[K]expRef[T]
+
+	log logging.Logger
 }
 
 type CleanerOpt[T any, K cmp.Ordered] func(*cleaner[T, K])
+
+// WithLoggerCleanerOpt wires the logger into the cleaner.
+func WithLoggerCleanerOpt[T any, K cmp.Ordered](log logging.Logger) CleanerOpt[T, K] {
+	return func(c *cleaner[T, K]) {
+		c.log = log
+	}
+}
+
+// WithTick sets the tick interval for the cleaner. Set it to zero to clean up
+// as soon as possible.
+func WithTick[T any, K cmp.Ordered](tick time.Duration) CleanerOpt[T, K] {
+	return func(c *cleaner[T, K]) {
+		c.tick = tick
+	}
+}
 
 // NewCleaner creates a cleaner for objects of type T, identified by comparable key K,
 // using cleanFn for cleanup.
@@ -102,9 +122,11 @@ func NewCleaner[T any, K cmp.Ordered](keyFn func(T) K, cleanFn func([]T) error, 
 	c := &cleaner[T, K]{
 		keyFn:   keyFn,
 		cleanFn: cleanFn,
+		tick:    time.Second,
 		clock:   clock.RealClock{},
 		signal:  make(chan struct{}),
 		refs:    make(map[K]expRef[T]),
+		log:     logging.NewNopLogger(),
 	}
 	for _, opt := range opts {
 		opt(c)
@@ -142,12 +164,18 @@ func (c *cleaner[T, K]) Start(ctx context.Context) error {
 		}
 		objs, exp := c.collect(c.clock.Now())
 		if len(objs) > 0 {
+			c.log.Debug("cleaning up objects", "count", len(objs), "next", exp)
 			if err := c.cleanFn(objs); err != nil {
+				// exit Start and stop the cache
 				return err
 			}
 		}
 		if !exp.IsZero() {
-			wakeup = c.clock.After(exp.Sub(c.clock.Now()))
+			after := exp.Sub(c.clock.Now())
+			if after < c.tick {
+				after = c.tick
+			}
+			wakeup = c.clock.After(after)
 		}
 	}
 }
