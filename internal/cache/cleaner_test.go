@@ -138,6 +138,7 @@ func TestCleaner_Schedule(t *testing.T) {
 					return nil
 				},
 				WithClock(clock),
+				WithTick[int, int](time.Duration(0)),
 			)
 			startedCh := make(chan struct{})
 			errCh := make(chan error, 1)

@@ -40,6 +40,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 
 	"github.com/crossplane/crossplane-runtime/pkg/errors"
+	"github.com/crossplane/crossplane-runtime/pkg/logging"
 
 	"github.com/upbound/xgql/internal/clients"
 )
@@ -152,6 +153,13 @@ func wrapCacheTranform(prev, next toolscache.TransformFunc) toolscache.Transform
 // Option is an option for a cache.
 type Option func(*BBoltCache)
 
+// WithLogger wires a logger into the bbolt cache.
+func WithLogger(o logging.Logger) Option {
+	return func(c *BBoltCache) {
+		c.log = o
+	}
+}
+
 // Cache implements cache.Cache.
 var _ cache.Cache = &BBoltCache{}
 
@@ -173,6 +181,8 @@ type BBoltCache struct {
 	unmarshalFn UnmarshalFn
 
 	running atomic.Bool
+
+	log logging.Logger
 }
 
 // NewBBoltCache creates a new cache.
@@ -196,7 +206,7 @@ func NewBBoltCache(cache cache.Cache, scheme *runtime.Scheme, file string, opts 
 		ca.db = db
 	}
 	if ca.cleaner == nil {
-		ca.cleaner = NewCleaner[client.Object, string](getKey, ca.cleanup)
+		ca.cleaner = NewCleaner[client.Object, string](getKey, ca.cleanup, WithLoggerCleanerOpt[client.Object, string](ca.log))
 	}
 	return ca, nil
 }
