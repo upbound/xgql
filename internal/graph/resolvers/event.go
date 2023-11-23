@@ -22,6 +22,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/crossplane/crossplane-runtime/pkg/errors"
 
@@ -51,7 +52,7 @@ func (r *events) Resolve(ctx context.Context, obj *corev1.ObjectReference) (mode
 	}
 
 	in := &corev1.EventList{}
-	if err := c.List(ctx, in); err != nil {
+	if err := c.List(ctx, in, client.UnsafeDisableDeepCopyOption(true)); err != nil {
 		graphql.AddError(ctx, errors.Wrap(err, errListEvents))
 		return model.EventConnection{}, nil
 	}
@@ -59,15 +60,22 @@ func (r *events) Resolve(ctx context.Context, obj *corev1.ObjectReference) (mode
 	// If no involved object was supplied we want to fetch all events. This may
 	// include Kubernetes events that don't pertain to Crossplane.
 	if obj == nil {
-		out := &model.EventConnection{
-			Nodes:      make([]model.Event, 0, len(in.Items)),
-			TotalCount: len(in.Items),
+		ordered := timeOrderedEventIndices{
+			indices: make([]int, len(in.Items)),
+			items:   in.Items,
 		}
 		for i := range in.Items {
-			out.Nodes = append(out.Nodes, model.GetEvent(&in.Items[i]))
+			ordered.indices[i] = i
+		}
+		sort.Stable(ordered)
+
+		config := FromConfig(ctx)
+		nodes := ordered.limit(config.GlobalEventsTarget, config.GlobalEventsCap)
+		out := &model.EventConnection{
+			Nodes:      nodes,
+			TotalCount: len(nodes),
 		}
 
-		sort.Stable(sort.Reverse(out))
 		return *out, nil
 	}
 
@@ -160,4 +168,51 @@ func (r *event) InvolvedObject(ctx context.Context, obj *model.Event) (model.Kub
 		return nil, nil
 	}
 	return out, nil
+}
+
+type timeOrderedEventIndices struct {
+	indices []int
+	items   []corev1.Event
+}
+
+func (i timeOrderedEventIndices) Len() int {
+	return len(i.indices)
+}
+
+func (i timeOrderedEventIndices) Less(a, b int) bool {
+	return i.items[i.indices[a]].LastTimestamp.Before(&i.items[i.indices[b]].LastTimestamp)
+}
+
+func (i timeOrderedEventIndices) Swap(a, b int) {
+	i.indices[a], i.indices[b] = i.indices[b], i.indices[a]
+}
+
+// limit tries to return target many events, if these are all warnings. It will
+// return more events until it found that many warnings. It stops at the upper
+// bound.
+//
+// Background: we want to fill an event view in the UI with a subset of the
+// events if there are many. The UI can switch to warnings-only view, so we
+// have to ensure enough warnings such that view is filled.
+func (ei timeOrderedEventIndices) limit(target, upperBound int) []model.Event {
+	warnings := 0
+	nodes := make([]model.Event, 0, upperBound)
+	for _, i := range ei.indices {
+		nodes = append(nodes, model.GetEvent(&ei.items[i]))
+
+		if len(nodes) >= upperBound {
+			// enough events of any type, we can stop now
+			break
+		}
+
+		if isWarning := ei.items[i].Type == corev1.EventTypeWarning; isWarning {
+			warnings++
+		}
+		if warnings >= target {
+			// enough warnings, we can stop now
+			break
+		}
+	}
+
+	return nodes
 }
