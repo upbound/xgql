@@ -123,6 +123,9 @@ func main() { //nolint:gocyclo
 		profiling       = app.Flag("profiling", "Enable profiling via web interface host:port/debug/pprof/.").Default("true").Bool()
 		cacheFile       = app.Flag("cache-file", "Path to the file used to persist client caches, set to reduce memory usage.").Default("").String()
 		noApolloTracing = app.Flag("disable-apollo-tracing", "Disable apollo tracing.").Bool()
+
+		globalEventsTarget = app.Flag("global-events-target", "The targeted number of events returned for global scope, potentially more if there are few warnings.").Default("500").Int()
+		globalEventsCap    = app.Flag("global-events-cap", "The maximum number of events returned for global scope.").Default("2000").Int()
 	)
 	app.Version(version.Version)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
@@ -230,9 +233,9 @@ func main() { //nolint:gocyclo
 		clients.UseNewCacheMiddleware(camid...),
 	}
 	ca := clients.NewCache(s, clients.Anonymize(cfg), caopts...)
-	srv := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
+	h := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
 
-	srv.AddTransport(transport.Websocket{
+	h.AddTransport(transport.Websocket{
 		Upgrader: websocket.Upgrader{
 			// Enable per message compression.
 			EnableCompression: true,
@@ -240,28 +243,28 @@ func main() { //nolint:gocyclo
 		PingPongInterval: 10 * time.Second,
 		InitFunc:         auth.WebsocketInit,
 	})
-	srv.AddTransport(transport.Options{})
-	srv.AddTransport(transport.GET{})
-	srv.AddTransport(transport.POST{})
-	srv.AddTransport(transport.MultipartForm{})
+	h.AddTransport(transport.Options{})
+	h.AddTransport(transport.GET{})
+	h.AddTransport(transport.POST{})
+	h.AddTransport(transport.MultipartForm{})
 
-	srv.SetQueryCache(lru.New(1000))
+	h.SetQueryCache(lru.New(1000))
 
-	srv.Use(extension.Introspection{})
-	srv.Use(extension.AutomaticPersistedQuery{
+	h.Use(extension.Introspection{})
+	h.Use(extension.AutomaticPersistedQuery{
 		Cache: lru.New(100),
 	})
 
-	srv.SetErrorPresenter(present.Error)
-	srv.Use(opentelemetry.MetricEmitter{})
-	srv.Use(opentelemetry.Tracer{})
+	h.SetErrorPresenter(present.Error)
+	h.Use(opentelemetry.MetricEmitter{})
+	h.Use(opentelemetry.Tracer{})
 	if !*noApolloTracing {
-		srv.Use(apollotracing.Tracer{})
+		h.Use(apollotracing.Tracer{})
 	}
 	if *tracer == "stdout" {
-		srv.Use(&gqldebug.Tracer{})
+		h.Use(&gqldebug.Tracer{})
 	}
-	srv.Use(live_query.LiveQuery{})
+	h.Use(live_query.LiveQuery{})
 
 	rt := chi.NewRouter()
 	rt.Use(middleware.RequestID)
@@ -275,8 +278,12 @@ func main() { //nolint:gocyclo
 	rt.Use(middleware.Compress(5)) // Chi recommends compression level 5.
 	rt.Use(auth.Middleware)
 	rt.Use(version.Middleware)
+	rt.Use(resolvers.InjectConfig(&resolvers.Config{
+		GlobalEventsTarget: *globalEventsTarget,
+		GlobalEventsCap:    *globalEventsCap,
+	}))
 
-	rt.Handle("/query", otelhttp.NewHandler(srv, "/query"))
+	rt.Handle("/query", otelhttp.NewHandler(h, "/query"))
 	rt.Handle("/metrics", promhttp.Handler())
 	rt.Handle("/version", version.Handler())
 	if *play {
@@ -286,25 +293,31 @@ func main() { //nolint:gocyclo
 	// start health endpoints to aid in routing traffic to the pod
 	kingpin.FatalIfError(startHealth(internal.HealthOptions{Health: *health, HealthPort: *healthPort}, log), "cannot start health endpoints")
 
-	h := &http.Server{
+	if *tlsCert != "" && *tlsKey != "" {
+		srv := &http.Server{
+			Addr:              *listen,
+			Handler:           rt,
+			WriteTimeout:      10 * time.Second,
+			ReadTimeout:       5 * time.Second,
+			ReadHeaderTimeout: 5 * time.Second,
+			ErrorLog:          stdlog.New(io.Discard, "", 0),
+		}
+		go func() {
+			log.Debug("Listening for TLS connections", "address", *listen)
+			kingpin.FatalIfError(srv.ListenAndServeTLS(*tlsCert, *tlsKey), "cannot serve TLS HTTP")
+		}()
+	}
+
+	log.Debug("Listening for insecure connections", "address", *insecure)
+	srv := &http.Server{
+		Addr:              *insecure,
 		Handler:           rt,
 		WriteTimeout:      10 * time.Second,
 		ReadTimeout:       5 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
 		ErrorLog:          stdlog.New(io.Discard, "", 0),
 	}
-
-	if *tlsCert != "" && *tlsKey != "" {
-		go func() {
-			log.Debug("Listening for TLS connections", "address", *listen)
-			h.Addr = *listen
-			kingpin.FatalIfError(h.ListenAndServeTLS(*tlsCert, *tlsKey), "cannot serve TLS HTTP")
-		}()
-	}
-
-	log.Debug("Listening for insecure connections", "address", *insecure)
-	h.Addr = *insecure
-	kingpin.FatalIfError(h.ListenAndServe(), "cannot serve insecure HTTP")
+	kingpin.FatalIfError(srv.ListenAndServe(), "cannot serve insecure HTTP")
 }
 
 // startHealth starts the readyz and livez endpoints for this service.
