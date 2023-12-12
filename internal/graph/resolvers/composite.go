@@ -215,7 +215,9 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 			xrc.SetKind(ref.Kind)
 			nn := types.NamespacedName{Namespace: ref.Namespace, Name: ref.Name}
 			if err := c.Get(ctx, nn, xrc); err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, errGetComposed))
+				if !apierrors.IsNotFound(err) {
+					graphql.AddError(ctx, errors.Wrap(err, errGetComposed))
+				}
 				return
 			}
 
@@ -235,6 +237,14 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 
 	sort.Stable(out)
 	return *out, nil
+}
+
+func (r *compositeResourceSpec) ResourceRefs(ctx context.Context, obj *model.CompositeResourceSpec) ([]model.ObjectReference, error) {
+	resourceRefs := make([]model.ObjectReference, 0, len(obj.ResourceReferences))
+	for i := range obj.ResourceReferences {
+		resourceRefs = append(resourceRefs, *model.GetObjectReference(&obj.ResourceReferences[i]))
+	}
+	return resourceRefs, nil
 }
 
 func (r *compositeResourceSpec) ConnectionSecret(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error) {

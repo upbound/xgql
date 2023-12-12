@@ -151,6 +151,11 @@ type CompositeResourceSpec {
   connectionSecret: Secret @goField(forceResolver: true)
 
   """
+  The `ObjectReference`s for the resources composed by this composite resources.
+  """
+  resourceRefs: [ObjectReference!]!
+
+  """
   The resources of which this composite resource is composed.
   """
   resources: KubernetesResourceConnection! @goField(forceResolver: true)
