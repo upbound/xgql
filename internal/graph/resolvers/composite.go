@@ -239,6 +239,14 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 	return *out, nil
 }
 
+func (r *compositeResourceSpec) ResourceRefs(ctx context.Context, obj *model.CompositeResourceSpec) ([]model.ObjectReference, error) {
+	resourceRefs := make([]model.ObjectReference, 0, len(obj.ResourceReferences))
+	for i := range obj.ResourceReferences {
+		resourceRefs = append(resourceRefs, *model.GetObjectReference(&obj.ResourceReferences[i]))
+	}
+	return resourceRefs, nil
+}
+
 func (r *compositeResourceSpec) ConnectionSecret(ctx context.Context, obj *model.CompositeResourceSpec) (*model.Secret, error) {
 	if obj.WriteConnectionSecretToReference == nil {
 		return nil, nil
