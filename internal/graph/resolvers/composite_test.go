@@ -668,6 +668,35 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 				},
 			},
 		},
+		"IgnoreMissingResources": {
+			reason: "If the resource is not found, skip it.",
+			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {
+				return &test.MockClient{
+					MockGet: func(ctx context.Context, key client.ObjectKey, obj client.Object) error {
+						if key.Name == "not-existing" {
+							return apierrors.NewNotFound(schema.GroupResource{}, key.Name)
+						}
+						return nil
+					},
+				}, nil
+			}),
+			args: args{
+				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
+				obj: &model.CompositeResourceSpec{
+					ResourceReferences: []corev1.ObjectReference{
+						{Kind: kra.GetKind(), Name: "an-a"},
+						{Kind: krc.GetKind(), Name: "not-existing"},
+						{Kind: krb.GetKind(), Name: "a-b"},
+					},
+				},
+			},
+			want: want{
+				krc: model.KubernetesResourceConnection{
+					TotalCount: 2,
+					Nodes:      []model.KubernetesResource{gkra, gkrb},
+				},
+			},
+		},
 		"Success": {
 			reason: "If we can get and model composed resources we should return them.",
 			clients: ClientCacheFn(func(_ auth.Credentials, _ ...clients.GetOption) (client.Client, error) {

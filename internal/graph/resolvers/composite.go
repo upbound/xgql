@@ -215,7 +215,9 @@ func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.Compos
 			xrc.SetKind(ref.Kind)
 			nn := types.NamespacedName{Namespace: ref.Namespace, Name: ref.Name}
 			if err := c.Get(ctx, nn, xrc); err != nil {
-				graphql.AddError(ctx, errors.Wrap(err, errGetComposed))
+				if !apierrors.IsNotFound(err) {
+					graphql.AddError(ctx, errors.Wrap(err, errGetComposed))
+				}
 				return
 			}
 
