@@ -20,6 +20,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	corev1 "k8s.io/api/core/v1"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -150,14 +151,19 @@ func (r *event) InvolvedObject(ctx context.Context, obj *model.Event) (model.Kub
 		return nil, nil
 	}
 
-	u := &unstructured.Unstructured{}
-	u.SetAPIVersion(obj.InvolvedObjectRef.APIVersion)
-	u.SetKind(obj.InvolvedObjectRef.Kind)
+	u := &unstructured.Unstructured{Object: map[string]interface{}{
+		"apiVersion": obj.InvolvedObjectRef.APIVersion,
+		"kind":       obj.InvolvedObjectRef.Kind,
+		"metadata": map[string]interface{}{
+			"namespace": obj.InvolvedObjectRef.Namespace,
+			"name":      obj.InvolvedObjectRef.Name,
+		},
+	}}
 	nn := types.NamespacedName{
 		Namespace: obj.InvolvedObjectRef.Namespace,
 		Name:      obj.InvolvedObjectRef.Name,
 	}
-	if err := c.Get(ctx, nn, u); err != nil {
+	if err := c.Get(ctx, nn, u); err != nil && !kerrors.IsNotFound(err) {
 		graphql.AddError(ctx, errors.Wrap(err, errGetInvolved))
 		return nil, nil
 	}

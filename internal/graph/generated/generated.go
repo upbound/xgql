@@ -4513,7 +4513,7 @@ type Event implements Node {
   metadata: ObjectMeta!
 
   "The Kubernetes resource this event pertains to."
-  involvedObject: KubernetesResource! @goField(forceResolver: true)
+  involvedObject: KubernetesResource @goField(forceResolver: true)
 
   "The type of event."
   type: EventType
@@ -17347,14 +17347,11 @@ func (ec *executionContext) _Event_involvedObject(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(model.KubernetesResource)
 	fc.Result = res
-	return ec.marshalNKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
+	return ec.marshalOKubernetesResource2githubᚗcomᚋupboundᚋxgqlᚋinternalᚋgraphᚋmodelᚐKubernetesResource(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Event_involvedObject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -30220,9 +30217,6 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 					}
 				}()
 				res = ec._Event_involvedObject(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
 				return res
 			}
 

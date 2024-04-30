@@ -504,7 +504,7 @@ type Event implements Node {
   metadata: ObjectMeta!
 
   "The Kubernetes resource this event pertains to."
-  involvedObject: KubernetesResource! @goField(forceResolver: true)
+  involvedObject: KubernetesResource @goField(forceResolver: true)
 
   "The type of event."
   type: EventType

@@ -1269,7 +1269,7 @@ type Event struct {
 	// Metadata that is common to all Kubernetes API resources.
 	Metadata ObjectMeta `json:"metadata"`
 	// The Kubernetes resource this event pertains to.
-	InvolvedObject KubernetesResource `json:"involvedObject"`
+	InvolvedObject KubernetesResource `json:"involvedObject,omitempty"`
 	// The type of event.
 	Type *EventType `json:"type,omitempty"`
 	// The reason the event was emitted.
