@@ -806,7 +806,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 				Name:       id.Name,
 			}},
 		},
-		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
+		Spec: pkgv1.ProviderRevisionSpec{PackageRevisionSpec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive}},
 	}
 	gactive := model.GetProviderRevision(&active)
 
@@ -820,7 +820,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 				Name:       id.Name,
 			}},
 		},
-		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
+		Spec: pkgv1.ProviderRevisionSpec{PackageRevisionSpec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive}},
 	}
 	ginactive := model.GetProviderRevision(&inactive)
 

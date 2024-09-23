@@ -140,13 +140,15 @@ func TestGetProviderRevision(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "cool",
 				},
-				Spec: pkgv1.PackageRevisionSpec{
-					DesiredState:                pkgv1.PackageRevisionActive,
-					Package:                     "coolthing:v1",
-					PackagePullPolicy:           &ppp,
-					Revision:                    42,
-					IgnoreCrossplaneConstraints: pointer.Bool(true),
-					SkipDependencyResolution:    pointer.Bool(true),
+				Spec: pkgv1.ProviderRevisionSpec{
+					PackageRevisionSpec: pkgv1.PackageRevisionSpec{
+						DesiredState:                pkgv1.PackageRevisionActive,
+						Package:                     "coolthing:v1",
+						PackagePullPolicy:           &ppp,
+						Revision:                    42,
+						IgnoreCrossplaneConstraints: pointer.Bool(true),
+						SkipDependencyResolution:    pointer.Bool(true),
+					},
 				},
 				Status: pkgv1.PackageRevisionStatus{
 					ConditionedStatus: xpv1.ConditionedStatus{
