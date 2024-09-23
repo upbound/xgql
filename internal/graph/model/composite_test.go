@@ -26,6 +26,7 @@ import (
 	"k8s.io/utils/pointer"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/resource/unstructured/claim"
 
 	"github.com/upbound/xgql/internal/unstructured"
 )
@@ -49,7 +50,7 @@ func TestGetCompositeResource(t *testing.T) {
 				xr.SetName("cool")
 				xr.SetCompositionSelector(&metav1.LabelSelector{MatchLabels: map[string]string{"cool": "very"}})
 				xr.SetCompositionReference(&corev1.ObjectReference{Name: "coolcmp"})
-				xr.SetClaimReference(&corev1.ObjectReference{Name: "coolclaim"})
+				xr.SetClaimReference(&claim.Reference{Name: "coolclaim"})
 				xr.SetResourceReferences([]corev1.ObjectReference{{Name: "coolmanaged"}})
 				xr.SetWriteConnectionSecretToReference(&xpv1.SecretReference{Name: "coolsecret"})
 				xr.SetConnectionDetailsLastPublishedTime(&mp)
@@ -71,7 +72,7 @@ func TestGetCompositeResource(t *testing.T) {
 				Spec: CompositeResourceSpec{
 					CompositionSelector:              &LabelSelector{MatchLabels: map[string]string{"cool": "very"}},
 					CompositionReference:             &corev1.ObjectReference{Name: "coolcmp"},
-					ClaimReference:                   &corev1.ObjectReference{Name: "coolclaim"},
+					ClaimReference:                   &claim.Reference{Name: "coolclaim"},
 					ResourceReferences:               []corev1.ObjectReference{{Name: "coolmanaged"}},
 					WriteConnectionSecretToReference: &xpv1.SecretReference{Name: "coolsecret"},
 				},

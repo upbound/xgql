@@ -21,6 +21,7 @@ import (
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
+	"github.com/crossplane/crossplane-runtime/pkg/resource/unstructured/claim"
 
 	"github.com/upbound/xgql/internal/unstructured"
 )
@@ -30,7 +31,7 @@ type CompositeResourceSpec struct {
 	CompositionSelector *LabelSelector `json:"compositionSelector"`
 
 	CompositionReference             *corev1.ObjectReference
-	ClaimReference                   *corev1.ObjectReference
+	ClaimReference                   *claim.Reference
 	ResourceReferences               []corev1.ObjectReference
 	WriteConnectionSecretToReference *xpv1.SecretReference
 }

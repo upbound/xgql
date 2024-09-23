@@ -32,6 +32,7 @@ import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/errors"
 	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
+	"github.com/crossplane/crossplane-runtime/pkg/resource/unstructured/claim"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 
@@ -416,7 +417,7 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
-					ClaimReference: &corev1.ObjectReference{},
+					ClaimReference: &claim.Reference{},
 				},
 			},
 			want: want{
@@ -435,7 +436,7 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
-					ClaimReference: &corev1.ObjectReference{},
+					ClaimReference: &claim.Reference{},
 				},
 			},
 			want: want{
@@ -454,7 +455,7 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
-					ClaimReference: &corev1.ObjectReference{},
+					ClaimReference: &claim.Reference{},
 				},
 			},
 			want: want{
@@ -471,7 +472,7 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
-					ClaimReference: &corev1.ObjectReference{},
+					ClaimReference: &claim.Reference{},
 				},
 			},
 			want: want{
@@ -537,7 +538,7 @@ func TestCompositeResourceSpecClaimRef(t *testing.T) {
 			clients: nil,
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceSpec{ClaimReference: &corev1.ObjectReference{Name: name}},
+				obj: &model.CompositeResourceSpec{ClaimReference: &claim.Reference{Name: name}},
 			},
 			want: want{
 				ref: &model.ObjectReference{Name: &name},
