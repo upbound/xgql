@@ -76,8 +76,8 @@ func TestGetCompositeResourceDefinition(t *testing.T) {
 							OpenAPIV3Schema: rschema,
 						},
 					}},
-					DefaultCompositionRef:  &xpv1.Reference{Name: "default"},
-					EnforcedCompositionRef: &xpv1.Reference{Name: "enforced"},
+					DefaultCompositionRef:  &extv1.CompositionReference{Name: "default"},
+					EnforcedCompositionRef: &extv1.CompositionReference{Name: "enforced"},
 				},
 				Status: extv1.CompositeResourceDefinitionStatus{
 					ConditionedStatus: xpv1.ConditionedStatus{
@@ -130,8 +130,8 @@ func TestGetCompositeResourceDefinition(t *testing.T) {
 						Served:        true,
 						Schema:        &CompositeResourceValidation{OpenAPIV3Schema: schema},
 					}},
-					DefaultCompositionReference:  &xpv1.Reference{Name: "default"},
-					EnforcedCompositionReference: &xpv1.Reference{Name: "enforced"},
+					DefaultCompositionReference:  &extv1.CompositionReference{Name: "default"},
+					EnforcedCompositionReference: &extv1.CompositionReference{Name: "enforced"},
 				},
 				Status: &CompositeResourceDefinitionStatus{
 					Conditions: []Condition{{}},
@@ -197,11 +197,6 @@ func TestGetComposition(t *testing.T) {
 						Kind:       "ClusterExample",
 					},
 					WriteConnectionSecretsToNamespace: pointer.String("ns"),
-				},
-				Status: extv1.CompositionStatus{
-					ConditionedStatus: xpv1.ConditionedStatus{
-						Conditions: []xpv1.Condition{{}},
-					},
 				},
 			},
 			want: Composition{

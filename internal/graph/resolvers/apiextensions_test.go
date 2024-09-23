@@ -1468,7 +1468,7 @@ func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
-					DefaultCompositionReference: &xpv1.Reference{},
+					DefaultCompositionReference: &extv1.CompositionReference{},
 				},
 			},
 			want: want{
@@ -1487,7 +1487,7 @@ func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
-					DefaultCompositionReference: &xpv1.Reference{},
+					DefaultCompositionReference: &extv1.CompositionReference{},
 				},
 			},
 			want: want{
@@ -1506,7 +1506,7 @@ func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
-					DefaultCompositionReference: &xpv1.Reference{},
+					DefaultCompositionReference: &extv1.CompositionReference{},
 				},
 			},
 			want: want{
@@ -1574,7 +1574,7 @@ func TestCompositeResourceDefinitionSpecEnforcedComposition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
-					EnforcedCompositionReference: &xpv1.Reference{},
+					EnforcedCompositionReference: &extv1.CompositionReference{},
 				},
 			},
 			want: want{
@@ -1593,7 +1593,7 @@ func TestCompositeResourceDefinitionSpecEnforcedComposition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
-					EnforcedCompositionReference: &xpv1.Reference{},
+					EnforcedCompositionReference: &extv1.CompositionReference{},
 				},
 			},
 			want: want{
@@ -1612,7 +1612,7 @@ func TestCompositeResourceDefinitionSpecEnforcedComposition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
-					EnforcedCompositionReference: &xpv1.Reference{},
+					EnforcedCompositionReference: &extv1.CompositionReference{},
 				},
 			},
 			want: want{
