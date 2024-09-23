@@ -21,7 +21,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 )
 
@@ -34,8 +33,8 @@ type CompositeResourceDefinitionSpec struct {
 	ConnectionSecretKeys []string                             `json:"connectionSecretKeys"`
 	Versions             []CompositeResourceDefinitionVersion `json:"versions"`
 
-	DefaultCompositionReference  *xpv1.Reference
-	EnforcedCompositionReference *xpv1.Reference
+	DefaultCompositionReference  *extv1.CompositionReference
+	EnforcedCompositionReference *extv1.CompositionReference
 }
 
 // GetCompositeResourceDefinitionNames from the supplied Kubernetes names.
