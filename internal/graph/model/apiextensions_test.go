@@ -217,9 +217,6 @@ func TestGetComposition(t *testing.T) {
 					},
 					WriteConnectionSecretsToNamespace: pointer.String("ns"),
 				},
-				Status: &CompositionStatus{
-					Conditions: []Condition{{}},
-				},
 			},
 		},
 		"Empty": {

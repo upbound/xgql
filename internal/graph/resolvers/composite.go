@@ -177,6 +177,10 @@ func (r *compositeResourceSpec) Claim(ctx context.Context, obj *model.CompositeR
 }
 
 func (r *compositeResourceSpec) ClaimRef(ctx context.Context, obj *model.CompositeResourceSpec) (*model.ObjectReference, error) {
+	if obj == nil || obj.ClaimReference == nil {
+		return nil, nil
+	}
+
 	return model.GetObjectReference(&corev1.ObjectReference{
 		Kind:       obj.ClaimReference.Kind,
 		Namespace:  obj.ClaimReference.Namespace,

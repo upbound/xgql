@@ -20,7 +20,11 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.42.0
 	go.opentelemetry.io/otel v1.30.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.16.0
+	go.opentelemetry.io/otel/exporters/prometheus v0.52.0
+	go.opentelemetry.io/otel/metric v1.30.0
 	go.opentelemetry.io/otel/sdk v1.30.0
+	go.opentelemetry.io/otel/sdk/metric v1.30.0
+	go.opentelemetry.io/otel/trace v1.30.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	k8s.io/api v0.31.1
 	k8s.io/apiextensions-apiserver v0.31.1
@@ -46,8 +50,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	go.opentelemetry.io/otel/metric v1.30.0 // indirect
-	go.opentelemetry.io/otel/trace v1.30.0 // indirect
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0 // indirect
 	sigs.k8s.io/controller-tools v0.14.0 // indirect
 )
