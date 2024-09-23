@@ -236,3 +236,18 @@ func (c *Claim) GetCompositionUpdatePolicy() *xpv1.UpdatePolicy {
 	out := xpv1.UpdatePolicy(p)
 	return &out
 }
+
+// SetObservedGeneration of this composite resource claim.
+func (c *Claim) SetObservedGeneration(generation int64) {
+	status := &xpv1.ObservedStatus{}
+	_ = fieldpath.Pave(c.Object).GetValueInto("status", status)
+	status.SetObservedGeneration(generation)
+	_ = fieldpath.Pave(c.Object).SetValue("status.observedGeneration", status.ObservedGeneration)
+}
+
+// GetObservedGeneration of this composite resource claim.
+func (c *Claim) GetObservedGeneration() int64 {
+	status := &xpv1.ObservedStatus{}
+	_ = fieldpath.Pave(c.Object).GetValueInto("status", status)
+	return status.GetObservedGeneration()
+}

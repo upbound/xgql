@@ -23,6 +23,7 @@ import (
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
+	"github.com/crossplane/crossplane-runtime/pkg/resource/unstructured/claim"
 )
 
 // TODO(negz): This is mostly straight from crossplane-runtime; dedupe with
@@ -91,8 +92,8 @@ func (c *Composite) SetCompositionReference(ref *corev1.ObjectReference) {
 }
 
 // GetClaimReference of this Composite resource.
-func (c *Composite) GetClaimReference() *corev1.ObjectReference {
-	out := &corev1.ObjectReference{}
+func (c *Composite) GetClaimReference() *claim.Reference {
+	out := &claim.Reference{}
 	if err := fieldpath.Pave(c.Object).GetValueInto("spec.claimRef", out); err != nil {
 		return nil
 	}
@@ -100,7 +101,7 @@ func (c *Composite) GetClaimReference() *corev1.ObjectReference {
 }
 
 // SetClaimReference of this Composite resource.
-func (c *Composite) SetClaimReference(ref *corev1.ObjectReference) {
+func (c *Composite) SetClaimReference(ref *claim.Reference) {
 	_ = fieldpath.Pave(c.Object).SetValue("spec.claimRef", ref)
 }
 
@@ -263,4 +264,19 @@ func (c *Composite) SetEnvironmentConfigReferences(refs []corev1.ObjectReference
 		filtered = append(filtered, ref)
 	}
 	_ = fieldpath.Pave(c.Object).SetValue("spec.environmentConfigRefs", filtered)
+}
+
+// SetObservedGeneration of this composite resource claim.
+func (c *Composite) SetObservedGeneration(generation int64) {
+	status := &xpv1.ObservedStatus{}
+	_ = fieldpath.Pave(c.Object).GetValueInto("status", status)
+	status.SetObservedGeneration(generation)
+	_ = fieldpath.Pave(c.Object).SetValue("status.observedGeneration", status.ObservedGeneration)
+}
+
+// GetObservedGeneration of this composite resource claim.
+func (c *Composite) GetObservedGeneration() int64 {
+	status := &xpv1.ObservedStatus{}
+	_ = fieldpath.Pave(c.Object).GetValueInto("status", status)
+	return status.GetObservedGeneration()
 }
