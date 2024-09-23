@@ -122,9 +122,9 @@ func WithBBoltCache(file string, opts ...Option) clients.NewCacheMiddlewareFn {
 			// set or wrap DefaultTransform.
 			o.DefaultTransform = wrapCacheTranform(o.DefaultTransform, bc.putObject)
 			// get undelying object from cache without copying.
-			o.UnsafeDisableDeepCopy = pointer.Bool(true)
+			o.DefaultUnsafeDisableDeepCopy = pointer.Bool(true)
 			// deep copy objects before returning by default.
-			bc.deepCopy = o.UnsafeDisableDeepCopy == nil || !*o.UnsafeDisableDeepCopy
+			bc.deepCopy = o.DefaultUnsafeDisableDeepCopy == nil || !*o.DefaultUnsafeDisableDeepCopy
 			ca, err := fn(cfg, o)
 			if err != nil {
 				return nil, err

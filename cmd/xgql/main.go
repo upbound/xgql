@@ -191,7 +191,11 @@ func main() { //nolint:gocyclo
 	// until they are resolved (e.g. the user is granted the RBAC access they
 	// need) or the cache expires.
 	//nolint:reassign
-	utilruntime.ErrorHandlers = []func(error){func(err error) { log.Debug("Kubernetes runtime error", "err", err) }}
+	utilruntime.ErrorHandlers = []utilruntime.ErrorHandler{
+		func(ctx context.Context, err error, msg string, keysAndValues ...interface{}) {
+			log.Debug("Kubernetes runtime error", "err", err)
+		},
+	}
 
 	s := runtime.NewScheme()
 	kingpin.FatalIfError(corev1.AddToScheme(s), "cannot add Kubernetes core/v1 to scheme")
