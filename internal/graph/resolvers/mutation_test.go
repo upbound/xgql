@@ -129,7 +129,7 @@ func TestCreateKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -146,7 +146,7 @@ func TestCreateKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errUnmarshal, errUnmarshalUnstructured).Error()),
+					gqlerror.Wrap(errors.Wrap(errUnmarshal, errUnmarshalUnstructured)),
 				},
 			},
 		},
@@ -166,7 +166,7 @@ func TestCreateKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrapf(errUnmarshalPatch, errFmtUnmarshalPatch, 0).Error()),
+					gqlerror.Wrap(errors.Wrapf(errUnmarshalPatch, errFmtUnmarshalPatch, 0)),
 				},
 			},
 		},
@@ -187,7 +187,7 @@ func TestCreateKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrapf(errFieldPath, errFmtPatch, 0).Error()),
+					gqlerror.Wrap(errors.Wrapf(errFieldPath, errFmtPatch, 0)),
 				},
 			},
 		},
@@ -206,7 +206,7 @@ func TestCreateKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errCreateResource).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errCreateResource)),
 				},
 			},
 		},
@@ -297,7 +297,7 @@ func TestUpdateKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -314,7 +314,7 @@ func TestUpdateKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errUnmarshal, errUnmarshalUnstructured).Error()),
+					gqlerror.Wrap(errors.Wrap(errUnmarshal, errUnmarshalUnstructured)),
 				},
 			},
 		},
@@ -334,7 +334,7 @@ func TestUpdateKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrapf(errUnmarshalPatch, errFmtUnmarshalPatch, 0).Error()),
+					gqlerror.Wrap(errors.Wrapf(errUnmarshalPatch, errFmtUnmarshalPatch, 0)),
 				},
 			},
 		},
@@ -355,7 +355,7 @@ func TestUpdateKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrapf(errFieldPath, errFmtPatch, 0).Error()),
+					gqlerror.Wrap(errors.Wrapf(errFieldPath, errFmtPatch, 0)),
 				},
 			},
 		},
@@ -374,7 +374,7 @@ func TestUpdateKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errUpdateResource).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errUpdateResource)),
 				},
 			},
 		},
@@ -462,7 +462,7 @@ func TestDeleteKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -479,7 +479,7 @@ func TestDeleteKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errDeleteResource).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errDeleteResource)),
 				},
 			},
 		},

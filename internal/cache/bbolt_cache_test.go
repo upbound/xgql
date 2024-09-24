@@ -66,12 +66,17 @@ type MockCache struct {
 }
 
 // GetInformer implements cache.Cache.
-func (*MockCache) GetInformer(ctx context.Context, obj client.Object) (cache.Informer, error) {
+func (*MockCache) GetInformer(ctx context.Context, obj client.Object, opts ...cache.InformerGetOption) (cache.Informer, error) {
 	panic("unimplemented")
 }
 
 // GetInformerForKind implements cache.Cache.
-func (*MockCache) GetInformerForKind(ctx context.Context, gvk schema.GroupVersionKind) (cache.Informer, error) {
+func (*MockCache) GetInformerForKind(ctx context.Context, gvk schema.GroupVersionKind, opts ...cache.InformerGetOption) (cache.Informer, error) {
+	panic("unimplemented")
+}
+
+// RemoveInformer implements cache.Cache.
+func (*MockCache) RemoveInformer(ctx context.Context, obj client.Object) error {
 	panic("unimplemented")
 }
 

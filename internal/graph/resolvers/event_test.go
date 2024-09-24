@@ -78,7 +78,7 @@ func TestEvent(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -94,7 +94,7 @@ func TestEvent(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListEvents).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListEvents)),
 				},
 			},
 		},
@@ -303,7 +303,7 @@ func TestEventInvolvedObject(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -322,7 +322,7 @@ func TestEventInvolvedObject(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetInvolved).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetInvolved)),
 				},
 			},
 		},

@@ -21,7 +21,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 )
 
@@ -34,8 +33,8 @@ type CompositeResourceDefinitionSpec struct {
 	ConnectionSecretKeys []string                             `json:"connectionSecretKeys"`
 	Versions             []CompositeResourceDefinitionVersion `json:"versions"`
 
-	DefaultCompositionReference  *xpv1.Reference
-	EnforcedCompositionReference *xpv1.Reference
+	DefaultCompositionReference  *extv1.CompositionReference
+	EnforcedCompositionReference *extv1.CompositionReference
 }
 
 // GetCompositeResourceDefinitionNames from the supplied Kubernetes names.
@@ -145,14 +144,6 @@ func GetCompositeResourceDefinition(xrd *extv1.CompositeResourceDefinition) Comp
 	}
 }
 
-// GetCompositionStatus from the supplied Crossplane status.
-func GetCompositionStatus(in extv1.CompositionStatus) *CompositionStatus {
-	if len(in.Conditions) == 0 {
-		return nil
-	}
-	return &CompositionStatus{Conditions: GetConditions(in.Conditions)}
-}
-
 // GetComposition from the supplied Crossplane Composition.
 func GetComposition(cmp *extv1.Composition) Composition {
 	return Composition{
@@ -171,7 +162,6 @@ func GetComposition(cmp *extv1.Composition) Composition {
 			},
 			WriteConnectionSecretsToNamespace: cmp.Spec.WriteConnectionSecretsToNamespace,
 		},
-		Status: GetCompositionStatus(cmp.Status),
 		PavedAccess: PavedAccess{
 			Paved: paveObject(cmp),
 		},

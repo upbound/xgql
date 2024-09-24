@@ -32,6 +32,7 @@ import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/errors"
 	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
+	"github.com/crossplane/crossplane-runtime/pkg/resource/unstructured/claim"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
 
@@ -100,7 +101,7 @@ func TestCompositeResourceDefinition(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -117,7 +118,7 @@ func TestCompositeResourceDefinition(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListXRDs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListXRDs)),
 				},
 			},
 		},
@@ -234,7 +235,7 @@ func TestCompositeResourceSpecComposition(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -253,7 +254,7 @@ func TestCompositeResourceSpecComposition(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetComposition).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetComposition)),
 				},
 			},
 		},
@@ -416,12 +417,12 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
-					ClaimReference: &corev1.ObjectReference{},
+					ClaimReference: &claim.Reference{},
 				},
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -435,12 +436,12 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
-					ClaimReference: &corev1.ObjectReference{},
+					ClaimReference: &claim.Reference{},
 				},
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetXRC).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetXRC)),
 				},
 			},
 		},
@@ -454,7 +455,7 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
-					ClaimReference: &corev1.ObjectReference{},
+					ClaimReference: &claim.Reference{},
 				},
 			},
 			want: want{
@@ -471,7 +472,7 @@ func TestCompositeResourceSpecClaim(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceSpec{
-					ClaimReference: &corev1.ObjectReference{},
+					ClaimReference: &claim.Reference{},
 				},
 			},
 			want: want{
@@ -537,7 +538,7 @@ func TestCompositeResourceSpecClaimRef(t *testing.T) {
 			clients: nil,
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				obj: &model.CompositeResourceSpec{ClaimReference: &corev1.ObjectReference{Name: name}},
+				obj: &model.CompositeResourceSpec{ClaimReference: &claim.Reference{Name: name}},
 			},
 			want: want{
 				ref: &model.ObjectReference{Name: &name},
@@ -607,7 +608,7 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -640,7 +641,7 @@ func TestCompositeResourceSpecResources(t *testing.T) {
 					Nodes:      []model.KubernetesResource{gkrb},
 				},
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetComposed).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetComposed)),
 				},
 			},
 		},
@@ -787,7 +788,7 @@ func TestCompositeResourceSpecConnectionSecret(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -806,7 +807,7 @@ func TestCompositeResourceSpecConnectionSecret(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetSecret).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetSecret)),
 				},
 			},
 		},
@@ -993,7 +994,7 @@ func TestCompositeResourceClaimDefinition(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -1010,7 +1011,7 @@ func TestCompositeResourceClaimDefinition(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListXRDs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListXRDs)),
 				},
 			},
 		},
@@ -1127,7 +1128,7 @@ func TestCompositeResourceClaimSpecComposition(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -1146,7 +1147,7 @@ func TestCompositeResourceClaimSpecComposition(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetComposition).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetComposition)),
 				},
 			},
 		},
@@ -1314,7 +1315,7 @@ func TestCompositeResourceClaimSpecResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -1333,7 +1334,7 @@ func TestCompositeResourceClaimSpecResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetXR).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetXR)),
 				},
 			},
 		},
@@ -1503,7 +1504,7 @@ func TestCompositeResourceClaimSpecConnectionSecret(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -1522,7 +1523,7 @@ func TestCompositeResourceClaimSpecConnectionSecret(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetSecret).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetSecret)),
 				},
 			},
 		},

@@ -23,7 +23,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kschema "k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 func TestGetEvent(t *testing.T) {
@@ -67,11 +67,11 @@ func TestGetEvent(t *testing.T) {
 					Name: "cool",
 				},
 				Type:    &warn,
-				Reason:  pointer.String("BadStuff"),
-				Message: pointer.String("Bad stuff happened."),
+				Reason:  ptr.To("BadStuff"),
+				Message: ptr.To("Bad stuff happened."),
 				Count:   func() *int { i := 42; return &i }(),
 				Source: &EventSource{
-					Component: pointer.String("that-thing"),
+					Component: ptr.To("that-thing"),
 				},
 				FirstTime: &now,
 				LastTime:  &now,

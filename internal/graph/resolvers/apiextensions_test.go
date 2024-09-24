@@ -25,7 +25,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
@@ -76,7 +76,7 @@ func TestCompositeResourceCrd(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -95,7 +95,7 @@ func TestCompositeResourceCrd(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetCRD).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetCRD)),
 				},
 			},
 		},
@@ -191,7 +191,7 @@ func TestCompositeResourceClaimCrd(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -210,7 +210,7 @@ func TestCompositeResourceClaimCrd(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetCRD).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetCRD)),
 				},
 			},
 		},
@@ -316,7 +316,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -338,7 +338,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListResources).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListResources)),
 				},
 			},
 		},
@@ -368,7 +368,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						Group: group,
 						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							{
@@ -418,7 +418,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						Group: group,
 						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// This version should be ignored because it is
@@ -467,7 +467,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						Group: group,
 						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -484,7 +484,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						},
 					},
 				},
-				options: &model.DefinedCompositeResourceOptionsInput{Version: pointer.String(version)},
+				options: &model.DefinedCompositeResourceOptionsInput{Version: ptr.To(version)},
 			},
 			want: want{
 				crc: model.CompositeResourceConnection{
@@ -519,7 +519,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						Group: group,
 						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -536,7 +536,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						},
 					},
 				},
-				version: pointer.String(version),
+				version: ptr.To(version),
 			},
 			want: want{
 				crc: model.CompositeResourceConnection{
@@ -571,7 +571,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						Group: group,
 						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -588,8 +588,8 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						},
 					},
 				},
-				options: &model.DefinedCompositeResourceOptionsInput{Version: pointer.String(version)},
-				version: pointer.String("v2"),
+				options: &model.DefinedCompositeResourceOptionsInput{Version: ptr.To(version)},
+				version: ptr.To("v2"),
 			},
 			want: want{
 				crc: model.CompositeResourceConnection{
@@ -615,7 +615,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						Group: group,
 						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -658,7 +658,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						Group: group,
 						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -675,7 +675,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						},
 					},
 				},
-				options: &model.DefinedCompositeResourceOptionsInput{Ready: pointer.Bool(false)},
+				options: &model.DefinedCompositeResourceOptionsInput{Ready: ptr.To(false)},
 			},
 			want: want{
 				crc: model.CompositeResourceConnection{
@@ -701,7 +701,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						Group: group,
 						Names: model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -718,7 +718,7 @@ func TestXRDDefinedCompositeResources(t *testing.T) {
 						},
 					},
 				},
-				options: &model.DefinedCompositeResourceOptionsInput{Ready: pointer.Bool(true)},
+				options: &model.DefinedCompositeResourceOptionsInput{Ready: ptr.To(true)},
 			},
 			want: want{
 				crc: model.CompositeResourceConnection{
@@ -823,7 +823,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -845,7 +845,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListResources).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListResources)),
 				},
 			},
 		},
@@ -875,7 +875,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							{
@@ -925,7 +925,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// This version should be ignored because it is
@@ -974,7 +974,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -991,7 +991,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						},
 					},
 				},
-				options: &model.DefinedCompositeResourceClaimOptionsInput{Version: pointer.String(version)},
+				options: &model.DefinedCompositeResourceClaimOptionsInput{Version: ptr.To(version)},
 			},
 			want: want{
 				crcc: model.CompositeResourceClaimConnection{
@@ -1026,7 +1026,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -1043,7 +1043,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						},
 					},
 				},
-				version: pointer.String(version),
+				version: ptr.To(version),
 			},
 			want: want{
 				crcc: model.CompositeResourceClaimConnection{
@@ -1078,7 +1078,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -1095,8 +1095,8 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						},
 					},
 				},
-				options: &model.DefinedCompositeResourceClaimOptionsInput{Version: pointer.String(version)},
-				version: pointer.String("v2"),
+				options: &model.DefinedCompositeResourceClaimOptionsInput{Version: ptr.To(version)},
+				version: ptr.To("v2"),
 			},
 			want: want{
 				crcc: model.CompositeResourceClaimConnection{
@@ -1135,7 +1135,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -1152,7 +1152,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						},
 					},
 				},
-				options: &model.DefinedCompositeResourceClaimOptionsInput{Version: pointer.String(version), Namespace: pointer.String("some-namespace")},
+				options: &model.DefinedCompositeResourceClaimOptionsInput{Version: ptr.To(version), Namespace: ptr.To("some-namespace")},
 			},
 			want: want{
 				crcc: model.CompositeResourceClaimConnection{
@@ -1191,7 +1191,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -1208,8 +1208,8 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						},
 					},
 				},
-				options:   &model.DefinedCompositeResourceClaimOptionsInput{Version: pointer.String(version)},
-				namespace: pointer.String("some-namespace"),
+				options:   &model.DefinedCompositeResourceClaimOptionsInput{Version: ptr.To(version)},
+				namespace: ptr.To("some-namespace"),
 			},
 			want: want{
 				crcc: model.CompositeResourceClaimConnection{
@@ -1248,7 +1248,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -1265,8 +1265,8 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						},
 					},
 				},
-				options:   &model.DefinedCompositeResourceClaimOptionsInput{Version: pointer.String(version), Namespace: pointer.String("some-namespace")},
-				namespace: pointer.String("some-other-namespace"),
+				options:   &model.DefinedCompositeResourceClaimOptionsInput{Version: ptr.To(version), Namespace: ptr.To("some-namespace")},
+				namespace: ptr.To("some-other-namespace"),
 			},
 			want: want{
 				crcc: model.CompositeResourceClaimConnection{
@@ -1292,7 +1292,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -1335,7 +1335,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -1352,7 +1352,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						},
 					},
 				},
-				options: &model.DefinedCompositeResourceClaimOptionsInput{Ready: pointer.Bool(false)},
+				options: &model.DefinedCompositeResourceClaimOptionsInput{Ready: ptr.To(false)},
 			},
 			want: want{
 				crcc: model.CompositeResourceClaimConnection{
@@ -1378,7 +1378,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						Group: group,
 						ClaimNames: &model.CompositeResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CompositeResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -1395,7 +1395,7 @@ func TestXRDDefinedCompositeResourceClaims(t *testing.T) {
 						},
 					},
 				},
-				options: &model.DefinedCompositeResourceClaimOptionsInput{Ready: pointer.Bool(true)},
+				options: &model.DefinedCompositeResourceClaimOptionsInput{Ready: ptr.To(true)},
 			},
 			want: want{
 				crcc: model.CompositeResourceClaimConnection{
@@ -1468,12 +1468,12 @@ func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
-					DefaultCompositionReference: &xpv1.Reference{},
+					DefaultCompositionReference: &extv1.CompositionReference{},
 				},
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -1487,12 +1487,12 @@ func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
-					DefaultCompositionReference: &xpv1.Reference{},
+					DefaultCompositionReference: &extv1.CompositionReference{},
 				},
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetComposition).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetComposition)),
 				},
 			},
 		},
@@ -1506,7 +1506,7 @@ func TestCompositeResourceDefinitionSpecDefaultComposition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
-					DefaultCompositionReference: &xpv1.Reference{},
+					DefaultCompositionReference: &extv1.CompositionReference{},
 				},
 			},
 			want: want{
@@ -1574,12 +1574,12 @@ func TestCompositeResourceDefinitionSpecEnforcedComposition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
-					EnforcedCompositionReference: &xpv1.Reference{},
+					EnforcedCompositionReference: &extv1.CompositionReference{},
 				},
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -1593,12 +1593,12 @@ func TestCompositeResourceDefinitionSpecEnforcedComposition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
-					EnforcedCompositionReference: &xpv1.Reference{},
+					EnforcedCompositionReference: &extv1.CompositionReference{},
 				},
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetComposition).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetComposition)),
 				},
 			},
 		},
@@ -1612,7 +1612,7 @@ func TestCompositeResourceDefinitionSpecEnforcedComposition(t *testing.T) {
 			args: args{
 				ctx: graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
 				obj: &model.CompositeResourceDefinitionSpec{
-					EnforcedCompositionReference: &xpv1.Reference{},
+					EnforcedCompositionReference: &extv1.CompositionReference{},
 				},
 			},
 			want: want{

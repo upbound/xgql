@@ -28,6 +28,7 @@ import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
+	"github.com/crossplane/crossplane-runtime/pkg/resource/unstructured/claim"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
 )
 
@@ -266,11 +267,11 @@ func TestCompositeCompositionReference(t *testing.T) {
 }
 
 func TestCompositeClaimReference(t *testing.T) {
-	ref := &corev1.ObjectReference{Namespace: "ns", Name: "cool"}
+	ref := &claim.Reference{Namespace: "ns", Name: "cool"}
 	cases := map[string]struct {
 		u    *Composite
-		set  *corev1.ObjectReference
-		want *corev1.ObjectReference
+		set  *claim.Reference
+		want *claim.Reference
 	}{
 		"NewRef": {
 			u:    emptyXR(),

@@ -26,7 +26,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	kschema "k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/test"
@@ -51,7 +51,7 @@ func TestGetConditions(t *testing.T) {
 				Status:             ConditionStatusTrue,
 				Reason:             string(xpv1.ReasonAvailable),
 				LastTransitionTime: c.LastTransitionTime.Time,
-				Message:            pointer.String("I'm here!"),
+				Message:            ptr.To("I'm here!"),
 			}},
 		},
 		"Empty": {
@@ -190,7 +190,7 @@ func TestGetSecret(t *testing.T) {
 				Metadata: ObjectMeta{
 					Name: "cool",
 				},
-				Type: pointer.String("cool"),
+				Type: ptr.To("cool"),
 				data: map[string]string{"cool": "secret"},
 			},
 		},
@@ -374,10 +374,10 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 					Group: "group",
 					Names: CustomResourceDefinitionNames{
 						Plural:     "clusterexamples",
-						Singular:   pointer.String("clusterexample"),
+						Singular:   ptr.To("clusterexample"),
 						ShortNames: []string{"cex"},
 						Kind:       "ClusterExample",
-						ListKind:   pointer.String("ClusterExampleList"),
+						ListKind:   ptr.To("ClusterExampleList"),
 						Categories: []string{"example"},
 					},
 					Scope: ResourceScopeNamespaceScoped,
@@ -391,7 +391,7 @@ func TestGetCustomResourceDefinition(t *testing.T) {
 					Conditions: []Condition{{
 						Type:    string(kextv1.Established),
 						Reason:  "VeryCoolCRD",
-						Message: pointer.String("So cool"),
+						Message: ptr.To("So cool"),
 						// NOTE(tnthornton) transition is being truncated
 						// during marshaling.
 						LastTransitionTime: transition.Truncate(time.Second),
@@ -528,7 +528,7 @@ func TestGetKubernetesResource(t *testing.T) {
 						Name:      "cool",
 					},
 					Metadata: ObjectMeta{
-						Namespace: pointer.String("default"),
+						Namespace: ptr.To("default"),
 						Name:      "cool",
 					},
 					Spec: CompositeResourceClaimSpec{

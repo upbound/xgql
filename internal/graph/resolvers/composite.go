@@ -177,7 +177,16 @@ func (r *compositeResourceSpec) Claim(ctx context.Context, obj *model.CompositeR
 }
 
 func (r *compositeResourceSpec) ClaimRef(ctx context.Context, obj *model.CompositeResourceSpec) (*model.ObjectReference, error) {
-	return model.GetObjectReference(obj.ClaimReference), nil
+	if obj == nil || obj.ClaimReference == nil {
+		return nil, nil
+	}
+
+	return model.GetObjectReference(&corev1.ObjectReference{
+		Kind:       obj.ClaimReference.Kind,
+		Namespace:  obj.ClaimReference.Namespace,
+		Name:       obj.ClaimReference.Name,
+		APIVersion: obj.ClaimReference.APIVersion,
+	}), nil
 }
 
 func (r *compositeResourceSpec) Resources(ctx context.Context, obj *model.CompositeResourceSpec) (model.KubernetesResourceConnection, error) {

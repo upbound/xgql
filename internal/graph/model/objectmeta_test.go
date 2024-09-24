@@ -23,7 +23,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 func TestGetObjectMeta(t *testing.T) {
@@ -56,9 +56,9 @@ func TestGetObjectMeta(t *testing.T) {
 				return u
 			}(),
 			want: ObjectMeta{
-				Namespace:       pointer.String("default"),
+				Namespace:       ptr.To("default"),
 				Name:            "cool-rando",
-				GenerateName:    pointer.String("cool-"),
+				GenerateName:    ptr.To("cool-"),
 				UID:             "no-you-id",
 				ResourceVersion: "42",
 				Generation:      42,

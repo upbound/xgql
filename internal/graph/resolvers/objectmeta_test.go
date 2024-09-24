@@ -24,7 +24,7 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/crossplane/crossplane-runtime/pkg/errors"
@@ -78,7 +78,7 @@ func TestObjectMetaOwners(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -107,7 +107,7 @@ func TestObjectMetaOwners(t *testing.T) {
 						{
 							APIVersion: ctrl.GetAPIVersion(),
 							Kind:       ctrl.GetKind(),
-							Controller: pointer.Bool(true),
+							Controller: ptr.To(true),
 						},
 					},
 				},
@@ -118,7 +118,7 @@ func TestObjectMetaOwners(t *testing.T) {
 					TotalCount: 1,
 				},
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetOwner).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetOwner)),
 				},
 			},
 		},
@@ -189,7 +189,7 @@ func TestObjectMetaController(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -207,14 +207,14 @@ func TestObjectMetaController(t *testing.T) {
 						{
 							APIVersion: ctrl.GetAPIVersion(),
 							Kind:       ctrl.GetKind(),
-							Controller: pointer.Bool(true),
+							Controller: ptr.To(true),
 						},
 					},
 				},
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetOwner).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetOwner)),
 				},
 			},
 		},
@@ -236,7 +236,7 @@ func TestObjectMetaController(t *testing.T) {
 						{
 							APIVersion: ctrl.GetAPIVersion(),
 							Kind:       ctrl.GetKind(),
-							Controller: pointer.Bool(true),
+							Controller: ptr.To(true),
 						},
 					},
 				},

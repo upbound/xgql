@@ -21,7 +21,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	"github.com/crossplane/crossplane-runtime/pkg/errors"
 
@@ -64,7 +64,7 @@ func (r *objectMeta) Owners(ctx context.Context, obj *model.ObjectMeta) (model.O
 			u.SetAPIVersion(ref.APIVersion)
 			u.SetKind(ref.Kind)
 
-			nn := types.NamespacedName{Namespace: pointer.StringDeref(obj.Namespace, ""), Name: ref.Name}
+			nn := types.NamespacedName{Namespace: ptr.Deref(obj.Namespace, ""), Name: ref.Name}
 			if err := c.Get(ctx, nn, u); err != nil {
 				graphql.AddError(ctx, errors.Wrap(err, errGetOwner))
 				return
@@ -98,7 +98,7 @@ func (r *objectMeta) Controller(ctx context.Context, obj *model.ObjectMeta) (mod
 	}
 
 	for _, ref := range obj.OwnerReferences {
-		if !pointer.BoolDeref(ref.Controller, false) {
+		if !ptr.Deref(ref.Controller, false) {
 			continue
 		}
 
@@ -106,7 +106,7 @@ func (r *objectMeta) Controller(ctx context.Context, obj *model.ObjectMeta) (mod
 		u.SetAPIVersion(ref.APIVersion)
 		u.SetKind(ref.Kind)
 
-		nn := types.NamespacedName{Namespace: pointer.StringDeref(obj.Namespace, ""), Name: ref.Name}
+		nn := types.NamespacedName{Namespace: ptr.Deref(obj.Namespace, ""), Name: ref.Name}
 		if err := c.Get(ctx, nn, u); err != nil {
 			graphql.AddError(ctx, errors.Wrap(err, errGetOwner))
 			return nil, nil

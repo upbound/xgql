@@ -24,7 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -77,7 +77,7 @@ func TestCrossplaneResourceTree(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -265,7 +265,7 @@ func TestQueryKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -281,7 +281,7 @@ func TestQueryKubernetesResource(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetResource).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetResource)),
 				},
 			},
 		},
@@ -369,7 +369,7 @@ func TestQueryKubernetesResources(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -385,7 +385,7 @@ func TestQueryKubernetesResources(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListResources).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListResources)),
 				},
 			},
 		},
@@ -544,7 +544,7 @@ func TestQuerySecret(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -560,7 +560,7 @@ func TestQuerySecret(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetSecret).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetSecret)),
 				},
 			},
 		},
@@ -634,7 +634,7 @@ func TestQueryConfigMap(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -650,7 +650,7 @@ func TestQueryConfigMap(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetConfigMap).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetConfigMap)),
 				},
 			},
 		},
@@ -723,7 +723,7 @@ func TestQueryProviders(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -739,7 +739,7 @@ func TestQueryProviders(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListProviders).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListProviders)),
 				},
 			},
 		},
@@ -806,7 +806,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 				Name:       id.Name,
 			}},
 		},
-		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
+		Spec: pkgv1.ProviderRevisionSpec{PackageRevisionSpec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive}},
 	}
 	gactive := model.GetProviderRevision(&active)
 
@@ -820,7 +820,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 				Name:       id.Name,
 			}},
 		},
-		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
+		Spec: pkgv1.ProviderRevisionSpec{PackageRevisionSpec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive}},
 	}
 	ginactive := model.GetProviderRevision(&inactive)
 
@@ -864,7 +864,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -880,7 +880,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListProviderRevs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListProviderRevs)),
 				},
 			},
 		},
@@ -943,7 +943,7 @@ func TestQueryProviderRevisions(t *testing.T) {
 			}),
 			args: args{
 				ctx:    graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				active: pointer.Bool(true),
+				active: ptr.To(true),
 			},
 			want: want{
 				pc: model.ProviderRevisionConnection{
@@ -1043,7 +1043,7 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -1059,7 +1059,7 @@ func TestQueryCustomResourceDefinitions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListConfigs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListConfigs)),
 				},
 			},
 		},
@@ -1177,7 +1177,7 @@ func TestQueryConfigurations(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -1193,7 +1193,7 @@ func TestQueryConfigurations(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListConfigs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListConfigs)),
 				},
 			},
 		},
@@ -1318,7 +1318,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -1334,7 +1334,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListConfigRevs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListConfigRevs)),
 				},
 			},
 		},
@@ -1397,7 +1397,7 @@ func TestQueryConfigurationRevisions(t *testing.T) {
 			}),
 			args: args{
 				ctx:    graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				active: pointer.Bool(true),
+				active: ptr.To(true),
 			},
 			want: want{
 				pc: model.ConfigurationRevisionConnection{
@@ -1496,7 +1496,7 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -1512,7 +1512,7 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListConfigs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListConfigs)),
 				},
 			},
 		},
@@ -1561,7 +1561,7 @@ func TestQueryCompositeResourceDefinitions(t *testing.T) {
 			}),
 			args: args{
 				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				dangling: pointer.Bool(true),
+				dangling: ptr.To(true),
 			},
 			want: want{
 				xrdc: model.CompositeResourceDefinitionConnection{
@@ -1691,7 +1691,7 @@ func TestQueryCompositions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -1707,7 +1707,7 @@ func TestQueryCompositions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListConfigs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListConfigs)),
 				},
 			},
 		},
@@ -1756,7 +1756,7 @@ func TestQueryCompositions(t *testing.T) {
 			}),
 			args: args{
 				ctx:      graphql.WithResponseContext(context.Background(), graphql.DefaultErrorPresenter, graphql.DefaultRecover),
-				dangling: pointer.Bool(true),
+				dangling: ptr.To(true),
 			},
 			want: want{
 				cc: model.CompositionConnection{

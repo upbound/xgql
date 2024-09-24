@@ -59,7 +59,7 @@ func TestProviderRevisions(t *testing.T) {
 			Name:            "coolconfig",
 			OwnerReferences: []metav1.OwnerReference{meta.AsController(&xpv1.TypedReference{UID: types.UID(uid)})},
 		},
-		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
+		Spec: pkgv1.ProviderRevisionSpec{PackageRevisionSpec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive}},
 	}
 	gactive := model.GetProviderRevision(&active)
 
@@ -69,7 +69,7 @@ func TestProviderRevisions(t *testing.T) {
 			Name:            "coolconfig",
 			OwnerReferences: []metav1.OwnerReference{meta.AsController(&xpv1.TypedReference{UID: types.UID(uid)})},
 		},
-		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
+		Spec: pkgv1.ProviderRevisionSpec{PackageRevisionSpec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive}},
 	}
 	ginactive := model.GetProviderRevision(&inactive)
 
@@ -102,7 +102,7 @@ func TestProviderRevisions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -118,7 +118,7 @@ func TestProviderRevisions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListProviderRevs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListProviderRevs)),
 				},
 			},
 		},
@@ -182,7 +182,7 @@ func TestProviderActiveRevision(t *testing.T) {
 			Name:            "coolconfig",
 			OwnerReferences: []metav1.OwnerReference{meta.AsController(&xpv1.TypedReference{UID: types.UID(uid)})},
 		},
-		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
+		Spec: pkgv1.ProviderRevisionSpec{PackageRevisionSpec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive}},
 	}
 	gactive := model.GetProviderRevision(&active)
 
@@ -192,13 +192,13 @@ func TestProviderActiveRevision(t *testing.T) {
 			Name:            "coolconfig",
 			OwnerReferences: []metav1.OwnerReference{meta.AsController(&xpv1.TypedReference{UID: types.UID(uid)})},
 		},
-		Spec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive},
+		Spec: pkgv1.ProviderRevisionSpec{PackageRevisionSpec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionInactive}},
 	}
 
 	// An active ProviderRevision which we do not control.
 	otherActive := pkgv1.ProviderRevision{
 		ObjectMeta: metav1.ObjectMeta{Name: "not-ours"},
-		Spec:       pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive},
+		Spec:       pkgv1.ProviderRevisionSpec{PackageRevisionSpec: pkgv1.PackageRevisionSpec{DesiredState: pkgv1.PackageRevisionActive}},
 	}
 
 	type args struct {
@@ -227,7 +227,7 @@ func TestProviderActiveRevision(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -243,7 +243,7 @@ func TestProviderActiveRevision(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListProviderRevs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListProviderRevs)),
 				},
 			},
 		},
@@ -346,7 +346,7 @@ func TestProviderRevisionStatusObjects(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -400,7 +400,7 @@ func TestProviderRevisionStatusObjects(t *testing.T) {
 					TotalCount: 0,
 				},
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetCRD).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetCRD)),
 				},
 			},
 		},
