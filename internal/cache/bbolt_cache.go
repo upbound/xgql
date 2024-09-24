@@ -34,7 +34,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/rest"
 	toolscache "k8s.io/client-go/tools/cache"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
@@ -122,7 +122,7 @@ func WithBBoltCache(file string, opts ...Option) clients.NewCacheMiddlewareFn {
 			// set or wrap DefaultTransform.
 			o.DefaultTransform = wrapCacheTranform(o.DefaultTransform, bc.putObject)
 			// get undelying object from cache without copying.
-			o.DefaultUnsafeDisableDeepCopy = pointer.Bool(true)
+			o.DefaultUnsafeDisableDeepCopy = ptr.To(true)
 			// deep copy objects before returning by default.
 			bc.deepCopy = o.DefaultUnsafeDisableDeepCopy == nil || !*o.DefaultUnsafeDisableDeepCopy
 			ca, err := fn(cfg, o)

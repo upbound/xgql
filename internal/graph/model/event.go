@@ -16,7 +16,7 @@ package model
 
 import (
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 // GetEventType from the supplied Kubernetes event type.
@@ -53,17 +53,17 @@ func GetEvent(e *corev1.Event) Event {
 	}
 
 	if e.Reason != "" {
-		out.Reason = pointer.String(e.Reason)
+		out.Reason = ptr.To(e.Reason)
 	}
 	if e.Message != "" {
-		out.Message = pointer.String(e.Message)
+		out.Message = ptr.To(e.Message)
 	}
 	if e.Count != 0 {
 		c := int(e.Count)
 		out.Count = &c
 	}
 	if e.Source.Component != "" {
-		out.Source = &EventSource{Component: pointer.String(e.Source.Component)}
+		out.Source = &EventSource{Component: ptr.To(e.Source.Component)}
 	}
 	ft := e.FirstTimestamp.Time
 	out.FirstTime = &ft

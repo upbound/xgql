@@ -23,7 +23,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/resource/unstructured/claim"
@@ -152,7 +152,7 @@ func TestGetCompositeResourceClaim(t *testing.T) {
 				APIVersion: "example.org/v1",
 				Kind:       "CompositeResource",
 				Metadata: ObjectMeta{
-					Namespace: pointer.String("default"),
+					Namespace: ptr.To("default"),
 					Name:      "cool",
 				},
 				Spec: CompositeResourceClaimSpec{

@@ -24,7 +24,7 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/crossplane/crossplane-runtime/pkg/errors"
@@ -88,7 +88,7 @@ func TestCRDDefinedResources(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -110,7 +110,7 @@ func TestCRDDefinedResources(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListResources).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListResources)),
 				},
 			},
 		},
@@ -140,7 +140,7 @@ func TestCRDDefinedResources(t *testing.T) {
 						Group: group,
 						Names: model.CustomResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CustomResourceDefinitionVersion{
 							// This version should be ignored because it is
@@ -189,7 +189,7 @@ func TestCRDDefinedResources(t *testing.T) {
 						Group: group,
 						Names: model.CustomResourceDefinitionNames{
 							Kind:     kind,
-							ListKind: pointer.String(listKind),
+							ListKind: ptr.To(listKind),
 						},
 						Versions: []model.CustomResourceDefinitionVersion{
 							// Normally we'd pick this version first, but in
@@ -206,7 +206,7 @@ func TestCRDDefinedResources(t *testing.T) {
 						},
 					},
 				},
-				version: pointer.String(version),
+				version: ptr.To(version),
 			},
 			want: want{
 				krc: model.KubernetesResourceConnection{

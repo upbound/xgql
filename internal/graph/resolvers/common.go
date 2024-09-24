@@ -23,7 +23,7 @@ import (
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	"github.com/crossplane/crossplane-runtime/pkg/errors"
 
@@ -45,7 +45,7 @@ func (r *genericResource) Events(ctx context.Context, obj *model.GenericResource
 		APIVersion: obj.APIVersion,
 		Kind:       obj.Kind,
 		Name:       obj.Metadata.Name,
-		Namespace:  pointer.StringDeref(obj.Metadata.Namespace, ""),
+		Namespace:  ptr.Deref(obj.Metadata.Namespace, ""),
 		UID:        types.UID(obj.Metadata.UID),
 	})
 }
@@ -60,7 +60,7 @@ func (r *secret) Events(ctx context.Context, obj *model.Secret) (model.EventConn
 		APIVersion: obj.APIVersion,
 		Kind:       obj.Kind,
 		Name:       obj.Metadata.Name,
-		Namespace:  pointer.StringDeref(obj.Metadata.Namespace, ""),
+		Namespace:  ptr.Deref(obj.Metadata.Namespace, ""),
 		UID:        types.UID(obj.Metadata.UID),
 	})
 }
@@ -75,7 +75,7 @@ func (r *configMap) Events(ctx context.Context, obj *model.ConfigMap) (model.Eve
 		APIVersion: obj.APIVersion,
 		Kind:       obj.Kind,
 		Name:       obj.Metadata.Name,
-		Namespace:  pointer.StringDeref(obj.Metadata.Namespace, ""),
+		Namespace:  ptr.Deref(obj.Metadata.Namespace, ""),
 		UID:        types.UID(obj.Metadata.UID),
 	})
 }

@@ -102,7 +102,7 @@ func TestProviderRevisions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -118,7 +118,7 @@ func TestProviderRevisions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListProviderRevs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListProviderRevs)),
 				},
 			},
 		},
@@ -227,7 +227,7 @@ func TestProviderActiveRevision(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -243,7 +243,7 @@ func TestProviderActiveRevision(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListProviderRevs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListProviderRevs)),
 				},
 			},
 		},
@@ -346,7 +346,7 @@ func TestProviderRevisionStatusObjects(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -400,7 +400,7 @@ func TestProviderRevisionStatusObjects(t *testing.T) {
 					TotalCount: 0,
 				},
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetCRD).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetCRD)),
 				},
 			},
 		},

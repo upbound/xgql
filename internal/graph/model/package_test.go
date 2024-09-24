@@ -22,7 +22,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	pkgv1 "github.com/crossplane/crossplane/apis/pkg/v1"
@@ -58,8 +58,8 @@ func TestGetProvider(t *testing.T) {
 						RevisionActivationPolicy:    &rap,
 						RevisionHistoryLimit:        &lim,
 						PackagePullPolicy:           &ppp,
-						IgnoreCrossplaneConstraints: pointer.Bool(true),
-						SkipDependencyResolution:    pointer.Bool(true),
+						IgnoreCrossplaneConstraints: ptr.To(true),
+						SkipDependencyResolution:    ptr.To(true),
 					},
 				},
 				Status: pkgv1.ProviderStatus{
@@ -88,13 +88,13 @@ func TestGetProvider(t *testing.T) {
 					RevisionActivationPolicy:    &mrap,
 					RevisionHistoryLimit:        &mlim,
 					PackagePullPolicy:           &mppp,
-					IgnoreCrossplaneConstraints: pointer.Bool(true),
-					SkipDependencyResolution:    pointer.Bool(true),
+					IgnoreCrossplaneConstraints: ptr.To(true),
+					SkipDependencyResolution:    ptr.To(true),
 				},
 				Status: &ProviderStatus{
 					Conditions:        []Condition{{}},
-					CurrentRevision:   pointer.String("8"),
-					CurrentIdentifier: pointer.String("coolthing:v1"),
+					CurrentRevision:   ptr.To("8"),
+					CurrentIdentifier: ptr.To("coolthing:v1"),
 				},
 			},
 		},
@@ -146,8 +146,8 @@ func TestGetProviderRevision(t *testing.T) {
 						Package:                     "coolthing:v1",
 						PackagePullPolicy:           &ppp,
 						Revision:                    42,
-						IgnoreCrossplaneConstraints: pointer.Bool(true),
-						SkipDependencyResolution:    pointer.Bool(true),
+						IgnoreCrossplaneConstraints: ptr.To(true),
+						SkipDependencyResolution:    ptr.To(true),
 					},
 				},
 				Status: pkgv1.PackageRevisionStatus{
@@ -183,8 +183,8 @@ func TestGetProviderRevision(t *testing.T) {
 					Package:                     "coolthing:v1",
 					PackagePullPolicy:           &mppp,
 					Revision:                    42,
-					IgnoreCrossplaneConstraints: pointer.Bool(true),
-					SkipDependencyResolution:    pointer.Bool(true),
+					IgnoreCrossplaneConstraints: ptr.To(true),
+					SkipDependencyResolution:    ptr.To(true),
 				},
 				Status: &ProviderRevisionStatus{
 					Conditions:            []Condition{{}},
@@ -252,8 +252,8 @@ func TestGetConfiguration(t *testing.T) {
 						RevisionActivationPolicy:    &rap,
 						RevisionHistoryLimit:        &lim,
 						PackagePullPolicy:           &ppp,
-						IgnoreCrossplaneConstraints: pointer.Bool(true),
-						SkipDependencyResolution:    pointer.Bool(true),
+						IgnoreCrossplaneConstraints: ptr.To(true),
+						SkipDependencyResolution:    ptr.To(true),
 					},
 				},
 				Status: pkgv1.ConfigurationStatus{
@@ -282,13 +282,13 @@ func TestGetConfiguration(t *testing.T) {
 					RevisionActivationPolicy:    &mrap,
 					RevisionHistoryLimit:        &mlim,
 					PackagePullPolicy:           &mppp,
-					IgnoreCrossplaneConstraints: pointer.Bool(true),
-					SkipDependencyResolution:    pointer.Bool(true),
+					IgnoreCrossplaneConstraints: ptr.To(true),
+					SkipDependencyResolution:    ptr.To(true),
 				},
 				Status: &ConfigurationStatus{
 					Conditions:        []Condition{{}},
-					CurrentRevision:   pointer.String("8"),
-					CurrentIdentifier: pointer.String("coolthing:v1"),
+					CurrentRevision:   ptr.To("8"),
+					CurrentIdentifier: ptr.To("coolthing:v1"),
 				},
 			},
 		},
@@ -339,8 +339,8 @@ func TestGetConfigurationRevision(t *testing.T) {
 					Package:                     "coolthing:v1",
 					PackagePullPolicy:           &ppp,
 					Revision:                    42,
-					IgnoreCrossplaneConstraints: pointer.Bool(true),
-					SkipDependencyResolution:    pointer.Bool(true),
+					IgnoreCrossplaneConstraints: ptr.To(true),
+					SkipDependencyResolution:    ptr.To(true),
 				},
 				Status: pkgv1.PackageRevisionStatus{
 					ConditionedStatus: xpv1.ConditionedStatus{
@@ -375,8 +375,8 @@ func TestGetConfigurationRevision(t *testing.T) {
 					Package:                     "coolthing:v1",
 					PackagePullPolicy:           &mppp,
 					Revision:                    42,
-					IgnoreCrossplaneConstraints: pointer.Bool(true),
-					SkipDependencyResolution:    pointer.Bool(true),
+					IgnoreCrossplaneConstraints: ptr.To(true),
+					SkipDependencyResolution:    ptr.To(true),
 				},
 				Status: &ConfigurationRevisionStatus{
 					Conditions:            []Condition{{}},

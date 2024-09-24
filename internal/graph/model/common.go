@@ -24,7 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/errors"
@@ -180,7 +180,7 @@ func GetSecret(s *corev1.Secret) Secret {
 	}
 
 	if s.Type != "" {
-		out.Type = pointer.String(string(s.Type))
+		out.Type = ptr.To(string(s.Type))
 	}
 
 	return out

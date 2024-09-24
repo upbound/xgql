@@ -25,7 +25,7 @@ import (
 	kextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	"github.com/upbound/xgql/internal/unstructured"
 )
@@ -108,7 +108,7 @@ func TestPavedAccess_FieldPath(t *testing.T) {
 		"Success": {
 			reason: "Returns value at fieldPath.",
 			args: args{
-				fieldPath: pointer.String("metadata.name"),
+				fieldPath: ptr.To("metadata.name"),
 				object:    crd,
 			},
 			want: want{
@@ -118,7 +118,7 @@ func TestPavedAccess_FieldPath(t *testing.T) {
 		"Wildcard": {
 			reason: "Returns all values in expanded wildcard paths.",
 			args: args{
-				fieldPath: pointer.String("spec.status.conditions[*].reason"),
+				fieldPath: ptr.To("spec.status.conditions[*].reason"),
 				object:    crd,
 			},
 			want: want{
@@ -128,7 +128,7 @@ func TestPavedAccess_FieldPath(t *testing.T) {
 		"WrongPath": {
 			reason: "Returns nil.",
 			args: args{
-				fieldPath: pointer.String("bad.field.path"),
+				fieldPath: ptr.To("bad.field.path"),
 				object:    crd,
 			},
 			want: want{

@@ -24,7 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/crossplane/crossplane-runtime/pkg/errors"
@@ -322,7 +322,7 @@ func (r *query) ProviderRevisions(ctx context.Context, provider *model.Reference
 		}
 
 		// We only want the active PackageRevision, and this isn't it.
-		if pointer.BoolDeref(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
+		if ptr.Deref(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
 			continue
 		}
 
@@ -431,7 +431,7 @@ func (r *query) ConfigurationRevisions(ctx context.Context, configuration *model
 		}
 
 		// We only want the active PackageRevision, and this isn't it.
-		if pointer.BoolDeref(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
+		if ptr.Deref(active, false) && pr.Spec.DesiredState != pkgv1.PackageRevisionActive {
 			continue
 		}
 
@@ -468,7 +468,7 @@ func (r *query) CompositeResourceDefinitions(ctx context.Context, revision *mode
 		xrd := &in.Items[i]
 
 		// We only want dangling XRDs but this one is owned by a config revision.
-		if pointer.BoolDeref(dangling, false) && containsCR(xrd.GetOwnerReferences()) {
+		if ptr.Deref(dangling, false) && containsCR(xrd.GetOwnerReferences()) {
 			continue
 		}
 
@@ -510,7 +510,7 @@ func (r *query) Compositions(ctx context.Context, revision *model.ReferenceID, d
 		cmp := &in.Items[i]
 
 		// We only want dangling XRs but this one is owned by a config revision.
-		if pointer.BoolDeref(dangling, false) && containsCR(cmp.GetOwnerReferences()) {
+		if ptr.Deref(dangling, false) && containsCR(cmp.GetOwnerReferences()) {
 			continue
 		}
 

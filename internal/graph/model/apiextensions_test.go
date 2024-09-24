@@ -23,7 +23,7 @@ import (
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	extv1 "github.com/crossplane/crossplane/apis/apiextensions/v1"
@@ -110,18 +110,18 @@ func TestGetCompositeResourceDefinition(t *testing.T) {
 					Group: "group",
 					Names: CompositeResourceDefinitionNames{
 						Plural:     "clusterexamples",
-						Singular:   pointer.String("clusterexample"),
+						Singular:   ptr.To("clusterexample"),
 						ShortNames: []string{"cex"},
 						Kind:       "ClusterExample",
-						ListKind:   pointer.String("ClusterExampleList"),
+						ListKind:   ptr.To("ClusterExampleList"),
 						Categories: []string{"example"},
 					},
 					ClaimNames: &CompositeResourceDefinitionNames{
 						Plural:     "examples",
-						Singular:   pointer.String("example"),
+						Singular:   ptr.To("example"),
 						ShortNames: []string{"ex"},
 						Kind:       "Example",
-						ListKind:   pointer.String("ExampleList"),
+						ListKind:   ptr.To("ExampleList"),
 						Categories: []string{"example"},
 					},
 					Versions: []CompositeResourceDefinitionVersion{{
@@ -196,7 +196,7 @@ func TestGetComposition(t *testing.T) {
 						APIVersion: "group/v1",
 						Kind:       "ClusterExample",
 					},
-					WriteConnectionSecretsToNamespace: pointer.String("ns"),
+					WriteConnectionSecretsToNamespace: ptr.To("ns"),
 				},
 			},
 			want: Composition{
@@ -215,7 +215,7 @@ func TestGetComposition(t *testing.T) {
 						APIVersion: "group/v1",
 						Kind:       "ClusterExample",
 					},
-					WriteConnectionSecretsToNamespace: pointer.String("ns"),
+					WriteConnectionSecretsToNamespace: ptr.To("ns"),
 				},
 			},
 		},

@@ -18,7 +18,7 @@ import (
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 // ObjectMeta that is common to all Kubernetes objects.
@@ -51,10 +51,10 @@ func GetObjectMeta(m metav1.Object) ObjectMeta {
 	}
 
 	if n := m.GetGenerateName(); n != "" {
-		om.GenerateName = pointer.String(n)
+		om.GenerateName = ptr.To(n)
 	}
 	if n := m.GetNamespace(); n != "" {
-		om.Namespace = pointer.String(n)
+		om.Namespace = ptr.To(n)
 	}
 	if t := m.GetDeletionTimestamp(); t != nil {
 		om.DeletionTime = &t.Time

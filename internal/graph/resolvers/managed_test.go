@@ -97,7 +97,7 @@ func TestManagedResourceDefinition(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -114,7 +114,7 @@ func TestManagedResourceDefinition(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetCRD).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetCRD)),
 				},
 			},
 		},
@@ -134,7 +134,7 @@ func TestManagedResourceDefinition(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListCRDs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListCRDs)),
 				},
 			},
 		},
@@ -282,7 +282,7 @@ func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -301,7 +301,7 @@ func TestManagedResourceSpecConnectionSecret(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetSecret).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetSecret)),
 				},
 			},
 		},

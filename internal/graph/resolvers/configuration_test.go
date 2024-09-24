@@ -101,7 +101,7 @@ func TestConfigurationRevisions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -117,7 +117,7 @@ func TestConfigurationRevisions(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListConfigRevs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListConfigRevs)),
 				},
 			},
 		},
@@ -226,7 +226,7 @@ func TestConfigurationActiveRevision(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -242,7 +242,7 @@ func TestConfigurationActiveRevision(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errListConfigRevs).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errListConfigRevs)),
 				},
 			},
 		},
@@ -346,7 +346,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 			},
 			want: want{
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetClient).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetClient)),
 				},
 			},
 		},
@@ -407,7 +407,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 					TotalCount: 1,
 				},
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetXRD).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetXRD)),
 				},
 			},
 		},
@@ -446,7 +446,7 @@ func TestConfigurationRevisionStatusObjects(t *testing.T) {
 					TotalCount: 1,
 				},
 				errs: gqlerror.List{
-					gqlerror.Errorf(errors.Wrap(errBoom, errGetComp).Error()),
+					gqlerror.Wrap(errors.Wrap(errBoom, errGetComp)),
 				},
 			},
 		},
