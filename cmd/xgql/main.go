@@ -119,7 +119,7 @@ func main() { //nolint:gocyclo
 		agent           = app.Flag("trace-agent", "Address of the Jaeger trace agent as [host]:[port]").TCP()
 		health          = app.Flag("health", "Enable health endpoints.").Default("true").Bool()
 		healthPort      = app.Flag("health-port", "Port used for readyz and livez requests.").Default("8088").Int()
-		cacheExpiry     = app.Flag("cache-expiry", "The duration since last activity by a user until that users client expires.").Default("336h").Duration()
+		cacheExpiry     = app.Flag("cache-expiry", "The duration since last activity by a user until that users client expires.").Default("30m").Duration()
 		profiling       = app.Flag("profiling", "Enable profiling via web interface host:port/debug/pprof/.").Default("true").Bool()
 		cacheFile       = app.Flag("cache-file", "Path to the file used to persist client caches, set to reduce memory usage.").Default("").String()
 		noApolloTracing = app.Flag("disable-apollo-tracing", "Disable apollo tracing.").Bool()

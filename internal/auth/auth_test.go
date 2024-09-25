@@ -92,14 +92,14 @@ func TestCredentialsHash(t *testing.T) {
 					Extra:    map[string][]string{"coolness": {"very"}},
 				},
 			},
-			want: "3a891076971c12916e6e52149563cba9b165017460c3fb7164f07f5bb5d94f18",
+			want: "077ae566a720ee75c24fe72441962d258909a380d0f1bf9da576e88ca8f871cd",
 		},
 		"Extra": {
 			creds: Credentials{
 				BearerToken: "toke-one",
 			},
 			extra: []byte("coolness"),
-			want:  "3a9957abe9a6091449e9a1facbde080fe01a291f62e88f9276a4d39d18be8393",
+			want:  "2d0c7f73540de525665793bb7a8c970ecaaf4c8f9a08920327819803648e4006",
 		},
 	}
 
