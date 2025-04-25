@@ -112,6 +112,8 @@ func main() { //nolint:gocyclo
 		listen          = app.Flag("listen", "Address at which to listen for TLS connections. Requires TLS cert and key.").Default(":8443").String()
 		tlsCert         = app.Flag("tls-cert", "Path to the TLS certificate file used to serve TLS connections.").ExistingFile()
 		tlsKey          = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
+		tlsClientCert   = app.Flag("tls-client-cert", "Path to the TLS client certificate file used for API server connections.").ExistingFile()
+		tlsClientKey    = app.Flag("tls-client-key", "Path to the TLS client key file used for API server connections.").ExistingFile()
 		insecure        = app.Flag("listen-insecure", "Address at which to listen for insecure connections.").Default("127.0.0.1:8080").String()
 		play            = app.Flag("enable-playground", "Serve a GraphQL Playground.").Bool()
 		tracer          = app.Flag("trace-backend", "Tracer to use.").Default("jaeger").Enum("jaeger", "gcp", "stdout")
@@ -236,7 +238,9 @@ func main() { //nolint:gocyclo
 		clients.WithExpiry(*cacheExpiry),
 		clients.UseNewCacheMiddleware(camid...),
 	}
-	ca := clients.NewCache(s, clients.Anonymize(cfg), caopts...)
+	cc := clients.Anonymize(cfg)
+	clients.InjectClientTLSCredentials(cc, *tlsClientKey, *tlsClientCert)
+	ca := clients.NewCache(s, cc, caopts...)
 	h := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers.New(ca)}))
 
 	h.AddTransport(transport.Websocket{

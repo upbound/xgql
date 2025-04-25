@@ -42,7 +42,6 @@ const (
 	errNewClient        = "cannot create new write client"
 	errNewCache         = "cannot create new read cache"
 	errNewHTTPClient    = "cannot create new HTTP client"
-	errDelegClient      = "cannot create cache-backed client"
 	errWaitForCacheSync = "cannot sync client cache"
 )
 
@@ -96,6 +95,17 @@ func RESTMapper(cfg *rest.Config, httpClient *http.Client) (meta.RESTMapper, err
 // details and credentials removed.
 func Anonymize(cfg *rest.Config) *rest.Config {
 	return rest.AnonymousClientConfig(cfg)
+}
+
+// InjectClientTLSCredentials injects the specified TLS client key and
+// certificate to be used when establishing connections to the API server.
+// If either keyFile or certFile is an empty string, cfg is not modified.
+func InjectClientTLSCredentials(cfg *rest.Config, keyFile, certFile string) {
+	if len(keyFile) == 0 || len(certFile) == 0 {
+		return
+	}
+	cfg.KeyFile = keyFile
+	cfg.CertFile = certFile
 }
 
 // TODO(negz): There are a few gotchas with watch based caches. The chief issue
