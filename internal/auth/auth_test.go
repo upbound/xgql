@@ -16,6 +16,8 @@ package auth
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -182,6 +184,9 @@ func TestAuthenticatingProxyTransportRoundTrip(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Unexpected error from RoundTripper: %v", err)
 			}
+			if resp.Body != nil {
+				_ = resp.Body.Close()
+			}
 			if resp.StatusCode != http.StatusOK {
 				t.Errorf("Expected HTTP status OK, got: %v", resp.StatusCode)
 			}
@@ -338,12 +343,31 @@ func TestMiddleware(t *testing.T) {
 				ok: true,
 			},
 		},
-		"WithProxiedUserInfo": {
+		"WithProxiedUserInfoNoMTLS": {
 			r: func() *http.Request {
 				r := httptest.NewRequest("GET", "/", nil)
 				r.Header.Add(headerXRemoteUser, proxiedUser)
 				r.Header.Add(headerXRemoteGroup, proxiedGroup)
 				r.Header.Add(headerPrefixXRemoteExtra+proxiedExtraKey, proxiedExtraVal)
+				return r
+			}(),
+			want: want{
+				c: Credentials{
+					AuthenticatingProxy: AuthenticatingProxy{},
+				},
+				ok: true,
+			},
+		},
+		"WithProxiedUserInfoUsingMTLS": {
+			r: func() *http.Request {
+				r := httptest.NewRequest("GET", "/", nil)
+				r.Header.Add(headerXRemoteUser, proxiedUser)
+				r.Header.Add(headerXRemoteGroup, proxiedGroup)
+				r.Header.Add(headerPrefixXRemoteExtra+proxiedExtraKey, proxiedExtraVal)
+
+				r.TLS = &tls.ConnectionState{
+					PeerCertificates: []*x509.Certificate{{}},
+				}
 				return r
 			}(),
 			want: want{
@@ -357,7 +381,7 @@ func TestMiddleware(t *testing.T) {
 				ok: true,
 			},
 		},
-		"WithProxiedUserInfoWithImpersonation": {
+		"WithProxiedUserInfoWithImpersonationUsingMTLS": {
 			r: func() *http.Request {
 				r := httptest.NewRequest("GET", "/", nil)
 				r.Header.Add(headerXRemoteUser, proxiedUser)
@@ -368,6 +392,9 @@ func TestMiddleware(t *testing.T) {
 				r.Header.Add(headerImpersonateGroup, impGroup)
 				r.Header.Add(headerPrefixImpersonateExtra+impExtraKey, impExtraVal)
 
+				r.TLS = &tls.ConnectionState{
+					PeerCertificates: []*x509.Certificate{{}},
+				}
 				return r
 			}(),
 			want: want{
@@ -386,10 +413,14 @@ func TestMiddleware(t *testing.T) {
 				ok: true,
 			},
 		},
-		"WithProxiedUserInfoOnlyUsername": {
+		"WithProxiedUserInfoOnlyUsernameUsingMTLS": {
 			r: func() *http.Request {
 				r := httptest.NewRequest("GET", "/", nil)
 				r.Header.Add(headerXRemoteUser, proxiedUser)
+
+				r.TLS = &tls.ConnectionState{
+					PeerCertificates: []*x509.Certificate{{}},
+				}
 				return r
 			}(),
 			want: want{

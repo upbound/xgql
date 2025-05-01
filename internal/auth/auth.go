@@ -180,6 +180,11 @@ func ExtractImpersonation(r *http.Request) Impersonation {
 // ExtractAuthenticatingProxy extracts the user info from the HTTP headers set
 // by an authenticating proxy (if any).
 func ExtractAuthenticatingProxy(r *http.Request) AuthenticatingProxy {
+	// if client did not authenticate using a certificate, proxied user info
+	// will not be relayed.
+	if r.TLS == nil || len(r.TLS.PeerCertificates) == 0 {
+		return AuthenticatingProxy{}
+	}
 	extra := make(map[string][]string)
 	for k, v := range r.Header {
 		if !strings.HasPrefix(k, headerPrefixXRemoteExtra) {

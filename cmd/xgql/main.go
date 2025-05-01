@@ -16,6 +16,8 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"fmt"
 	"io"
@@ -110,6 +112,7 @@ func main() { //nolint:gocyclo
 		app             = kingpin.New(filepath.Base(os.Args[0]), "A GraphQL API for Crossplane.").DefaultEnvars()
 		debug           = app.Flag("debug", "Enable debug logging.").Short('d').Counter()
 		listen          = app.Flag("listen", "Address at which to listen for TLS connections. Requires TLS cert and key.").Default(":8443").String()
+		clientCABundle  = app.Flag("client-ca-bundle", "Path to the CA bundle that will be used to verify a client's certificate if the client sends a certificate during the TLS handshake.").ExistingFile()
 		tlsCert         = app.Flag("tls-cert", "Path to the TLS certificate file used to serve TLS connections.").ExistingFile()
 		tlsKey          = app.Flag("tls-key", "Path to the TLS key file used to serve TLS connections.").ExistingFile()
 		tlsClientCert   = app.Flag("tls-client-cert", "Path to the TLS client certificate file used for API server connections.").ExistingFile()
@@ -310,6 +313,17 @@ func main() { //nolint:gocyclo
 			ReadHeaderTimeout: 5 * time.Second,
 			ErrorLog:          stdlog.New(io.Discard, "", 0),
 		}
+		if len(*clientCABundle) > 0 {
+			p, err := getCertPool(*clientCABundle)
+			if err != nil {
+				kingpin.FatalIfError(err, "cannot initialize the client CA pool from the specified bundle %s", *clientCABundle)
+			}
+			srv.TLSConfig = &tls.Config{
+				ClientAuth: tls.VerifyClientCertIfGiven,
+				ClientCAs:  p,
+				MinVersion: tls.VersionTLS12,
+			}
+		}
 		go func() {
 			log.Debug("Listening for TLS connections", "address", *listen)
 			kingpin.FatalIfError(srv.ListenAndServeTLS(*tlsCert, *tlsKey), "cannot serve TLS HTTP")
@@ -326,6 +340,19 @@ func main() { //nolint:gocyclo
 		ErrorLog:          stdlog.New(io.Discard, "", 0),
 	}
 	kingpin.FatalIfError(srv.ListenAndServe(), "cannot serve insecure HTTP")
+}
+
+// getCertPool parses the provided CA bundle file and returns a CertPool.
+func getCertPool(caBundle string) (*x509.CertPool, error) {
+	result := x509.NewCertPool()
+	ca, err := os.ReadFile(filepath.Clean(caBundle))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read CA bundle file")
+	}
+	if !result.AppendCertsFromPEM(ca) {
+		return nil, errors.New("failed to append CA certificate to pool")
+	}
+	return result, nil
 }
 
 // startHealth starts the readyz and livez endpoints for this service.
