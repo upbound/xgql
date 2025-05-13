@@ -231,10 +231,7 @@ func (c *Cache) Get(cr auth.Credentials, o ...GetOption) (client.Client, error) 
 	c.mx.RUnlock()
 
 	if ok {
-		log.Debug("Used existing cached client",
-			"new-expiry", time.Now().Add(c.expiry),
-		)
-		sn.expiration.Reset(c.expiry)
+		log.Debug("Used existing cached client")
 		return sn.client, nil
 	}
 
