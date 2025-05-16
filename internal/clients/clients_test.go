@@ -190,3 +190,83 @@ func WithContext(ctx context.Context) CacheOption {
 		c.ctx = ctx
 	}
 }
+
+func TestInjectClientTLSCredentials(t *testing.T) {
+	type args struct {
+		cfg      *rest.Config
+		keyFile  string
+		certFile string
+	}
+
+	type want struct {
+		keyFile  string
+		certFile string
+	}
+
+	cases := map[string]struct {
+		reason string
+		args   args
+		want   want
+	}{
+		"BothEmpty": {
+			reason: "When both keyFile and certFile are empty, cfg should not be modified.",
+			args: args{
+				cfg:      &rest.Config{},
+				keyFile:  "",
+				certFile: "",
+			},
+			want: want{
+				keyFile:  "",
+				certFile: "",
+			},
+		},
+		"KeyFileEmpty": {
+			reason: "When keyFile is empty, cfg should not be modified.",
+			args: args{
+				cfg:      &rest.Config{},
+				keyFile:  "",
+				certFile: "/path/to/cert.pem",
+			},
+			want: want{
+				keyFile:  "",
+				certFile: "",
+			},
+		},
+		"CertFileEmpty": {
+			reason: "When certFile is empty, cfg should not be modified.",
+			args: args{
+				cfg:      &rest.Config{},
+				keyFile:  "/path/to/key.pem",
+				certFile: "",
+			},
+			want: want{
+				keyFile:  "",
+				certFile: "",
+			},
+		},
+		"BothSpecified": {
+			reason: "When both keyFile and certFile are specified, cfg should be modified.",
+			args: args{
+				cfg:      &rest.Config{},
+				keyFile:  "/path/to/key.pem",
+				certFile: "/path/to/cert.pem",
+			},
+			want: want{
+				keyFile:  "/path/to/key.pem",
+				certFile: "/path/to/cert.pem",
+			},
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			InjectClientTLSCredentials(tc.args.cfg, tc.args.keyFile, tc.args.certFile)
+			if diff := cmp.Diff(tc.want.keyFile, tc.args.cfg.KeyFile); diff != "" {
+				t.Errorf("\n%s\nInjectClientTLSCredentials(...): -want keyFile, +got:\n%s", tc.reason, diff)
+			}
+			if diff := cmp.Diff(tc.want.certFile, tc.args.cfg.CertFile); diff != "" {
+				t.Errorf("\n%s\nInjectClientTLSCredentials(...): -want certFile, +got:\n%s", tc.reason, diff)
+			}
+		})
+	}
+}
