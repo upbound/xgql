@@ -79,14 +79,13 @@ func Config() (*rest.Config, error) {
 // RESTMapper returns a 'REST mapper' that discovers an API server's available
 // REST API endpoints. The returned REST mapper is intended to be shared by many
 // clients. It is 'dynamic' in that it will attempt to rediscover API endpoints
-// any time a client asks for a kind of resource that is unknown to it. Each
-// discovery process may burst up to 100 API server requests per second, and
-// average 20 requests per second. Rediscovery may not happen more frequently
-// than once every 20 seconds.
+// any time a client asks for a kind of resource that is unknown to it. Client-side
+// rate limiting is disabled, relying on server-side API Priority and Fairness
+// instead. Rediscovery may not happen more frequently than once every 20 seconds.
 func RESTMapper(cfg *rest.Config, httpClient *http.Client) (meta.RESTMapper, error) {
 	dcfg := rest.CopyConfig(cfg)
-	dcfg.QPS = 50
-	dcfg.Burst = 300
+	dcfg.QPS = 0
+	dcfg.Burst = 0
 
 	return apiutil.NewDynamicRESTMapper(dcfg, httpClient)
 }
