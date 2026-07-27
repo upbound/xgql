@@ -85,8 +85,8 @@ func Config() (*rest.Config, error) {
 // than once every 20 seconds.
 func RESTMapper(cfg *rest.Config, httpClient *http.Client) (meta.RESTMapper, error) {
 	dcfg := rest.CopyConfig(cfg)
-	dcfg.QPS = 50
-	dcfg.Burst = 300
+	dcfg.QPS = 0
+	dcfg.Burst = 0
 
 	return apiutil.NewDynamicRESTMapper(dcfg, httpClient)
 }
