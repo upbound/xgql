@@ -229,6 +229,9 @@ func main() { //nolint:gocyclo
 	rm, err := clients.RESTMapper(cfg, httpClient)
 	kingpin.FatalIfError(err, "cannot create REST mapper")
 
+	ready, err := clients.Readiness(cfg, httpClient)
+	kingpin.FatalIfError(err, "cannot create readiness check")
+
 	var camid []clients.NewCacheMiddlewareFn
 	// wrap client.Cache in cache.*BBoltCache if cacheFile is specified.
 	if *cacheFile != "" {
@@ -305,7 +308,7 @@ func main() { //nolint:gocyclo
 	}
 
 	// start health endpoints to aid in routing traffic to the pod
-	kingpin.FatalIfError(startHealth(internal.HealthOptions{Health: *health, HealthPort: *healthPort}, log), "cannot start health endpoints")
+	kingpin.FatalIfError(startHealth(internal.HealthOptions{Health: *health, HealthPort: *healthPort}, log, ready), "cannot start health endpoints")
 
 	if *tlsCert != "" && *tlsKey != "" {
 		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -388,9 +391,10 @@ func getCertPool(caBundle string) (*x509.CertPool, error) {
 	return result, nil
 }
 
-// startHealth starts the readyz and livez endpoints for this service.
-func startHealth(opts internal.HealthOptions, log logging.Logger) error {
-	p, err := hprobe.Server(opts, log)
+// startHealth starts the readyz and livez endpoints for this service. readyz
+// answers 503 while any of the checks fails.
+func startHealth(opts internal.HealthOptions, log logging.Logger, checks ...hprobe.Check) error {
+	p, err := hprobe.Server(opts, log, checks...)
 
 	if err != nil {
 		return err

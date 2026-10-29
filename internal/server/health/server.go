@@ -28,14 +28,19 @@ import (
 	"github.com/upbound/xgql/internal/request"
 )
 
-// Server is a liveness and readiness server.
-func Server(opts internal.HealthOptions, log logging.Logger) (*http.Server, error) {
+// Server is a liveness and readiness server. Readiness answers 503 while any
+// of the supplied checks fails.
+func Server(opts internal.HealthOptions, log logging.Logger, checks ...Check) (*http.Server, error) {
 	r := chi.NewRouter()
 	r.Use(chimid.RedirectSlashes)
 	r.Use(chimid.RequestLogger(&request.Formatter{Log: log}))
 	r.Use(chimid.Compress(5))
 
-	h := New(WithLogger(log))
+	po := []Opt{WithLogger(log)}
+	for _, c := range checks {
+		po = append(po, WithCheck(c))
+	}
+	h := New(po...)
 
 	r.Get("/livez", h.GetLiveness)
 	r.Get("/readyz", h.GetReadiness)

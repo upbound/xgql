@@ -15,24 +15,47 @@
 package health
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
 )
+
+// readinessTimeout bounds the readiness checks, so that an API server that
+// accepts connections but never answers turns into a 503 rather than a
+// readiness request that hangs.
+var readinessTimeout = 5 * time.Second
+
+// A Check reports whether the service can do its job, for example whether it
+// can reach the API server it serves.
+type Check func(ctx context.Context) error
 
 // GetLiveness gets the servic liveness.
 func (h *Probes) GetLiveness(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// GetReadiness gets the service readiness.
+// GetReadiness gets the service readiness: 200 when every check passes, 503
+// with the first failure otherwise. Without checks it always answers 200.
 func (h *Probes) GetReadiness(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), readinessTimeout)
+	defer cancel()
+
+	for _, c := range h.checks {
+		if err := c(ctx); err != nil {
+			h.log.Debug("Readiness check failed", "error", err)
+			http.Error(w, err.Error(), http.StatusServiceUnavailable)
+			return
+		}
+	}
 	w.WriteHeader(http.StatusOK)
 }
 
 // Probes indicates the health of a service.
 type Probes struct {
-	log logging.Logger
+	log    logging.Logger
+	checks []Check
 }
 
 // Opt sets an option on the probes API.
@@ -42,6 +65,13 @@ type Opt func(p *Probes)
 func WithLogger(l logging.Logger) Opt {
 	return func(p *Probes) {
 		p.log = l
+	}
+}
+
+// WithCheck adds a readiness check.
+func WithCheck(c Check) Opt {
+	return func(p *Probes) {
+		p.checks = append(p.checks, c)
 	}
 }
 

@@ -25,6 +25,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -74,6 +75,20 @@ func Config() (*rest.Config, error) {
 	cfg.UserAgent = "xgql/" + version.Version
 
 	return cfg, nil
+}
+
+// Readiness returns a check that confirms the API server answers, using the
+// same configuration and HTTP client as the shared REST mapper. It asks for
+// the server version, which every caller may read.
+func Readiness(cfg *rest.Config, httpClient *http.Client) (func(ctx context.Context) error, error) {
+	dc, err := discovery.NewDiscoveryClientForConfigAndClient(cfg, httpClient)
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot create discovery client")
+	}
+	return func(ctx context.Context) error {
+		_, err := dc.RESTClient().Get().AbsPath("/version").Do(ctx).Raw()
+		return errors.Wrap(err, "cannot reach the API server")
+	}, nil
 }
 
 // RESTMapper returns a 'REST mapper' that discovers an API server's available
